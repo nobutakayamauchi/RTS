@@ -7,4 +7,4 @@ def rts_log(event):
         f.write("Status: ACTIVE\n")
         f.write("Integrity: VERIFIED\n\n")
 
-rts_log("Vibecode main entry executed")
+log("Vibecode main entry executed")
