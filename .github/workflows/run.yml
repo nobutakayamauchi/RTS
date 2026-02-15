@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
   # 自動実行（JST基準じゃなくUTC基準で動く）
-  # 例：30分ごとに実行
+  # 例：5分ごとに実行
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/5 * * * *"
 
   # vibecode配下が更新されたときにも走らせる（今まで通り）
   push:
