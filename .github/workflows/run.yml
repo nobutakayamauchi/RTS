@@ -2,9 +2,13 @@ name: RTS Vibecode Runner
 
 on:
   workflow_dispatch:
+
   push:
     paths:
       - 'vibecode/**'
+
+  schedule:
+    - cron: '*/15 * * * *'
 
 jobs:
   run:
@@ -14,6 +18,7 @@ jobs:
       contents: write
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -28,12 +33,14 @@ jobs:
 
       - name: Commit RTS execution and evolution logs
         run: |
-          git config --global user.name "RTS CORE"
-          git config --global user.email "rts@system.local"
+
+          git config --global user.name "RTS Core"
+          git config --global user.email "rts@autonomous.system"
 
           git add logs/EXECUTION_LOG.md || true
           git add evolution/ACTIVE_PROPOSALS.md || true
           git add evolution/PROPOSALS.md || true
 
           git commit -m "RTS autonomous execution cycle" || true
+
           git push
