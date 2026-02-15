@@ -1,100 +1,92 @@
-from __future__ import annotations
-
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
-
-# Paths
 EXECUTION_LOG = Path("logs/EXECUTION_LOG.md")
-PROPOSALS = Path("evolution/PROPOSALS.md")
 ACTIVE_PROPOSALS = Path("evolution/ACTIVE_PROPOSALS.md")
 
+def now_iso_z() -> str:
+    # e.g. 2026-02-15T21:49:38.930883Z
+    return datetime.utcnow().isoformat(timespec="microseconds") + "Z"
 
-def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
-
-
-def ensure_file(path: Path, header: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        path.write_text(header + "\n", encoding="utf-8")
-
-
-def append_md(path: Path, text: str) -> None:
+def append_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
         f.write(text)
 
-
-def log_execution(event: str, status: str = "ACTIVE", integrity: str = "VERIFIED") -> None:
-    ts = utc_now_iso()
+def log_execution(event: str, source: str = "GitHub Actions", operator: str = "RTS Core") -> None:
     block = (
-        f"\n---\n"
-        f"## {ts}\n"
+        f"\n## {now_iso_z()}\n"
         f"Event: {event}\n"
-        f"Status: {status}\n"
-        f"Integrity: {integrity}\n"
+        f"Source: {source}\n"
+        f"Operator: {operator}\n\n"
+        f"Status: ACTIVE\n"
+        f"Integrity: VERIFIED\n"
         f"---\n"
     )
-    append_md(EXECUTION_LOG, block)
+    append_text(EXECUTION_LOG, block)
 
+def has_pending_proposals() -> bool:
+    if not ACTIVE_PROPOSALS.exists():
+        return False
+    text = ACTIVE_PROPOSALS.read_text(encoding="utf-8", errors="ignore")
+    # 「PENDING」が1つでもあれば、提案は増やさない
+    return "Status: PENDING" in text
 
-def add_proposal_to_active(
-    proposal_id: str,
-    proposed_by: str,
-    change_description: str,
-    reason: str,
-    status: str = "PENDING",
-    approved_by: str = "",
-    approval_reason: str = "",
-) -> None:
-    ts = utc_now_iso()
-    block = (
-        f"\n---\n"
-        f"## Proposal ID: {proposal_id}\n"
-        f"Timestamp: {ts}\n"
-        f"Proposed by: {proposed_by}\n"
-        f"Change description: {change_description}\n"
-        f"Reason: {reason}\n"
-        f"Status: {status}\n"
-        f"Approved by: {approved_by}\n"
-        f"Approval reason: {approval_reason}\n"
-        f"---\n"
-    )
-
-    # ACTIVE_PROPOSALS に追記（現時点はテンプレ運用でOK）
-    append_md(ACTIVE_PROPOSALS, block)
-
-
-def main() -> None:
-    # Ensure base files exist
-    ensure_file(EXECUTION_LOG, "# RTS Execution Log\n")
-    ensure_file(PROPOSALS, "# RTS Evolution Proposals\n")
-    ensure_file(
-        ACTIVE_PROPOSALS,
+def ensure_active_template() -> None:
+    if ACTIVE_PROPOSALS.exists():
+        return
+    template = (
         "# RTS Active Evolution Proposals\n\n"
+        "This file contains proposals that have not yet been approved.\n\n"
         "Status definitions:\n\n"
         "PENDING  = awaiting originator decision\n"
         "APPROVED = authorized and ready to integrate\n"
         "REJECTED = denied\n\n"
-        "Only the originator may approve proposals.\n",
+        "Only the originator may approve proposals.\n\n"
+        "---\n\n"
+        "No active proposals.\n"
+    )
+    append_text(ACTIVE_PROPOSALS, template)
+
+def propose_evolution(change_description: str, reason: str, proposed_by: str = "RTS CORE") -> None:
+    proposal_id = "RTS-" + datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    proposal = (
+        "\n---\n\n"
+        f"## Proposal ID: {proposal_id}\n\n"
+        f"Timestamp: {now_iso_z()}\n"
+        f"Proposed by: {proposed_by}\n"
+        f"Change description: {change_description}\n"
+        f"Reason: {reason}\n\n"
+        "Status: PENDING\n"
+        "Approved by:\n"
+        "Approval reason:\n"
     )
 
-    # Execution cycle
+    # まだ "No active proposals." が残ってたら、消してから追記
+    if ACTIVE_PROPOSALS.exists():
+        text = ACTIVE_PROPOSALS.read_text(encoding="utf-8", errors="ignore")
+        if "No active proposals." in text:
+            text = text.replace("No active proposals.\n", "")
+            ACTIVE_PROPOSALS.write_text(text, encoding="utf-8")
+
+    append_text(ACTIVE_PROPOSALS, proposal)
+
+def main():
+    ensure_active_template()
+
     log_execution("RTS execution cycle started")
 
-    # ここは“自動で提案を1本起票する”サンプル（要らなければ後でOFFにしてOK）
-    proposal_id = "RTS-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    add_proposal_to_active(
-        proposal_id=proposal_id,
-        proposed_by="RTS CORE",
-        change_description="Log execution cycle events to RTS markdown logs",
-        reason="Ensure auditability and reproducible operational history",
-        status="PENDING",
-    )
+    if has_pending_proposals():
+        # 重要：PENDING がある間は増殖しない
+        log_execution("RTS decision: skipped proposal (pending exists)")
+    else:
+        propose_evolution(
+            change_description="Introduce RTS decision core to prevent proposal spam and enforce governance.",
+            reason="Maintain auditable evolution while avoiding uncontrolled self-evolution loops.",
+        )
+        log_execution("RTS decision: created proposal")
 
     log_execution("RTS execution cycle completed")
-
 
 if __name__ == "__main__":
     main()
