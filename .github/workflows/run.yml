@@ -10,6 +10,9 @@ jobs:
   run:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,6 +22,18 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run Vibecode
+      - name: Run RTS Core
         run: |
           python vibecode/main.py
+
+      - name: Commit RTS execution and evolution logs
+        run: |
+          git config --global user.name "RTS CORE"
+          git config --global user.email "rts@system.local"
+
+          git add logs/EXECUTION_LOG.md || true
+          git add evolution/ACTIVE_PROPOSALS.md || true
+          git add evolution/PROPOSALS.md || true
+
+          git commit -m "RTS autonomous execution cycle" || true
+          git push
