@@ -2,25 +2,22 @@ name: RTS Vibecode Runner
 
 on:
   workflow_dispatch:
-
   push:
     paths:
       - 'vibecode/**'
 
-  schedule:
-    - cron: '*/15 * * * *'
+permissions:
+  contents: write
 
 jobs:
   run:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,14 +30,16 @@ jobs:
 
       - name: Commit RTS execution and evolution logs
         run: |
-
           git config --global user.name "RTS Core"
-          git config --global user.email "rts@autonomous.system"
+          git config --global user.email "rts@autonomous.local"
 
+          # 変更があったファイルだけ add（無くても落ちない）
           git add logs/EXECUTION_LOG.md || true
           git add evolution/ACTIVE_PROPOSALS.md || true
           git add evolution/PROPOSALS.md || true
 
-          git commit -m "RTS autonomous execution cycle" || true
+          # 何も変更が無ければコミットしない（これ超重要）
+          git diff --cached --quiet && echo "No changes to commit." && exit 0
 
+          git commit -m "RTS autonomous execution cycle"
           git push
