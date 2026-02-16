@@ -1,4 +1,3 @@
-Protocol Status: ACTIVE
 Protocol: RTS — Real-Time Trust System
 Version: 1.0
 Status: ACTIVE
@@ -12,8 +11,8 @@ https://risingson2.gumroad.com/l/ukaob
 
 Professional Edition:
 https://risingson2.gumroad.com/l/sgeldp
-Protocol Class: Execution Integrity Layer
-Specification Version: 1.0
+
+---
 
 # RTS — Real-Time Trust System
 
