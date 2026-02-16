@@ -3,6 +3,9 @@
 RTS Protocol Version: 1.0
 Status: ACTIVE
 
+Official Live Protocol Site:
+https://nobutakayamauchi.github.io/RTS/
+
 Official Starter Kit (Free):
 https://risingson2.gumroad.com/l/ukaob
 
