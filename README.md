@@ -1,3 +1,7 @@
+Protocol Status: ACTIVE
+Protocol Class: Execution Integrity Layer
+Specification Version: 1.0
+
 # RTS — Real-Time Trust System
 
 RTS Protocol Version: 1.0
