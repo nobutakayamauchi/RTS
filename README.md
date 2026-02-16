@@ -23,6 +23,12 @@ Integrity: VERIFIED
 Mutation Policy: Append-only evolution  
 Replacement Policy: Prohibited  
 
+Protocol Authority Seal:
+Nobutaka Yamauchi — Original Creator and Protocol Authority
+
+This protocol definition is the canonical origin reference.
+Any derivative must acknowledge this origin.
+
 ============================
 
 Protocol: RTS — Real-Time Trust System
