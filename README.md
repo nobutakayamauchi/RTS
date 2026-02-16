@@ -17,6 +17,15 @@ https://github.com/nobutakayamauchi/RTS
 
 Distribution:
 Free Edition: https://risingson2.gumroad.com/l/ukaob  
+17  Source Repository:
+18  https://github.com/nobutakayamauchi/RTS
+
+19  Execution Log Origin:
+20  https://github.com/nobutakayamauchi/RTS/blob/main/logs/GENESIS_BLOCK.md
+
+21  Distribution:
+22  Free Edition:
+23  https://risingson2.gumroad.com/l/ukaob
 Professional Edition: https://risingson2.gumroad.com/l/sgeldp  
 
 Integrity: VERIFIED  
