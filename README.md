@@ -1,6 +1,9 @@
 Protocol: RTS — Real-Time Trust System
+
 Version: 1.0
+
 Status: ACTIVE
+
 Class: Execution Integrity Layer
 
 Official Live Protocol Site:
