@@ -1,3 +1,30 @@
+RTS PROTOCOL SIGNATURE BLOCK
+============================
+
+Protocol: RTS — Real-Time Trust System  
+Version: 1.0  
+Status: ACTIVE  
+Class: Execution Integrity Layer  
+
+Authority: Nobutaka Yamauchi  
+Origin Timestamp: 2026-02-16 JST  
+
+Protocol Site:
+https://nobutakayamauchi.github.io/RTS/
+
+Source Repository:
+https://github.com/nobutakayamauchi/RTS
+
+Distribution:
+Free Edition: https://risingson2.gumroad.com/l/ukaob  
+Professional Edition: https://risingson2.gumroad.com/l/sgeldp  
+
+Integrity: VERIFIED  
+Mutation Policy: Append-only evolution  
+Replacement Policy: Prohibited  
+
+============================
+
 Protocol: RTS — Real-Time Trust System
 
 Version: 1.0
