@@ -6,6 +6,7 @@ Specification Version: 1.0
 
 RTS Protocol Version: 1.0
 Status: ACTIVE
+Protocol Class: Execution Integrity Layer
 
 Official Live Protocol Site:
 https://nobutakayamauchi.github.io/RTS/
