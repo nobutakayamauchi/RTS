@@ -11,7 +11,8 @@ Origin Timestamp: 2026-02-16 JST
 
 Protocol Site:
 https://nobutakayamauchi.github.io/RTS/
-
+Canonical Execution Origin:
+https://github.com/nobutakayamauchi/RTS/blob/main/logs/GENESIS_BLOCK.md
 Source Repository:
 https://github.com/nobutakayamauchi/RTS
 
