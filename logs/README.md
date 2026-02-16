@@ -1,3 +1,8 @@
+RTS Execution Log Origin:
+
+GENESIS BLOCK:
+https://github.com/nobutakayamauchi/RTS/blob/main/logs/GENESIS_BLOCK.md
+
 # RTS Logs
 
 This directory contains published RTS logs.
