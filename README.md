@@ -21,9 +21,14 @@ Professional Edition: https://risingson2.gumroad.com/l/sgeldp
 
 Integrity: VERIFIED  
 Mutation Policy: Append-only evolution  
-Replacement Policy: Prohibited  
+Replacement Policy: Prohibited 
 
 Protocol Authority Seal:
+Nobutaka Yamauchi — Original Creator and Protocol Authority
+
+This protocol definition is the canonical origin reference.
+Any derivative must acknowledge this origin.
+
 Nobutaka Yamauchi — Original Creator and Protocol Authority
 
 This protocol definition is the canonical origin reference.
