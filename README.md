@@ -1,4 +1,17 @@
 Protocol Status: ACTIVE
+Protocol: RTS — Real-Time Trust System
+Version: 1.0
+Status: ACTIVE
+Class: Execution Integrity Layer
+
+Official Live Protocol Site:
+https://nobutakayamauchi.github.io/RTS/
+
+Official Starter Kit (Free):
+https://risingson2.gumroad.com/l/ukaob
+
+Professional Edition:
+https://risingson2.gumroad.com/l/sgeldp
 Protocol Class: Execution Integrity Layer
 Specification Version: 1.0
 
