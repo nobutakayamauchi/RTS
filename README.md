@@ -1,3 +1,12 @@
+# RTS — Real-Time Trust System
+
+Official Starter Kit (Free):
+https://risingson2.gumroad.com/l/ukaob
+
+Professional Edition:
+https://risingson2.gumroad.com/l/sgeldp
+
+---
 # Real-Time Trust System (RTS)
 
 Real-Time Trust System (RTS) is a framework for **recording decisions, not enforcing conclusions**.
