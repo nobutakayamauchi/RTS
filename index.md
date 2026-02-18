@@ -20,3 +20,7 @@ Action logs are being recorded publicly.
   https://github.com/nobutakayamauchi/RTS
 - Action Logs:
   https://github.com/nobutakayamauchi/RTS/tree/main/logs/action
+
+  ## Applied Models
+
+- RTS Miyako (Local Governance Decision Model) – v1 structured (see logs/BLOCK_00000010_RTS_MIYAKO_DECISION-FRAMEWORK_v1)
