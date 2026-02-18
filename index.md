@@ -23,10 +23,8 @@ Action logs are being recorded publicly.
 
   ## Applied Models
 
-## Applied Models
 
 ## Applied Models
 
 - RTS Miyako (Local Governance Decision Model) – v1 structured  
-  → [BLOCK_00000010_RTS-MIYAKO_DECISION-FRAMEWORK_v1](./logs/BLOCK_00000010_RTS-MIYAKO_DECISION-FRAMEWORK_v1.md)
-
+  → [BLOCK_00000010 – AI Assetization Confirmed](https://github.com/nobutakayamauchi/RTS/blob/main/logs/BLOCK_00000010%20%E2%80%93%20AI%20Assetization%20Confirmed)
