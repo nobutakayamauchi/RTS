@@ -23,4 +23,7 @@ Action logs are being recorded publicly.
 
   ## Applied Models
 
-- RTS Miyako (Local Governance Decision Model) – v1 structured (see logs/BLOCK_00000010_RTS_MIYAKO_DECISION-FRAMEWORK_v1)
+## Applied Models
+
+- RTS Miyako (Local Governance Decision Model) – v1 structured  
+  → [BLOCK_00000010_RTS_MIYAKO_DECISION-FRAMEWORK_v1](logs/BLOCK_00000010_RTS_MIYAKO_DECISION-FRAMEWORK_v1.md)
