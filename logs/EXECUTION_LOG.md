@@ -1483,3 +1483,54 @@ Operator: RTS Core
 Status: ACTIVE
 Integrity: VERIFIED
 ---
+
+# EXECUTION_LOG — 2026-02-20 (JST)
+
+## EXECUTION_NODE: RTS_GOVERNANCE / AUTO-CUT GOVERNOR DEPLOYMENT
+
+### STATUS
+CONFIRMED / DEPLOYED (RULESET ADDED + COMMITTED)
+
+### DATE
+2026-02-20 (JST)
+
+### OPERATOR
+Nobutaka Yamauchi
+
+### CONTEXT
+- RTS運用中に「ログを切らずにログが増えている」状態の理解が曖昧だったため、
+  運用を強制せず「促す」ガバナンス層を先に実装し、手動判断を残したまま自動化を開始した。
+- 目的：
+  1) ブロック切り忘れ防止（AUTO-CUT）
+  2) 作業過多の抑制（Safety）
+  3) 次のBLOCK番号付与の補助（Draft + Suggestion）
+
+### ACTIONS
+- Added: RTS_AUTO-CUT_GOVERNOR (Operational Rule)
+  - CUT条件（any triggers）
+    - Event Score >= 6
+    - Conversation Turns >= 10
+    - Elapsed Work Time >= 75 minutes
+  - Event Score definition
+    - External action: +2
+    - Decision made: +2
+    - GitHub commit / file edit: +1
+    - Error → fix loop: +1
+    - New feature added: +2
+  - User Response protocol
+    - "CUT" → generate BLOCK draft + numbering suggestion
+    - "SKIP" → continue session, postpone logging
+    - "LATER(30)" → postpone prompt for 30 minutes equivalent
+  - Safety
+    - workload score >= 4 → recommend logging + stopping heavy tasks
+
+### OUTPUTS
+- File added/updated: RTS_GOVERNANCE.md (AUTO-CUT GOVERNOR ruleset)
+
+### RISKS / NOTES
+- ガバナンスは「強制」ではなく「提案」に留める（運用崩壊を防ぐ）。
+- しきい値は暫定。運用データにより調整予定。
+
+### NEXT
+- Implement: RTS_EVOLUTION_ENGINE (self-improvement trigger rules)
+- Implement: AUTO-CUT minimal runtime (manual triggers + scoring)
