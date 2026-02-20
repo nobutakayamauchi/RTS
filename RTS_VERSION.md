@@ -39,4 +39,4 @@ Nobutaka Yamauchi
 RTS becomes operational through execution history.
 
 ---
-Genesis Complete.
+Genesis Complete
