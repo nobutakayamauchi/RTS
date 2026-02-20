@@ -43,3 +43,52 @@ Operator retains final authority.
 
 Operator: RTS Core
 Status: ACTIVE
+
+---
+
+## RUNTIME SCORING SYSTEM
+
+RTS evaluates workload and execution density using proxy signals.
+
+### EVENT SCORE
+
+External action detected (GitHub / Stripe / Submission): +2  
+Decision commitment detected: +2  
+GitHub commit or file edit: +1  
+Repeated correction loop: +1  
+New feature implementation: +2
+
+### WORKLOAD SCORE
+
+Conversation turns >=10 : +1  
+Elapsed work time >=75 minutes : +1  
+Multiple BLOCK edits within session : +1  
+Operator excitement or stress signals detected : +1
+
+---
+
+## CUT PROMPT CONDITION
+
+RTS suggests BLOCK logging when ANY condition is met:
+
+Event Score >=6
+
+OR
+
+Workload Score >=4
+
+---
+
+## PROMPT OUTPUT
+
+RTS sends recommendation message:
+
+"RTS suggests BLOCK logging.
+CUT / SKIP / LATER(30)"
+
+Human operator decides execution.
+
+---
+
+Operator: RTS Core  
+Runtime Status: ACTIVE
