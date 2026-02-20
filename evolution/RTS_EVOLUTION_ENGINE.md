@@ -85,3 +85,26 @@ RTS recommends BLOCK logging and rest.
 
 Operator: RTS Core
 Status: ACTIVE
+
+---
+
+## SUCCESS PATTERN DETECTION
+
+RTS analyzes successful execution patterns.
+
+Success signals include:
+
+- Approved proposals repeatedly adopted
+- Reduced workload after change
+- Stable execution cycles without overload
+- External execution success (publish / deploy / submission)
+
+RTS may recommend:
+
+- Converting proposal into governance rule
+- Updating AUTO-CUT thresholds
+- Workflow simplification.
+
+Human operator approves adoption.
+
+---
