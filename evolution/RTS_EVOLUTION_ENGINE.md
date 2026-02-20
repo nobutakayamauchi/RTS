@@ -102,9 +102,32 @@ Success signals include:
 RTS may recommend:
 
 - Converting proposal into governance rule
-- Updating AUTO-CUT thresholds
+- Updating AUTO-CUT thresholdsぬ
 - Workflow simplification.
 
 Human operator approves adoption.
 
 ---
+
+---
+
+# SUCCESS PATTERN INPUT
+
+RTS analyzes successful execution patterns recorded in:
+
+logs/SUCCESS_LOG.md
+
+Signals include:
+
+- Repeated approved evolution proposals
+- Reduced workload score trends
+- Stable BLOCK execution continuity
+- External deployment or publication success
+
+RTS may recommend:
+
+- Converting successful proposals into governance rules
+- AUTO-CUT threshold adjustment
+- Workflow simplification adoption
+
+Human operator approves adoption.
