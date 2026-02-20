@@ -25,9 +25,11 @@ RTS reads:
 - RESULT_LOG.md
 - EXECUTION_LOG.md
 - REFLECTION_LOG.md
+- MEMORY_INDEX.md 
 - BLOCK logs
-- GitHub commits (optional)
+- GitHub commits
 - External execution events (publish / deploy / submission)
+- 
 
 ---
 
