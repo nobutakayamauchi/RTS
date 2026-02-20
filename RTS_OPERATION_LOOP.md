@@ -1,5 +1,6 @@
 # RTS OPERATION LOOP
 (Execution Cycle Orchestration)
+(Core Continuous Execution Cycle)
 
 ## PURPOSE
 Define the daily/continuous execution loop of RTS.
