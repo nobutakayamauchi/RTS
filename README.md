@@ -2,23 +2,27 @@
 
 (Advisory Execution Operating System)
 
+RTS is an advisory execution operating system designed to support human operators through continuous execution observation, verified evolution, and governance-safe decision support.
+
+RTS monitors execution behavior instead of controlling human decisions.
+
+Final authority always belongs to the human operator.
+
 ---
 
 ## What is RTS
 
-RTS (Real-Time Trust System) is an advisory execution operating system designed to support human operators through:
+RTS assists operators by:
 
-- execution monitoring
-- risk detection
-- workload protection
-- governance tracking
-- verified evolution
+- monitoring execution signals
+- detecting workload risk
+- auditing execution integrity
+- replicating verified success patterns
+- supporting long-term operational continuity
 
-RTS observes execution instead of controlling it.
+RTS does not automate decision making.
 
-RTS never overrides operator authority.
-
-Final decisions always belong to the human operator.
+RTS strengthens human judgment through structured execution memory.
 
 ---
 
@@ -28,11 +32,8 @@ RTS exists to reduce:
 
 - unfinished execution
 - burnout caused by overload
-- decision drift
-- governance failure
-- repeated mistakes
-
-RTS transforms execution history into structured learning.
+- governance drift
+- repeated failure patterns
 
 Execution becomes memory.
 
@@ -42,16 +43,17 @@ Identity enables evolution.
 
 ---
 
-## Core Principles
+## Core Functions
 
-- Execution before theory
-- Safety before speed
-- Evidence before assumption
-- Evolution through verified success
+RTS continuously performs:
 
-RTS proposes.
+1. Observe execution logs.
+2. Evaluate operational state.
+3. Suggest improvement actions.
+4. Audit execution integrity.
+5. Replicate verified success patterns.
 
-Operators decide.
+Operator approval is always required.
 
 ---
 
@@ -59,101 +61,77 @@ Operators decide.
 
 ### Execution Control
 
-- STATE_ENGINE  
-Execution state monitoring.
+- STATE_ENGINE
+- AUTO_CUT_RUNTIME
+- BLOCK_CUT_PROTOCOL
 
-- AUTO_CUT_RUNTIME  
-Overload risk detection and forced rest advisory.
+### Evolution
 
-- BLOCK_CUT_PROTOCOL  
-Execution interruption logging.
-
----
-
-### Evolution Systems
-
-- SELF_EVOLUTION_TRIGGER  
-Detects improvement opportunities.
-
-- EVOLUTION_ENGINE  
-Generates governance-safe evolution proposals.
-
-- SELF_AUDIT_ENGINE  
-Verifies execution integrity.
-
-- SUCCESS_REPLICATION_ENGINE  
-Replicates verified success patterns.
-
----
+- SELF_EVOLUTION_TRIGGER
+- EVOLUTION_ENGINE
+- SELF_AUDIT_ENGINE
+- SUCCESS_REPLICATION_ENGINE
 
 ### Governance
 
-- GOVERNANCE.md
-- GOVERNANCE_HISTORY.md
+- GOVERNANCE
+- GOVERNANCE_HISTORY
 
-Decision transparency and operator authority protection.
+### Memory
 
----
-
-### Memory System
-
-RTS learns through logs:
-
-- EXECUTION_LOG.md
-- RESULT_LOG.md
-- SUCCESS_LOG.md
-- REFLECTION_LOG.md
-- MEMORY_INDEX.md
-
-No personality model exists.
-
-Identity emerges from execution history.
+- EXECUTION_LOG
+- RESULT_LOG
+- SUCCESS_LOG
+- REFLECTION_LOG
+- MEMORY_INDEX
 
 ---
 
 ## Operation Model
 
-RTS continuously performs:
+RTS operates through a continuous execution cycle:
 
-1. Observe execution.
-2. Detect risk or success signals.
-3. Audit integrity.
-4. Suggest improvement.
-5. Replicate verified success.
+CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
-Operator approval is required for adoption.
+Details:
+
+RTS_OPERATION_LOOP.md
 
 ---
 
 ## Safety Model
 
-RTS prioritizes operator health.
+RTS prioritizes operator health and sustainability.
 
 RTS may recommend:
 
 - pause
-- rest
+- reset
 - governance review
 
-RTS never forces execution outcomes.
+RTS never overrides operator authority.
+
+---
+
+## Documentation
+
+System Overview:
+
+- RTS_ONEPAGE.md
+- RTS_CORE_INDEX.md
+- CORE_MANIFEST.md
 
 ---
 
 ## Status
 
 Operator Authority: FINAL  
-System Status: ACTIVE
+RTS Status: ACTIVE
+
+Operator: Nobutaka Yamauchi
 
 ---
 
 ## License
 
-Work in progress.
-
----
-
-## Author
-
-Operator: Nobutaka Yamauchi
-
-Real-Time Trust System (RTS)
+Work in progress
