@@ -66,3 +66,15 @@ Success pattern detection
 
 Operator: RTS Core
 Memory Index Status: ACTIVE
+
+---
+
+## DAILY LOG SYSTEM
+
+- DAILY_LOG.md → ./logs/RTS_DAILY_OPERATION.md
+
+Purpose:
+Daily operational tracking and execution continuity.
+
+Status:
+ACTIVE
