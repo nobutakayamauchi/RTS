@@ -120,6 +120,7 @@ System Overview:
 - RTS_ONEPAGE.md
 - RTS_CORE_INDEX.md
 - CORE_MANIFEST.md
+- logs/MAIN_LOG.md
 
 ---
 
