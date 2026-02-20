@@ -136,3 +136,15 @@ Operator: Nobutaka Yamauchi
 ## License
 
 Work in progress
+
+---
+
+## System Entry
+
+RTS operational history begins here:
+
+- MAIN_LOG.md
+
+Execution authority belongs to the operator.
+
+RTS Status: ACTIVE
