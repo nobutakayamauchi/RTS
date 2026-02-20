@@ -6,78 +6,115 @@
 
 ## PURPOSE
 
-RTS analyzes successful execution patterns and recommends replication or system adoption.
+RTS detects verified success patterns and converts them into
+repeatable execution templates.
 
-RTS does not auto-execute replication.
+RTS does not assume success by declaration.
+
+RTS verifies success via logs and audit linkage.
+
 Human operator retains final authority.
 
 ---
 
-## SUCCESS SOURCE INPUT
+## INPUT SOURCES
 
-RTS reads success signals from:
+RTS reads:
 
 - SUCCESS_LOG.md
 - RESULT_LOG.md
 - EXECUTION_LOG.md
+- REFLECTION_LOG.md
 - BLOCK logs
-- External execution events
+- GitHub commits (optional)
+- External execution events (publish / deploy / submission)
 
 ---
 
-## SUCCESS SIGNAL CONDITIONS
+## VERIFIED SUCCESS CONDITIONS
 
-RTS detects success patterns when:
+A success is "VERIFIED" only if:
 
-- Approved evolution proposals repeatedly adopted
-- Reduced workload score after execution
-- Stable BLOCK execution cycles detected
-- External success (publish / deploy / submission)
-- Positive operator reflection signals
+- SUCCESS_LOG entry exists
+AND
+- RESULT_LOG contains measurable output or completion note
+AND
+- EXECUTION_LOG shows corresponding execution trail
+AND
+- SELF AUDIT ENGINE returns NORMAL or WARNING (not RISK/CRITICAL)
 
-Repeated pattern >=3 considered stable success.
-
----
-
-## ANALYSIS PROCESS
-
-RTS evaluates:
-
-- Execution duration
-- Operator workload change
-- Failure reduction
-- External outcome success
-- Momentum continuity
-
-RTS extracts repeatable workflow structures.
+If audit fails → success is marked as "UNVERIFIED" and not replicated.
 
 ---
 
-## REPLICATION PROPOSAL TYPES
+## SUCCESS PATTERN CARD FORMAT
 
-### SYSTEM
+When success is VERIFIED, RTS extracts a Pattern Card:
 
-- workflow template recommendation
-- governance conversion suggestion
-- automation rule addition
+### PATTERN CARD
 
-### EXECUTION
-
-- BLOCK template reuse suggestion
-- similar task replication proposal
-- timing optimization
+- Name:
+- Context:
+- Trigger:
+- Core Actions (3-7 steps):
+- Tools/Assets used:
+- Time window:
+- Workload range:
+- Failure risks observed:
+- Recovery step:
+- Result gained:
+- Confidence score (1-5):
 
 ---
 
-## OUTPUT LOCATION
+## PATTERN EXTRACTION SIGNALS
 
-Replication proposals recorded in:
+RTS extracts patterns when ANY is met:
 
-/evolution/ACTIVE_PROPOSALS.md
+- Verified success repeats 2+ times
+- Workload decreases after stable execution cycle
+- External execution success detected (publish / deploy / submission)
+- Approved proposal adoption results in improved stability
 
-Approved replication rules move to:
+---
 
-/evolution/PROPOSALS.md
+## CONFIDENCE SCORING
+
+Confidence Score increases when:
+
+- Verified success repeats (+2)
+- Workload decreases after change (+1)
+- Stall/overload reduced (+1)
+- Output is externally visible (+2)
+
+Confidence >=4 → Eligible for replication injection
+
+---
+
+## REPLICATION OUTPUT TYPES
+
+RTS may output:
+
+### A) EXECUTION TEMPLATE
+A repeatable block template to reuse.
+
+### B) GOVERNANCE UPDATE
+Rules adjustment based on proven safe success patterns.
+
+### C) AUTO-CUT THRESHOLD UPDATE
+Adjust trigger thresholds if it improved flow.
+
+### D) PROPOSAL UPDATE
+Convert pattern into a reusable proposal in PROPOSALS.md
+
+---
+
+## OUTPUT LOCATIONS
+
+- evolution/PROPOSALS.md  (approved patterns converted to proposals)
+- evolution/ACTIVE_PROPOSALS.md (candidate patterns pending approval)
+- logs/SUCCESS_LOG.md (source of truth)
+- logs/EXECUTION_LOG.md and RESULT_LOG.md (verification base)
 
 ---
 
@@ -85,43 +122,20 @@ Approved replication rules move to:
 
 Operator chooses:
 
-APPROVE → replication rule added
-
-REJECT → archive reasoning
-
-LATER → retry after next BLOCK
+- ADOPT → replicate pattern into next BLOCK
+- HOLD → keep in ACTIVE_PROPOSALS for review
+- REJECT → archive with reason
 
 ---
 
 ## SAFETY RULE
 
-RTS prioritizes operator health.
+Replication must never increase operator overload.
 
-If overload risk detected:
+If Workload Score >=4:
 
-RTS delays replication proposal.
+RTS recommends rest or simplified replication only.
 
----
+Operator authority retained.
 
-## ENGINE EXECUTION TRIGGER
-
-RTS evaluates replication when ANY condition is met:
-
-- SUCCESS_LOG.md updated
-- RESULT_LOG.md updated
-- External execution success detected
-- STATE ENGINE reports MOMENTUM state
-- Operator manual request
-
-Minimum interval:
-
-Every 60 minutes equivalent execution time.
-
-Command:
-
-REPLICATE CHECK → Force evaluation.
-
----
-
-Operator: RTS Core  
-System Status: ACTIVE
+Operator: RTS Core Status ACTIVE
