@@ -1,189 +1,159 @@
-RTS PROTOCOL SIGNATURE BLOCK
-============================
-
-Protocol: RTS — Real-Time Trust System  
-Version: 1.0  
-Status: ACTIVE  
-Class: Execution Integrity Layer  
-
-Authority: Nobutaka Yamauchi  
-Origin Timestamp: 2026-02-16 JST  
-
-Protocol Site:
-https://nobutakayamauchi.github.io/RTS/
-Canonical Execution Origin:
-https://github.com/nobutakayamauchi/RTS/blob/main/logs/GENESIS_BLOCK.md
-Source Repository:
-https://github.com/nobutakayamauchi/RTS
-
-Distribution:
-Free Edition: https://risingson2.gumroad.com/l/ukaob  
-17  Source Repository:
-18  https://github.com/nobutakayamauchi/RTS
-
-19  Execution Log Origin:
-20  https://github.com/nobutakayamauchi/RTS/blob/main/logs/GENESIS_BLOCK.md
-
-21  Distribution:
-22  Free Edition:
-23  https://risingson2.gumroad.com/l/ukaob
-Professional Edition: https://risingson2.gumroad.com/l/sgeldp  
-
-Integrity: VERIFIED  
-Mutation Policy: Append-only evolution  
-Replacement Policy: Prohibited 
-
-Protocol Authority Seal:
-Nobutaka Yamauchi — Original Creator and Protocol Authority
-
-This protocol definition is the canonical origin reference.
-Any derivative must acknowledge this origin.
-
-Nobutaka Yamauchi — Original Creator and Protocol Authority
-
-This protocol definition is the canonical origin reference.
-Any derivative must acknowledge this origin.
-
-============================
-
-Protocol: RTS — Real-Time Trust System
-
-Version: 1.0
-
-Status: ACTIVE
-
-Class: Execution Integrity Layer
-
-Official Live Protocol Site:
-https://nobutakayamauchi.github.io/RTS/
-
-Official Starter Kit (Free):
-https://risingson2.gumroad.com/l/ukaob
-
-Professional Edition:
-https://risingson2.gumroad.com/l/sgeldp
-
----
-
 # RTS — Real-Time Trust System
 
-RTS Protocol Version: 1.0
-Status: ACTIVE
-Protocol Class: Execution Integrity Layer
-
-Official Live Protocol Site:
-https://nobutakayamauchi.github.io/RTS/
-
-Official Starter Kit (Free):
-https://risingson2.gumroad.com/l/ukaob
-
-Professional Edition:
-https://risingson2.gumroad.com/l/sgeldp
+(Advisory Execution Operating System)
 
 ---
 
-# Real-Time Trust System (RTS)
+## What is RTS
 
-Real-Time Trust System (RTS) is a framework for **recording decisions, not enforcing conclusions**.
+RTS (Real-Time Trust System) is an advisory execution operating system designed to support human operators through:
 
-RTS does not define what is right.
-RTS does not decide outcomes.
-RTS exists to preserve **how decisions were made**, under what assumptions, with what information, and at what cost.
+- execution monitoring
+- risk detection
+- workload protection
+- governance tracking
+- verified evolution
+
+RTS observes execution instead of controlling it.
+
+RTS never overrides operator authority.
+
+Final decisions always belong to the human operator.
 
 ---
 
 ## Purpose
 
-RTS was created to:
-- Record **Do / No-Do decisions** under a common, inspectable structure
-- Preserve assumptions, constraints, and uncertainties at the time of decision
-- Enable third-party verification *after the fact*
-- Prevent the rewriting of history through selective memory
+RTS exists to reduce:
 
-RTS is a tool for accountability, not control.
+- unfinished execution
+- burnout caused by overload
+- decision drift
+- governance failure
+- repeated mistakes
 
----
+RTS transforms execution history into structured learning.
 
-## What RTS Does / Does Not Do
+Execution becomes memory.
 
-### RTS DOES:
-- Record decisions in time sequence
-- Preserve assumptions, estimates, and known risks
-- Record costs, impacts, and uncertainties
-- Accept criticism, counter-evidence, and later correction as logs
+Memory becomes identity.
 
-### RTS DOES NOT:
-- Score morality or correctness
-- Enforce judgments or penalties
-- Optimize outcomes through numerical weighting
-- Track private lives, thoughts, or personal location data
+Identity enables evolution.
 
 ---
 
-## Core Log Categories
+## Core Principles
 
-RTS operates through structured logs:
+- Execution before theory
+- Safety before speed
+- Evidence before assumption
+- Evolution through verified success
 
-1. **Decision Log**  
-   Who decided what, when, and based on which information.
+RTS proposes.
 
-2. **Cost & Financial Log**  
-   Initial cost, operational cost, future liabilities — estimates and actuals.
-
-3. **Impact & Safety Log**  
-   Environmental, social, safety, and risk impacts.
-
-4. **Information Environment Log**  
-   Sources used for decisions and their credibility at the time.
+Operators decide.
 
 ---
 
-## Handling of Numbers
+## Core Systems
 
-- Early-stage figures must be expressed as **ranges**, not fixed values.
-- Each number is tagged with confidence level: Low / Medium / High.
-- Later corrections do not erase past values; differences are appended.
-- Once recorded, values are never overwritten.
+### Execution Control
 
----
+- STATE_ENGINE  
+Execution state monitoring.
 
-## Participation, Review, and Approval
+- AUTO_CUT_RUNTIME  
+Overload risk detection and forced rest advisory.
 
-- Anyone may observe and verify logs.
-- Approval requires **at least two real-name signatories**.
-- Approvers rotate to prevent concentration of authority.
-- Even after approval, objections and audits may be logged.
+- BLOCK_CUT_PROTOCOL  
+Execution interruption logging.
 
 ---
 
-## Governance
+### Evolution Systems
 
-RTS has a single originator who publishes the initial charter.
-However, the originator **does not possess exclusive authority** over approval, operation, or judgment.
+- SELF_EVOLUTION_TRIGGER  
+Detects improvement opportunities.
 
-RTS is designed to survive its creator.
+- EVOLUTION_ENGINE  
+Generates governance-safe evolution proposals.
 
----
+- SELF_AUDIT_ENGINE  
+Verifies execution integrity.
 
-## Freeze Clause
-
-This document is frozen as version 1.0.
-
-No modification, deletion, or revision of this text shall occur.
-Interpretation and operational guidance may be added through
-supplementary documents and live logs, which do not alter this charter.
+- SUCCESS_REPLICATION_ENGINE  
+Replicates verified success patterns.
 
 ---
 
-## Positioning
+### Governance
 
-RTS does not support any ideology or predetermined conclusion.
+- GOVERNANCE.md
+- GOVERNANCE_HISTORY.md
 
-Through real-world application, RTS aims to establish a
-transparent, verifiable model of decision-making
-that can be examined long after decisions are made.
+Decision transparency and operator authority protection.
 
 ---
 
-*RTS records how humans chose —  
-and lets the world decide what that choice meant.*
+### Memory System
+
+RTS learns through logs:
+
+- EXECUTION_LOG.md
+- RESULT_LOG.md
+- SUCCESS_LOG.md
+- REFLECTION_LOG.md
+- MEMORY_INDEX.md
+
+No personality model exists.
+
+Identity emerges from execution history.
+
+---
+
+## Operation Model
+
+RTS continuously performs:
+
+1. Observe execution.
+2. Detect risk or success signals.
+3. Audit integrity.
+4. Suggest improvement.
+5. Replicate verified success.
+
+Operator approval is required for adoption.
+
+---
+
+## Safety Model
+
+RTS prioritizes operator health.
+
+RTS may recommend:
+
+- pause
+- rest
+- governance review
+
+RTS never forces execution outcomes.
+
+---
+
+## Status
+
+Operator Authority: FINAL  
+System Status: ACTIVE
+
+---
+
+## License
+
+Work in progress.
+
+---
+
+## Author
+
+Operator: Nobutaka Yamauchi
+
+Real-Time Trust System (RTS)
