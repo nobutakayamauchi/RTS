@@ -131,3 +131,23 @@ RTS may recommend:
 - Workflow simplification adoption
 
 Human operator approves adoption.
+
+---
+
+## ENGINE EXECUTION TRIGGER
+
+RTS evaluates evolution proposals when ANY condition is met:
+
+- STATE ENGINE reports STALL state
+- Repeated BLOCK context detected >=3
+- RESULT_LOG.md updated
+- SUCCESS_LOG.md updated
+- External execution detected (publish / deploy / submission)
+- Operator manual request
+
+Minimum interval:
+Every 60 minutes equivalent session time.
+
+Command:
+
+EVOLVE CHECK → Force proposal evaluation.
