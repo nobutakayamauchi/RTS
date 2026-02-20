@@ -151,3 +151,5 @@ Every 60 minutes equivalent session time.
 Command:
 
 EVOLVE CHECK → Force proposal evaluation.
+
+Emergency override allowed during STALL state.
