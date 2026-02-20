@@ -1,3 +1,84 @@
+RTS — Stop Losing Your Thinking.
+
+Most AI users lose their best ideas every day.
+RTS exists so thinking itself becomes an asset.
+
+RTS (Real-Time Trust System) is an experimental framework that turns AI collaboration into a persistent, version-controlled intellectual operating system.
+
+Instead of restarting from zero every conversation, RTS records reasoning, decisions, research context, execution history, and evolution paths as structured logs.
+
+AI thinking becomes reproducible.
+
+⸻
+
+Why RTS Exists
+
+Modern AI workflows suffer from memory loss.
+
+Ideas disappear.
+Strategy fragments.
+Execution resets.
+
+RTS treats cognition as infrastructure.
+
+⸻
+
+Core Concept
+
+RTS records:
+	•	Strategic Decisions
+	•	Research Reasoning
+	•	Execution Logs
+	•	Evolution Experiments
+	•	AI Collaboration Processes
+
+All version controlled through GitHub.
+
+⸻
+
+Current Capabilities
+	•	BLOCK structured logging protocol
+	•	Git-based knowledge persistence
+	•	Evolution Engine (self improvement proposals)
+	•	Self Audit Engine (workload monitoring)
+	•	Research OS prototype
+	•	Revenue execution experimentation
+
+This repository is a live operational environment.
+
+⸻
+
+Who This Is For
+	•	AI builders
+	•	Independent researchers
+	•	founders
+	•	AI-native operators
+	•	knowledge workers building long-term systems
+
+⸻
+
+Status
+
+Experimental — actively evolving in public.
+
+Built and operated through real execution history.
+
+⸻
+
+Operator
+
+Nobutaka Yamauchi
+
+⸻
+
+⭐ If this concept interests you, consider starring the repository.
+
+⸻
+
+🇯🇵 Japanese Documentation Below
+
+(The original RTS operational documentation continues below.)
+
 # RTS — Real-Time Trust System
 
 (Advisory Execution Operating System)
