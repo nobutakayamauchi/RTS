@@ -113,3 +113,28 @@ RTS Core
 
 State Engine Status:
 ACTIVE
+
+---
+
+## EVALUATION TRIGGER
+
+RTS evaluates operator state when ANY condition occurs:
+
+- New BLOCK committed
+- EXECUTION_LOG.md updated
+- RESULT_LOG.md updated
+- External execution detected
+- Conversation session exceeds 10 turns
+- AUTO-CUT runtime triggered
+
+Evaluation frequency:
+
+Minimum interval: every 15 minutes equivalent session time.
+
+Operator may manually request evaluation.
+
+Command:
+
+STATE CHECK → Force evaluation.
+
+---
