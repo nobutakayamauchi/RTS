@@ -232,3 +232,18 @@ Operator retains final decision authority.
 
 Operator: RTS Core
 Loop Status: ACTIVE
+
+---
+
+## DAILY EXECUTION LINK
+
+RTS references daily operational records:
+
+- ./logs/RTS_DAILY_OPERATION.md
+
+Daily execution provides continuous state signal input.
+
+Operator records execution status through DAILY LOOP.
+
+Status:
+ACTIVE
