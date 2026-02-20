@@ -22,7 +22,7 @@ Human operator retains final decision.
 - Execution before theory.
 - Safety before speed.
 - Evidence before assumption.
-- Evolution through verified success.
+  Evolution through verified success.
 
 ---
 
@@ -39,7 +39,8 @@ BLOCK_CUT_PROTOCOL
 SELF_EVOLUTION_TRIGGER  
 EVOLUTION_ENGINE  
 SELF_AUDIT_ENGINE  
-SUCCESS_REPLICATION_ENGINE  
+SUCCESS_REPLICATION_ENGINE
+RTS_OPERATION_LOOP
 
 ---
 
