@@ -77,6 +77,15 @@ RTS logs are designed as historical execution evidence.
 Forks are permitted.
 
 Misrepresentation is not.
+Trademark & Naming Notice
+
+“RTS — Real Time Trust System” is a project identity publicly associated with its original creator.
+
+Derivative works, forks, or modified distributions may not present themselves as the official RTS project or imply endorsement without explicit permission from the creator.
+
+Use of the RTS name in commercial branding or product marketing requires separate authorization.
+
+This notice protects project identity while allowing open technical collaboration.
 
 License
 
