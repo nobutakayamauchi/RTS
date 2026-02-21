@@ -1,231 +1,107 @@
-RTS — Stop Losing Your Thinking.
+RTS — Real Time Trust System
 
-Most AI users lose their best ideas every day.
-RTS exists so thinking itself becomes an asset.
+Origin
 
-RTS (Real-Time Trust System) is an experimental framework that turns AI collaboration into a persistent, version-controlled intellectual operating system.
+Creator: Nobutaka YamauchiInitial Public Release: 2026
 
-Instead of restarting from zero every conversation, RTS records reasoning, decisions, research context, execution history, and evolution paths as structured logs.
+RTS (Real Time Trust System) is a decision-logging operating system designed to preserve reasoning continuity inside AI workflows.
 
-AI thinking becomes reproducible.
+RTS transforms temporary AI conversations into persistent, version-controlled operational memory.
 
-⸻
+Authorship & Provenance Notice
 
-Why RTS Exists
+RTS is an original framework concept created and publicly operated by the creator listed above.
 
-Modern AI workflows suffer from memory loss.
+The following elements function as provenance evidence:
 
-Ideas disappear.
-Strategy fragments.
-Execution resets.
+Git commit history
+
+BLOCK structured execution logs
+
+Repository timestamps
+
+Governance documents
+
+These records collectively establish historical authorship continuity.
+
+Forks and derivative works must retain attribution.
+
+Core Philosophy
+
+Modern AI workflows suffer from:
+
+memory loss
+
+reasoning fragmentation
+
+execution discontinuity
 
 RTS treats cognition as infrastructure.
 
-⸻
+Instead of restarting from zero each session, RTS records:
 
-Core Concept
+reasoning decisions
 
-RTS records:
-	•	Strategic Decisions
-	•	Research Reasoning
-	•	Execution Logs
-	•	Evolution Experiments
-	•	AI Collaboration Processes
+execution context
 
-All version controlled through GitHub.
+research paths
 
-⸻
+operational outcomes
 
-Current Capabilities
-	•	BLOCK structured logging protocol
-	•	Git-based knowledge persistence
-	•	Evolution Engine (self improvement proposals)
-	•	Self Audit Engine (workload monitoring)
-	•	Research OS prototype
-	•	Revenue execution experimentation
+evolution experiments
 
-This repository is a live operational environment.
-
-⸻
-
-Who This Is For
-	•	AI builders
-	•	Independent researchers
-	•	founders
-	•	AI-native operators
-	•	knowledge workers building long-term systems
-
-⸻
-
-Status
-
-Experimental — actively evolving in public.
-
-Built and operated through real execution history.
-
-⸻
-
-Operator
-
-Nobutaka Yamauchi
-
-⸻
-
-⭐ If this concept interests you, consider starring the repository.
-
-⸻
-
-🇯🇵 Japanese Documentation Below
-
-(The original RTS operational documentation continues below.)
-
-# RTS — Real-Time Trust System
-
-(Advisory Execution Operating System)
-
-RTS is an advisory execution operating system designed to support human operators through continuous execution observation, verified evolution, and governance-safe decision support.
-
-RTS monitors execution behavior instead of controlling human decisions.
-
-Final authority always belongs to the human operator.
-
----
-
-## What is RTS
-
-RTS assists operators by:
-
-- monitoring execution signals
-- detecting workload risk
-- auditing execution integrity
-- replicating verified success patterns
-- supporting long-term operational continuity
-
-RTS does not automate decision making.
-
-RTS strengthens human judgment through structured execution memory.
-
----
-
-## Purpose
-
-RTS exists to reduce:
-
-- unfinished execution
-- burnout caused by overload
-- governance drift
-- repeated failure patterns
+AI thinking becomes reproducible.
 
 Execution becomes memory.
 
 Memory becomes identity.
 
-Identity enables evolution.
-
----
-
-## Core Functions
-
-RTS continuously performs:
-
-1. Observe execution logs.
-2. Evaluate operational state.
-3. Suggest improvement actions.
-4. Audit execution integrity.
-5. Replicate verified success patterns.
-
-Operator approval is always required.
-
----
-
-## Core Systems
-
-### Execution Control
-
-- STATE_ENGINE
-- AUTO_CUT_RUNTIME
-- BLOCK_CUT_PROTOCOL
-
-### Evolution
-
-- SELF_EVOLUTION_TRIGGER
-- EVOLUTION_ENGINE
-- SELF_AUDIT_ENGINE
-- SUCCESS_REPLICATION_ENGINE
-
-### Governance
-
-- GOVERNANCE
-- GOVERNANCE_HISTORY
-
-### Memory
-
-- EXECUTION_LOG
-- RESULT_LOG
-- SUCCESS_LOG
-- REFLECTION_LOG
-- MEMORY_INDEX
-
----
-
-## Operation Model
+Operational Model
 
 RTS operates through a continuous execution cycle:
 
 CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
-Details:
+Human operator authority is always final.
 
-RTS_OPERATION_LOOP.md
+RTS observes execution.
 
----
+It never replaces human judgement.
 
-## Safety Model
+Integrity Protection
 
-RTS prioritizes operator health and sustainability.
+Removal or falsification of authorship, provenance records, or execution history is considered a violation of repository integrity.
 
-RTS may recommend:
+RTS logs are designed as historical execution evidence.
 
-- pause
-- reset
-- governance review
+Forks are permitted.
 
-RTS never overrides operator authority.
+Misrepresentation is not.
 
----
+License
 
-## Documentation
+MIT License
 
-System Overview:
+Copyright (c) 2026 Nobutaka Yamauchi
 
-- RTS_ONEPAGE.md
-- RTS_CORE_INDEX.md
-- CORE_MANIFEST.md
-- logs/MAIN_LOG.md
+Permission is hereby granted, free of charge, to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of this software, provided that this copyright notice and attribution remain included.
 
----
+Status
 
-## Status
+Experimental — actively evolving in public execution.
 
-Operator Authority: FINAL  
-RTS Status: ACTIVE
-
-Operator: Nobutaka Yamauchi
-
----
-
-## License
-
-Work in progress
-
----
-
-## System Entry
-
-RTS operational history begins here:
-
-- MAIN_LOG.md
+RTS development history is intentionally transparent.
 
 Execution authority belongs to the operator.
 
-RTS Status: ACTIVE
+Creator Statement
+
+RTS exists to prevent loss of thinking.
+
+Ideas should survive execution.
+
+History should survive iteration.
+
+Continuity creates trust.
+
+— Nobutaka Yamauchi
