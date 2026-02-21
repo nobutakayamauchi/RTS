@@ -1,5 +1,11 @@
 RTS — Real Time Trust System
 
+## Quick Start
+
+Run RTS locally:
+
+python3 START_HERE.py
+
 Origin
 
 Creator: Nobutaka YamauchiInitial Public Release: 2026
