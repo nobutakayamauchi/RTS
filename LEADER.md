@@ -1,56 +1,55 @@
-# RTS Leader — Operator System
+# RTS Leader --- Operator System
 
 RTS (Real Time Trust System) is an execution memory OS for AI operators.
 
-Execution becomes memory.  
-Memory becomes identity.
+Execution becomes memory. Memory becomes identity.
 
----
+------------------------------------------------------------------------
 
 ## ⚡ Start in 3 Steps
 
-1. Fork this repository.
+1.  Fork this repository.
 
-2. Run locally:
+2.  Run locally:
 
-```bash
 python START_HERE.py
-```
 
-3. Begin logging execution.
+3.  Begin logging execution.
+
+------------------------------------------------------------------------
 
 ## 📱 Smartphone Operator Method
 
-RTS was developed under a smartphone-only operational environment.
+RTS was developed under a smartphone‑only operational environment.
 
 Environment:
 
-- iPhone 15 Pro
-- Mobile browser GitHub interface
-- AI assisted execution collaboration (ChatGPT)
+-   iPhone 15 Pro
+-   Mobile browser GitHub interface
+-   AI assisted execution collaboration (ChatGPT)
 
 Operational Discipline:
 
-1. Concept wall-bounce discussion with AI.
-2. Specification confirmation before writing files.
-3. GitHub repository structure verification.
-4. Explicit instruction issuance to AI system.
-5. Operator rest during file generation (fatigue control).
-6. GitHub deployment and update.
-7. Human + AI dual verification using screenshots.
-8. Next structural planning iteration.
+1.  Concept wall‑bounce discussion with AI.
+2.  Specification confirmation before writing files.
+3.  GitHub repository structure verification.
+4.  Explicit instruction issuance to AI system.
+5.  Operator rest during file generation (fatigue control).
+6.  GitHub deployment and update.
+7.  Human + AI dual verification using screenshots.
+8.  Next structural planning iteration.
 
 Execution Recovery Rule:
 
 If critical errors occur twice consecutively:
 
-- delete unstable sections
-- rebuild from clean state
+-   delete unstable sections
+-   rebuild from clean state
 
 Markdown instability mitigation:
 
-- long outputs delivered as files
-- avoid code-block truncation.
+-   long outputs delivered as files
+-   avoid code‑block truncation.
 
 Execution priority:
 
@@ -58,48 +57,45 @@ Continuity over perfection.
 
 Operational history itself becomes infrastructure.
 
+------------------------------------------------------------------------
+
 ## Public Execution Milestone
 
 RTS Version 1.0 Public Execution Record:
 
-RTS_VERSION_1_0_MILESTONE.md
----
+RTS_VERSION_1\_0_MILESTONE.md
+
+------------------------------------------------------------------------
 
 ## 🎯 What RTS Leader Does
 
-RTS Leader turns AI usage into a persistent operational workflow.
+RTS Leader turns AI collaboration into persistent operational memory.
 
 Instead of losing context every session, RTS records:
 
-- Decisions
-- Failures
-- Incidents
-- Operational reasoning
+-   Decisions
+-   Failures
+-   Incidents
+-   Operational reasoning
 
-This creates long-term execution continuity.
+This creates long‑term execution continuity.
 
----
+------------------------------------------------------------------------
 
 ## 🔎 Core Features
 
-- Execution Logging
-- Incident Tracking
-- AI Failure Evidence Collection
-- Workflow Memory Preservation
+-   Execution Logging
+-   Incident Tracking
+-   AI Failure Evidence Collection
+-   Workflow Memory Preservation
 
----
+------------------------------------------------------------------------
 
 ## 📂 Directory Overview
 
-```text
-logs/
-incidents/
-radar/
-START_HERE.py
-README.md
-```
+logs/ incidents/ radar/ START_HERE.py README.md
 
----
+------------------------------------------------------------------------
 
 ## 🧠 Why RTS Exists
 
@@ -107,32 +103,33 @@ Modern AI tools reset context constantly.
 
 Operators lose:
 
-- prompts
-- reasoning
-- debugging history
+-   prompts
+-   reasoning
+-   debugging history
 
 RTS prevents this loss.
 
----
+------------------------------------------------------------------------
 
 ## 🚀 Intended Users
 
-- AI Operators
-- GPT Builders
-- Agent Developers
-- Researchers
-- Automation Engineers
+-   Independent Operators
+-   AI Operators
+-   GPT Builders
+-   Agent Developers
+-   Researchers
+-   Automation Engineers
 
----
+------------------------------------------------------------------------
 
 ## 📜 License
 
 MIT License
 
----
+------------------------------------------------------------------------
 
 ## 👤 Creator
 
 Nobutaka Yamauchi
 
-First Public Release — 2026
+First Public Release --- 2026
