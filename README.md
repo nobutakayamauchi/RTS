@@ -7,6 +7,10 @@
 
 RTS turns AI collaboration into operational memory (logs + incidents).
 
+RTS converts AI collaboration into verifiable operational evidence.
+
+Execution history becomes operational identity.
+
 Latest execution memory index:
 - [memory/index.md](memory/index.md)
 
