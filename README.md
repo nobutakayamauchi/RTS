@@ -1,7 +1,9 @@
 # RTS — Real Time Trust System
 
-Execution becomes memory. 
-Memory becomes identity.
+Execution becomes memory.  
+Memory becomes operational identity.
+
+---
 
 ## 🧠 RTS Operational Memory (Auto-Generated)
 
@@ -18,16 +20,23 @@ Continuity survives session resets.
 Live operational history generated every execution cycle.
 
 Latest execution memory index:
-- **Memory Index:** [memory/index.md](memory/index.md)
 
-Automatically generated from execution logs, incidents, and audit records.
+- **Live Memory Index:** [memory/index.md](memory/index.md)
 
-### 1) Run RTS locally (Quick Start)
+Automatically generated from execution logs and incidents.
+
+RTS runs continuously via GitHub Actions Autonomous Kernel.
+
+---
+
+## 1) Run RTS locally (Quick Start)
+
 ```bash
 python START_HERE.py
 ```
 
-For long-running AI workflows and research operators.
+For long-running AI workflows, research execution, and autonomous operator systems.
+
 🔥 RTS PRO — Operator Execution System
 
 For operators working continuously with AI agents and GPT workflows.
@@ -41,20 +50,17 @@ Includes:
 
 Built for operators who treat AI execution as infrastructure.
 
-If you run long AI workflows, research iterations, or GPT agent systems,
-RTS PRO preserves operational continuity across sessions.
+If you run long AI workflows, research iterations, or GPT agent systems, RTS PRO preserves operational continuity across sessions.
 
 👉 Download RTS PRO:
 
 https://risingson2.gumroad.com/l/sgeldp
-
 
 ---
 
 ## Quick Start
 
 Run RTS locally:
-
 
 The guided starter initializes a local RTS workspace.
 
@@ -215,6 +221,9 @@ Core folders:
 - logs/ → execution evidence
 - evolution/ → experimentation history
 - vibecode/ → agent workflow space
+- incidents/ → failure intelligence
+- radar/ → incident radar system
+- memory/ → operational indexes and summaries
 
 Governance and specification documents define operational scope.
 
