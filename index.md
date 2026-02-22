@@ -74,11 +74,10 @@ Execution becomes memory.
 Quick Structure
 
 Core folders:
-
-logs → execution evidence
-incidents → failure intelligence
-vibecode → agent workflows
-radar → incident radar system
+	•	logs → execution evidence
+	•	incidents → failure intelligence
+	•	vibecode → agent workflows
+	•	radar → incident radar system
 
 ⸻
 
