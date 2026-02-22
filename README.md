@@ -11,9 +11,14 @@ Includes:
 - Decision logging system
 - RTS evolution workflow
 
-Download RTS PRO:
+Built for operators who treat AI execution as infrastructure.
 
-👉 https://irisnson2.gumroad.com/l/sgelpb
+If you run long AI workflows, research iterations, or GPT agent systems,
+RTS PRO preserves operational continuity across sessions.
+
+👉 Download RTS PRO:
+https://irisnson2.gumroad.com/l/sgelpb
+
 
 ---
 
