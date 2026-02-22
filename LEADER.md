@@ -19,6 +19,45 @@ python START_HERE.py
 
 3. Begin logging execution.
 
+## 📱 Smartphone Operator Method
+
+RTS was developed under a smartphone-only operational environment.
+
+Environment:
+
+- iPhone 15 Pro
+- Mobile browser GitHub interface
+- AI assisted execution collaboration (ChatGPT)
+
+Operational Discipline:
+
+1. Concept wall-bounce discussion with AI.
+2. Specification confirmation before writing files.
+3. GitHub repository structure verification.
+4. Explicit instruction issuance to AI system.
+5. Operator rest during file generation (fatigue control).
+6. GitHub deployment and update.
+7. Human + AI dual verification using screenshots.
+8. Next structural planning iteration.
+
+Execution Recovery Rule:
+
+If critical errors occur twice consecutively:
+
+- delete unstable sections
+- rebuild from clean state
+
+Markdown instability mitigation:
+
+- long outputs delivered as files
+- avoid code-block truncation.
+
+Execution priority:
+
+Continuity over perfection.
+
+Operational history itself becomes infrastructure.
+
 ## Public Execution Milestone
 
 RTS Version 1.0 Public Execution Record:
