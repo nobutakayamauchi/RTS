@@ -29,18 +29,29 @@ jobs:
         with:
           python-version: "3.11"
 
+      # =========================
+      # ✅ RTS KERNEL（ここが本体）
+      # =========================
       - name: Run RTS Kernel (state/memory/audit)
-  run: |
-    set -euo pipefail
-    python -V
+        run: |
+          set -euo pipefail
+          python -V
 
-    # RTS deterministic execution order
-    python state_engine.py
-    python memory_index.py || true
-    python memory_index_engine.py
-    python self_audit.py
+          # 1) state
+          python state_engine.py
 
-      # ✅ ここがAUTO RESET本体：ジョブ失敗時だけ発火
+          # 2) memory (古い/未整備でも止めない)
+          python memory_index.py || true
+
+          # 3) memory index engine (これが最重要)
+          python memory_index_engine.py
+
+          # 4) audit
+          python self_audit.py
+
+      # =========================
+      # ✅ AUTO RESET（ジョブ失敗時のみ）
+      # =========================
       - name: Auto Reset (on failure)
         if: failure()
         env:
@@ -48,37 +59,57 @@ jobs:
           RTS_RESET_STATE_FILE: ".rts/reset_state.json"
           RTS_LOGS_DIR: "logs"
         run: |
-          set -eux
+          set -euo pipefail
           python reset_engine.py
 
-      # ✅ 変更があれば commit & push（syntax error回避済み）
+      # =========================
+      # ✅ 変更があれば commit & push
+      # =========================
       - name: Commit & Push if changed
         run: |
-          set -eux
+          set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git status --porcelain | grep -q .; then
-            git add -A
-            git commit -m "RTS kernel: autonomous cycle update"
-            git push
-          else
+          # 変更がなければ終了
+          if git diff --quiet && git diff --cached --quiet; then
             echo "No changes to commit."
+            exit 0
           fi
 
-      # ✅ 失敗したら Issue を切る（Resource not accessible 対策で issues:write）
+          # 念のため add
+          git add -A
+
+          # addしても差分ゼロなら終了
+          if git diff --cached --quiet; then
+            echo "No changes after git add."
+            exit 0
+          fi
+
+          git commit -m "RTS kernel: autonomous update"
+          git push
+
+      # =========================
+      # ✅ 失敗したら Issue を切る
+      # =========================
       - name: RTS Self Incident Report
         if: failure()
         uses: actions/github-script@v7
         with:
           script: |
             const title = "RTS Autonomous Kernel Incident";
-            const body =
-              `RTS Autonomous Kernel detected a failure.\n\n` +
-              `Time: ${new Date().toISOString()}\n` +
-              `Actor: GitHub Actions\n\n` +
-              `Action required:\n- Review latest workflow logs.\n- Check logs/ and .rts/reset_state.json\n\n` +
-              `Integrity preserved.\n`;
+            const body = [
+              "RTS Autonomous Kernel detected a failure.",
+              "",
+              `Time: ${new Date().toISOString()}`,
+              `Actor: GitHub Actions`,
+              "",
+              "Action required:",
+              "- Review latest workflow logs.",
+              "",
+              "Integrity preserved."
+            ].join("\n");
 
             await github.rest.issues.create({
               owner: context.repo.owner,
