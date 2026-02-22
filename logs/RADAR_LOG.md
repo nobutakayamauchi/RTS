@@ -72,3 +72,7 @@ Title: jennifer evans 🇵🇸🇱🇧🇨🇦 on X: "@MrEwanMorrison This is ar
 https://status.anthropic.com
 [![Image 1: Claude logo](http://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/362807/NEW_claude_status_banner-183284a4-558d-4835-b3a4-a601e0a4daa8.png)](https://status.claude.com/)
 
+## 20260222_2256
+https://status.openai.com
+[![Image 1: OpenAI](https://status.openai.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fincident-io-status-page-logos%2F01H537TKYPX5W42WRCKR1AGPFT%2Fopenai-1%2Fxrs545k8.png&w=3840&q=75&dpl=dpl_99gqKXRUR5BXR5qqF9opvEp61tqb) ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------](https://status.openai.com/)
+
