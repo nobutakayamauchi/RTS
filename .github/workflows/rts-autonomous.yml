@@ -36,6 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           python -V
+          python radar_analysis.py
 
           # 1) state
           python state_engine.py
