@@ -13,9 +13,6 @@ Memory becomes identity.
 
 2.  Run locally:
 
-```{=html}
-<!-- -->
-```
     python START_HERE.py
 
 3.  Begin logging execution decisions.
