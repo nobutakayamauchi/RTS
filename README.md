@@ -1,5 +1,11 @@
 # RTS — Real Time Trust System
 
+🔥 RTS PRO Operator Templates Available:
+
+https://irisnson2.gumroad.com/l/sgelpb
+
+Decision Logging Operating System for AI Execution Continuity.
+
 Decision Logging Operating System for AI Execution Continuity.
 
 ---
