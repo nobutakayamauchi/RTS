@@ -1,0 +1,131 @@
+{
+  "generated_utc": "2026-02-22T16:33:49.902223+00:00",
+  "total_files": 25,
+  "entries": [
+    {
+      "path": "logs/RADAR_LOG.md",
+      "size": 4903,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "logs/EXECUTION_LOG.md",
+      "size": 42383,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
+      "size": 2312,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md",
+      "size": 233,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
+      "size": 1546,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INCIDENT_RULES.md",
+      "size": 629,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
+      "size": 707,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1704_GPT_ContextResearcher.md",
+      "size": 1035,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
+      "size": 884,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_YYYYMMDD_HHMM_System_Problem.md",
+      "size": 931,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md",
+      "size": 997,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1840_ChatGPT_RadarHit.md",
+      "size": 505,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_TEMPLATE.md",
+      "size": 564,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
+      "size": 826,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_SELF_EVOLUTION_ENGINE.md",
+      "size": 4568,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_SELF_AUDIT_ENGINE.md",
+      "size": 2009,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_SUCCESS_REPLICATION_ENGINE.md",
+      "size": 2769,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_GOVERNANCE.md",
+      "size": 973,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_BLOCK_CUT_PROTOCOL.md",
+      "size": 892,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_EVOLUTION_ENGINE.md",
+      "size": 2667,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_STATE_ENGINE.md",
+      "size": 1950,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/ACTIVE_PROPOSALS.md",
+      "size": 2389,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_GOVERNANCE_HISTORY.md",
+      "size": 367,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/RTS_AUTO_CUT_RUNTIME.md",
+      "size": 1539,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    },
+    {
+      "path": "evolution/PROPOSALS.md",
+      "size": 958,
+      "modified_utc": "2026-02-22T16:33:49.526450+00:00"
+    }
+  ]
+}
