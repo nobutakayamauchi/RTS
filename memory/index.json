@@ -4,10 +4,10 @@
     "incidents": 9,
     "logs": 6
   },
-  "generated_utc": "2026-02-22T17:23:05+00:00",
+  "generated_utc": "2026-02-22T17:41:06+00:00",
   "incidents": [
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1704_GPT_ContextResearcher.md",
       "path": "incidents/INC_20260222_1704_GPT_ContextResearcher.md",
       "score": 110.0,
@@ -16,7 +16,7 @@
       "url": "https://x.com/nejsnave/status/2024718761622749689?s=46"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md",
       "path": "incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md",
       "score": 102.0,
@@ -25,7 +25,7 @@
       "url": "https://t.co/Zdclh2X9vg\""
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1545_Cursor_ContextLoss.md",
       "path": "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
       "score": 80.0,
@@ -34,7 +34,7 @@
       "url": "https://x.com/keithwhor/status/2023568333522825458?s=46"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1603_ClaudeCode_ContextLoss.md",
       "path": "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
       "score": 80.0,
@@ -43,7 +43,7 @@
       "url": "https://x.com/giladvdn/status/2024062412656148895?s=46"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
       "path": "incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
       "score": 80.0,
@@ -52,7 +52,7 @@
       "url": "https://x.com/giladvdn/status/2024062412656148895"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_20260222_1840_ChatGPT_RadarHit.md",
       "path": "incidents/INC_20260222_1840_ChatGPT_RadarHit.md",
       "score": 42.0,
@@ -61,7 +61,7 @@
       "url": "https://t.co/Zdclh2X9vg\""
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_YYYYMMDD_HHMM_System_Problem.md",
       "path": "incidents/INC_YYYYMMDD_HHMM_System_Problem.md",
       "score": 30.0,
@@ -70,7 +70,7 @@
       "url": null
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INC_TEMPLATE.md",
       "path": "incidents/INC_TEMPLATE.md",
       "score": 30.0,
@@ -79,7 +79,7 @@
       "url": null
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "INCIDENT_RULES.md",
       "path": "incidents/INCIDENT_RULES.md",
       "score": 10.0,
@@ -90,7 +90,7 @@
   ],
   "latest_logs": [
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "RADAR_LOG.md",
       "path": "logs/RADAR_LOG.md",
       "snippet": "# RTS AI RADAR LOG ## Run — 2026-02-22 18:17 JST - Targets: 3 - ✅ Incident: `incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md` - URL: https://x.com/amurepinho/status/2018789010769080603 - Snippet: Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Error\" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not w…",
@@ -98,7 +98,7 @@
       "url": "https://x.com/amurepinho/status/2018789010769080603"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "EXECUTION_LOG.md",
       "path": "logs/EXECUTION_LOG.md",
       "snippet": "## 2026-02-20T14:04:14.199512Z Event: RTS execution cycle started Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity: VERIFIED --- ## 2026-02-20T14:04:14.199669Z Event: RTS decision: skipped proposal (pending exists) Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity: VERIFIED --- ## 2026-02-20T14:04:14.199715Z Event: RTS execution cycle complet…",
@@ -106,7 +106,7 @@
       "url": null
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
       "path": "logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
       "snippet": "# BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION Operator: Nobutaka Yamauchi Framework: RTS — Real Time Trust System Date: 2026-02-22 JST Mode: Execution Phase Transition --- ## I. Background Following extended implementation and structural stabilization, RTS transitioned from internal experimental workflow OS to externally accessible public system. Primary moti…",
@@ -114,7 +114,7 @@
       "url": null
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
       "path": "logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
       "snippet": "# BLOCK_00000016 — RTS Tester Recruitment Phase Initiated Timestamp (UTC): 2026-02-22 Operator: Nobutaka Yamauchi Repository: https://github.com/nobutakayamauchi/RTS --- ## Event RTS (Real Time Trust System) enters early operator adoption phase. Public release infrastructure completed: - GitHub public repository operational - GitHub Pages LP deployed - Gumroad commercial distr…",
@@ -122,7 +122,7 @@
       "url": "https://github.com/nobutakayamauchi/RTS"
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "BLOCK_00000017_GENESIS_AUTONOMOUS.md",
       "path": "logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md",
       "snippet": "BLOCK_00000017 Event: RTS Autonomous Kernel entered scheduled execution. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS transitioned from manual execution to autonomous GitHub Actions operation. Integrity: VERIFIED",
@@ -130,7 +130,7 @@
       "url": null
     },
     {
-      "mtime_utc": "2026-02-22T17:23:05+00:00",
+      "mtime_utc": "2026-02-22T17:41:05+00:00",
       "name": "BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md",
       "path": "logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md",
       "snippet": "BLOCK_00000018 Event: RTS Auto Reset Engine activated. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS Autonomous Kernel gained automatic recovery capability. Failure detection and recovery loop operational. Integrity: VERIFIED",
