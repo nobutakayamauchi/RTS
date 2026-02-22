@@ -1,6 +1,7 @@
 # RTS — Real Time Trust System
 
-Execution becomes memory. Memory becomes identity.
+Execution becomes memory. 
+Memory becomes identity.
 
 ## 🧠 RTS Operational Memory (Auto-Generated)
 
