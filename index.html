@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RTS — Real Time Trust System</title>
-  <meta name="description" content="Execution becomes memory. Memory becomes identity. RTS preserves reasoning continuity across AI sessions." />
+
+  <meta name="description" content="RTS — Execution OS for AI Operators. Preserve reasoning continuity across AI workflows. Public execution logs + operator templates (RTS PRO)." />
+  <meta property="og:title" content="RTS — Real Time Trust System" />
+  <meta property="og:description" content="AI workflows forget. RTS remembers. Execution becomes memory." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <style>
     :root{
@@ -12,174 +17,146 @@
       --muted:#5b6577;
       --line:#e7eaf0;
       --bg:#ffffff;
-      --card:#f7f8fb;
+      --card:#f6f7fb;
+      --accent:#2f6fdb;
       --btn:#111;
       --btnfg:#fff;
-      --accent:#2f6fdb;
-      --ok:#0a7a2f;
+      --shadow: 0 10px 30px rgba(10,15,25,.08);
+      --r: 18px;
     }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
       background:var(--bg);
       color:var(--fg);
       line-height:1.55;
     }
-    .wrap{
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 28px 18px 80px;
-    }
-    .topbar{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:18px;
-    }
-    .badge{
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:860px; margin:0 auto; padding:28px 18px 80px;}
+    .topbar{display:flex; align-items:center; gap:12px; margin-bottom:18px;}
+    .logo{font-weight:900; letter-spacing:.08em; color:var(--accent)}
+    .pill{
       display:inline-block;
-      font-weight:800;
-      letter-spacing:.12em;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(47,111,219,.10);
       color:var(--accent);
-      text-transform:uppercase;
+      font-weight:700;
       font-size:12px;
     }
     h1{
-      font-size: 40px;
-      line-height:1.12;
-      margin: 8px 0 10px;
+      font-size:44px;
+      line-height:1.1;
+      margin:14px 0 10px;
+      letter-spacing:-.02em;
     }
     .sub{
       color:var(--muted);
       font-size:18px;
       margin:0 0 18px;
     }
-    .rule{
-      height:1px;
-      background:var(--line);
-      margin: 22px 0;
-    }
-    h2{
-      font-size:22px;
-      margin: 18px 0 8px;
-    }
-    p{ margin: 10px 0; }
-    ul{ margin: 10px 0 0 18px; }
-    li{ margin: 6px 0; }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-    .card{
+    .rule{height:1px; background:var(--line); margin:22px 0;}
+    .hero{
+      background:linear-gradient(180deg, rgba(47,111,219,.06), rgba(47,111,219,0));
       border:1px solid var(--line);
-      background:var(--card);
-      padding:16px;
-      border-radius:14px;
+      border-radius:var(--r);
+      padding:22px;
+      box-shadow:var(--shadow);
     }
-    .ctaRow{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      margin: 14px 0 8px;
-    }
+    .btns{display:flex; flex-direction:column; gap:10px; margin-top:16px;}
     .cta{
-      display:inline-block;
+      display:block;
       width:100%;
-      text-align:center;
       background:var(--btn);
       color:var(--btnfg);
-      padding: 14px 16px;
-      border-radius: 14px;
-      text-decoration:none;
-      font-weight:800;
-      font-size:18px;
-    }
-    .cta:active{ transform: translateY(1px); }
-    .ghost{
-      display:inline-block;
-      width:100%;
+      padding:16px 18px;
+      border-radius:14px;
+      font-weight:900;
       text-align:center;
-      border:1px solid var(--line);
-      color:var(--fg);
-      padding: 14px 16px;
-      border-radius: 14px;
-      text-decoration:none;
-      font-weight:700;
+      font-size:18px;
+      border:1px solid rgba(0,0,0,.12);
+    }
+    .cta.secondary{
       background:#fff;
-      font-size:16px;
+      color:var(--fg);
+      border:1px solid var(--line);
     }
-    .note{
+    .note{color:var(--muted); font-size:14px; margin-top:10px;}
+    h2{
+      margin:24px 0 10px;
+      font-size:28px;
+      letter-spacing:-.01em;
+    }
+    p{margin:10px 0}
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    .box{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      padding:16px;
+    }
+    .box h3{margin:0 0 8px; font-size:18px}
+    ul{margin:10px 0 0 18px}
+    li{margin:6px 0}
+    .footer{
+      margin-top:26px;
       color:var(--muted);
-      font-size:14px;
-      margin-top:6px;
+      font-size:13px;
     }
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eef3ff;
-      color:var(--accent);
-      font-weight:700;
-      font-size:12px;
-    }
-    .kicker{
-      font-weight:800;
-      font-size:16px;
-      margin: 0 0 8px;
-    }
-    .small{
-      font-size:14px;
-      color:var(--muted);
-    }
-    .ok{
-      color:var(--ok);
-      font-weight:800;
-    }
-    @media (min-width:720px){
-      .cta{ width:auto; min-width: 260px; }
-      .ghost{ width:auto; }
-      .grid{ grid-template-columns: 1fr 1fr; }
+    .links a{display:block; margin:6px 0}
+    @media (min-width:700px){
+      .btns{flex-direction:row}
+      .cta{width:auto; flex:1}
+      .grid{grid-template-columns:1fr 1fr}
     }
   </style>
 </head>
 
 <body>
-  <main class="wrap">
+  <div class="wrap">
 
     <div class="topbar">
-      <span class="badge">RTS</span>
-      <span class="pill">Execution OS for AI Operators</span>
+      <div class="logo">RTS</div>
+      <div class="pill">Execution OS for AI Operators</div>
     </div>
 
-    <h1>RTS — Real Time Trust System</h1>
-    <p class="sub">
-      <strong>Execution becomes memory.</strong><br/>
-      <strong>Memory becomes identity.</strong><br/>
-      AI workflows forget. RTS remembers.
-    </p>
+    <div class="hero">
+      <h1>RTS — Real Time Trust System</h1>
+      <p class="sub">
+        <b>Execution becomes memory.</b><br/>
+        <b>Memory becomes identity.</b><br/>
+        AI workflows forget. RTS remembers.
+      </p>
 
-    <!-- CTA (TOP) -->
-    <div class="ctaRow">
-      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
-      <a class="ghost" href="https://github.com/nobutakayamauchi/RTS">View Public Repository</a>
+      <div class="btns">
+        <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
+        <a class="cta secondary" href="https://github.com/nobutakayamauchi/RTS">View Public Repository</a>
+      </div>
+
+      <div class="note">
+        Payment securely handled by Gumroad. Instant download. No subscription. Lifetime access.
+      </div>
     </div>
-    <div class="note">Payment & delivery are handled by Gumroad. Instant download.</div>
 
     <div class="rule"></div>
 
     <h2>Why RTS?</h2>
     <p>
-      Modern AI workflows restart thinking every session.
-      Ideas disappear. Decisions fragment. Execution history is lost.
+      Modern AI workflows restart thinking every session. Ideas disappear. Decisions fragment.
+      Execution history is lost.
     </p>
-    <p class="kicker">RTS preserves reasoning continuity across AI sessions.</p>
+    <p><b>RTS preserves reasoning continuity across AI sessions.</b></p>
 
     <div class="grid">
-      <div class="card">
-        <div class="kicker">Built for AI Operators</div>
+      <div class="box">
+        <h3>Built for AI Operators</h3>
         <ul>
           <li>AI researchers running long experiments</li>
           <li>GPT workflow builders</li>
@@ -187,8 +164,9 @@
           <li>Prompt engineers</li>
         </ul>
       </div>
-      <div class="card">
-        <div class="kicker">What RTS Records</div>
+
+      <div class="box">
+        <h3>What RTS Records</h3>
         <ul>
           <li>Reasoning decisions</li>
           <li>Execution context</li>
@@ -202,22 +180,20 @@
     <div class="rule"></div>
 
     <h2>RTS PRO — Operator Execution System 🔥</h2>
-    <p>
-      Turn AI collaboration into persistent operational memory.
-    </p>
-    <div class="card">
-      <div class="kicker">Includes</div>
+    <p>Turn AI collaboration into persistent operational memory.</p>
+
+    <div class="box">
+      <h3>Includes</h3>
       <ul>
         <li>Execution templates (ready to run)</li>
         <li>Operator governance framework</li>
         <li>Decision logging system</li>
         <li>RTS evolution workflow</li>
       </ul>
-      <p class="small"><span class="ok">✓</span> Instant download · No subscription · Lifetime access</p>
+      <p class="note">✅ Instant download · No subscription · Lifetime access</p>
     </div>
 
-    <!-- CTA (MIDDLE) -->
-    <div class="ctaRow" style="margin-top:14px;">
+    <div class="btns" style="margin-top:14px;">
       <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Get RTS PRO →</a>
     </div>
 
@@ -225,16 +201,16 @@
 
     <h2>Free vs PRO</h2>
     <div class="grid">
-      <div class="card">
-        <div class="kicker">Free (GitHub)</div>
+      <div class="box">
+        <h3>Free (GitHub)</h3>
         <ul>
           <li>Framework documentation</li>
           <li>Public execution logs</li>
           <li>Operational evidence trail</li>
         </ul>
       </div>
-      <div class="card">
-        <div class="kicker">RTS PRO (Gumroad)</div>
+      <div class="box">
+        <h3>RTS PRO (Gumroad)</h3>
         <ul>
           <li>Operator templates</li>
           <li>Execution workflows</li>
@@ -246,23 +222,21 @@
     <div class="rule"></div>
 
     <h2>Official Links</h2>
-    <p>
-      Repository: <a href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a><br/>
-      Pages: <a href="https://nobutakayamauchi.github.io/RTS/">https://nobutakayamauchi.github.io/RTS/</a><br/>
-      RTS PRO: <a href="https://risingson2.gumroad.com/l/sgeldp">https://risingson2.gumroad.com/l/sgeldp</a>
-    </p>
-
-    <!-- CTA (BOTTOM) -->
-    <div class="ctaRow" style="margin-top:14px;">
-      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
-      <a class="ghost" href="https://github.com/nobutakayamauchi/RTS">Open GitHub Repo</a>
+    <div class="box links">
+      <a href="https://github.com/nobutakayamauchi/RTS">Repository: https://github.com/nobutakayamauchi/RTS</a>
+      <a href="https://nobutakayamauchi.github.io/RTS/">Pages: https://nobutakayamauchi.github.io/RTS/</a>
+      <a href="https://risingson2.gumroad.com/l/sgeldp">RTS PRO: https://risingson2.gumroad.com/l/sgeldp</a>
     </div>
 
-    <div class="rule"></div>
+    <div class="btns" style="margin-top:14px;">
+      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
+      <a class="cta secondary" href="https://github.com/nobutakayamauchi/RTS">Open GitHub Repo</a>
+    </div>
 
-    <p class="small">
+    <div class="footer">
       Creator: Nobutaka Yamauchi · MIT License — 2026
-    </p>
-  </main>
+    </div>
+
+  </div>
 </body>
 </html>
