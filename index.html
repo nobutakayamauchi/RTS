@@ -4,90 +4,265 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RTS — Real Time Trust System</title>
-  <meta name="description" content="RTS preserves reasoning continuity across AI sessions. Execution becomes memory." />
+  <meta name="description" content="Execution becomes memory. Memory becomes identity. RTS preserves reasoning continuity across AI sessions." />
+
   <style>
     :root{
-      --fg:#0b0f18; --muted:#5b6577; --line:#e7eaf0; --btn:#111;
-      --max:900px;
+      --fg:#0b0f18;
+      --muted:#5b6577;
+      --line:#e7eaf0;
+      --bg:#ffffff;
+      --card:#f7f8fb;
+      --btn:#111;
+      --btnfg:#fff;
+      --accent:#2f6fdb;
+      --ok:#0a7a2f;
     }
     body{
-      margin:0; color:var(--fg); background:#fff;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--fg);
       line-height:1.55;
     }
-    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 64px;}
-    .badge{display:inline-block; font-weight:700; letter-spacing:.12em; color:#2f6fdb; text-transform:uppercase; font-size:12px;}
-    h1{font-size:38px; line-height:1.15; margin:10px 0 8px;}
-    .sub{color:var(--muted); font-size:18px; margin:0 0 18px;}
-    .rule{height:1px; background:var(--line); margin:22px 0;}
-    h2{font-size:22px; margin:18px 0 8px;}
-    ul{margin:10px 0 0 20px;}
-    li{margin:6px 0;}
-    .cta{
-      display:block; width:100%;
-      background:var(--btn); color:#fff;
-      padding:16px 18px; border-radius:12px;
-      text-align:center; text-decoration:none;
-      font-size:18px; font-weight:700;
-      margin:18px 0 0;
+    .wrap{
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
     }
-    .note{color:var(--muted); font-size:13px; margin:10px 0 0;}
-    a.link{color:#2f6fdb; text-decoration:none;}
-    a.link:hover{text-decoration:underline;}
-    .box{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fff;}
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .badge{
+      display:inline-block;
+      font-weight:800;
+      letter-spacing:.12em;
+      color:var(--accent);
+      text-transform:uppercase;
+      font-size:12px;
+    }
+    h1{
+      font-size: 40px;
+      line-height:1.12;
+      margin: 8px 0 10px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:18px;
+      margin:0 0 18px;
+    }
+    .rule{
+      height:1px;
+      background:var(--line);
+      margin: 22px 0;
+    }
+    h2{
+      font-size:22px;
+      margin: 18px 0 8px;
+    }
+    p{ margin: 10px 0; }
+    ul{ margin: 10px 0 0 18px; }
+    li{ margin: 6px 0; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .card{
+      border:1px solid var(--line);
+      background:var(--card);
+      padding:16px;
+      border-radius:14px;
+    }
+    .ctaRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin: 14px 0 8px;
+    }
+    .cta{
+      display:inline-block;
+      width:100%;
+      text-align:center;
+      background:var(--btn);
+      color:var(--btnfg);
+      padding: 14px 16px;
+      border-radius: 14px;
+      text-decoration:none;
+      font-weight:800;
+      font-size:18px;
+    }
+    .cta:active{ transform: translateY(1px); }
+    .ghost{
+      display:inline-block;
+      width:100%;
+      text-align:center;
+      border:1px solid var(--line);
+      color:var(--fg);
+      padding: 14px 16px;
+      border-radius: 14px;
+      text-decoration:none;
+      font-weight:700;
+      background:#fff;
+      font-size:16px;
+    }
+    .note{
+      color:var(--muted);
+      font-size:14px;
+      margin-top:6px;
+    }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef3ff;
+      color:var(--accent);
+      font-weight:700;
+      font-size:12px;
+    }
+    .kicker{
+      font-weight:800;
+      font-size:16px;
+      margin: 0 0 8px;
+    }
+    .small{
+      font-size:14px;
+      color:var(--muted);
+    }
+    .ok{
+      color:var(--ok);
+      font-weight:800;
+    }
+    @media (min-width:720px){
+      .cta{ width:auto; min-width: 260px; }
+      .ghost{ width:auto; }
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="badge">RTS</div>
-    <h1>RTS — Real Time Trust System</h1>
-    <p class="sub">(Advisory Execution Operating System)</p>
 
-    <div class="box">
-      <h2>Execution becomes memory.<br/>Memory becomes identity.</h2>
-      <p>
-        RTS preserves reasoning continuity inside AI workflows.<br/>
-        It records decisions, execution context, and operational history so thinking survives beyond individual sessions.
-      </p>
+<body>
+  <main class="wrap">
+
+    <div class="topbar">
+      <span class="badge">RTS</span>
+      <span class="pill">Execution OS for AI Operators</span>
+    </div>
+
+    <h1>RTS — Real Time Trust System</h1>
+    <p class="sub">
+      <strong>Execution becomes memory.</strong><br/>
+      <strong>Memory becomes identity.</strong><br/>
+      AI workflows forget. RTS remembers.
+    </p>
+
+    <!-- CTA (TOP) -->
+    <div class="ctaRow">
+      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
+      <a class="ghost" href="https://github.com/nobutakayamauchi/RTS">View Public Repository</a>
+    </div>
+    <div class="note">Payment & delivery are handled by Gumroad. Instant download.</div>
+
+    <div class="rule"></div>
+
+    <h2>Why RTS?</h2>
+    <p>
+      Modern AI workflows restart thinking every session.
+      Ideas disappear. Decisions fragment. Execution history is lost.
+    </p>
+    <p class="kicker">RTS preserves reasoning continuity across AI sessions.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="kicker">Built for AI Operators</div>
+        <ul>
+          <li>AI researchers running long experiments</li>
+          <li>GPT workflow builders</li>
+          <li>Startup operators</li>
+          <li>Prompt engineers</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="kicker">What RTS Records</div>
+        <ul>
+          <li>Reasoning decisions</li>
+          <li>Execution context</li>
+          <li>Operational outcomes</li>
+          <li>Iteration history</li>
+          <li>Evolution experiments</li>
+        </ul>
+      </div>
     </div>
 
     <div class="rule"></div>
 
-    <h2>Built for AI Operators</h2>
-    <p>Designed for operators working continuously with AI.</p>
-    <ul>
-      <li>AI researchers</li>
-      <li>GPT workflow builders</li>
-      <li>Startup operators</li>
-      <li>Prompt engineers</li>
-    </ul>
-    <p class="note">RTS prevents loss of reasoning across sessions. Execution history becomes operational memory.</p>
-
-    <div class="rule"></div>
-
     <h2>RTS PRO — Operator Execution System 🔥</h2>
-    <p>For operators working continuously with AI agents and GPT workflows.</p>
-    <ul>
-      <li>Execution templates</li>
-      <li>Operator governance framework</li>
-      <li>Decision logging system</li>
-      <li>RTS evolution workflow</li>
-    </ul>
-
-    <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
-    <p class="note">Payment & delivery are handled by Gumroad.</p>
-
-    <div class="rule"></div>
-
-    <h2>Official Repository</h2>
-    <p><a class="link" href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a></p>
-
-    <div class="rule"></div>
-
-    <p class="note">
-      Creator: Nobutaka Yamauchi<br/>
-      MIT License — 2026
+    <p>
+      Turn AI collaboration into persistent operational memory.
     </p>
-  </div>
+    <div class="card">
+      <div class="kicker">Includes</div>
+      <ul>
+        <li>Execution templates (ready to run)</li>
+        <li>Operator governance framework</li>
+        <li>Decision logging system</li>
+        <li>RTS evolution workflow</li>
+      </ul>
+      <p class="small"><span class="ok">✓</span> Instant download · No subscription · Lifetime access</p>
+    </div>
+
+    <!-- CTA (MIDDLE) -->
+    <div class="ctaRow" style="margin-top:14px;">
+      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Get RTS PRO →</a>
+    </div>
+
+    <div class="rule"></div>
+
+    <h2>Free vs PRO</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="kicker">Free (GitHub)</div>
+        <ul>
+          <li>Framework documentation</li>
+          <li>Public execution logs</li>
+          <li>Operational evidence trail</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="kicker">RTS PRO (Gumroad)</div>
+        <ul>
+          <li>Operator templates</li>
+          <li>Execution workflows</li>
+          <li>Ready execution environment</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <h2>Official Links</h2>
+    <p>
+      Repository: <a href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a><br/>
+      Pages: <a href="https://nobutakayamauchi.github.io/RTS/">https://nobutakayamauchi.github.io/RTS/</a><br/>
+      RTS PRO: <a href="https://risingson2.gumroad.com/l/sgeldp">https://risingson2.gumroad.com/l/sgeldp</a>
+    </p>
+
+    <!-- CTA (BOTTOM) -->
+    <div class="ctaRow" style="margin-top:14px;">
+      <a class="cta" href="https://risingson2.gumroad.com/l/sgeldp">Download RTS PRO</a>
+      <a class="ghost" href="https://github.com/nobutakayamauchi/RTS">Open GitHub Repo</a>
+    </div>
+
+    <div class="rule"></div>
+
+    <p class="small">
+      Creator: Nobutaka Yamauchi · MIT License — 2026
+    </p>
+  </main>
 </body>
 </html>
