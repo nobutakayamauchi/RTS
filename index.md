@@ -1,15 +1,13 @@
-RTS Leader — Operator System
+RTS Leader — Operator Execution OS
 
 RTS (Real Time Trust System) is an execution memory OS for AI operators.
 
 Execution becomes memory.
 Memory becomes identity.
 
-
-
 ⸻
 
-Start RTS in 3 Steps
+⚡ Start RTS in 3 Steps
 	1.	Fork this repository.
 	2.	Run locally:
 python START_HERE.py
