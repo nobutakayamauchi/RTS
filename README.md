@@ -18,7 +18,7 @@ Continuity survives session resets.
 Live operational history generated every execution cycle.
 
 Latest execution memory index:
-- [memory/index.md](memory/index.md)
+- **Memory Index:** [memory/index.md](memory/index.md)
 
 Automatically generated from execution logs and incidents.
 
