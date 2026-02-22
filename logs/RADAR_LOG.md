@@ -56,3 +56,7 @@ https://github.com/openai/openai-python/issues
 https://github.com/anthropics/anthropic-sdk-python/issues
 [Skip to content](http://github.com/anthropics/anthropic-sdk-python/issues#start-of-content)
 
+## 20260222_1852
+https://cursor.sh/changelog
+[CLI Improvements and Mermaid ASCII Diagrams](https://cursor.com/changelog/cli-feb-18-2026)
+
