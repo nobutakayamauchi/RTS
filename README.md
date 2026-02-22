@@ -18,11 +18,12 @@ Latest execution memory index:
 
 Automatically generated from execution logs and incidents.
 
-### 1) Run RTS locally
+### 1) Run RTS locally (Quick Start)
 ```bash
 python START_HERE.py
 ```
 
+For long-running AI workflows and research operators.
 🔥 RTS PRO — Operator Execution System
 
 For operators working continuously with AI agents and GPT workflows.
