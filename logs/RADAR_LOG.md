@@ -15,3 +15,12 @@
 - Skipped (already seen): 0
 - Skipped (no incident keywords): 1
 - Fetch errors: 0
+
+## Run — 2026-02-22 18:30 JST
+- Targets: 3
+
+### Summary
+- Incidents created: 0
+- Skipped (already seen): 3
+- Skipped (no incident keywords): 0
+- Fetch errors: 0
