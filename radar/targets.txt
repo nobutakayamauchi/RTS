@@ -1,3 +1,19 @@
 https://x.com/nejsnave/status/2023926052826055088
 https://x.com/amurepinho/status/2018789010769080603
 https://x.com/giladvdn/status/2024062412656148895
+
+# ===== AI STATUS =====
+
+https://status.openai.com
+https://status.anthropic.com
+
+# ===== REDDIT =====
+
+https://www.reddit.com/r/ChatGPT/
+https://www.reddit.com/r/ClaudeAI/
+
+# ===== DEV =====
+
+https://github.com/openai/openai-python/issues
+https://github.com/anthropics/anthropic-sdk-python/issues
+https://cursor.sh/changelog
