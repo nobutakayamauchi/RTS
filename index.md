@@ -5,7 +5,6 @@ RTS (Real Time Trust System) is an execution memory OS for AI operators.
 Execution becomes memory.
 Memory becomes identity.
 
-⸻
 
 
 ⸻
