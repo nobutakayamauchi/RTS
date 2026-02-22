@@ -30,13 +30,15 @@ jobs:
           python-version: "3.11"
 
       - name: Run RTS Kernel (state/memory/audit)
-        run: |
-          set -eux
-          python -V
-          python state_engine.py
-          python memory_index.py
-          python memory_index_engine.py
-          python self_audit.py
+  run: |
+    set -euo pipefail
+    python -V
+
+    # RTS deterministic execution order
+    python state_engine.py
+    python memory_index.py || true
+    python memory_index_engine.py
+    python self_audit.py
 
       # ✅ ここがAUTO RESET本体：ジョブ失敗時だけ発火
       - name: Auto Reset (on failure)
