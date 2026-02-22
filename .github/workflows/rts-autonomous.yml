@@ -35,6 +35,7 @@ jobs:
           python -V
           python state_engine.py
           python memory_index.py
+          python memory_index_engine.py
           python self_audit.py
 
       # ✅ ここがAUTO RESET本体：ジョブ失敗時だけ発火
