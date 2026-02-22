@@ -3,6 +3,10 @@
 ## ⚡ Start RTS in 5 Minutes
 
 RTS turns AI collaboration into operational memory (logs + incidents).
+## 🧠 RTS Operational Memory (Auto-Generated)
+
+Latest execution memory index:
+- [memory/index.md](memory/index.md)
 
 ### 1) Run RTS locally
 ```bash
