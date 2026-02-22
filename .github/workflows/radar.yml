@@ -44,4 +44,5 @@ jobs:
           fi
 
           git commit -m "RTS Radar: update incidents"
+          git pull --rebase origin main || true
           git push
