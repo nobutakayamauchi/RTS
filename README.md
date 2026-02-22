@@ -11,8 +11,12 @@ RTS converts AI collaboration into verifiable operational evidence.
 
 Execution history becomes operational identity.
 
+Continuity survives session resets.
+
 Latest execution memory index:
 - [memory/index.md](memory/index.md)
+
+Automatically generated from execution logs and incidents.
 
 ### 1) Run RTS locally
 ```bash
