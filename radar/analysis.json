@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-02-22T19:55:40.403304+00:00",
+  "generated_utc": "2026-02-22T20:31:37.524665+00:00",
   "counts": {
     "docs": 15,
     "incidents": 9,
@@ -18,7 +18,7 @@
     {
       "path": "incidents/INC_YYYYMMDD_HHMM_System_Problem.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "HIGH",
       "incident_id": "INC_20260222_1405_ClaudeCode_ContextLoss",
@@ -28,7 +28,7 @@
     {
       "path": "incidents/INC_20260222_1840_ChatGPT_RadarHit.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": null,
       "incident_id": "INC_20260222_1840_ChatGPT_RadarHit",
@@ -38,7 +38,7 @@
     {
       "path": "incidents/INC_TEMPLATE.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S1",
       "incident_id": null,
@@ -48,7 +48,7 @@
     {
       "path": "incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1818_Claude_RadarHit_3e4912f6ac44",
@@ -58,7 +58,7 @@
     {
       "path": "logs/RADAR_LOG.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "RTS AI RADAR LOG",
       "severity": null,
       "incident_id": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd",
@@ -68,7 +68,7 @@
     {
       "path": "logs/EXECUTION_LOG.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "2026-02-20T14:04:14.199512Z",
       "severity": null,
       "incident_id": null,
@@ -78,7 +78,7 @@
     {
       "path": "logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "BLOCK_00000018",
       "severity": null,
       "incident_id": null,
@@ -88,7 +88,7 @@
     {
       "path": "logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION",
       "severity": null,
       "incident_id": null,
@@ -98,7 +98,7 @@
     {
       "path": "logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "BLOCK_00000017",
       "severity": null,
       "incident_id": null,
@@ -108,7 +108,7 @@
     {
       "path": "logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
       "kind": "log",
-      "mtime_utc": "2026-02-22T19:55:40.068832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.830077+00:00",
       "title": "BLOCK_00000016 — RTS Tester Recruitment Phase Initiated",
       "severity": null,
       "incident_id": null,
@@ -118,7 +118,7 @@
     {
       "path": "incidents/INCIDENT_RULES.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.067832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.829077+00:00",
       "title": "RTS Incident Standard",
       "severity": "S1",
       "incident_id": "INC_20260222_1545_Cursor_ContextLoss",
@@ -128,7 +128,7 @@
     {
       "path": "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.067832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.829077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1545",
@@ -138,7 +138,7 @@
     {
       "path": "incidents/INC_20260222_1704_GPT_ContextResearcher.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.067832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.829077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1704",
@@ -148,7 +148,7 @@
     {
       "path": "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.067832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.829077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": null,
@@ -158,7 +158,7 @@
     {
       "path": "incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T19:55:40.067832+00:00",
+      "mtime_utc": "2026-02-22T20:31:36.829077+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd",
