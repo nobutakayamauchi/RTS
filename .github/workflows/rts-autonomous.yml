@@ -3,7 +3,7 @@ name: RTS Autonomous Kernel
 on:
   workflow_dispatch:
   schedule:
-    # 15分ごと（負荷が気になるなら "0 * * * *" にして毎時にしてOK）
+    # 15分ごと（負荷が気になるなら "0 * * * *" などに変更）
     - cron: "*/15 * * * *"
 
 concurrency:
@@ -26,13 +26,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Run RTS Kernel (state/memory/audit)
         run: |
           set -eux
           python -V
-          # ここは「存在するものだけ」実行（あなたのrepoに今ある構成に合わせてる）
+          # ここは「存在するものだけ」実行（あなたの repo にある前提）
           python state_engine.py
           python memory_index.py
           python self_audit.py
@@ -46,12 +46,11 @@ jobs:
           # 変更がなければ終了
           if git status --porcelain | grep .; then
             git add -A
-            git commit -m "RTS kernel: autonomous cycle"
+            git commit -m "RTS kernel: autonomous tick"
             git push
           else
             echo "No changes to commit."
           fi
-
 
       - name: RTS Self Incident Report
         if: failure()
@@ -59,22 +58,22 @@ jobs:
         with:
           script: |
             const title = "RTS Autonomous Kernel Incident";
-            const body = `
-            RTS Autonomous Kernel detected a failure.
-
-            Time: ${new Date().toISOString()}
-            Actor: GitHub Actions
-
-            Action required:
-            Review latest workflow logs.
-
-            Integrity preserved.
-            `;
+            const body = [
+              "RTS Autonomous Kernel detected a failure.",
+              "",
+              `Time: ${new Date().toISOString()}`,
+              "Actor: GitHub Actions",
+              "",
+              "Action required:",
+              "- Review latest workflow logs.",
+              "",
+              "Integrity preserved."
+            ].join("\n");
 
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: title,
-              body: body,
+              title,
+              body,
               labels: ["RTS", "incident"]
             });
