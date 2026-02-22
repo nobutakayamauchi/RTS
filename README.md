@@ -1,5 +1,13 @@
 # RTS — Real Time Trust System
 
+## ⚡ Start RTS in 5 Minutes
+
+RTS turns AI collaboration into operational memory (logs + incidents).
+
+### 1) Run RTS locally
+```bash
+python START_HERE.py
+
 🔥 RTS PRO — Operator Execution System
 
 For operators working continuously with AI agents and GPT workflows.
