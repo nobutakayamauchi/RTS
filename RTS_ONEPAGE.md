@@ -4,6 +4,21 @@
 
 ---
 
+## Who RTS Is For
+
+RTS is designed for operators working with AI continuously.
+
+Examples:
+
+- AI researchers running long experiments.
+- AI marketers testing prompts and funnels.
+- Startup founders making strategic AI-assisted decisions.
+- Independent builders collaborating daily with AI agents.
+
+RTS prevents loss of reasoning across sessions.
+
+Execution history becomes operational memory.
+
 ## WHAT IS RTS
 
 RTS is an advisory execution operating system designed to support human operators through continuous execution observation and verified evolution.
