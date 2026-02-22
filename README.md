@@ -7,6 +7,7 @@ RTS turns AI collaboration into operational memory (logs + incidents).
 ### 1) Run RTS locally
 ```bash
 python START_HERE.py
+```
 
 🔥 RTS PRO — Operator Execution System
 
