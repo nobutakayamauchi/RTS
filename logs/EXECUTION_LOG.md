@@ -2091,3 +2091,46 @@ Operator: RTS Core
 Status: ACTIVE
 Integrity: VERIFIED
 ---
+
+# RTS Operational Workflow Log --- Smartphone Operator Method
+
+Operator: Nobutaka Yamauchi\
+AI System: ChatGPT 5.2 (AI‑assisted execution collaboration)\
+Environment: Smartphone‑only workflow (iPhone 15 Pro)
+
+Timestamp: 2026-02-22 12:57:53
+
+------------------------------------------------------------------------
+
+## Operational Reason
+
+Long markdown pasting instability increased fatigue and retry time.
+File‑based output delivery adopted for stability.
+
+------------------------------------------------------------------------
+
+## Standard Development Procedure
+
+1.  Concept wall‑bounce discussion.
+2.  Specification confirmation.
+3.  GitHub structure verification.
+4.  ChatGPT instruction issuance.
+5.  Operator rest during file generation.
+6.  GitHub update.
+7.  Human + AI verification.
+8.  Next planning discussion.
+
+------------------------------------------------------------------------
+
+## Feedback Expansion
+
+Future observation targets:
+
+-   X (social monitoring)
+-   Web communities
+
+------------------------------------------------------------------------
+
+Status: ACTIVE Integrity: VERIFIED
+
+END OF OPERATIONAL WORKFLOW LOG
