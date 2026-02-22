@@ -3,13 +3,13 @@ name: RTS Autonomous Kernel
 on:
   workflow_dispatch:
   schedule:
-    # 15分ごと（負荷が気になるなら "0 * * * *" などに変更）
     - cron: "*/15 * * * *"
 
 concurrency:
   group: rts-autonomous-kernel
   cancel-in-progress: true
 
+# ★ここが肝：Issue作成/Pushに必要な権限
 permissions:
   contents: write
   issues: write
@@ -26,48 +26,52 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
       - name: Run RTS Kernel (state/memory/audit)
         run: |
           set -eux
           python -V
-          # ここは「存在するものだけ」実行（あなたの repo にある前提）
           python state_engine.py
           python memory_index.py
           python self_audit.py
 
+      # ★ここが肝：grep/fi地獄をやめて「差分検知」で安全運用
       - name: Commit & Push if changed
         run: |
           set -eux
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # 変更がなければ終了
-          if git status --porcelain | grep .; then
-            git add -A
-            git commit -m "RTS kernel: autonomous tick"
-            git push
-          else
+          git add -A
+
+          # staged差分が無ければ何もしない
+          if git diff --cached --quiet; then
             echo "No changes to commit."
+            exit 0
           fi
 
-      - name: RTS Self Incident Report
+          git commit -m "RTS kernel: autonomous tick"
+          git push
+
+      # ★失敗したら自分でIssue立てる（Resource not accessible対策は permissions:issues:write + settings保存）
+      - name: RTS Self Incident Report (create issue on failure)
         if: failure()
         uses: actions/github-script@v7
         with:
           script: |
-            const title = "RTS Autonomous Kernel Incident";
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const title = `RTS Autonomous Kernel Incident (${new Date().toISOString()})`;
             const body = [
-              "RTS Autonomous Kernel detected a failure.",
-              "",
-              `Time: ${new Date().toISOString()}`,
-              "Actor: GitHub Actions",
-              "",
-              "Action required:",
-              "- Review latest workflow logs.",
-              "",
-              "Integrity preserved."
+              `RTS Autonomous Kernel detected a failure.`,
+              ``,
+              `- Time: ${new Date().toISOString()}`,
+              `- Actor: ${context.actor}`,
+              `- Run: ${runUrl}`,
+              ``,
+              `Action required: Review latest workflow logs.`,
+              `Integrity preserved.`
             ].join("\n");
 
             await github.rest.issues.create({
