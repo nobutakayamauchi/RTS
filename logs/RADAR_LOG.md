@@ -36,3 +36,23 @@ Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal
 https://x.com/giladvdn/status/2024062412656148895
 Title: Gilad Avidan on X: "@nemibanigo Designer friend of mine showed me a Figma/Claude workflow this morning and it looked amazing" / X
 
+## 20260222_1850
+https://status.openai.com
+[![Image 1: OpenAI](https://status.openai.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fincident-io-status-page-logos%2F01H537TKYPX5W42WRCKR1AGPFT%2Fopenai-1%2Fxrs545k8.png&w=256&q=75&dpl=dpl_99gqKXRUR5BXR5qqF9opvEp61tqb) -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------](https://status.openai.com/)
+
+## 20260222_1850
+https://status.anthropic.com
+**Resolved** - Some Windows users on v1.1.3918 of Desktop saw a "Virtualization is not enabled" message and were not able to use Cowork. Resolved in v1.1.3963
+
+## 20260222_1850
+https://www.reddit.com/r/ChatGPT/
+If you think you've been blocked by mistake, file a ticket below and we'll look into it.
+
+## 20260222_1850
+https://github.com/openai/openai-python/issues
+[Skip to content](http://github.com/openai/openai-python/issues#start-of-content)
+
+## 20260222_1850
+https://github.com/anthropics/anthropic-sdk-python/issues
+[Skip to content](http://github.com/anthropics/anthropic-sdk-python/issues#start-of-content)
+
