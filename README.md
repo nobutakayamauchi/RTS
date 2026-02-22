@@ -20,7 +20,7 @@ Live operational history generated every execution cycle.
 Latest execution memory index:
 - **Memory Index:** [memory/index.md](memory/index.md)
 
-Automatically generated from execution logs and incidents.
+Automatically generated from execution logs, incidents, and audit records.
 
 ### 1) Run RTS locally (Quick Start)
 ```bash
