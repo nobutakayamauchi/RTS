@@ -1,6 +1,6 @@
 # RTS RADAR ANALYSIS
 
-- generated_utc: `2026-02-22T19:37:33.226251+00:00`
+- generated_utc: `2026-02-22T19:55:40.403304+00:00`
 - docs: **15** / incidents: **9** / logs: **6**
 
 ## Incident Stats
@@ -32,13 +32,13 @@
   - file: `incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md`
   - url: https://x.com/giladvdn/status/2024062412656148895?s=46
   - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_ClaudeCode Severity: S2 System: Claude Code Status: OPEN --- ## Symptom Long Claude Code workflows lose structural reasoning continuity across sessions. Outputs become inconsistent and require repeated manual prompting to restore context. --- ## Root C…
-- **HIGH** / INC_20260222_1405_ClaudeCode_ContextLoss — **RTS INCIDENT REPORT**
-  - file: `incidents/INC_YYYYMMDD_HHMM_System_Problem.md`
-  - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…
 - **S2** / INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd — **RTS INCIDENT REPORT**
   - file: `incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md`
   - url: https://t.co/Zdclh2X9vg"
   - snippet: # RTS INCIDENT REPORT - Incident ID: INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd - Severity: S2 - System: ChatGPT - Status: OPEN ## Symptom Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. T…
+- **HIGH** / INC_20260222_1405_ClaudeCode_ContextLoss — **RTS INCIDENT REPORT**
+  - file: `incidents/INC_YYYYMMDD_HHMM_System_Problem.md`
+  - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…
 - **S2** / INC_20260222_1818_Claude_RadarHit_3e4912f6ac44 — **RTS INCIDENT REPORT**
   - file: `incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md`
   - url: https://x.com/giladvdn/status/2024062412656148895
