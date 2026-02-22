@@ -1,6 +1,6 @@
 # RTS RADAR ANALYSIS
 
-- generated_utc: `2026-02-22T20:59:22.215554+00:00`
+- generated_utc: `2026-02-22T21:33:55.979520+00:00`
 - docs: **15** / incidents: **9** / logs: **6**
 
 ## Incident Stats
@@ -32,6 +32,9 @@
   - file: `incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md`
   - url: https://x.com/giladvdn/status/2024062412656148895?s=46
   - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_ClaudeCode Severity: S2 System: Claude Code Status: OPEN --- ## Symptom Long Claude Code workflows lose structural reasoning continuity across sessions. Outputs become inconsistent and require repeated manual prompting to restore context. --- ## Root C…
+- **HIGH** / INC_20260222_1405_ClaudeCode_ContextLoss — **RTS INCIDENT REPORT**
+  - file: `incidents/INC_YYYYMMDD_HHMM_System_Problem.md`
+  - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…
 - **S2** / INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd — **RTS INCIDENT REPORT**
   - file: `incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md`
   - url: https://t.co/Zdclh2X9vg"
@@ -40,9 +43,6 @@
   - file: `incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md`
   - url: https://x.com/giladvdn/status/2024062412656148895
   - snippet: # RTS INCIDENT REPORT - Incident ID: INC_20260222_1818_Claude_RadarHit_3e4912f6ac44 - Severity: S2 - System: Claude - Status: OPEN ## Symptom Title: Gilad Avidan on X: "@nemibanigo Designer friend of mine showed me a Figma/Claude workflow this morning and it looked amazing" / X ## Root Cause (Hypoth…
-- **HIGH** / INC_20260222_1405_ClaudeCode_ContextLoss — **RTS INCIDENT REPORT**
-  - file: `incidents/INC_YYYYMMDD_HHMM_System_Problem.md`
-  - snippet: # RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…
 - **UNSPECIFIED** / INC_20260222_1840_ChatGPT_RadarHit — **RTS INCIDENT REPORT**
   - file: `incidents/INC_20260222_1840_ChatGPT_RadarHit.md`
   - url: https://t.co/Zdclh2X9vg"
