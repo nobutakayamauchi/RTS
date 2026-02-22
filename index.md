@@ -1,68 +1,113 @@
-# RTS — Real Time Trust System
+RTS Leader — Operator System
 
-(Advisory Execution Operating System)
+RTS (Real Time Trust System) is an execution memory OS for AI operators.
 
----
+Execution becomes memory.
+Memory becomes identity.
 
-## Execution becomes memory.
+⸻
 
-## Memory becomes identity.
+Start RTS in 3 Steps
+	1.	Fork this repository.
+	2.	Run locally:
+python START_HERE.py
+	3.	Begin logging execution decisions.
 
-RTS is an advisory execution operating system designed to preserve reasoning continuity inside AI workflows.
+RTS converts AI collaboration into operational memory.
 
-It records decisions, execution context, and operational history so thinking survives beyond individual sessions.
+⸻
 
----
-
-## Built for AI Operators
+Built for AI Operators
 
 RTS is designed for operators working continuously with AI.
 
 Designed for:
-- AI researchers
-- GPT workflow builders
-- startup operators
-- prompt engineers
+	•	AI researchers
+	•	GPT workflow builders
+	•	startup operators
+	•	prompt engineers
 
-RTS prevents loss of reasoning across sessions.  
+RTS prevents loss of reasoning across sessions.
+
 Execution history becomes operational memory.
 
----
+⸻
 
-## Why RTS?
+RTS Leader
+
+RTS Leader is a lightweight execution OS for individuals.
+
+It allows operators to:
+	•	preserve reasoning continuity
+	•	maintain execution history
+	•	audit AI collaboration
+	•	build reproducible workflows
+
+Human operator authority remains final.
+
+RTS observes execution.
+
+It never replaces judgment.
+
+⸻
+
+Why RTS Exists
 
 Modern AI workflows restart thinking every session.
 
-Ideas disappear.  
+Ideas disappear.
+
 Execution history is lost.
 
-RTS turns execution into operational memory.
+RTS converts execution into persistent operational memory.
 
----
+⸻
 
-## RTS PRO — Operator Execution System 🔥
+Operational Loop
 
-For operators working continuously with AI agents and GPT workflows.
+CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
+
+Execution becomes memory.
+
+⸻
+
+Quick Structure
+
+Core folders:
+
+logs → execution evidence
+incidents → failure intelligence
+vibecode → agent workflows
+radar → incident radar system
+
+⸻
+
+RTS PRO — Operator Execution System
+
+For operators running long AI workflows or research iterations.
 
 Includes:
-- Execution templates
-- Operator governance framework
-- Decision logging system
-- RTS evolution workflow
+	•	Execution templates
+	•	Operator governance framework
+	•	Decision logging system
+	•	RTS evolution workflow
 
-### Download RTS PRO
-👉 https://risingson2.gumroad.com/l/sgeldp
+Download RTS PRO:
 
----
+https://risingson2.gumroad.com/l/sgeldp
 
-## Official Repository
+⸻
+
+Official Repository
+
 https://github.com/nobutakayamauchi/RTS
 
 Public execution logs serve as operational evidence.
 
----
+⸻
 
-## Creator
+Creator
+
 Nobutaka Yamauchi
 
 MIT License — 2026
