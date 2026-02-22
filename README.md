@@ -1,12 +1,19 @@
 # RTS — Real Time Trust System
 
-🔥 RTS PRO Operator Templates Available:
+🔥 RTS PRO — Operator Execution System
 
-https://irisnson2.gumroad.com/l/sgelpb
+For operators working continuously with AI agents and GPT workflows.
 
-Decision Logging Operating System for AI Execution Continuity.
+Includes:
 
-Decision Logging Operating System for AI Execution Continuity.
+- Execution templates
+- Operator governance framework
+- Decision logging system
+- RTS evolution workflow
+
+Download RTS PRO:
+
+👉 https://irisnson2.gumroad.com/l/sgelpb
 
 ---
 
