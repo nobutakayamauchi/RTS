@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-02-22T17:41:06.301402+00:00",
+  "generated_utc": "2026-02-22T17:51:23.342482+00:00",
   "counts": {
     "docs": 15,
     "incidents": 9,
@@ -16,109 +16,9 @@
   },
   "docs": [
     {
-      "path": "incidents/INC_YYYYMMDD_HHMM_System_Problem.md",
-      "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "RTS INCIDENT REPORT",
-      "severity": "HIGH",
-      "incident_id": "INC_20260222_1405_ClaudeCode_ContextLoss",
-      "url": null,
-      "snippet": "# RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…"
-    },
-    {
-      "path": "incidents/INC_20260222_1840_ChatGPT_RadarHit.md",
-      "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "RTS INCIDENT REPORT",
-      "severity": null,
-      "incident_id": "INC_20260222_1840_ChatGPT_RadarHit",
-      "url": "https://t.co/Zdclh2X9vg\"",
-      "snippet": "# RTS INCIDENT REPORT Incident ID : INC_20260222_1840_ChatGPT_RadarHit System : ChatGPT Status : OPEN ## Symptom Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Error\" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works…"
-    },
-    {
-      "path": "incidents/INC_TEMPLATE.md",
-      "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "RTS INCIDENT REPORT",
-      "severity": "S1",
-      "incident_id": null,
-      "url": null,
-      "snippet": "# RTS INCIDENT REPORT RTS converts AI workflow failure into recoverable operational memory. --- ## Incident ID INC_YYYYMMDD_HHMM ## Severity S1 (critical) / S2 / S3 ## System ChatGPT / Claude / Cursor / Agent / GitHub / Other ## Status OPEN / MITIGATED / CLOSED --- ## Symptom What happened? ## Impac…"
-    },
-    {
-      "path": "incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
-      "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "RTS INCIDENT REPORT",
-      "severity": "S2",
-      "incident_id": "INC_20260222_1818_Claude_RadarHit_3e4912f6ac44",
-      "url": "https://x.com/giladvdn/status/2024062412656148895",
-      "snippet": "# RTS INCIDENT REPORT - Incident ID: INC_20260222_1818_Claude_RadarHit_3e4912f6ac44 - Severity: S2 - System: Claude - Status: OPEN ## Symptom Title: Gilad Avidan on X: \"@nemibanigo Designer friend of mine showed me a Figma/Claude workflow this morning and it looked amazing\" / X ## Root Cause (Hypoth…"
-    },
-    {
-      "path": "logs/RADAR_LOG.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "RTS AI RADAR LOG",
-      "severity": null,
-      "incident_id": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd",
-      "url": "https://x.com/amurepinho/status/2018789010769080603",
-      "snippet": "# RTS AI RADAR LOG ## Run — 2026-02-22 18:17 JST - Targets: 3 - ✅ Incident: `incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md` - URL: https://x.com/amurepinho/status/2018789010769080603 - Snippet: Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Err…"
-    },
-    {
-      "path": "logs/EXECUTION_LOG.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "2026-02-20T14:04:14.199512Z",
-      "severity": null,
-      "incident_id": null,
-      "url": null,
-      "snippet": "## 2026-02-20T14:04:14.199512Z Event: RTS execution cycle started Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity: VERIFIED --- ## 2026-02-20T14:04:14.199669Z Event: RTS decision: skipped proposal (pending exists) Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity:…"
-    },
-    {
-      "path": "logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "BLOCK_00000018",
-      "severity": null,
-      "incident_id": null,
-      "url": null,
-      "snippet": "BLOCK_00000018 Event: RTS Auto Reset Engine activated. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS Autonomous Kernel gained automatic recovery capability. Failure detection and recovery loop operational. Integrity: VERIFIED"
-    },
-    {
-      "path": "logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION",
-      "severity": null,
-      "incident_id": null,
-      "url": null,
-      "snippet": "# BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION Operator: Nobutaka Yamauchi Framework: RTS — Real Time Trust System Date: 2026-02-22 JST Mode: Execution Phase Transition --- ## I. Background Following extended implementation and structural stabilization, RTS transitioned from interna…"
-    },
-    {
-      "path": "logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "BLOCK_00000017",
-      "severity": null,
-      "incident_id": null,
-      "url": null,
-      "snippet": "BLOCK_00000017 Event: RTS Autonomous Kernel entered scheduled execution. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS transitioned from manual execution to autonomous GitHub Actions operation. Integrity: VERIFIED"
-    },
-    {
-      "path": "logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
-      "kind": "log",
-      "mtime_utc": "2026-02-22T17:41:05.981728+00:00",
-      "title": "BLOCK_00000016 — RTS Tester Recruitment Phase Initiated",
-      "severity": null,
-      "incident_id": null,
-      "url": "https://github.com/nobutakayamauchi/RTS",
-      "snippet": "# BLOCK_00000016 — RTS Tester Recruitment Phase Initiated Timestamp (UTC): 2026-02-22 Operator: Nobutaka Yamauchi Repository: https://github.com/nobutakayamauchi/RTS --- ## Event RTS (Real Time Trust System) enters early operator adoption phase. Public release infrastructure completed: - GitHub publ…"
-    },
-    {
       "path": "incidents/INCIDENT_RULES.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.980728+00:00",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
       "title": "RTS Incident Standard",
       "severity": "S1",
       "incident_id": "INC_20260222_1545_Cursor_ContextLoss",
@@ -128,7 +28,7 @@
     {
       "path": "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.980728+00:00",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1545",
@@ -138,7 +38,7 @@
     {
       "path": "incidents/INC_20260222_1704_GPT_ContextResearcher.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.980728+00:00",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1704",
@@ -148,7 +48,7 @@
     {
       "path": "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.980728+00:00",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": null,
@@ -156,14 +56,114 @@
       "snippet": "# RTS INCIDENT REPORT Incident ID: INC_20260222_ClaudeCode Severity: S2 System: Claude Code Status: OPEN --- ## Symptom Long Claude Code workflows lose structural reasoning continuity across sessions. Outputs become inconsistent and require repeated manual prompting to restore context. --- ## Root C…"
     },
     {
+      "path": "incidents/INC_YYYYMMDD_HHMM_System_Problem.md",
+      "kind": "incident",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "RTS INCIDENT REPORT",
+      "severity": "HIGH",
+      "incident_id": "INC_20260222_1405_ClaudeCode_ContextLoss",
+      "url": null,
+      "snippet": "# RTS INCIDENT REPORT Incident ID: INC_20260222_1405_ClaudeCode_ContextLoss System: ClaudeCode Category: Context Failure Severity: High Status: Open --- ## Summary Context memory was lost during active AI workflow execution. Session continuity broke unexpectedly. --- ## Symptoms - AI forgot prior in…"
+    },
+    {
       "path": "incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md",
       "kind": "incident",
-      "mtime_utc": "2026-02-22T17:41:05.980728+00:00",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
       "title": "RTS INCIDENT REPORT",
       "severity": "S2",
       "incident_id": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd",
       "url": "https://t.co/Zdclh2X9vg\"",
       "snippet": "# RTS INCIDENT REPORT - Incident ID: INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd - Severity: S2 - System: ChatGPT - Status: OPEN ## Symptom Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Error\" when I try to add files do knowledge creating a custom GPT. T…"
+    },
+    {
+      "path": "incidents/INC_20260222_1840_ChatGPT_RadarHit.md",
+      "kind": "incident",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "RTS INCIDENT REPORT",
+      "severity": null,
+      "incident_id": "INC_20260222_1840_ChatGPT_RadarHit",
+      "url": "https://t.co/Zdclh2X9vg\"",
+      "snippet": "# RTS INCIDENT REPORT Incident ID : INC_20260222_1840_ChatGPT_RadarHit System : ChatGPT Status : OPEN ## Symptom Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Error\" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works…"
+    },
+    {
+      "path": "incidents/INC_TEMPLATE.md",
+      "kind": "incident",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "RTS INCIDENT REPORT",
+      "severity": "S1",
+      "incident_id": null,
+      "url": null,
+      "snippet": "# RTS INCIDENT REPORT RTS converts AI workflow failure into recoverable operational memory. --- ## Incident ID INC_YYYYMMDD_HHMM ## Severity S1 (critical) / S2 / S3 ## System ChatGPT / Claude / Cursor / Agent / GitHub / Other ## Status OPEN / MITIGATED / CLOSED --- ## Symptom What happened? ## Impac…"
+    },
+    {
+      "path": "incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md",
+      "kind": "incident",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "RTS INCIDENT REPORT",
+      "severity": "S2",
+      "incident_id": "INC_20260222_1818_Claude_RadarHit_3e4912f6ac44",
+      "url": "https://x.com/giladvdn/status/2024062412656148895",
+      "snippet": "# RTS INCIDENT REPORT - Incident ID: INC_20260222_1818_Claude_RadarHit_3e4912f6ac44 - Severity: S2 - System: Claude - Status: OPEN ## Symptom Title: Gilad Avidan on X: \"@nemibanigo Designer friend of mine showed me a Figma/Claude workflow this morning and it looked amazing\" / X ## Root Cause (Hypoth…"
+    },
+    {
+      "path": "logs/RADAR_LOG.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "RTS AI RADAR LOG",
+      "severity": null,
+      "incident_id": "INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd",
+      "url": "https://x.com/amurepinho/status/2018789010769080603",
+      "snippet": "# RTS AI RADAR LOG ## Run — 2026-02-22 18:17 JST - Targets: 3 - ✅ Incident: `incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md` - URL: https://x.com/amurepinho/status/2018789010769080603 - Snippet: Title: Amure Pinho on X: \"@grok and @OpenAI getting \"Error saving GPT - Internal Server Err…"
+    },
+    {
+      "path": "logs/EXECUTION_LOG.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "2026-02-20T14:04:14.199512Z",
+      "severity": null,
+      "incident_id": null,
+      "url": null,
+      "snippet": "## 2026-02-20T14:04:14.199512Z Event: RTS execution cycle started Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity: VERIFIED --- ## 2026-02-20T14:04:14.199669Z Event: RTS decision: skipped proposal (pending exists) Source: GitHub Actions Operator: RTS Core Status: ACTIVE Integrity:…"
+    },
+    {
+      "path": "logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "BLOCK_00000018",
+      "severity": null,
+      "incident_id": null,
+      "url": null,
+      "snippet": "BLOCK_00000018 Event: RTS Auto Reset Engine activated. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS Autonomous Kernel gained automatic recovery capability. Failure detection and recovery loop operational. Integrity: VERIFIED"
+    },
+    {
+      "path": "logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION",
+      "severity": null,
+      "incident_id": null,
+      "url": null,
+      "snippet": "# BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION Operator: Nobutaka Yamauchi Framework: RTS — Real Time Trust System Date: 2026-02-22 JST Mode: Execution Phase Transition --- ## I. Background Following extended implementation and structural stabilization, RTS transitioned from interna…"
+    },
+    {
+      "path": "logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "BLOCK_00000017",
+      "severity": null,
+      "incident_id": null,
+      "url": null,
+      "snippet": "BLOCK_00000017 Event: RTS Autonomous Kernel entered scheduled execution. Date: 2026-02-23 JST Operator: Nobutaka Yamauchi Notes: RTS transitioned from manual execution to autonomous GitHub Actions operation. Integrity: VERIFIED"
+    },
+    {
+      "path": "logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md",
+      "kind": "log",
+      "mtime_utc": "2026-02-22T17:51:22.987675+00:00",
+      "title": "BLOCK_00000016 — RTS Tester Recruitment Phase Initiated",
+      "severity": null,
+      "incident_id": null,
+      "url": "https://github.com/nobutakayamauchi/RTS",
+      "snippet": "# BLOCK_00000016 — RTS Tester Recruitment Phase Initiated Timestamp (UTC): 2026-02-22 Operator: Nobutaka Yamauchi Repository: https://github.com/nobutakayamauchi/RTS --- ## Event RTS (Real Time Trust System) enters early operator adoption phase. Public release infrastructure completed: - GitHub publ…"
     }
   ]
 }
