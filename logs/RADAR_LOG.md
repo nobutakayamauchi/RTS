@@ -64,3 +64,11 @@ https://cursor.sh/changelog
 https://x.com/nejsnave/status/2023926052826055088
 Warning: This page maybe not yet fully loaded, consider explicitly specify a timeout.
 
+## 20260222_2012
+https://x.com/nejsnave/status/2023926052826055088
+Title: jennifer evans 🇵🇸🇱🇧🇨🇦 on X: "@MrEwanMorrison This is architectural. The instability is triggered by input length, complexity, and ambiguity in ways that follow scaling behavior. We haven't seen evidence that runtime degradation is driven by synthetic-data feedback loops.
+
+## 20260222_2012
+https://status.anthropic.com
+[![Image 1: Claude logo](http://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/362807/NEW_claude_status_banner-183284a4-558d-4835-b3a4-a601e0a4daa8.png)](https://status.claude.com/)
+
