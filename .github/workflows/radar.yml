@@ -1,4 +1,8 @@
-name: RTS AI Radar
+name: RTS AI Rada
+
+concurrency:
+  group: rts-main-writer
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
