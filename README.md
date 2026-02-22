@@ -15,6 +15,8 @@ Execution history becomes operational identity.
 
 Continuity survives session resets.
 
+Live operational history generated every execution cycle.
+
 Latest execution memory index:
 - [memory/index.md](memory/index.md)
 
