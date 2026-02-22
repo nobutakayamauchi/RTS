@@ -9,8 +9,10 @@ Memory becomes identity.
 
 Start RTS in 3 Steps
 	1.	Fork this repository.
+	
 	2.	Run locally:
 python START_HERE.py
+	
 	3.	Begin logging execution decisions.
 
 RTS converts AI collaboration into operational memory.
