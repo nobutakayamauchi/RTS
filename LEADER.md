@@ -19,6 +19,11 @@ python START_HERE.py
 
 3. Begin logging execution.
 
+## Public Execution Milestone
+
+RTS Version 1.0 Public Execution Record:
+
+RTS_VERSION_1_0_MILESTONE.md
 ---
 
 ## 🎯 What RTS Leader Does
