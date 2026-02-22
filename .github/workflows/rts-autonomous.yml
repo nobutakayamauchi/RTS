@@ -1,0 +1,52 @@
+name: RTS Autonomous Kernel
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 15分ごと（負荷が気になるなら "0 * * * *" にして毎時にしてOK）
+    - cron: "*/15 * * * *"
+
+concurrency:
+  group: rts-autonomous-kernel
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  run-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run RTS Kernel (state/memory/audit)
+        run: |
+          set -eux
+          python -V
+          # ここは「存在するものだけ」実行（あなたのrepoに今ある構成に合わせてる）
+          python state_engine.py
+          python memory_index.py
+          python self_audit.py
+
+      - name: Commit & Push if changed
+        run: |
+          set -eux
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # 変更がなければ終了
+          if git status --porcelain | grep .; then
+            git add -A
+            git commit -m "RTS kernel: autonomous cycle"
+            git push
+          else
+            echo "No changes to commit."
+          fi
