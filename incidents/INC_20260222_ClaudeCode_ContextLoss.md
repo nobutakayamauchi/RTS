@@ -50,4 +50,4 @@ Public user reports discussing Claude Code workflow instability on X.
 
 https://x.com/giladvdn/status/2024062412656148895?s=46
 
-(Add evidence links here)
+
