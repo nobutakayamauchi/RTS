@@ -1,6 +1,6 @@
 # RTS Analyze
 
-Generated: 2026-02-23 04:11 UTC
+Generated: 2026-02-23 04:26 UTC
 
 ---
 
@@ -17,35 +17,35 @@ Generated: 2026-02-23 04:11 UTC
 - Incidents observed (raw): 9
 - Incidents observed (deduplicated): 9
 - Duplicate pairs detected: 0
-- Latest incident mtime: 2026-02-23 04:11 UTC
+- Latest incident mtime: 2026-02-23 04:26 UTC
 
 ### Latest Incidents (deduplicated)
 
-- **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:11 UTC, sha:ca0f7868)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md) (mtime: 2026-02-23 04:11 UTC, sha:9f2a9e4b)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md](incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md) (mtime: 2026-02-23 04:11 UTC, sha:88104201)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:11 UTC, sha:000492b5)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:11 UTC, sha:2c3d6558)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md](incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md) (mtime: 2026-02-23 04:11 UTC, sha:e85a6d40)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:11 UTC, sha:dcca6b58)
-- **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:11 UTC, sha:3970b341)
-- **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:11 UTC, sha:79d7e88e)
+- **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:26 UTC, sha:ca0f7868)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md) (mtime: 2026-02-23 04:26 UTC, sha:9f2a9e4b)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md](incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md) (mtime: 2026-02-23 04:26 UTC, sha:88104201)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:26 UTC, sha:000492b5)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:26 UTC, sha:2c3d6558)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md](incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md) (mtime: 2026-02-23 04:26 UTC, sha:e85a6d40)
+- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:26 UTC, sha:dcca6b58)
+- **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:26 UTC, sha:3970b341)
+- **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:26 UTC, sha:79d7e88e)
 
 ---
 
 ## Execution Stability
 
 - Logs observed: 6
-- Latest log mtime: 2026-02-23 04:11 UTC
+- Latest log mtime: 2026-02-23 04:26 UTC
 
 ### Latest Logs
 
-- **BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION** — [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md) (mtime: 2026-02-23 04:11 UTC, sha:8fb84074)
-- **BLOCK_00000016 — RTS Tester Recruitment Phase Initiated** — [logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md) (mtime: 2026-02-23 04:11 UTC, sha:8010baaf)
-- **BLOCK_00000017** — [logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md) (mtime: 2026-02-23 04:11 UTC, sha:1ddad98d)
-- **BLOCK_00000018** — [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (mtime: 2026-02-23 04:11 UTC, sha:c7ce9cb2)
-- **RTS Operational Workflow Log --- Smartphone Operator Method** — [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (mtime: 2026-02-23 04:11 UTC, sha:1c613dac)
-- **RTS AI RADAR LOG** — [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (mtime: 2026-02-23 04:11 UTC, sha:f71ef752)
+- **RTS AI RADAR LOG** — [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (mtime: 2026-02-23 04:26 UTC, sha:f71ef752)
+- **BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION** — [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md) (mtime: 2026-02-23 04:26 UTC, sha:8fb84074)
+- **BLOCK_00000016 — RTS Tester Recruitment Phase Initiated** — [logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md) (mtime: 2026-02-23 04:26 UTC, sha:8010baaf)
+- **BLOCK_00000017** — [logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md) (mtime: 2026-02-23 04:26 UTC, sha:1ddad98d)
+- **BLOCK_00000018** — [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (mtime: 2026-02-23 04:26 UTC, sha:c7ce9cb2)
+- **RTS Operational Workflow Log --- Smartphone Operator Method** — [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (mtime: 2026-02-23 04:26 UTC, sha:1c613dac)
 
 ---
 
@@ -193,12 +193,12 @@ Deterministic governance keyword scan (evidence-only).
 
 Deterministic keyword risk scoring (evidence-only).
 
-- Risk Score **4** — **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:11 UTC, sha:79d7e88e)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:11 UTC, sha:000492b5)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:11 UTC, sha:2c3d6558)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:11 UTC, sha:dcca6b58)
-- Risk Score **1** — **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:11 UTC, sha:ca0f7868)
-- Risk Score **1** — **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:11 UTC, sha:3970b341)
+- Risk Score **4** — **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:26 UTC, sha:79d7e88e)
+- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:26 UTC, sha:000492b5)
+- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:26 UTC, sha:2c3d6558)
+- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:26 UTC, sha:dcca6b58)
+- Risk Score **1** — **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:26 UTC, sha:ca0f7868)
+- Risk Score **1** — **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:26 UTC, sha:3970b341)
 
 ---
 
@@ -211,6 +211,43 @@ Governance Score: **352**
 - deletion: 1
 - human: 304
 - automation: 32
+---
+
+## Future Risk Radar
+
+Deterministic forecast based on recent evidence frequency (no ML, no inference beyond counts).
+
+### Window
+
+- Recent window: last **7 days** (cutoff: 2026-02-16 04:26 UTC)
+- Recent incidents: 9 / Recent logs: 6
+
+### Predicted Next Risk Areas (top 10)
+
+| Level | Topic | Recent Incidents | Recent Logs | Recent Total | Overall Total |
+|---|---:|---:|---:|---:|---:|
+| RISING | **error** | 4 | 8 | 12 | 12 |
+| RISING | **failure** | 5 | 6 | 11 | 11 |
+| RISING | **server error** | 2 | 2 | 4 | 4 |
+| STABLE | **workflow interruption** | 2 | 0 | 2 | 2 |
+| STABLE | **token** | 1 | 0 | 1 | 1 |
+| STABLE | **auth** | 0 | 1 | 1 | 1 |
+| STABLE | **github mobile** | 0 | 1 | 1 | 1 |
+| STABLE | **timeout** | 0 | 1 | 1 | 1 |
+| QUIET | **automation** | 0 | 0 | 0 | 0 |
+| QUIET | **context loss** | 0 | 0 | 0 | 0 |
+
+### Operational Hotspots (rule-based)
+
+- **Backup Culture is weak (backup=0)** → elevated recovery risk if workflow/session breaks.
+- **Deletion signals detected** → elevated risk of accidental removal / workflow interruption.
+- **Automation + workflow interruption evidence** → prioritize workflow hardening.
+
+### Failure Pressure Index (deterministic)
+
+- Failure Pressure Index: **127**
+- Definition: weighted sum of recent evidence hits (failure/error/server/session/workflow) + recent volume.
+
 
 ---
 
