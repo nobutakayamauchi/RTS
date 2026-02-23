@@ -1,253 +1,56 @@
 # RTS Analyze
 
-Generated: 2026-02-23 04:26 UTC
-
----
-
-## Inputs
-
-- memory/index.md (priority): [memory/index.md](memory/index.md)
-- incidents/*.md: incidents/
-- logs/*.md: logs/
+Generated: 2026-02-23 04:39 UTC
 
 ---
 
 ## Incident Trend
 
-- Incidents observed (raw): 9
-- Incidents observed (deduplicated): 9
-- Duplicate pairs detected: 0
-- Latest incident mtime: 2026-02-23 04:26 UTC
-
-### Latest Incidents (deduplicated)
-
-- **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:26 UTC, sha:ca0f7868)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md) (mtime: 2026-02-23 04:26 UTC, sha:9f2a9e4b)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md](incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md) (mtime: 2026-02-23 04:26 UTC, sha:88104201)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:26 UTC, sha:000492b5)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:26 UTC, sha:2c3d6558)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md](incidents/INC_20260222_1818_Claude_RadarHit_3e4912f6ac44.md) (mtime: 2026-02-23 04:26 UTC, sha:e85a6d40)
-- **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:26 UTC, sha:dcca6b58)
-- **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:26 UTC, sha:3970b341)
-- **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:26 UTC, sha:79d7e88e)
+- incidents observed: 9
+- latest incident: 2026-02-23 04:39 UTC
 
 ---
 
-## Execution Stability
+## Risk Topic Ranking
 
-- Logs observed: 6
-- Latest log mtime: 2026-02-23 04:26 UTC
-
-### Latest Logs
-
-- **RTS AI RADAR LOG** — [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (mtime: 2026-02-23 04:26 UTC, sha:f71ef752)
-- **BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION** — [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md) (mtime: 2026-02-23 04:26 UTC, sha:8fb84074)
-- **BLOCK_00000016 — RTS Tester Recruitment Phase Initiated** — [logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md) (mtime: 2026-02-23 04:26 UTC, sha:8010baaf)
-- **BLOCK_00000017** — [logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md) (mtime: 2026-02-23 04:26 UTC, sha:1ddad98d)
-- **BLOCK_00000018** — [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (mtime: 2026-02-23 04:26 UTC, sha:c7ce9cb2)
-- **RTS Operational Workflow Log --- Smartphone Operator Method** — [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (mtime: 2026-02-23 04:26 UTC, sha:1c613dac)
-
----
-
-## Observed Risk Patterns
-
-Evidence-first keyword signals across incidents + logs. No inference beyond evidence hits.
-
-### Risk Topic Ranking
-
-- **failure**: 11
-- **error**: 8
-- **server error**: 4
-- **workflow interruption**: 2
-- **auth**: 1
-- **github mobile**: 1
-- **timeout**: 1
-- **token**: 1
-- **automation**: 0
-- **context loss**: 0
-- **deleted workflow**: 0
-- **downtime**: 0
-- **exception**: 0
-- **force push**: 0
-- **ios**: 0
-- **merge conflict**: 0
-- **permission**: 0
-- **rate limit**: 0
-- **rebase**: 0
-- **session reset**: 0
-
-### Evidence Hits (top per topic)
-
-#### failure
-
-- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)#L48 — `Execution failure becomes operational memory.`
-- [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md)#L15 — `AI researcher publicly reports reasoning instability and early prompt failures across frontier LLM models.`
-- [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md)#L17 — `Observed degradation includes proper noun failures and early reasoning collapse.`
-- [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md)#L3 — `RTS converts AI workflow failure into recoverable operational memory.`
-- [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md)#L10 — `Context Failure`
-
-#### error
-
-- [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md)#L9 — `Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works. Failed to load resource: the server responded with …`
-- [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md)#L8 — `Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works. Failed to load resource: the server responded with …`
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1956 — `If the same execution error occurred twice consecutively:`
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1974 — `Operator executed rapid trial-and-error operational cycles.`
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md)#L8 — `- Snippet: Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, im...`
-
-#### server error
-
-- [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md)#L9 — `Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works. Failed to load resource: the server responded with …`
-- [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md)#L8 — `Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works. Failed to load resource: the server responded with …`
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md)#L8 — `- Snippet: Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, im...`
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md)#L33 — `Title: Amure Pinho on X: "@grok and @OpenAI getting "Error saving GPT - Internal Server Error" when I try to add files do knowledge creating a custom GPT. Txt, PDF, not working, img works. Failed to load resource: the server responded with …`
-
-#### workflow interruption
-
-- [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md)#L30 — `- Workflow interruption occurred`
-- [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md)#L70 — `Workflow interruption.`
-
-#### auth
-
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1817 — `Author:`
-
-#### github mobile
-
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1946 — `• iPhone 15 Pro • ChatGPT AI collaboration • GitHub mobile interface`
-
-#### timeout
-
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md)#L65 — `Warning: This page maybe not yet fully loaded, consider explicitly specify a timeout.`
-
-#### token
-
-- [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md)#L43 — `LLM reasoning degradation is now observable even within shorter token windows.`
-
----
-
-## Governance Signals
-
-Deterministic governance keyword scan (evidence-only).
-
-- **operator**: 304
-- **evidence**: 14
-- **verification**: 8
-- **deletion**: 1
-- **governance**: 1
-- **human**: 1
-- **policy**: 1
-- **provenance**: 1
-- **authority**: 0
-- **backup**: 0
-- **last resort**: 0
-- **verify**: 0
-
-### Governance Evidence
-
-#### operator
-
-- [incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)#L34 — `Operator repeatedly rebuilds context manually.`
-- [incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md](incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md)#L29 — `Operator repeatedly rebuilds reasoning state manually.`
-- [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md)#L29 — `Operators must manually validate outputs earlier and more frequently.`
-- [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md)#L37 — `Operator initiated structured execution logging and research dialogue engagement to validate operational memory hypothesis.`
-- [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md)#L15 — `Operator must rebuild context manually, losing time and continuity.`
-
-#### evidence
-
-- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)#L21 — `- Evidence (URL)`
-- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)#L35 — `## Evidence`
-- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)#L37 — `Evidence must include at least one:`
-- [incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)#L50 — `## Evidence`
-- [incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md](incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md)#L47 — `## Evidence`
-
-#### verification
-
-- [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)#L27 — `- Verification through real user operation`
-- [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)#L48 — `- Stripe Identity Verification Completed`
-- [logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)#L40 — `- AI collaboration memory persistence verification`
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L2000 — `4.  Verification Protocol`
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L2004 — `• Screenshot capture • AI cross-verification`
-
-#### deletion
-
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1958 — `Operator performed complete deletion and reconstruction from clean`
-
-#### governance
-
-- [logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)#L39 — `- governance protocol stress testing`
-
-#### human
-
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L2120 — `7.  Human + AI verification.`
-
-#### policy
-
-- [logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)#L69 — `- README Protection policy added`
-
-#### provenance
-
-- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)#L1815 — `- GitHub provenance recording confirmed operational`
-
----
-
-## High Risk Incidents
-
-Deterministic keyword risk scoring (evidence-only).
-
-- Risk Score **4** — **RTS INCIDENT REPORT** — [incidents/INC_YYYYMMDD_HHMM_System_Problem.md](incidents/INC_YYYYMMDD_HHMM_System_Problem.md) (mtime: 2026-02-23 04:26 UTC, sha:79d7e88e)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1704_GPT_ContextResearcher.md](incidents/INC_20260222_1704_GPT_ContextResearcher.md) (mtime: 2026-02-23 04:26 UTC, sha:000492b5)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md](incidents/INC_20260222_1818_ChatGPT_RadarHit_2471f850d6dd.md) (mtime: 2026-02-23 04:26 UTC, sha:2c3d6558)
-- Risk Score **3** — **RTS INCIDENT REPORT** — [incidents/INC_20260222_1840_ChatGPT_RadarHit.md](incidents/INC_20260222_1840_ChatGPT_RadarHit.md) (mtime: 2026-02-23 04:26 UTC, sha:dcca6b58)
-- Risk Score **1** — **RTS Incident Standard** — [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (mtime: 2026-02-23 04:26 UTC, sha:ca0f7868)
-- Risk Score **1** — **RTS INCIDENT REPORT** — [incidents/INC_TEMPLATE.md](incidents/INC_TEMPLATE.md) (mtime: 2026-02-23 04:26 UTC, sha:3970b341)
+- error: 12
+- failure: 11
+- server error: 4
+- workflow interruption: 2
+- token: 1
+- auth: 1
 
 ---
 
 ## Governance Score
 
-Governance Score: **352**
+- Governance Score: 329
 
-- backup: 0
-- provenance: 15
+- operator: 304
+- verification: 8
+- evidence: 14
+- policy: 1
+- human: 1
 - deletion: 1
-- human: 304
-- automation: 32
+
 ---
 
 ## Future Risk Radar
 
-Deterministic forecast based on recent evidence frequency (no ML, no inference beyond counts).
+- recent failures: 5
+- recent errors: 4
+- workflow interruptions: 19
 
-### Window
+### Failure Pressure Index
 
-- Recent window: last **7 days** (cutoff: 2026-02-16 04:26 UTC)
-- Recent incidents: 9 / Recent logs: 6
+- Failure Pressure Index: 94
 
-### Predicted Next Risk Areas (top 10)
+---
 
-| Level | Topic | Recent Incidents | Recent Logs | Recent Total | Overall Total |
-|---|---:|---:|---:|---:|---:|
-| RISING | **error** | 4 | 8 | 12 | 12 |
-| RISING | **failure** | 5 | 6 | 11 | 11 |
-| RISING | **server error** | 2 | 2 | 4 | 4 |
-| STABLE | **workflow interruption** | 2 | 0 | 2 | 2 |
-| STABLE | **token** | 1 | 0 | 1 | 1 |
-| STABLE | **auth** | 0 | 1 | 1 | 1 |
-| STABLE | **github mobile** | 0 | 1 | 1 | 1 |
-| STABLE | **timeout** | 0 | 1 | 1 | 1 |
-| QUIET | **automation** | 0 | 0 | 0 | 0 |
-| QUIET | **context loss** | 0 | 0 | 0 | 0 |
+## Recovery Health
 
-### Operational Hotspots (rule-based)
-
-- **Backup Culture is weak (backup=0)** → elevated recovery risk if workflow/session breaks.
-- **Deletion signals detected** → elevated risk of accidental removal / workflow interruption.
-- **Automation + workflow interruption evidence** → prioritize workflow hardening.
-
-### Failure Pressure Index (deterministic)
-
-- Failure Pressure Index: **127**
-- Definition: weighted sum of recent evidence hits (failure/error/server/session/workflow) + recent volume.
-
+- recovery evidence: 2
+- recovery capability: LOW
 
 ---
 
