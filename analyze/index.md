@@ -1,49 +1,72 @@
-# RTS Analyze
+# RTS Sentinel Analysis
 
-Generated: 2026-02-23 04:39 UTC
+Generated: 2026-02-23 04:51 UTC
+
+---
+
+## Inputs
+
+- memory/index.md (priority): [memory/index.md](memory/index.md)
+- incidents/*.md: [incidents/](incidents/)
+- logs/*.md: [logs/](logs/)
 
 ---
 
 ## Incident Trend
 
 - incidents observed: 9
-- latest incident: 2026-02-23 04:39 UTC
+- latest incident: 2026-02-23 04:51 UTC
 
 ---
 
 ## Risk Topic Ranking
 
+- workflow interruption: 572
+- human: 305
+- verify: 280
+- failure: 14
+- context loss: 13
 - error: 12
-- failure: 11
-- server error: 4
-- workflow interruption: 2
+- server error: 8
+- github mobile: 4
+- session reset: 3
+- auth: 2
+- timeout: 1
 - token: 1
-- auth: 1
+- deletion: 1
+- policy: 1
+- provenance: 1
+- backup: 0
 
 ---
 
 ## Governance Score
 
-- Governance Score: 329
+- Governance Score: 603
 
 - operator: 304
-- verification: 8
+- verification: 280
 - evidence: 14
-- policy: 1
-- human: 1
 - deletion: 1
+- governance: 1
+- human: 1
+- policy: 1
+- provenance: 1
+- authority: 0
+- backup: 0
+- last resort: 0
 
 ---
 
 ## Future Risk Radar
 
-- recent failures: 5
+- recent failures: 7
 - recent errors: 4
-- workflow interruptions: 19
+- workflow interruptions: 22
 
-### Failure Pressure Index
+## Failure Pressure Index
 
-- Failure Pressure Index: 94
+- Failure Pressure Index: 108
 
 ---
 
