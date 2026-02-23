@@ -1,22 +1,47 @@
 name: "RTS Incident Report"
-description: "Report a safety or reliability incident (evidence-first)"
-title: "INC_YYYYMMDD_HHMM__<short_title>"
+description: "Report a safety or reliability incident (evidence-first, audit-grade)"
+title: "INC_YYYYMMDD_HHMM__short_title"
 labels: ["incident"]
 assignees:
   - nobutakayamauchi
+
 body:
   - type: markdown
     attributes:
       value: |
         **Evidence-first. No inference beyond evidence.**
-        Paste repository links (logs/incidents/radar). Do not paste secrets.
+
+        ✅ Fill minimum facts + attach evidence provenance.
+        ❌ Do NOT paste secrets / API keys / personal data.
+
+        **RTS uses two evidence streams:**
+        1) first-party operational logs (execution + memory index)
+        2) third-party evidence attached to incidents (with provenance + integrity)
+
+        Tip:
+        - First-party: link to `logs/`, `memory/`, `radar/`
+        - Third-party: fill `source_type + url + retrieved_at + content_hash (+ snapshot_path if available)`
 
   - type: textarea
     id: summary
     attributes:
-      label: Summary
-      description: What happened?
-      placeholder: "Short, factual description."
+      label: Summary (facts only)
+      description: What happened? 1–3 sentences. No speculation.
+      placeholder: "Example: Cursor long session lost context; autocomplete broke randomly; old chats reopened unexpectedly."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lifecycle_state
+    attributes:
+      label: Lifecycle State
+      description: Current state in RTS incident lifecycle.
+      options:
+        - INCIDENT
+        - INVESTIGATION
+        - INTERVENTION
+        - RECOVERY
+        - KNOWLEDGE
     validations:
       required: true
 
@@ -24,46 +49,112 @@ body:
     id: severity
     attributes:
       label: Severity
+      description: Audit-grade severity scale.
       options:
-        - LOW
-        - MED
-        - HIGH
+        - S0 (Catastrophic systemic failure)
+        - S1 (Production blocking)
+        - S2 (Degradation / workflow disruption)
+        - S3 (Minor / reduced efficiency)
+        - S4 (Cosmetic / UI-only)
+    validations:
+      required: true
+
+  - type: input
+    id: system
+    attributes:
+      label: System
+      description: Product / tool / environment where it occurred.
+      placeholder: "ChatGPT / Cursor / Claude / GitHub / Browser / Agent / Other"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: Current incident status.
+      options:
+        - OPEN
+        - MITIGATED
+        - CLOSED
     validations:
       required: true
 
   - type: textarea
     id: impact
     attributes:
-      label: Impact
-      description: Who/what was affected?
-      placeholder: "What broke or was at risk?"
+      label: Operational Impact
+      description: What broke or was at risk? Who/what was affected?
+      placeholder: |
+        - Workflow blocked / delayed
+        - Manual verification required
+        - Research interrupted
+        - Data loss risk
     validations:
       required: true
 
-  - type: textarea
-    id: evidence
+  - type: markdown
     attributes:
-      label: Evidence (required)
-      description: Paste repository evidence links
-      placeholder: |
-        - logs/...
-        - incidents/...
-        - radar/...
-        - screenshots (if any)
+      value: |
+        ---
+        # Timeline (audit minimum)
+        Put timestamps if known. Use `unknown` if you don't know.
+
+  - type: input
+    id: detected_at
+    attributes:
+      label: detected_at
+      description: First operator detection time (ISO 8601 recommended).
+      placeholder: "2026-02-24T08:08:00+09:00"
     validations:
       required: true
+
+  - type: input
+    id: investigation_started_at
+    attributes:
+      label: investigation_started_at
+      placeholder: "2026-02-24T08:12:00+09:00 or unknown"
+    validations:
+      required: true
+
+  - type: input
+    id: mitigation_started_at
+    attributes:
+      label: mitigation_started_at
+      placeholder: "2026-02-24T08:20:00+09:00 or unknown"
+    validations:
+      required: true
+
+  - type: input
+    id: recovered_at
+    attributes:
+      label: recovered_at
+      placeholder: "2026-02-24T09:10:00+09:00 or unknown"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        # Reproduction Steps (required)
+        If unknown, write: "Reproduction unknown."
 
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction
-      description: Steps to reproduce (if applicable)
-      placeholder: "1) ... 2) ... 3) ..."
+      label: Reproduction Steps
+      description: Minimum: workflow length, interaction type, triggering action(s).
+      placeholder: |
+        1) ...
+        2) ...
+        3) ...
+        If unknown: Reproduction unknown.
     validations:
-      required: false
+      required: true
 
   - type: textarea
-    id: expected_actual
+    id: expected_vs_actual
     attributes:
       label: Expected vs Actual
       placeholder: |
@@ -72,19 +163,181 @@ body:
     validations:
       required: false
 
-  - type: textarea
-    id: mitigation
+  - type: markdown
     attributes:
-      label: Mitigation / Recovery
-      description: How was the system stabilized?
+      value: |
+        ---
+        # Environment (recommended)
+        Helps separate operator error vs platform issue vs transient outage.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        device:
+        interface: (mobile / desktop)
+        browser/IDE:
+        workflow: (long session / agent / research / coding)
+        network: (optional)
     validations:
       required: false
 
   - type: textarea
-    id: prevention
+    id: model_info
     attributes:
-      label: Prevention
+      label: Model Information (if AI involved)
+      placeholder: |
+        provider:
+        model_name:
+        version:
+        notes:
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        # Evidence (audit-grade, required)
+        **URLだけは最弱。**
+        ✅ provenance (source + time) + ✅ integrity (hash) + ✅ reference (url or internal path)
+        - first_party: repo内部のログ/メモリ/レーダー
+        - third_party: 外部URL + retrieved_at + content_hash (+ snapshot_path)
+
+  - type: dropdown
+    id: evidence_source_type
+    attributes:
+      label: evidence.source_type
+      description: Evidence stream type.
+      options:
+        - first_party (repo internal logs)
+        - third_party (external/public source)
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence_reference
+    attributes:
+      label: evidence.reference
+      description: Links/paths that prove the incident. Include repo paths and/or URLs.
+      placeholder: |
+        First-party examples:
+        - logs/... (repo link)
+        - memory/... (repo link)
+        - radar/... (repo link)
+
+        Third-party examples:
+        - https://x.com/... (public post)
+        - official vendor statement URL
+    validations:
+      required: true
+
+  - type: input
+    id: evidence_retrieved_at
+    attributes:
+      label: evidence.retrieved_at
+      description: When the evidence was retrieved/confirmed (ISO 8601).
+      placeholder: "2026-02-24T08:08:00+09:00"
+    validations:
+      required: true
+
+  - type: input
+    id: evidence_content_hash
+    attributes:
+      label: evidence.content_hash
+      description: Hash for integrity. If you cannot hash yet, write: pending_manual_hash
+      placeholder: "sha256:... or pending_manual_hash"
+    validations:
+      required: true
+
+  - type: input
+    id: evidence_snapshot_path
+    attributes:
+      label: evidence.snapshot_path (optional)
+      description: If you saved a snapshot inside repo (recommended for third_party).
+      placeholder: "incidents/evidence_snapshots/INC_YYYYMMDD_HHMM_xxx_snapshot.md"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        # Root Cause (research-grade)
+        Separate hypothesis, how you validate, and confirmed cause.
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: Initial explanation based on available evidence. Avoid definitive claims.
+      placeholder: "Possible context window fragmentation during long sessions..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: validation_method
+    attributes:
+      label: Validation Method
+      description: How hypothesis is tested.
+      placeholder: |
+        - reproduction experiment
+        - controlled retry
+        - vendor confirmation
+        - log correlation
+    validations:
+      required: false
+
+  - type: textarea
+    id: confirmed_cause
+    attributes:
+      label: Confirmed Cause
+      description: Only if verified through evidence. Otherwise write: Unconfirmed.
+      placeholder: "Unconfirmed."
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        # Intervention / Recovery / Knowledge
+
+  - type: textarea
+    id: intervention
+    attributes:
+      label: RTS Intervention
+      description: What did the operator do?
+      placeholder: |
+        - execution logging initiated
+        - workflow isolation
+        - rollback
+    validations:
+      required: false
+
+  - type: textarea
+    id: recovery
+    attributes:
+      label: Recovery
+      description: Stabilization outcome.
+      placeholder: |
+        - manual audit completed
+        - workflow rebuilt
+        - mitigated by switching tool/model
+    validations:
+      required: false
+
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons Learned (Knowledge)
       description: What should change to prevent recurrence?
+      placeholder: |
+        - Add guardrails
+        - Add verification step
+        - Add monitoring
+        - Update playbook
     validations:
       required: false
 
@@ -92,6 +345,7 @@ body:
     id: operator_handle
     attributes:
       label: Operator handle
+      description: Your handle (for attribution). Example: @ultimate28
       placeholder: "@your-handle"
     validations:
       required: true
