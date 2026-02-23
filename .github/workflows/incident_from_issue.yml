@@ -1,1 +1,40 @@
+name: RTS Issue -> Incident File
 
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+
+jobs:
+  build_incident:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate incident markdown from issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          REPO: ${{ github.repository }}
+        run: |
+          python scripts/issue_to_incident.py
+
+      - name: Commit incident file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add incidents/*.md incidents/evidence_snapshots/*.md || true
+          git diff --cached --quiet || git commit -m "RTS: generate incident from issue #${{ github.event.issue.number }}"
+          git push
