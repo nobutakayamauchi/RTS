@@ -5,7 +5,7 @@ import hashlib
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, List, Dict, Tuple, Optional
+from typing import Iterable, List, Dict, Tuple
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +16,7 @@ MEMORY_INDEX = ROOT / "memory" / "index.md"
 
 OUTPUT = ROOT / "analyze" / "index.md"
 
-# --- Risk topics: keep operator-defined ones first (RTS handover) ---
+# Operator-defined priority topics (from handover)
 RISK_TOPICS = [
     "context loss",
     "workflow interruption",
@@ -24,7 +24,7 @@ RISK_TOPICS = [
     "session reset",
 ]
 
-# Add deterministic expansions (still evidence-based: just keyword scans)
+# Deterministic expansions (still evidence-based: keyword scans only)
 EXTRA_RISK_TOPICS = [
     "rate limit",
     "timeout",
@@ -40,6 +40,10 @@ EXTRA_RISK_TOPICS = [
     "shortcut",
     "automation",
     "downtime",
+    "failure",
+    "error",
+    "exception",
+    "traceback",
 ]
 
 GOVERNANCE_KEYWORDS = [
@@ -114,8 +118,10 @@ def extract_doc_title(content: str, fallback: str) -> str:
     # Prefer first markdown H1
     for line in content.splitlines():
         if line.strip().startswith("# "):
-            return line.strip()[2:].strip() or fallback
-    # Else use first non-empty line
+            t = line.strip()[2:].strip()
+            if t:
+                return t
+    # Else first non-empty line
     for line in content.splitlines():
         if line.strip():
             return line.strip()[:120]
@@ -124,9 +130,11 @@ def extract_doc_title(content: str, fallback: str) -> str:
 
 def dedup_docs_by_fingerprint(docs: List[Doc]) -> Tuple[List[Doc], List[Tuple[Doc, Doc]]]:
     """
-    Deduplicate incidents/logs deterministically using fingerprint:
-    - normalized title + first 400 chars (normalized) -> hash
-    Returns (unique_docs, duplicates_pairs(original_kept, duplicate))
+    Deterministic dedup:
+    - fingerprint = hash(normalized title + normalized head(<=400 chars))
+    Returns:
+      - unique docs (sorted by mtime desc)
+      - duplicate pairs (kept, dup)
     """
     seen: Dict[str, Doc] = {}
     dups: List[Tuple[Doc, Doc]] = []
@@ -151,8 +159,7 @@ def find_hits(docs: Iterable[Doc], topics: List[str]) -> Tuple[Dict[str, int], L
     hits: List[EvidenceHit] = []
 
     for d in docs:
-        lines = d.content.splitlines()
-        for i, raw in enumerate(lines, start=1):
+        for i, raw in enumerate(d.content.splitlines(), start=1):
             line = raw.strip()
             if not line:
                 continue
@@ -160,7 +167,6 @@ def find_hits(docs: Iterable[Doc], topics: List[str]) -> Tuple[Dict[str, int], L
             for t in topics:
                 if t in lower:
                     counts[t] += 1
-                    # store shortest evidence line (bounded)
                     clipped = (line[:240] + "…") if len(line) > 240 else line
                     hits.append(EvidenceHit(topic=t, file_rel=d.rel_path, line_no=i, line=clipped))
 
@@ -169,13 +175,12 @@ def find_hits(docs: Iterable[Doc], topics: List[str]) -> Tuple[Dict[str, int], L
 
 def top_hits_by_topic(hits: List[EvidenceHit], topic: str, limit: int = 5) -> List[EvidenceHit]:
     out = [h for h in hits if h.topic == topic]
-    # Stable ordering: by file then line number
     out.sort(key=lambda h: (h.file_rel, h.line_no))
     return out[:limit]
 
 
 def md_link_to_repo(rel_path: str) -> str:
-    # Keep provenance inside repo; works on GitHub and GitHub Pages rendered markdown.
+    # Works in GitHub and GitHub Pages Markdown render.
     return f"[{rel_path}]({rel_path})"
 
 
@@ -189,34 +194,30 @@ def main() -> None:
 
     incidents, incident_dups = dedup_docs_by_fingerprint(incidents_all)
 
-    # Risk scan: priority topics + deterministic expansions
     topics = RISK_TOPICS + [t for t in EXTRA_RISK_TOPICS if t not in RISK_TOPICS]
 
     risk_counts_inc, risk_hits_inc = find_hits(incidents, topics)
     risk_counts_log, risk_hits_log = find_hits(logs_all, topics)
 
-    # Merge counts
     risk_counts = {t: risk_counts_inc.get(t, 0) + risk_counts_log.get(t, 0) for t in topics}
     all_hits = risk_hits_inc + risk_hits_log
 
-    # Governance scan (separate section)
-    gov_counts, gov_hits = find_hits(incidents + logs_all, GOVERNANCE_KEYWORDS)
+    gov_counts, gov_hits = find_hits(list(incidents) + list(logs_all), GOVERNANCE_KEYWORDS)
 
-    # Memory index presence (priority input) - not parsed for content claims, only linked as source
     memory_exists = MEMORY_INDEX.exists()
     memory_rel = MEMORY_INDEX.relative_to(ROOT).as_posix() if memory_exists else None
 
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.now(timezone.utc)
 
-    # Rank topics by counts (stable)
     ranked_topics = sorted(topics, key=lambda t: (-risk_counts[t], t))
+    ranked_gov = sorted(GOVERNANCE_KEYWORDS, key=lambda k: (-gov_counts[k], k))
 
-    # Basic stability signal: latest mtime
     latest_inc = incidents[0].mtime_utc if incidents else None
     latest_log = max((d.mtime_utc for d in logs_all), default=None)
 
-    report = []
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+
+    report: List[str] = []
     report.append("# RTS Analyze")
     report.append("")
     report.append(f"Generated: {fmt_dt(now)}")
@@ -225,7 +226,7 @@ def main() -> None:
     report.append("")
     report.append("## Inputs")
     report.append("")
-    if memory_exists:
+    if memory_exists and memory_rel:
         report.append(f"- memory/index.md (priority): {md_link_to_repo(memory_rel)}")
     else:
         report.append("- memory/index.md (priority): **MISSING**")
@@ -247,7 +248,9 @@ def main() -> None:
     if incidents:
         for d in incidents[:10]:
             title = extract_doc_title(d.content, d.file_path.name)
-            report.append(f"- **{title}** — {md_link_to_repo(d.rel_path)} (mtime: {fmt_dt(d.mtime_utc)}, sha:{d.sha8})")
+            report.append(
+                f"- **{title}** — {md_link_to_repo(d.rel_path)} (mtime: {fmt_dt(d.mtime_utc)}, sha:{d.sha8})"
+            )
     else:
         report.append("- (none)")
     report.append("")
@@ -274,7 +277,9 @@ def main() -> None:
         logs_sorted = sorted(logs_all, key=lambda x: x.mtime_utc, reverse=True)
         for d in logs_sorted[:10]:
             title = extract_doc_title(d.content, d.file_path.name)
-            report.append(f"- **{title}** — {md_link_to_repo(d.rel_path)} (mtime: {fmt_dt(d.mtime_utc)}, sha:{d.sha8})")
+            report.append(
+                f"- **{title}** — {md_link_to_repo(d.rel_path)} (mtime: {fmt_dt(d.mtime_utc)}, sha:{d.sha8})"
+            )
     else:
         report.append("- (none)")
     report.append("")
@@ -307,7 +312,6 @@ def main() -> None:
     report.append("")
     report.append("Deterministic governance keyword scan (evidence-only).")
     report.append("")
-    ranked_gov = sorted(GOVERNANCE_KEYWORDS, key=lambda k: (-gov_counts[k], k))
     for k in ranked_gov:
         report.append(f"- **{k}**: {gov_counts[k]}")
     report.append("")
@@ -327,15 +331,61 @@ def main() -> None:
         report.append("- (no governance keywords detected)")
         report.append("")
 
-　　　327 report.append("- (no governance keywords detected)")
-328 report.append("")
+    # ----------------------------
+    # SECOND FORM
+    # High Risk Incident Ranking
+    # ----------------------------
+    report.append("---")
+    report.append("")
+    report.append("## High Risk Incidents")
+    report.append("")
+    report.append("Deterministic keyword risk scoring (evidence-only).")
+    report.append("")
 
-329
+    risk_score_words = [
+        "context loss",
+        "workflow interruption",
+        "server error",
+        "session reset",
+        "deleted workflow",
+        "downtime",
+        "failure",
+        "reset",
+        "error",
+        "exception",
+        "traceback",
+        "permission",
+        "auth",
+        "token",
+        "rate limit",
+        "timeout",
+        "github mobile",
+        "ios",
+        "shortcut",
+        "automation",
+    ]
 
-330 report.append("---")
-331 report.append("")
-332 report.append("## Provenance")
-    
+    scored: List[Tuple[int, Doc]] = []
+    for d in incidents:
+        lower = d.content.lower()
+        score = 0
+        for w in risk_score_words:
+            score += lower.count(w)
+        if score > 0:
+            scored.append((score, d))
+
+    scored.sort(key=lambda x: (-x[0], x[1].rel_path))
+
+    if scored:
+        for score, d in scored[:10]:
+            title = extract_doc_title(d.content, d.file_path.name)
+            report.append(
+                f"- Risk Score **{score}** — **{title}** — {md_link_to_repo(d.rel_path)} (mtime: {fmt_dt(d.mtime_utc)}, sha:{d.sha8})"
+            )
+    else:
+        report.append("- No high risk incidents detected.")
+    report.append("")
+
     report.append("---")
     report.append("")
     report.append("## Provenance")
