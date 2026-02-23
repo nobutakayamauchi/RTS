@@ -429,7 +429,133 @@ def main() -> None:
     for k, v in gov_score.items():
 
         report.append(f"- {k}: {v}")
+    # ----------------------------
+    # FOURTH FORM
+    # Future Risk Radar (deterministic)
+    # ----------------------------
 
+    report.append("---")
+    report.append("")
+    report.append("## Future Risk Radar")
+    report.append("")
+    report.append("Deterministic forecast based on recent evidence frequency (no ML, no inference beyond counts).")
+    report.append("")
+
+    # Window settings
+    recent_days = 7
+    recent_cutoff = now - timedelta(days=recent_days)
+
+    # Use the same topic list already used in Observed Risk Patterns
+    radar_topics = topics
+
+    # Recent-only docs
+    recent_incidents = [d for d in incidents if d.mtime_utc >= recent_cutoff]
+    recent_logs = [d for d in logs_all if d.mtime_utc >= recent_cutoff]
+
+    def count_topic_in_docs(t: str, docs_list: List[Doc]) -> int:
+        c = 0
+        for dd in docs_list:
+            c += dd.content.lower().count(t)
+        return c
+
+    radar_rows = []
+    for t in radar_topics:
+        recent_i = count_topic_in_docs(t, recent_incidents)
+        recent_l = count_topic_in_docs(t, recent_logs)
+        total_i = count_topic_in_docs(t, incidents)
+        total_l = count_topic_in_docs(t, logs_all)
+
+        recent_total = recent_i + recent_l
+        overall_total = total_i + total_l
+
+        # Trend score: recent is weighted higher than historical (deterministic)
+        # + incidents weight 2, logs weight 1
+        trend_score = (recent_i * 2 + recent_l * 1)
+
+        # Simple classification
+        if recent_total >= 4:
+            level = "RISING"
+        elif recent_total >= 1:
+            level = "STABLE"
+        else:
+            level = "QUIET"
+
+        radar_rows.append((level, -trend_score, -recent_total, t, recent_i, recent_l, overall_total))
+
+    # Sort: RISING first, then by trend_score, then recent_total
+    level_order = {"RISING": 0, "STABLE": 1, "QUIET": 2}
+    radar_rows.sort(key=lambda x: (level_order[x[0]], x[1], x[2], x[3]))
+
+    report.append(f"### Window")
+    report.append("")
+    report.append(f"- Recent window: last **{recent_days} days** (cutoff: {fmt_dt(recent_cutoff)})")
+    report.append(f"- Recent incidents: {len(recent_incidents)} / Recent logs: {len(recent_logs)}")
+    report.append("")
+
+    report.append("### Predicted Next Risk Areas (top 10)")
+    report.append("")
+    report.append("| Level | Topic | Recent Incidents | Recent Logs | Recent Total | Overall Total |")
+    report.append("|---|---:|---:|---:|---:|---:|")
+    for lvl, _ts, _rt, t, ri, rl, overall in radar_rows[:10]:
+        report.append(f"| {lvl} | **{t}** | {ri} | {rl} | {ri+rl} | {overall} |")
+    report.append("")
+
+    # Hotspot rules based on Governance Score components (evidence-only)
+    # If governance signals are weak, elevate related operational risk.
+    report.append("### Operational Hotspots (rule-based)")
+    report.append("")
+    hotspots = []
+
+    # gov_score exists in THIRD FORM; if not, fallback safely.
+    try:
+        b = gov_score.get("backup", 0)
+        dlt = gov_score.get("deletion", 0)
+        aut = gov_score.get("automation", 0)
+        prv = gov_score.get("provenance", 0)
+        hum = gov_score.get("human", 0)
+    except Exception:
+        b = dlt = aut = prv = hum = 0
+
+    if b == 0:
+        hotspots.append("- **Backup Culture is weak (backup=0)** → elevated recovery risk if workflow/session breaks.")
+    if dlt > 0:
+        hotspots.append("- **Deletion signals detected** → elevated risk of accidental removal / workflow interruption.")
+    if aut > 0 and (count_topic_in_docs("workflow interruption", recent_incidents) + count_topic_in_docs("workflow interruption", recent_logs)) > 0:
+        hotspots.append("- **Automation + workflow interruption evidence** → prioritize workflow hardening.")
+    if prv == 0:
+        hotspots.append("- **Provenance signals weak** → elevated auditability risk (harder to trace regressions).")
+    if hum == 0:
+        hotspots.append("- **Human governance signals weak** → elevated risk of unsafe automated change.")
+
+    if hotspots:
+        report.extend(hotspots)
+    else:
+        report.append("- No governance-derived hotspots detected in current evidence window.")
+    report.append("")
+
+    # Deterministic "Failure Pressure" number (not probability; just an index)
+    # Uses only recent evidence counts.
+    recent_failure = count_topic_in_docs("failure", recent_incidents) + count_topic_in_docs("failure", recent_logs)
+    recent_error = count_topic_in_docs("error", recent_incidents) + count_topic_in_docs("error", recent_logs)
+    recent_server = count_topic_in_docs("server error", recent_incidents) + count_topic_in_docs("server error", recent_logs)
+    recent_reset = count_topic_in_docs("session reset", recent_incidents) + count_topic_in_docs("session reset", recent_logs)
+    recent_wf = count_topic_in_docs("workflow interruption", recent_incidents) + count_topic_in_docs("workflow interruption", recent_logs)
+
+    failure_pressure = (
+        recent_failure * 5
+        + recent_error * 2
+        + recent_server * 4
+        + recent_reset * 3
+        + recent_wf * 4
+        + len(recent_incidents) * 2
+        + len(recent_logs) * 1
+    )
+
+    report.append("### Failure Pressure Index (deterministic)")
+    report.append("")
+    report.append(f"- Failure Pressure Index: **{failure_pressure}**")
+    report.append("- Definition: weighted sum of recent evidence hits (failure/error/server/session/workflow) + recent volume.")
+    report.append("")
     report.append("")
     report.append("---")
     report.append("")
