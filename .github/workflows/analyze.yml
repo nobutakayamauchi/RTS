@@ -1,6 +1,9 @@
 name: RTS Analyze Auto
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"  # 6時間ごと（好みで変更OK）
   push:
     paths:
       - "logs/**"
@@ -8,12 +11,18 @@ on:
       - "memory/**"
       - "scripts/analyze.py"
 
+permissions:
+  contents: write
+
+concurrency:
+  group: rts-analyze
+  cancel-in-progress: true
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -33,6 +42,9 @@ jobs:
 
           git add analyze/index.md
 
-          git diff --cached --quiet || git commit -m "RTS Auto Analyze Update"
+          # 変更がなければ何もしない
+          git diff --cached --quiet && exit 0
 
+          # 無限ループ抑止（Actions が作ったコミットは再トリガーされにくくする）
+          git commit -m "RTS Auto Analyze Update [skip ci]"
           git push
