@@ -385,7 +385,52 @@ def main() -> None:
     else:
         report.append("- No high risk incidents detected.")
     report.append("")
+    # ----------------------------
+    # THIRD FORM
+    # Governance Score
+    # ----------------------------
 
+    report.append("---")
+    report.append("")
+    report.append("## Governance Score")
+    report.append("")
+
+    gov_words = {
+        "backup": ["backup"],
+        "provenance": ["provenance", "evidence"],
+        "deletion": ["deletion", "deleted workflow"],
+        "human": ["operator", "verify", "authority"],
+        "automation": ["automation", "workflow"],
+    }
+
+    gov_score = {}
+
+    combined_docs = incidents + logs_all
+
+    for key, words in gov_words.items():
+
+        count = 0
+
+        for d in combined_docs:
+
+            lower = d.content.lower()
+
+            for w in words:
+
+                count += lower.count(w)
+
+        gov_score[key] = count
+
+    total_score = sum(gov_score.values())
+
+    report.append(f"Governance Score: **{total_score}**")
+    report.append("")
+
+    for k, v in gov_score.items():
+
+        report.append(f"- {k}: {v}")
+
+    report.append("")
     report.append("---")
     report.append("")
     report.append("## Provenance")
