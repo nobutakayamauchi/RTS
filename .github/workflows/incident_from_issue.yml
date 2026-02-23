@@ -1,40 +1,159 @@
-name: RTS Issue -> Incident File
+name: "RTS Incident Report"
+description: "Report a safety or reliability incident (evidence-first)"
+title: "INC_YYYYMMDD_HHMM__short_title"
+labels: ["incident"]
+assignees:
+  - nobutakayamauchi
 
-on:
-  issues:
-    types: [opened, edited]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Evidence-first. No inference beyond evidence.**
+        Paste repository evidence links (logs/incidents/radar) and third-party evidence with provenance+integrity.
 
-permissions:
-  contents: write
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Short factual description (what happened?)
+      placeholder: "Short, factual description."
+    validations:
+      required: true
 
-jobs:
-  build_incident:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: S0 catastrophic / S1 blocking / S2 degradation / S3 minor / S4 cosmetic
+      options:
+        - S0
+        - S1
+        - S2
+        - S3
+        - S4
+    validations:
+      required: true
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+  - type: textarea
+    id: impact
+    attributes:
+      label: Operational Impact
+      description: What broke or what was at risk?
+      placeholder: "workflow delay / manual rebuild required / reliability degraded / etc"
+    validations:
+      required: true
 
-      - name: Generate incident markdown from issue
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
-          ISSUE_URL: ${{ github.event.issue.html_url }}
-          REPO: ${{ github.repository }}
-        run: |
-          python scripts/issue_to_incident.py
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Steps to reproduce (if applicable). If unknown, write: "Reproduction unknown."
+      placeholder: |
+        1) ...
+        2) ...
+        3) ...
+    validations:
+      required: false
 
-      - name: Commit incident file
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add incidents/*.md incidents/evidence_snapshots/*.md || true
-          git diff --cached --quiet || git commit -m "RTS: generate incident from issue #${{ github.event.issue.number }}"
-          git push
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Execution conditions (device/interface/workflow/model if known)
+      placeholder: |
+        device = iPhone15Pro
+        interface = Mobile GitHub Browser
+        workflow = Long session AI operation
+        model = GPT (unknown)
+    validations:
+      required: false
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: Initial explanation based on evidence. Avoid definitive claims.
+      placeholder: "context fragmentation suspected / etc"
+    validations:
+      required: false
+
+  - type: textarea
+    id: validation_method
+    attributes:
+      label: Validation Method
+      description: How will the hypothesis be tested?
+      placeholder: "reproduction experiment / controlled retry / vendor confirmation / etc"
+    validations:
+      required: false
+
+  - type: textarea
+    id: confirmed_cause
+    attributes:
+      label: Confirmed Cause
+      description: Root cause verified through evidence. If unknown, write: "Unconfirmed."
+      placeholder: "Unconfirmed."
+    validations:
+      required: false
+
+  - type: textarea
+    id: intervention
+    attributes:
+      label: RTS Intervention
+      description: Operator response actions
+      placeholder: "execution logging initiated / workflow isolation / rollback / etc"
+    validations:
+      required: false
+
+  - type: textarea
+    id: recovery
+    attributes:
+      label: Recovery
+      description: Mitigation outcome
+      placeholder: "manual audit completed / workflow rebuilt / etc"
+    validations:
+      required: false
+
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons Learned
+      description: Operational learning extracted
+      placeholder: "persistent execution logging stabilizes workflow continuity"
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (Required)
+      description: |
+        Required. Include repo links (logs/incidents/radar) and/or third-party evidence with provenance+integrity.
+        Minimum strong evidence:
+        - source_type: first_party|third_party
+        - url: (third_party only)
+        - retrieved_at: ISO8601 with timezone
+        - content_hash: sha256 of snapshot or retrieved content (or "pending")
+        - snapshot_path: repo path if stored (optional but recommended)
+      placeholder: |
+        ## First-party (repo evidence)
+        - logs: https://github.com/<you>/<repo>/tree/main/logs
+        - incidents: https://github.com/<you>/<repo>/tree/main/incidents
+
+        ## Third-party (external evidence)
+        source_type: third_party
+        url: https://example.com/post/123
+        retrieved_at: 2026-02-24T08:08:00+09:00
+        content_hash: pending_manual_hash
+        snapshot_path: incidents/evidence_snapshots/INC_YYYYMMDD_HHMM__snapshot.md
+    validations:
+      required: true
+
+  - type: input
+    id: operator_handle
+    attributes:
+      label: Operator Handle
+      description: Your handle (for accountability)
+      placeholder: "@operator_handle"
+    validations:
+      required: true
