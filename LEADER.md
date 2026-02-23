@@ -1,267 +1,149 @@
-RTS — Real Time Trust System
+# RTS --- Real Time Trust System
 
-Execution becomes memory.Memory becomes operational identity.
+## Final Public Execution Edition
 
-RTS (Real Time Trust System) is an execution-memory operating framework designed to preserve reasoning continuity inside AI workflows.
+Execution becomes memory. Memory becomes operational identity.
 
-Instead of resetting context every session, RTS records operational thinking as persistent evidence.
+------------------------------------------------------------------------
 
-🚀 New to RTS? (Start in 5 Minutes)
+## What RTS Is
 
-No coding required.
+RTS (Real Time Trust System) is an execution‑memory operating framework
+designed to preserve reasoning continuity inside AI workflows.
 
-👉 RTS First Steps
+Modern AI collaboration repeatedly resets context.
 
-Explore operational memoryhttps://nobutakayamauchi.github.io/RTS/memory/
+RTS converts execution itself into verifiable operational memory.
 
-Review RTS GENESIS evidencehttps://github.com/nobutakayamauchi/RTS/releases/tag/RTS_GENESIS
+Execution history becomes infrastructure.
 
-Inspect execution logshttps://github.com/nobutakayamauchi/RTS/tree/main/logs
+------------------------------------------------------------------------
 
-Smartphone operators welcome.
+## Start in 3 Steps
 
-🧠 What RTS Does
+1.  Fork or clone the repository.
 
-RTS turns AI collaboration into persistent operational memory.
+2.  Run:
 
-Instead of losing context every session, RTS records:
+    python START_HERE.py
 
-Decisions
+3.  Begin logging execution.
 
-Failures
+RTS prepares:
 
-Incidents
+-   logs/
+-   evolution/
+-   vibecode/
 
-Research reasoning
+Nothing uploads without explicit GitHub push.
 
-Execution outcomes
+------------------------------------------------------------------------
 
-Operational history itself becomes infrastructure.
+## Operational Model
 
-⚡ Execution Model
+CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
-RTS operates through a continuous execution loop:
+Human authority remains final.
 
-CAPTURE → EVALUATE → DECIDE → EXECUTE→ AUDIT → EVOLVE → RECORD → RESET
+RTS observes execution. It never replaces human judgement.
 
-Human operator authority remains final.
+------------------------------------------------------------------------
 
-RTS observes execution.It never replaces human judgment.
+## Core Capabilities
 
-📱 Smartphone Operator Method
+-   Execution Logging
+-   Incident Intelligence
+-   AI Failure Evidence Collection
+-   Workflow Memory Preservation
+-   Autonomous Audit Trail
 
-RTS was developed under a smartphone-only operational environment.
+AI collaboration becomes reproducible.
 
-Environment:
+------------------------------------------------------------------------
 
-iPhone 15 Pro
+## Directory Structure
 
-Mobile GitHub browser interface
+logs/ → execution evidence\
+incidents/ → failure intelligence\
+radar/ → incident radar\
+memory/ → operational index\
+evolution/ → experimentation history\
+vibecode/ → workflow execution space
 
-AI collaboration via ChatGPT
-
-Execution discipline:
-
-Concept discussion with AI
-
-Specification confirmation
-
-Repository structure verification
-
-Explicit instruction issuance
-
-Operator rest during generation (fatigue control)
-
-GitHub deployment
-
-Human + AI verification via screenshots
-
-Structural iteration planning
-
-⚠️ RTS execution history publicly proves smartphone-first development.
-
-🔎 RTS Operational Reference
-
-RTS operational history is continuously recorded as public evidence.
-
-Operational Memory:
-
-https://nobutakayamauchi.github.io/RTS/memory/
-
-Execution Logs:
-
-https://github.com/nobutakayamauchi/RTS/tree/main/logs
-
-Incident Intelligence:
-
-https://github.com/nobutakayamauchi/RTS/tree/main/incidents
-
-Operational Search:
-
-https://nobutakayamauchi.github.io/RTS/search.html
-
-RTS functions as a continuously auditable operational record.
-
-⚙️ Run RTS Locally (Optional)
-
-For long-running workflows:
+Entry:
 
 python START_HERE.py
 
-Creates:
+------------------------------------------------------------------------
 
-logs/
+## Why RTS Exists
 
-evolution/
+AI workflows suffer from:
 
-vibecode/
-
-Nothing uploads automatically without explicit GitHub push.
-
-🔥 RTS PRO — Operator Execution System
-
-For continuous AI operator workflows.
-
-Includes:
-
-execution templates
-
-governance framework
-
-incident intelligence
-
-decision logging system
-
-workflow memory preservation
-
-Download RTS PRO:
-
-https://risingson2.gumroad.com/l/sgeldp
-
-🧩 Core Features
-
-Execution Logging
-
-Incident Tracking
-
-AI Failure Evidence Collection
-
-Workflow Memory Preservation
-
-Autonomous Memory Indexing
-
-📂 Repository Structure
-
-Core folders:
-
-logs/ → execution evidenceincidents/ → failure intelligenceradar/ → incident radar systemmemory/ → operational indexesvibecode/ → workflow execution spaceevolution/ → experimentation history
-
-Governance documents define operational scope.
-
-🎯 Why RTS Exists
-
-Modern AI workflows suffer from:
-
-conversational reset loss
-
-reasoning fragmentation
-
-execution discontinuity
+-   conversational reset loss
+-   reasoning fragmentation
+-   execution discontinuity
 
 Operators lose:
 
-prompts
+-   prompts
+-   debugging context
+-   research continuity
 
-debugging history
+RTS preserves thinking.
 
-research context
+Execution becomes memory. Memory becomes identity.
 
-RTS prevents this loss.
+------------------------------------------------------------------------
 
-Execution becomes memory.
+## Public Operational Evidence
 
-Memory becomes identity.
+Operational Memory: https://nobutakayamauchi.github.io/RTS/memory/
 
-🧾 Authorship & Provenance
+Execution Logs: https://github.com/nobutakayamauchi/RTS/tree/main/logs
 
-RTS establishes authorship continuity through:
+Incident Intelligence:
+https://github.com/nobutakayamauchi/RTS/tree/main/incidents
 
-Git commit history
+Operational Search: https://nobutakayamauchi.github.io/RTS/search.html
 
-GitHub release timestamps
+RTS functions as a continuously auditable operational record.
 
-GitHub Pages deployment history
+------------------------------------------------------------------------
 
-BLOCK structured execution logs
-
-governance documentation
-
-These collectively function as historical provenance evidence.
-
-🧪 Research & Academic Use
-
-RTS may be referenced as:
+## Academic Reference
 
 Real Time Trust System (RTS), Yamauchi, N. (2026).
 
-Public repository and operational history serve as primary reference material.
+Repository execution history serves as provenance evidence.
 
-🛡 Integrity Protection
+------------------------------------------------------------------------
+
+## Integrity Protection
 
 Removal or falsification of:
 
-authorship attribution
-
-execution logs
-
-provenance records
+-   authorship attribution
+-   execution logs
+-   provenance records
 
 is considered repository integrity violation.
 
-Forks are permitted.
+Forks permitted. Misrepresentation is not.
 
-Misrepresentation is not.
+------------------------------------------------------------------------
 
-™ Trademark & Naming Notice
-
-“RTS — Real Time Trust System” is a publicly associated project identity.
-
-Derivative works may not:
-
-present themselves as official RTS
-
-imply endorsement
-
-reuse branding commercially
-
-without explicit permission from the creator.
-
-🔐 Security Philosophy
-
-RTS assumes:
-
-trust must be auditable.
-
-Decisions must survive execution.
-
-History must survive iteration.
-
-Transparency reduces operational risk.
-
-📜 License
+## License
 
 MIT License
 
 Copyright (c) 2026 Nobutaka Yamauchi
 
-Permission is granted free of charge to use, modify, merge and distribute this software with attribution.
+------------------------------------------------------------------------
 
-🧍 Creator
-
-Nobutaka Yamauchi
-
-First Public Release — 2026
+## Creator Statement
 
 RTS exists to prevent loss of thinking.
 
-Ideas should survive execution.History should survive iteration.Continuity creates trust
+Ideas should survive execution. History should survive iteration.
+Continuity creates trust.
