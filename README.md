@@ -21,6 +21,18 @@ Live operational history generated every execution cycle.
 
 Latest execution memory index:
 
+---
+
+## 🔎 RTS Operational Search
+
+Access live operational memory:
+
+➡️ https://nobutakayamauchi.github.io/RTS/memory/
+
+Search execution logs, incidents and radar intelligence.
+
+---
+
 - 🔎 RTS Search:
   https://nobutakayamauchi.github.io/RTS/search.html
 
