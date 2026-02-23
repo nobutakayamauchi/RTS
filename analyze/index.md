@@ -1,43 +1,164 @@
 # RTS Sentinel Analyze
 
-Generated: 2026-02-23 05:00 UTC
+Generated: 2026-02-23 05:07 UTC
+
+## Inputs
+
+- memory/index.md (priority): [memory/index.md](memory/index.md)
+- incidents/*.md: [incidents](incidents)
+- logs/*.md: [logs](logs)
 
 ## Incident Trend
-- incidents observed: 2
-- latest incident: 2026-02-23 05:00 UTC
 
-## Risk Topic Ranking
+- Incidents observed (raw): 9
+- Incidents observed (deduplicated): 2
+- Duplicate pairs detected: 7
+- Latest incident mtime: 2026-02-23 05:07 UTC
 
-- failure: 8
+## Latest Incidents (deduplicated)
+
+- RTS Incident Standard ([incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)) (mtime: 2026-02-23 05:07 UTC, sha:ca0f7868)
+- RTS INCIDENT REPORT ([incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)) (mtime: 2026-02-23 05:07 UTC, sha:9f2a9e4b)
+
+## Execution Stability
+
+- Logs observed: 6
+- Latest log mtime: 2026-02-23 05:07 UTC
+
+## Latest Logs
+
+- BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION ([logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)) (mtime: 2026-02-23 05:07 UTC, sha:8fb84074)
+- BLOCK_00000016 — RTS Tester Recruitment Phase Initiated ([logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)) (mtime: 2026-02-23 05:07 UTC, sha:8010baaf)
+- BLOCK_00000017 ([logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md)) (mtime: 2026-02-23 05:07 UTC, sha:1ddad98d)
+- BLOCK_00000018 ([logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md)) (mtime: 2026-02-23 05:07 UTC, sha:c7ce9cb2)
+- RTS Operational Workflow Log --- Smartphone Operator Method ([logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)) (mtime: 2026-02-23 05:07 UTC, sha:1c613dac)
+- RTS AI RADAR LOG ([logs/RADAR_LOG.md](logs/RADAR_LOG.md)) (mtime: 2026-02-23 05:07 UTC, sha:f71ef752)
+
+## Observed Risk Patterns
+
+Evidence-first keyword scan across incidents + logs. No inference beyond evidence hits.
+
+### Risk Topic Ranking
+
 - error: 8
-- server error: 3
-- workflow interruption: 0
+- failure: 8
+- server error: 5
+- github mobile: 3
+- session reset: 2
+- auth: 1
+- timeout: 1
+- context loss: 0
+- deleted workflow: 0
 - token: 0
-- auth: 0
+- workflow interruption: 0
 
-## Evidence Hits
+### Evidence Hits (top per topic)
 
-failure:
-- incidents/INCIDENT_RULES.md#ca0f7868
-- logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md#c7ce9cb2
-- logs/EXECUTION_LOG.md#1c613dac
+#### auth
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
 
-error:
-- logs/EXECUTION_LOG.md#1c613dac
-- logs/RADAR_LOG.md#f71ef752
-
-server error:
-- logs/RADAR_LOG.md#f71ef752
-
-workflow interruption:
+#### context loss
 - none
 
-token:
+#### deleted workflow
 - none
 
-auth:
+#### error
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+
+#### failure
+- [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md#sha:c7ce9cb2)
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (incidents/INCIDENT_RULES.md#sha:ca0f7868)
+
+#### github mobile
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+
+#### server error
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+
+#### session reset
+- [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md#sha:c7ce9cb2)
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+
+#### timeout
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+
+#### token
 - none
+
+#### workflow interruption
+- none
+
+---
+
+## Sentinel Phase-3
+
+### Failure Cascade Detection
+
+Co-occurrence-based detection (same doc contains multiple risk topics). Evidence-only.
+
+#### Recent Cascade Hits (last 7 days)
+
+##### cascade: error + workflow interruption
+- none
+
+##### cascade: server error + error
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+
+##### cascade: session reset + context loss
+- none
+
+##### cascade: error + session reset
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+
+##### cascade: workflow interruption + session reset
+- none
+
+#### Cascade Hits (all time, top)
+
+##### cascade: error + workflow interruption
+- none
+
+##### cascade: server error + error
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+
+##### cascade: session reset + context loss
+- none
+
+##### cascade: error + session reset
+- [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+
+##### cascade: workflow interruption + session reset
+- none
+
+### Drift Detection
+
+- baseline: previous analyze/index.md parsed
+
+#### Topic Delta (current - previous)
+
+- github mobile: +3
+- server error: +2
+- session reset: +2
+- auth: +1
+- timeout: +1
+
+### Self Awareness Ledger
+
+- This section records measurable generation conditions (no inference).
+
+- generated_utc: 2026-02-23T05:07:07.716090+00:00
+- inputs: incidents_raw=9, incidents_dedup=2, logs=6
+- dedup: duplicate_pairs=7
+- drift_baseline_available: true
+
+---
 
 ## Provenance
 
-- Generated by scripts/analyze.py
+- This report is generated by `scripts/analyze.py`.
+- Sources are not modified. Only parsed.
+- Evidence links point to repository paths.
