@@ -1,40 +1,97 @@
----
 name: "RTS Incident Report"
-about: "Report a safety or reliability incident (evidence-first)"
-title: "INC_YYYYMMDD_HHMM__short_title"
+description: "Report a safety or reliability incident (evidence-first)"
+title: "INC_YYYYMMDD_HHMM__<short_title>"
 labels: ["incident"]
-assignees: []
----
+assignees:
+  - nobutakayamauchi
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Evidence-first. No inference beyond evidence.**
+        Paste repository links (logs/incidents/radar). Do not paste secrets.
 
-## Summary
-What happened?
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+      placeholder: "Short, factual description."
+    validations:
+      required: true
 
-## Impact
-- Severity: LOW / MED / HIGH
-- Who or what was affected?
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - LOW
+        - MED
+        - HIGH
+    validations:
+      required: true
 
-## Evidence (required)
-Paste repository evidence links:
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who/what was affected?
+      placeholder: "What broke or was at risk?"
+    validations:
+      required: true
 
-- logs/...
-- incidents/...
-- screenshots
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (required)
+      description: Paste repository evidence links
+      placeholder: |
+        - logs/...
+        - incidents/...
+        - radar/...
+        - screenshots (if any)
+    validations:
+      required: true
 
-## Reproduction
-Steps to reproduce.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Steps to reproduce (if applicable)
+      placeholder: "1) ... 2) ... 3) ..."
+    validations:
+      required: false
 
-## Expected vs Actual
-Expected:
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs Actual
+      placeholder: |
+        Expected:
+        Actual:
+    validations:
+      required: false
 
-Actual:
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation / Recovery
+      description: How was the system stabilized?
+    validations:
+      required: false
 
-## Mitigation / Recovery
-How was the system stabilized?
+  - type: textarea
+    id: prevention
+    attributes:
+      label: Prevention
+      description: What should change to prevent recurrence?
+    validations:
+      required: false
 
-## Prevention
-What should change to prevent recurrence?
-
-## Operator
-Environment:
-
-Operator handle:
+  - type: input
+    id: operator_handle
+    attributes:
+      label: Operator handle
+      placeholder: "@your-handle"
+    validations:
+      required: true
