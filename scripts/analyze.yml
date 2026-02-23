@@ -1,0 +1,39 @@
+name: RTS Analyze
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    if: ${{ !contains(github.event.head_commit.message, 'RTS analyze auto update') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Analyze
+        run: python scripts/analyze.py
+
+      - name: Commit Analyze Result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add analyze/index.md
+
+          git diff --staged --quiet || git commit -m "RTS analyze auto update"
+
+          git push
