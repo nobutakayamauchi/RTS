@@ -21,6 +21,11 @@ Live operational history generated every execution cycle.
 
 Latest execution memory index:
 
+- 🔎 RTS Search:
+  https://nobutakayamauchi.github.io/RTS/search.html
+
+Latest execution memory index:
+
 - **Live Memory Index:** [memory/index.md](memory/index.md)
 
 Automatically generated from execution logs and incidents.
