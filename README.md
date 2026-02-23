@@ -21,6 +21,17 @@ Live operational history generated every execution cycle.
 
 Latest execution memory index:
 
+### 🚀 Try RTS Now
+
+1. Explore operational memory:
+https://nobutakayamauchi.github.io/RTS/memory/
+
+2. Review GENESIS evidence:
+https://github.com/nobutakayamauchi/RTS/releases/tag/RTS_GENESIS
+
+3. Inspect live execution logs:
+https://github.com/nobutakayamauchi/RTS/tree/main/logs
+
 ---
 
 ## 🔎 RTS Operational Search
