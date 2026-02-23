@@ -1,50 +1,40 @@
-name: RTS Analyze Auto
+name: RTS Analyze
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "17 */6 * * *"  # 6時間ごと（好みで変更OK）
   push:
-    paths:
-      - "logs/**"
-      - "incidents/**"
-      - "memory/**"
-      - "scripts/analyze.py"
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 3 * * *"
 
 permissions:
   contents: write
 
-concurrency:
-  group: rts-analyze
-  cancel-in-progress: true
-
 jobs:
   analyze:
+    # Prevent infinite loop when workflow commits analyze/index.md
+    if: ${{ !contains(github.event.head_commit.message, 'RTS analyze auto update') }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
 
       - name: Run Analyze
-        run: |
-          python scripts/analyze.py
+        run: python scripts/analyze.py
 
-      - name: Commit Analyze Update
+      - name: Commit Analyze Result
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name "github-actions"
           git config user.email "actions@github.com"
 
           git add analyze/index.md
 
-          # 変更がなければ何もしない
-          git diff --cached --quiet && exit 0
+          git diff --staged --quiet || git commit -m "RTS analyze auto update"
 
-          # 無限ループ抑止（Actions が作ったコミットは再トリガーされにくくする）
-          git commit -m "RTS Auto Analyze Update [skip ci]"
           git push
