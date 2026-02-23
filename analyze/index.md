@@ -1,6 +1,6 @@
 # RTS Sentinel Analyze
 
-Generated: 2026-02-23 22:56 UTC
+Generated: 2026-02-23 23:10 UTC
 
 ## Inputs
 
@@ -13,26 +13,26 @@ Generated: 2026-02-23 22:56 UTC
 - Incidents observed (raw): 9
 - Incidents observed (deduplicated): 2
 - Duplicate pairs detected: 7
-- Latest incident mtime: 2026-02-23 22:56 UTC
+- Latest incident mtime: 2026-02-23 23:10 UTC
 
 ## Latest Incidents (deduplicated)
 
-- RTS Incident Report --- Execution Audit Template v3 ([incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)) (mtime: 2026-02-23 22:56 UTC, sha:8a1a3b80)
-- RTS INCIDENT REPORT ([incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)) (mtime: 2026-02-23 22:56 UTC, sha:9f2a9e4b)
+- RTS Incident Report --- Execution Audit Template v3 ([incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)) (mtime: 2026-02-23 23:10 UTC, sha:8a1a3b80)
+- RTS INCIDENT REPORT ([incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)) (mtime: 2026-02-23 23:10 UTC, sha:9f2a9e4b)
 
 ## Execution Stability
 
 - Logs observed: 6
-- Latest log mtime: 2026-02-23 22:56 UTC
+- Latest log mtime: 2026-02-23 23:10 UTC
 
 ## Latest Logs
 
-- RTS AI RADAR LOG ([logs/RADAR_LOG.md](logs/RADAR_LOG.md)) (mtime: 2026-02-23 22:56 UTC, sha:f71ef752)
-- BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION ([logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)) (mtime: 2026-02-23 22:56 UTC, sha:8fb84074)
-- BLOCK_00000016 — RTS Tester Recruitment Phase Initiated ([logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)) (mtime: 2026-02-23 22:56 UTC, sha:8010baaf)
-- BLOCK_00000017 ([logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md)) (mtime: 2026-02-23 22:56 UTC, sha:1ddad98d)
-- BLOCK_00000018 ([logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md)) (mtime: 2026-02-23 22:56 UTC, sha:c7ce9cb2)
-- RTS Operational Workflow Log --- Smartphone Operator Method ([logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)) (mtime: 2026-02-23 22:56 UTC, sha:1c613dac)
+- BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION ([logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)) (mtime: 2026-02-23 23:10 UTC, sha:8fb84074)
+- BLOCK_00000016 — RTS Tester Recruitment Phase Initiated ([logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)) (mtime: 2026-02-23 23:10 UTC, sha:8010baaf)
+- BLOCK_00000017 ([logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md)) (mtime: 2026-02-23 23:10 UTC, sha:1ddad98d)
+- BLOCK_00000018 ([logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md)) (mtime: 2026-02-23 23:10 UTC, sha:c7ce9cb2)
+- RTS Operational Workflow Log --- Smartphone Operator Method ([logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)) (mtime: 2026-02-23 23:10 UTC, sha:1c613dac)
+- RTS AI RADAR LOG ([logs/RADAR_LOG.md](logs/RADAR_LOG.md)) (mtime: 2026-02-23 23:10 UTC, sha:f71ef752)
 
 ## Observed Risk Patterns
 
@@ -64,14 +64,14 @@ Evidence-first keyword scan across incidents + logs. No inference beyond evidenc
 - none
 
 #### error
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
 - [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
 
 #### failure
-- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
-- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (incidents/INCIDENT_RULES.md#sha:8a1a3b80)
 - [logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md) (logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md#sha:c7ce9cb2)
 - [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
+- [logs/RADAR_LOG.md](logs/RADAR_LOG.md) (logs/RADAR_LOG.md#sha:f71ef752)
+- [incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md) (incidents/INCIDENT_RULES.md#sha:8a1a3b80)
 
 #### github mobile
 - [logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md) (logs/EXECUTION_LOG.md#sha:1c613dac)
@@ -144,7 +144,7 @@ Co-occurrence-based detection (same doc contains multiple risk topics). Evidence
 
 - This section records measurable generation conditions (no inference).
 
-- generated_utc: 2026-02-23T22:56:03.262829+00:00
+- generated_utc: 2026-02-23T23:10:51.838767+00:00
 - inputs: incidents_raw=9, incidents_dedup=2, logs=6
 - dedup: duplicate_pairs=7
 - drift_baseline_available: false
