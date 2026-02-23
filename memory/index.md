@@ -7,6 +7,8 @@
 
 ---
 
+GENESIS START
+
 ## Latest Logs
 
 - **RADAR_LOG.md**
