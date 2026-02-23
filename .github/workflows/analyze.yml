@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   analyze:
-    # Prevent infinite loop when workflow commits analyze/index.md
     if: ${{ !contains(github.event.head_commit.message, 'RTS analyze auto update') }}
     runs-on: ubuntu-latest
 
