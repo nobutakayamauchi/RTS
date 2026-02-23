@@ -1,28 +1,25 @@
 name: "RTS Incident Report"
-description: "Report a safety or reliability incident (evidence-first)"
+description: "Report an incident (evidence-first, audit-grade)."
 title: "INC_YYYYMMDD_HHMM__short_title"
 labels: ["incident"]
 assignees:
   - nobutakayamauchi
 
 body:
-
   - type: markdown
     attributes:
       value: |
         ## RTS Incident Report
 
-        Evidence-first reporting.
-        No inference beyond evidence.
-
-        Paste repository evidence links.
+        Evidence-first. No inference beyond evidence.
+        Use this form to generate audit-grade incident records.
 
   - type: textarea
     id: summary
     attributes:
       label: Summary
-      description: What happened?
-      placeholder: Short factual description.
+      description: What happened? (facts only)
+      placeholder: "Short factual description."
     validations:
       required: true
 
@@ -30,33 +27,48 @@ body:
     id: severity
     attributes:
       label: Severity
+      description: S0 catastrophic / S1 blocking / S2 degradation / S3 minor / S4 cosmetic
       options:
-        - S0 Catastrophic systemic failure
-        - S1 Production blocking
-        - S2 Workflow degradation
-        - S3 Minor friction
-        - S4 Cosmetic
+        - S0
+        - S1
+        - S2
+        - S3
+        - S4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lifecycle_state
+    attributes:
+      label: Lifecycle State
+      description: Where is this incident in the operational state machine?
+      options:
+        - INCIDENT
+        - INVESTIGATION
+        - INTERVENTION
+        - RECOVERY
+        - KNOWLEDGE
     validations:
       required: true
 
   - type: textarea
-    id: impact
+    id: operational_impact
     attributes:
       label: Operational Impact
-      description: Who or what was affected
-      placeholder: workflow delay or manual rebuild required
+      description: Who/what was affected? What broke or was at risk?
+      placeholder: "workflow delay / manual rebuild required / decision risk introduced"
     validations:
       required: true
 
   - type: textarea
-    id: reproduction
+    id: reproduction_steps
     attributes:
       label: Reproduction Steps
-      description: workflow length interaction triggering actions
+      description: Minimum: (1) workflow length (2) interaction type (3) triggering actions. If unknown, say 'Reproduction unknown.'
       placeholder: |
-        1 workflow longer than 2 hours
-        2 continuous GPT interaction
-        3 observe context reset
+        1) workflow longer than 2 hours
+        2) continuous GPT interaction
+        3) observe context reset
     validations:
       required: false
 
@@ -64,12 +76,12 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: execution conditions
+      description: Execution conditions (device / interface / workflow / etc.)
       placeholder: |
         device = iPhone15Pro
         interface = Mobile GitHub Browser
         workflow = Long Session AI Operation
-        model = GPT unknown
+        model = GPT (unknown version)
     validations:
       required: false
 
@@ -77,35 +89,35 @@ body:
     id: hypothesis
     attributes:
       label: Hypothesis
-      description: initial explanation based on evidence only
-      placeholder: context fragmentation suspected
+      description: Initial explanation based on available evidence (avoid definitive claims).
+      placeholder: "context fragmentation suspected"
     validations:
       required: false
 
   - type: textarea
-    id: validation
+    id: validation_method
     attributes:
       label: Validation Method
-      description: how hypothesis is tested
-      placeholder: reproduction experiment or controlled retry
+      description: How will you test the hypothesis?
+      placeholder: "reproduction experiment / controlled retry / vendor confirmation"
     validations:
       required: false
 
   - type: textarea
-    id: confirmed
+    id: confirmed_cause
     attributes:
       label: Confirmed Cause
-      description: verified root cause if known
-      placeholder: unconfirmed if unknown
+      description: Verified root cause (if unknown, write 'Unconfirmed.')
+      placeholder: "Unconfirmed."
     validations:
       required: false
 
   - type: textarea
-    id: mitigation
+    id: rts_intervention
     attributes:
       label: RTS Intervention
-      description: operator response actions
-      placeholder: execution logging initiated workflow isolation rollback
+      description: Operator response actions (facts only).
+      placeholder: "execution logging initiated / workflow isolation / rollback"
     validations:
       required: false
 
@@ -113,41 +125,99 @@ body:
     id: recovery
     attributes:
       label: Recovery
-      description: mitigation outcome
-      placeholder: manual audit completed workflow rebuilt
+      description: Mitigation outcome.
+      placeholder: "manual audit completed / workflow rebuilt"
     validations:
       required: false
 
   - type: textarea
-    id: lessons
+    id: lessons_learned
     attributes:
       label: Lessons Learned
-      description: operational learning extracted
-      placeholder: persistent execution logging stabilizes workflow continuity
+      description: Operational learning extracted.
+      placeholder: "persistent execution logging stabilizes workflow continuity"
     validations:
       required: false
 
-  - type: textarea
-    id: evidence
+  - type: markdown
     attributes:
-      label: Evidence Required
-      description: first party or third party evidence
-      placeholder: |
-        source_type = third_party
-        url = https://example.com
+      value: |
+        ## Evidence v3 (Required)
 
-        retrieved_at = YYYY-MM-DDTHHMM
+        Evidence is valid if it has:
+        - provenance (source + time)
+        - integrity (hash)
+        - reference (url or internal path)
 
-        snapshot_path = incidents/evidence_snapshots/example.md
+        RTS uses two evidence streams:
+        (1) first-party operational logs (execution + memory index)
+        (2) third-party evidence links attached to incidents
 
-        content_hash = SHA256_PENDING
+  - type: dropdown
+    id: evidence_source_type
+    attributes:
+      label: Evidence Source Type
+      description: first_party = RTS repo logs / third_party = external source
+      options:
+        - first_party
+        - third_party
     validations:
       required: true
 
   - type: input
-    id: operator
+    id: evidence_url
+    attributes:
+      label: Evidence URL (third_party only)
+      description: If third_party, paste the URL. If first_party, leave blank.
+      placeholder: "https://x.com/... or https://example.com"
+    validations:
+      required: false
+
+  - type: input
+    id: retrieved_at
+    attributes:
+      label: Retrieved At (ISO8601)
+      description: When you referenced/captured the evidence.
+      placeholder: "2026-02-24T08:08:00+09:00"
+    validations:
+      required: true
+
+  - type: input
+    id: content_hash
+    attributes:
+      label: Content Hash (sha256)
+      description: sha256 of the captured content (or snapshot file content).
+      placeholder: "sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    validations:
+      required: true
+
+  - type: input
+    id: snapshot_path
+    attributes:
+      label: Snapshot Path (optional)
+      description: Repo path to stored snapshot (recommended).
+      placeholder: "incidents/evidence_snapshots/INC_YYYYMMDD_HHMM_xxx_snapshot.md"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: detection_source
+    attributes:
+      label: Detection Source
+      description: Who/what detected it first?
+      options:
+        - operator
+        - automation
+        - public_report
+        - vendor_notice
+    validations:
+      required: true
+
+  - type: input
+    id: operator_handle
     attributes:
       label: Operator Handle
+      description: GitHub/X handle (no secrets).
       placeholder: "@operator_handle"
     validations:
       required: true
