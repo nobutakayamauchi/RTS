@@ -1,8 +1,8 @@
-name: RTS Analyze
+name: RTS Sentinel Analyze
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
     - cron: "0 3 * * *"
 
@@ -11,9 +11,7 @@ permissions:
 
 jobs:
   analyze:
-    if: ${{ !contains(github.event.head_commit.message, 'RTS analyze auto update') }}
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,16 +22,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Analyze
+      - name: Run Sentinel Analyze
         run: python scripts/analyze.py
 
-      - name: Commit Analyze Result
+      - name: Commit Sentinel Report
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add analyze/index.md
-
-          git diff --staged --quiet || git commit -m "RTS analyze auto update"
-
+          git diff --cached --quiet || git commit -m "chore: update sentinel analyze report"
           git push
