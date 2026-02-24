@@ -4,16 +4,16 @@ on:
   workflow_run:
     workflows:
       - "RTS Sentinel Analyze"
-      - "RTS Heartbeat (Lightweight)"
       - "pages build and deployment"
-    types:
-      - completed
+      - "RTS Heartbeat (Lightweight)"
+    types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: write
   actions: read
 
-# 同時実行で push が競合するのを止める
+# 競合（push rejected）を抑える
 concurrency:
   group: rts-escalation-recorder-main
   cancel-in-progress: true
@@ -34,46 +34,53 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Record failure evidence (escalation)
+      - name: Record failure evidence (snapshot freeze)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+
           TARGET_WORKFLOW: ${{ github.event.workflow_run.name }}
           TARGET_RUN_ID: ${{ github.event.workflow_run.id }}
           TARGET_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
-          TARGET_BRANCH: ${{ github.event.workflow_run.head_branch }}
           TARGET_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          TARGET_BRANCH: ${{ github.event.workflow_run.head_branch }}
           TARGET_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           TARGET_ACTOR: ${{ github.event.workflow_run.actor.login }}
 
-          # ---- knobs (A運用: 自動で回す)
+          # ---- knobs (まずは緩め推奨) ----
           WINDOW_N: "12"
-          FAIL_THRESHOLD_LAST_N: "1"
+          FAIL_THRESHOLD_LAST_N: "3"
           BURST_MINUTES: "30"
-          BURST_FAIL_THRESHOLD: "2"
+          BURST_FAIL_THRESHOLD: "3"
 
-          IMPORTANT_ONLY: "true"
-          IMPORTANT_WORKFLOWS: "RTS Sentinel Analyze,RTS Heartbeat (Lightweight),pages build and deployment"
-
-          # L3にしたいときだけ追加（任意）
-          EXTRA_REFERENCE_URLS: ""
+          IMPORTANT_ONLY: "false"
+          IMPORTANT_WORKFLOWS: "RTS Sentinel Analyze,pages build and deployment,RTS Heartbeat (Lightweight)"
         run: |
           python scripts/rts_escalation.py
 
-      - name: Commit evidence (safe)
+      - name: Commit evidence (safe push)
         run: |
-          git config user.name "actions-user"
-          git config user.email "actions@users.noreply.github.com"
+          set -e
+          git config user.name "rts-bot"
+          git config user.email "rts-bot@users.noreply.github.com"
 
-          git add incidents/evidence_snapshots analysis incidents || true
+          git add incidents/evidence_packs incidents/evidence_snapshots || true
 
-          if git diff --cached --quiet; then
-            echo "[ok] no changes"
-            exit 0
-          fi
+          # 変更がないなら終了
+          git diff --cached --quiet && exit 0
 
-          git commit -m "RTS: escalation evidence pack" || exit 0
+          git commit -m "RTS: escalation evidence pack (snapshot freeze)" || exit 0
 
-          # 競合対策：必ず取り込んでからpush
-          git pull --rebase origin main
-          git push origin HEAD:main
+          # リモート更新があると push rejected になるので rebase して再試行
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            if git push origin main; then
+              echo "push ok"
+              exit 0
+            fi
+            echo "push failed, retry $i..."
+            sleep 2
+          done
+
+          echo "push failed after retries"
+          exit 1
