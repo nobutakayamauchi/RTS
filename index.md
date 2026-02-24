@@ -1,58 +1,123 @@
-# RTS --- Real‑Time Trust System
+# RTS PRO — Execution Audit for AI Operators
 
-## Execution becomes memory. Memory becomes identity.
+If you run AI for client work, you are exposed to execution risk.
 
-AI workflows forget. RTS remembers.
+- Model updates silently change outputs.
+- Long sessions fragment context.
+- Decisions become untraceable.
+- Incidents are hard to reproduce.
+- You cannot prove what happened.
 
-Execution OS for operators running long GPT workflows and research
-iterations.
+RTS adds execution audit to your AI workflow.
 
-------------------------------------------------------------------------
+Execution becomes memory.  
+Memory becomes verifiable.
 
-## Why RTS?
+---
 
-Modern AI workflows restart thinking every session. Ideas disappear.
-Decisions fragment. Execution history is lost.
+## ⚠ Built for Operators (Not for Beginners)
 
-RTS preserves reasoning continuity across AI sessions.
+RTS PRO is designed for:
 
-------------------------------------------------------------------------
+- AI freelancers running client delivery
+- GPT / Claude / Cursor heavy users
+- Operators using GitHub in production
+- People who care about reproducibility
 
-## Built for AI Operators
+Not for:
 
--   AI researchers running long experiments
--   GPT workflow builders
--   Startup operators
--   Prompt engineers
+- Casual AI users
+- Prompt hobbyists
+- People expecting output guarantees
+- Anyone who wants live calls or consulting
 
-------------------------------------------------------------------------
+---
 
-## RTS PRO --- Operator Execution System 🔥
+## What RTS PRO Includes
 
-Turn AI collaboration into persistent operational memory.
+- Incident Spec v3 (audit-grade structure)
+- Evidence Pack framework (snapshot + hash)
+- GitHub-native execution logging system
+- RTS Sentinel workflow template
+- Analyze script for structured reports
+- Async onboarding via GitHub Issues
 
-Includes:
+Everything runs inside your repository.
 
--   Execution templates (ready to run)
--   Operator governance framework
--   Decision logging system
--   RTS evolution workflow
+No SaaS. No subscription. No lock-in.
 
-Instant download · Lifetime access.
+---
 
-Download RTS PRO: https://risingson2.gumroad.com/l/sgeldp
+## Evidence Architecture (Example)
 
-------------------------------------------------------------------------
+RTS Evidence Packs include:
 
-## Official Links
+- Archived snapshot
+- SHA256 integrity hash
+- Run metadata
+- Escalation rules
+- Execution statistics
+- Inference separation
+- Provenance source
 
-Repository: https://github.com/nobutakayamauchi/RTS
+Example (Escalation Evidence Pack):
+See `/incidents/evidence_packs/`
 
-Pages: https://nobutakayamauchi.github.io/RTS/
+RTS is not a note-taking tool.  
+It is an execution audit structure.
 
-Evidence Index: https://nobutakayamauchi.github.io/RTS/analysis/
+---
 
-------------------------------------------------------------------------
+## Beta Operator Edition
 
-Creator: Nobutaka Yamauchi\
-MIT License --- 2026
+RTS PRO is currently in Beta.
+
+- Price: $19 (first 5 operators only)
+- Async onboarding via GitHub Issues
+- No live calls
+- Limited support window
+- Feedback required
+
+After beta: $59
+
+---
+
+## Scope & Responsibility
+
+RTS improves audit visibility.
+
+It does not operate your AI systems.  
+It does not guarantee output quality.  
+It does not prevent all incidents.
+
+Production responsibility remains with the operator.
+
+---
+
+## Why This Exists
+
+AI workflows forget.
+
+Chat history is not operational memory.
+
+As AI systems become more autonomous,
+execution depth increases,
+and silent failures compound.
+
+RTS provides structured execution logs,
+so decisions remain traceable.
+
+---
+
+## Get RTS PRO
+
+👉 [Join RTS PRO Beta](YOUR_GUMROAD_LINK_HERE)
+
+Public OSS version:
+https://github.com/nobutakayamauchi/RTS
+
+---
+
+Creator: Nobutaka Yamauchi  
+Execution Reliability Architect  
+Git-native Execution Audit OS
