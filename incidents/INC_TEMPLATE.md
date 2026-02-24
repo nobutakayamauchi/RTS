@@ -19,36 +19,87 @@ Status: OPEN
 
 ---
 
-## Symptom
+## Symptom (FACTS ONLY)
 
-(Observed behaviour only)
+Observed behaviour only.
+
+No assumptions.
 
 ---
 
-## Root Cause
+## Root Cause (HYPOTHESIS)
 
-(Initial hypothesis — avoid definitive claims.)
+Initial hypothesis.
+
+Avoid definitive claims.
 
 ---
 
 ## Operational Impact
 
-(Operator consequences.)
+Operator consequences.
+
+Example:
+
+- workflow interruption
+- rebuild required
+- reasoning reset
 
 ---
 
 ## RTS Intervention
 
-(Actions taken.)
+Actions taken.
+
+Example:
+
+- logging enabled
+- workflow isolation
+- retry execution
 
 ---
 
 ## Lessons Learned
 
-(Operational learning extracted.)
+Operational learning extracted.
 
 ---
 
-## Evidence
+## Evidence (REQUIRED)
 
-(URL_REQUIRED)
+Paste at least one reference.
+
+Example:
+
+https://example.com/source
+
+Multiple allowed.
+
+---
+
+## Evidence Facts (NO INFERENCE)
+
+Only measurable facts:
+
+- timestamps
+- URLs
+- workflow runs
+- system outputs
+
+Do NOT include judgement.
+
+---
+
+## Analysis (OPTIONAL — SEPARATE)
+
+Operator reasoning or interpretation.
+
+Can be empty.
+
+---
+
+## Conclusion (OPERATOR ONLY)
+
+Final operator judgement.
+
+Optional.
