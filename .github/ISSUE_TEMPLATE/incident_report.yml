@@ -1,28 +1,15 @@
-name: RTS Incident Report
-description: Evidence first incident reporting
-title: INC_YYYYMMDD_HHMM_short_title
-labels:
-  - incident
-
-assignees:
-  - nobutakayamauchi
+name: Incident Report
+description: RTS Incident submission
+title: "[INCIDENT] "
+labels: ["incident"]
 
 body:
-
-- type: markdown
-  attributes:
-    value: |
-      RTS Incident Report
-
-      Evidence first reporting.
-      No inference beyond evidence.
 
 - type: textarea
   id: summary
   attributes:
-    label: Summary
-    description: factual description only
-    placeholder: short factual description
+    label: What Happened
+    description: Describe the incident.
   validations:
     required: true
 
@@ -31,141 +18,8 @@ body:
   attributes:
     label: Severity
     options:
-      - S0
-      - S1
-      - S2
-      - S3
-      - S4
-  validations:
-    required: true
-
-- type: textarea
-  id: operational_impact
-  attributes:
-    label: Operational Impact
-    placeholder: workflow delay or rebuild required
-  validations:
-    required: true
-
-- type: textarea
-  id: reproduction
-  attributes:
-    label: Reproduction Steps
-    placeholder: workflow longer than two hours
-  validations:
-    required: false
-
-- type: textarea
-  id: environment
-  attributes:
-    label: Environment
-    placeholder: device interface workflow model
-  validations:
-    required: false
-
-- type: textarea
-  id: hypothesis
-  attributes:
-    label: Hypothesis
-    placeholder: suspected explanation
-  validations:
-    required: false
-
-- type: textarea
-  id: validation
-  attributes:
-    label: Validation Method
-    placeholder: retry or experiment
-  validations:
-    required: false
-
-- type: textarea
-  id: confirmed_cause
-  attributes:
-    label: Confirmed Cause
-    placeholder: unconfirmed if unknown
-  validations:
-    required: false
-
-- type: textarea
-  id: intervention
-  attributes:
-    label: RTS Intervention
-    placeholder: rollback isolation logging
-  validations:
-    required: false
-
-- type: textarea
-  id: recovery
-  attributes:
-    label: Recovery
-    placeholder: workflow rebuilt
-  validations:
-    required: false
-
-- type: textarea
-  id: lessons
-  attributes:
-    label: Lessons Learned
-    placeholder: operational learning
-  validations:
-    required: false
-
-- type: markdown
-  attributes:
-    value: |
-      Evidence v3 minimum requirements
-
-      provenance source and time
-      integrity hash
-      reference url or repo path
-
-- type: dropdown
-  id: evidence_source_type
-  attributes:
-    label: Evidence Source Type
-    options:
-      - first_party
-      - third_party
-  validations:
-    required: true
-
-- type: input
-  id: evidence_url
-  attributes:
-    label: Evidence URL
-    placeholder: https example
-  validations:
-    required: false
-
-- type: input
-  id: retrieved_at
-  attributes:
-    label: Retrieved At ISO8601
-    placeholder: 2026-02-24T08-08-00
-  validations:
-    required: true
-
-- type: input
-  id: content_hash
-  attributes:
-    label: Content Hash
-    placeholder: sha256 value
-  validations:
-    required: true
-
-- type: input
-  id: snapshot_path
-  attributes:
-    label: Snapshot Path
-    placeholder: incidents evidence snapshots file
-  validations:
-    required: false
-
-- type: input
-  id: operator
-  attributes:
-    label: Operator Handle
-    placeholder: operator handle
-  validations:
-    required: true
+      - S0 Catastrophic systemic failure
+      - S1 Production blocking
+      - S2 Degradation
+      - S3 Minor
+      - S4 Cosmetic
