@@ -2,8 +2,6 @@ name: RTS Snapshot Collector (Level2)
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"  # every 30 minutes
 
 permissions:
   contents: write
@@ -13,11 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
   snapshot:
+
     runs-on: ubuntu-latest
-    timeout-minutes: 10
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -28,33 +28,29 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Snapshot Collector (create snapshots)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          # ここで対象を絞りたいなら使う（空なら全パック走査）
-          PACK_DIR: incidents/evidence_packs
-          SNAPSHOT_DIR: incidents/evidence_snapshots
-        run: |
-          python scripts/rts_snapshot_collector.py
+      # -------- SNAPSHOT CREATE --------
 
-      - name: Link snapshots into incidents (write refs back)
-        run: |
-          # collector側で incidents を更新していない場合の保険（任意）
-          # 何もしないなら安全に通す
-          echo "link step: handled by collector (if implemented)"
+      - name: Run Snapshot Collector
+        run: python scripts/rts_snapshot_collector.py
 
-      - name: Commit evidence
+      # -------- HASH WRITE --------
+
+      - name: Write Snapshot Hash
+        run: python scripts/rts_snapshot_hash_writer.py
+
+      # -------- COMMIT --------
+
+      - name: Commit Evidence
         run: |
+
           git config user.name "rts-bot"
           git config user.email "rts-bot@users.noreply.github.com"
 
-          git add incidents/
+          git add incidents/evidence_snapshots || true
+          git add incidents/*.md || true
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
+          git commit -m "RTS: snapshot + hash update" || echo "No changes"
 
-          git commit -m "RTS snapshot evidence update"
-          git push
+          git pull --rebase origin main || true
+
+          git push origin main
