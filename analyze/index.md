@@ -1,6 +1,6 @@
 # RTS Sentinel Analyze
 
-Generated: 2026-02-24 04:20 UTC
+Generated: 2026-02-24 04:28 UTC
 
 ## Inputs
 
@@ -13,28 +13,28 @@ Generated: 2026-02-24 04:20 UTC
 - Incidents observed (raw): 15
 - Incidents observed (deduplicated): 3
 - Duplicate pairs detected: 12
-- Latest incident mtime: 2026-02-24 04:20 UTC
+- Latest incident mtime: 2026-02-24 04:28 UTC
 
 ## Latest Incidents (deduplicated)
 
-- RTS Incident Report — Execution Audit Template v3.1 ([incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)) (mtime: 2026-02-24 04:20 UTC, sha:af1bf626)
-- RTS INCIDENT REPORT ([incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)) (mtime: 2026-02-24 04:20 UTC, sha:9f2a9e4b)
-- RTS Incident Draft (From Escalation) ([incidents/INC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_DRAFT.md](incidents/INC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_DRAFT.md)) (mtime: 2026-02-24 04:20 UTC, sha:307008c8)
+- RTS Incident Draft (From Escalation) ([incidents/INC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_DRAFT.md](incidents/INC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_DRAFT.md)) (mtime: 2026-02-24 04:28 UTC, sha:307008c8)
+- RTS Incident Report — Execution Audit Template v3.1 ([incidents/INCIDENT_RULES.md](incidents/INCIDENT_RULES.md)) (mtime: 2026-02-24 04:28 UTC, sha:af1bf626)
+- RTS INCIDENT REPORT ([incidents/INC_20260222_1545_Cursor_ContextLoss.md](incidents/INC_20260222_1545_Cursor_ContextLoss.md)) (mtime: 2026-02-24 04:28 UTC, sha:9f2a9e4b)
 
 ## Execution Stability
 
 - Logs observed: 7
-- Latest log mtime: 2026-02-24 04:20 UTC
+- Latest log mtime: 2026-02-24 04:28 UTC
 
 ## Latest Logs
 
-- BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION ([logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)) (mtime: 2026-02-24 04:20 UTC, sha:8fb84074)
-- BLOCK_00000016 — RTS Tester Recruitment Phase Initiated ([logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)) (mtime: 2026-02-24 04:20 UTC, sha:8010baaf)
-- BLOCK_00000017 ([logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md)) (mtime: 2026-02-24 04:20 UTC, sha:1ddad98d)
-- BLOCK_00000018 ([logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md)) (mtime: 2026-02-24 04:20 UTC, sha:c7ce9cb2)
-- RTS Operational Workflow Log --- Smartphone Operator Method ([logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)) (mtime: 2026-02-24 04:20 UTC, sha:1c613dac)
-- - 2026-02-24T02:33:00Z heartbeat run_id=22334121780 ([logs/HEARTBEAT_LOG.md](logs/HEARTBEAT_LOG.md)) (mtime: 2026-02-24 04:20 UTC, sha:16f8ff61)
-- RTS AI RADAR LOG ([logs/RADAR_LOG.md](logs/RADAR_LOG.md)) (mtime: 2026-02-24 04:20 UTC, sha:f71ef752)
+- BLOCK_00000015 — RTS PUBLIC RELEASE & MONETIZATION ACTIVATION ([logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md](logs/BLOCK_00000015_RTS_PUBLIC_RELEASE.md)) (mtime: 2026-02-24 04:28 UTC, sha:8fb84074)
+- BLOCK_00000016 — RTS Tester Recruitment Phase Initiated ([logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md](logs/BLOCK_00000016_RTS_TESTER_RECRUITMENT.md)) (mtime: 2026-02-24 04:28 UTC, sha:8010baaf)
+- BLOCK_00000017 ([logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md](logs/BLOCK_00000017_GENESIS_AUTONOMOUS.md)) (mtime: 2026-02-24 04:28 UTC, sha:1ddad98d)
+- BLOCK_00000018 ([logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md](logs/BLOCK_00000018_AUTORESET_ENGINE_ONLINE.md)) (mtime: 2026-02-24 04:28 UTC, sha:c7ce9cb2)
+- RTS Operational Workflow Log --- Smartphone Operator Method ([logs/EXECUTION_LOG.md](logs/EXECUTION_LOG.md)) (mtime: 2026-02-24 04:28 UTC, sha:1c613dac)
+- - 2026-02-24T02:33:00Z heartbeat run_id=22334121780 ([logs/HEARTBEAT_LOG.md](logs/HEARTBEAT_LOG.md)) (mtime: 2026-02-24 04:28 UTC, sha:16f8ff61)
+- RTS AI RADAR LOG ([logs/RADAR_LOG.md](logs/RADAR_LOG.md)) (mtime: 2026-02-24 04:28 UTC, sha:f71ef752)
 
 ## Observed Risk Patterns
 
@@ -147,7 +147,7 @@ Co-occurrence-based detection (same doc contains multiple risk topics). Evidence
 
 - This section records measurable generation conditions (no inference).
 
-- generated_utc: 2026-02-24T04:20:21.493040+00:00
+- generated_utc: 2026-02-24T04:28:04.439316+00:00
 - inputs: incidents_raw=15, incidents_dedup=3, logs=7
 - dedup: duplicate_pairs=12
 - drift_baseline_available: false
