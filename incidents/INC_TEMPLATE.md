@@ -21,16 +21,14 @@ Status: OPEN
 
 ## Symptom (FACTS ONLY)
 
-Observed behaviour only.
-
+Observed behaviour only.  
 No assumptions.
 
 ---
 
 ## Root Cause (HYPOTHESIS)
 
-Initial hypothesis.
-
+Initial hypothesis.  
 Avoid definitive claims.
 
 ---
@@ -40,7 +38,6 @@ Avoid definitive claims.
 Operator consequences.
 
 Example:
-
 - workflow interruption
 - rebuild required
 - reasoning reset
@@ -52,7 +49,6 @@ Example:
 Actions taken.
 
 Example:
-
 - logging enabled
 - workflow isolation
 - retry execution
@@ -70,7 +66,6 @@ Operational learning extracted.
 Paste at least one reference.
 
 Example:
-
 https://example.com/source
 
 Multiple allowed.
@@ -80,7 +75,6 @@ Multiple allowed.
 ## Evidence Facts (NO INFERENCE)
 
 Only measurable facts:
-
 - timestamps
 - URLs
 - workflow runs
@@ -92,14 +86,12 @@ Do NOT include judgement.
 
 ## Analysis (OPTIONAL — SEPARATE)
 
-Operator reasoning or interpretation.
-
+Operator reasoning or interpretation.  
 Can be empty.
 
 ---
 
 ## Conclusion (OPERATOR ONLY)
 
-Final operator judgement.
-
+Final operator judgement.  
 Optional.
