@@ -16,6 +16,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 10
+
     steps:
 
       - name: Checkout
@@ -28,29 +30,60 @@ jobs:
         with:
           python-version: "3.11"
 
-      # -------- SNAPSHOT CREATE --------
+      ###############################################################
+      # Snapshot Collector (INLINE PYTHON)
+      ###############################################################
 
       - name: Run Snapshot Collector
-        run: python scripts/rts_snapshot_collector.py
+        run: |
 
-      # -------- HASH WRITE --------
+          python << 'PYTHON'
 
-      - name: Write Snapshot Hash
-        run: python scripts/rts_snapshot_hash_writer.py
+          import os
+          import json
+          import hashlib
+          import datetime
 
-      # -------- COMMIT --------
+          base="incidents/evidence_snapshots"
 
-      - name: Commit Evidence
+          os.makedirs(base,exist_ok=True)
+
+          now=datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+
+          filename=f"SNAP_{now}.bin"
+
+          path=os.path.join(base,filename)
+
+          payload={
+            "created_at":now,
+            "actor":"rts-bot",
+            "type":"snapshot"
+          }
+
+          data=json.dumps(payload,indent=2).encode()
+
+          with open(path,"wb") as f:
+              f.write(data)
+
+          sha=hashlib.sha256(data).hexdigest()
+
+          print("Snapshot created:",path)
+          print("sha256:",sha)
+
+          PYTHON
+
+      ###############################################################
+      # SAFE COMMIT (NO REBASE)
+      ###############################################################
+
+      - name: Commit evidence
         run: |
 
           git config user.name "rts-bot"
-          git config user.email "rts-bot@users.noreply.github.com"
+          git config user.email "actions@github.com"
 
           git add incidents/evidence_snapshots || true
-          git add incidents/*.md || true
 
-          git commit -m "RTS: snapshot + hash update" || echo "No changes"
+          git commit -m "RTS Snapshot Collector auto snapshot" || echo "No changes"
 
-          git pull --rebase origin main || true
-
-          git push origin main
+          git push
