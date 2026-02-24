@@ -3,7 +3,6 @@ name: RTS Snapshot Collector (Level2)
 on:
   workflow_dispatch:
   schedule:
-    # every 30 minutes
     - cron: "*/30 * * * *"
 
 permissions:
@@ -24,55 +23,36 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Run snapshot collector
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+      # ① Snapshotを作る（URL抽出→取得→incidents/evidence_snapshots/へ保存）
+      - name: Run Snapshot Collector (create snapshots)
         run: |
-          set -euo pipefail
+          python -V
           python scripts/rts_snapshot_collector.py
 
-      - name: Commit snapshots (if any)
-        env:
-          RUN_ID: ${{ github.run_id }}
+      # ② Snapshotのsha256を計算して、INC_*.md の frontmatter に
+      #    snapshot_ref / snapshot_hash_sha256 を書き戻す（Level2完成）
+      - name: Link snapshots into incidents (write ref + hash)
         run: |
-          set -euo pipefail
+          python scripts/rts_snapshot_linker.py
 
-          # configure bot identity
+      # ③ push競合を避けて main を取り込み→commit→push
+      - name: Commit evidence
+        run: |
           git config user.name "rts-bot"
           git config user.email "rts-bot@users.noreply.github.com"
 
-          # if no changes, exit cleanly
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "[ok] no changes"
+          git add incidents/evidence_snapshots incidents/INC_*.md || true
+
+          if git diff --cached --quiet; then
+            echo "[skip] nothing to commit"
             exit 0
           fi
 
-          git add -A
-          git commit -m "RTS: snapshot collector (run ${RUN_ID})"
-
-      - name: Push (rebase + retry)
-        env:
-          BRANCH: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-
-          # If the previous step made no commit, this step will have nothing to push.
-          # Still safe to run.
-          for i in 1 2 3 4 5; do
-            git pull --rebase origin "${BRANCH}" || true
-            if git push origin "HEAD:${BRANCH}"; then
-              echo "[ok] pushed"
-              exit 0
-            fi
-            echo "[warn] push failed, retry ${i}/5"
-            sleep $((i*2))
-          done
-
-          echo "[error] failed to push after retries"
-          exit 1
+          git pull --rebase origin main
+          git commit -m "RTS: snapshot level2 (collector+linker)"
+          git push origin main
