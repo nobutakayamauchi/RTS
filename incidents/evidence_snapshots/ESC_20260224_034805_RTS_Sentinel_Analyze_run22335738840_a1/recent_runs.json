@@ -1,0 +1,186 @@
+{
+  "generated_at_utc": "2026-02-24T03:48:06+00:00",
+  "recent_runs_slice": [
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T03:47:47Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22335738840",
+      "id": 22335738840,
+      "run_number": 65,
+      "status": "completed",
+      "updated_at": "2026-02-24T03:47:57Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:39:54Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22334273204",
+      "id": 22334273204,
+      "run_number": 64,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:40:06Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:33:27Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22334134077",
+      "id": 22334134077,
+      "run_number": 63,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:33:38Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:32:11Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22334106083",
+      "id": 22334106083,
+      "run_number": 62,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:32:18Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:28:36Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22334027681",
+      "id": 22334027681,
+      "run_number": 61,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:28:44Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:19:28Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333823833",
+      "id": 22333823833,
+      "run_number": 60,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:19:36Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T02:14:17Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333704411",
+      "id": 22333704411,
+      "run_number": 59,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:14:27Z"
+    },
+    {
+      "conclusion": "failure",
+      "created_at": "2026-02-24T02:05:45Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333506198",
+      "id": 22333506198,
+      "run_number": 58,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:05:55Z"
+    },
+    {
+      "conclusion": "failure",
+      "created_at": "2026-02-24T02:00:30Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333380857",
+      "id": 22333380857,
+      "run_number": 57,
+      "status": "completed",
+      "updated_at": "2026-02-24T02:00:40Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T01:53:06Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333208935",
+      "id": 22333208935,
+      "run_number": 56,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:53:13Z"
+    },
+    {
+      "conclusion": "failure",
+      "created_at": "2026-02-24T01:48:00Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333092749",
+      "id": 22333092749,
+      "run_number": 55,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:48:08Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T01:45:09Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22333026535",
+      "id": 22333026535,
+      "run_number": 54,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:45:19Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T01:36:00Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22332807894",
+      "id": 22332807894,
+      "run_number": 53,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:36:11Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T01:25:35Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22332558172",
+      "id": 22332558172,
+      "run_number": 52,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:25:45Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T01:22:38Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22332487134",
+      "id": 22332487134,
+      "run_number": 51,
+      "status": "completed",
+      "updated_at": "2026-02-24T01:22:47Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T00:53:52Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22331754500",
+      "id": 22331754500,
+      "run_number": 50,
+      "status": "completed",
+      "updated_at": "2026-02-24T00:53:59Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T00:39:40Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22331369971",
+      "id": 22331369971,
+      "run_number": 49,
+      "status": "completed",
+      "updated_at": "2026-02-24T00:39:51Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T00:28:13Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22331055025",
+      "id": 22331055025,
+      "run_number": 48,
+      "status": "completed",
+      "updated_at": "2026-02-24T00:28:22Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T00:27:18Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22331029643",
+      "id": 22331029643,
+      "run_number": 47,
+      "status": "completed",
+      "updated_at": "2026-02-24T00:27:26Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-02-24T00:06:29Z",
+      "html_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22330449376",
+      "id": 22330449376,
+      "run_number": 46,
+      "status": "completed",
+      "updated_at": "2026-02-24T00:06:41Z"
+    }
+  ],
+  "window_n": 12
+}

@@ -1,0 +1,18 @@
+{
+  "branch": "main",
+  "bundle_hash_sha256": "2c3395fb8acf749b82b96d2a8302cb4fb7624f6780d53c69d9ab99c7f8d1570b",
+  "bundle_id": "ESC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_a1",
+  "files": {
+    "commit.diff.patch": "c79b4377d3a8c8e2f8ef2e5b935a31b25d93604ff77613c6597b2e51c30acc93",
+    "commit.json": "f85f37bc3e24d662784513e10ccf052757aef54ac431388b5778941ffb76ff6c",
+    "jobs.json": "302945391f3e7bab6954885161a9d342fefc60130742bf7295e7167c0781ba69",
+    "recent_runs.json": "436d4e1c593e82952561dc94fb8223dcf7b67a2aa92e7735332d6aaaaf057afc",
+    "run.json": "eee3ffc26e48d5cfbc1698e97ca64c013ad0c5d432a4363e203732eb5e4109e1"
+  },
+  "generated_at_jst": "2026-02-24T12:48:06+09:00",
+  "generated_at_utc": "2026-02-24T03:48:06+00:00",
+  "repo": "nobutakayamauchi/RTS",
+  "run_attempt": "1",
+  "run_id": "22335738840",
+  "workflow": "RTS Sentinel Analyze"
+}
