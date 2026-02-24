@@ -1,0 +1,87 @@
+diff --git a/.github/workflows/rts_escalation_recorder.yml b/.github/workflows/rts_escalation_recorder.yml
+index d338092..ab8f9eb 100644
+--- a/.github/workflows/rts_escalation_recorder.yml
++++ b/.github/workflows/rts_escalation_recorder.yml
+@@ -4,18 +4,16 @@ on:
+   workflow_run:
+     workflows:
+       - "RTS Sentinel Analyze"
+-      - "RTS Issue -> Incident File"
+-      - "RTS Issue Close -> Incident Close"
+-      - "pages build and deployment"
+       - "RTS Heartbeat (Lightweight)"
+-    types: [completed]
+-  workflow_dispatch:
++      - "pages build and deployment"
++    types:
++      - completed
+ 
+ permissions:
+   contents: write
+   actions: read
+ 
+-# 同時実行で main push が競合しないようにする
++# 同時実行で push が競合するのを止める
+ concurrency:
+   group: rts-escalation-recorder-main
+   cancel-in-progress: true
+@@ -36,42 +34,46 @@ jobs:
+         with:
+           python-version: "3.11"
+ 
+-      - name: Record failure evidence
++      - name: Record failure evidence (escalation)
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           REPO: ${{ github.repository }}
+           TARGET_WORKFLOW: ${{ github.event.workflow_run.name }}
+           TARGET_RUN_ID: ${{ github.event.workflow_run.id }}
+           TARGET_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+-          TARGET_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+           TARGET_BRANCH: ${{ github.event.workflow_run.head_branch }}
++          TARGET_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+           TARGET_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+           TARGET_ACTOR: ${{ github.event.workflow_run.actor.login }}
+-          # --- knobs (必要なら後で調整) ---
++
++          # ---- knobs (A運用: 自動で回す)
+           WINDOW_N: "12"
+           FAIL_THRESHOLD_LAST_N: "1"
+           BURST_MINUTES: "30"
+           BURST_FAIL_THRESHOLD: "2"
+-          IMPORTANT_ONLY: "false"
+-          IMPORTANT_WORKFLOWS: ""
++
++          IMPORTANT_ONLY: "true"
++          IMPORTANT_WORKFLOWS: "RTS Sentinel Analyze,RTS Heartbeat (Lightweight),pages build and deployment"
++
++          # L3にしたいときだけ追加（任意）
++          EXTRA_REFERENCE_URLS: ""
+         run: |
+           python scripts/rts_escalation.py
+ 
+-      - name: Commit evidence
++      - name: Commit evidence (safe)
+         run: |
+-          git config user.name "rts-bot"
+-          git config user.email "actions@github.com"
++          git config user.name "actions-user"
++          git config user.email "actions@users.noreply.github.com"
+ 
+-          git add incidents || true
++          git add incidents/evidence_snapshots analysis incidents || true
+ 
+           if git diff --cached --quiet; then
+-            echo "No evidence changes"
++            echo "[ok] no changes"
+             exit 0
+           fi
+ 
+-          git commit -m "RTS: escalation evidence (run ${{ github.run_id }})"
++          git commit -m "RTS: escalation evidence pack" || exit 0
+ 
+-          # ★競合対策：他workflowのpushを取り込んでからpush
++          # 競合対策：必ず取り込んでからpush
+           git pull --rebase origin main
+-
+           git push origin HEAD:main
