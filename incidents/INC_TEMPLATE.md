@@ -1,40 +1,54 @@
-# RTS INCIDENT REPORT
-
-RTS converts AI workflow failure into recoverable operational memory.
-
+---
+schema_version: RTS-EVIDENCE-V1
+evidence_level: pending
+snapshot_ref: null
+snapshot_hash_sha256: null
+retrieved_at: null
+analysis_status: draft
 ---
 
-## Incident ID
-INC_YYYYMMDD_HHMM
+# RTS INCIDENT REPORT
 
-## Severity
-S1 (critical) / S2 / S3
+Incident ID: INC_YYYYMMDD_HHMM
 
-## System
-ChatGPT / Claude / Cursor / Agent / GitHub / Other
+Severity: S0 / S1 / S2 / S3 / S4
 
-## Status
-OPEN / MITIGATED / CLOSED
+System:
+
+Status: OPEN
 
 ---
 
 ## Symptom
-What happened?
 
-## Impact
-What broke?
+(Observed behaviour only)
 
-## Suspected Cause
-What likely caused it?
+---
+
+## Root Cause
+
+(Initial hypothesis — avoid definitive claims.)
+
+---
+
+## Operational Impact
+
+(Operator consequences.)
+
+---
+
+## RTS Intervention
+
+(Actions taken.)
+
+---
+
+## Lessons Learned
+
+(Operational learning extracted.)
+
+---
 
 ## Evidence
-Links / screenshots / log references.
 
-## Containment
-Immediate actions taken.
-
-## Recovery Steps
-How was functionality restored?
-
-## Prevention Rule
-What RTS rule prevents recurrence?
+(URL_REQUIRED)
