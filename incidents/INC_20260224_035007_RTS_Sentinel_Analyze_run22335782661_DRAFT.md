@@ -12,6 +12,9 @@
 
 - snapshot_ref:
   incidents/evidence_snapshots/SNAP_20260224_143656.bin
+snapshot_hash_sha256:
+ 665ac10b24d3dee44ec0e1c3befebbac9e16df52cd7a701596dee88e74f8c9cd
+
 
 ---
 
