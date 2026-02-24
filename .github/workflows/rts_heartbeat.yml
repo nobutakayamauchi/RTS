@@ -3,61 +3,75 @@ name: RTS Heartbeat (Lightweight)
 on:
   workflow_dispatch:
   schedule:
-    # every 30 minutes
+    # 30分おき（必要なら */15 に変更OK）
     - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
 
 # 同時実行を止める（競合の根本対策）
 concurrency:
   group: rts-heartbeat-main
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  actions: read
-
 jobs:
   heartbeat:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
 
     steps:
-      - name: Heartbeat snapshot (no commit)
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Append heartbeat line (always)
+        run: |
+          mkdir -p logs
+          ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "- ${ts} heartbeat run_id=${GITHUB_RUN_ID}" >> logs/HEARTBEAT_LOG.md
+
+      - name: Commit heartbeat (with rebase + retry)
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          REF:  ${{ github.ref }}
-          RUN_ID: ${{ github.run_id }}
-          RUN_NUMBER: ${{ github.run_number }}
-          ACTOR: ${{ github.actor }}
+          BRANCH: main
         run: |
           set -euo pipefail
 
-          utc_now="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          jst_now="$(TZ=Asia/Tokyo date '+%Y-%m-%dT%H:%M:%S%z')"
+          git config user.name "rts-bot"
+          git config user.email "rts-bot@users.noreply.github.com"
 
-          # repo HEAD sha を軽く取得（監視用・書き込み無し）
-          head_json="$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${REPO}/commits/${REF#refs/heads/}")" || head_json="{}"
-          head_sha="$(echo "$head_json" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha','unknown'))" 2>/dev/null || echo unknown)"
+          # 競合しやすいので、pull(rebase) -> commit -> push をリトライ
+          for i in 1 2 3; do
+            echo "[try $i] sync with origin/${BRANCH}"
+            git fetch origin "${BRANCH}"
 
-          echo "UTC: $utc_now"
-          echo "JST: $jst_now"
-          echo "REPO: $REPO"
-          echo "REF: $REF"
-          echo "HEAD_SHA: $head_sha"
-          echo "RUN: #$RUN_NUMBER ($RUN_ID)"
-          echo "ACTOR: $ACTOR"
+            # リベース（コンフリクトが起きたらabortして次のtryへ）
+            if ! git pull --rebase origin "${BRANCH}"; then
+              echo "[warn] rebase failed, aborting rebase and retry..."
+              git rebase --abort || true
+              sleep $((i * 2))
+              continue
+            fi
 
-          {
-            echo "## RTS Heartbeat (no commit)"
-            echo ""
-            echo "- utc_now: \`$utc_now\`"
-            echo "- jst_now: \`$jst_now\`"
-            echo "- repo: \`$REPO\`"
-            echo "- ref: \`$REF\`"
-            echo "- head_sha: \`$head_sha\`"
-            echo "- run: \`#$RUN_NUMBER ($RUN_ID)\`"
-            echo "- actor: \`$ACTOR\`"
-            echo ""
-            echo "> This heartbeat does **not** write to the repository."
-          } >> "$GITHUB_STEP_SUMMARY"
+            git add logs/HEARTBEAT_LOG.md || true
+
+            if git diff --cached --quiet; then
+              echo "[ok] no changes to commit"
+              exit 0
+            fi
+
+            git commit -m "RTS: heartbeat (run ${GITHUB_RUN_ID})" || true
+
+            echo "[try $i] pushing..."
+            if git push origin "HEAD:${BRANCH}"; then
+              echo "[ok] push succeeded"
+              exit 0
+            fi
+
+            echo "[warn] push failed, retrying after backoff..."
+            sleep $((i * 3))
+          done
+
+          echo "[error] push failed after retries"
+          exit 1
