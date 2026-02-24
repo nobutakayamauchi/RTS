@@ -1,0 +1,40 @@
+name: RTS Heartbeat (Lightweight)
+
+on:
+  workflow_run:
+    workflows: ["*"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: rts-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Append heartbeat line (always)
+        if: always()
+        run: |
+          mkdir -p radar
+          TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "- ts_utc: ${TS} | workflow: '${{ github.event.workflow_run.name }}' | conclusion: '${{ github.event.workflow_run.conclusion }}' | run_id: '${{ github.event.workflow_run.id }}' | attempt: '${{ github.event.workflow_run.run_attempt }}' | actor: '${{ github.event.workflow_run.actor.login }}' | head_sha: '${{ github.event.workflow_run.head_sha }}' | branch: '${{ github.event.workflow_run.head_branch }}'" >> radar/heartbeat.md
+
+      - name: Commit heartbeat
+        if: always()
+        run: |
+          git config user.name "rts-bot"
+          git config user.email "rts-bot@users.noreply.github.com"
+          git add radar/heartbeat.md
+          if git diff --cached --quiet; then
+            echo "No heartbeat changes."
+            exit 0
+          fi
+          git commit -m "RTS: heartbeat (run ${{ github.event.workflow_run.id }})"
+          git push
