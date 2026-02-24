@@ -1,144 +1,78 @@
-import os
-import re
-import hashlib
-import urllib.request
-from datetime import datetime, timezone, timedelta
+name: RTS Snapshot Collector (Level2)
 
-ROOT = os.getcwd()
+on:
+  workflow_dispatch:
+  schedule:
+    # every 30 minutes
+    - cron: "*/30 * * * *"
 
-PACK_DIR = "incidents/evidence_packs"
-SNAPSHOT_DIR = "incidents/evidence_snapshots"
+permissions:
+  contents: write
 
-JST = timezone(timedelta(hours=9))
+concurrency:
+  group: rts-snapshot-collector-main
+  cancel-in-progress: true
 
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-def now_jst_compact() -> str:
-    return datetime.now(JST).strftime("%Y%m%d_%H%M%S")
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-def sha256_bytes(data: bytes) -> str:
-    h = hashlib.sha256()
-    h.update(data)
-    return h.hexdigest()
+      - name: Run snapshot collector
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python scripts/rts_snapshot_collector.py
 
+      - name: Commit snapshots (if any)
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
 
-def extract_urls(text: str) -> list[str]:
-    return re.findall(r"https?://[^\s)]+", text)
+          # configure bot identity
+          git config user.name "rts-bot"
+          git config user.email "rts-bot@users.noreply.github.com"
 
+          # if no changes, exit cleanly
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "[ok] no changes"
+            exit 0
+          fi
 
-def download(url: str) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "RTS-SnapshotCollector"},
-    )
-    with urllib.request.urlopen(req, timeout=25) as r:
-        return r.read()
+          git add -A
+          git commit -m "RTS: snapshot collector (run ${RUN_ID})"
 
+      - name: Push (rebase + retry)
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
 
-def save_snapshot(content: bytes) -> str:
-    os.makedirs(SNAPSHOT_DIR, exist_ok=True)
-    ts = now_jst_compact()
-    filename = f"SNAP_{ts}.bin"
-    path = os.path.join(SNAPSHOT_DIR, filename)
-    with open(path, "wb") as f:
-        f.write(content)
-    return path
+          # If the previous step made no commit, this step will have nothing to push.
+          # Still safe to run.
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin "${BRANCH}" || true
+            if git push origin "HEAD:${BRANCH}"; then
+              echo "[ok] pushed"
+              exit 0
+            fi
+            echo "[warn] push failed, retry ${i}/5"
+            sleep $((i*2))
+          done
 
-
-def has_frontmatter_field(text: str, key: str) -> bool:
-    # only checks inside the first frontmatter block
-    if not text.startswith("---"):
-        return False
-    end = text.find("\n---", 3)
-    if end == -1:
-        return False
-    fm = text[: end + 4]
-    return re.search(rf"^{re.escape(key)}\s*:", fm, flags=re.MULTILINE) is not None
-
-
-def upsert_frontmatter(pack_text: str, updates: dict[str, str]) -> str:
-    if not pack_text.startswith("---"):
-        return pack_text
-
-    end = pack_text.find("\n---", 3)
-    if end == -1:
-        return pack_text
-
-    fm = pack_text[0 : end + 4]
-    rest = pack_text[end + 4 :]
-
-    lines = fm.splitlines(keepends=True)
-
-    def set_key(lines_in: list[str], k: str, v: str) -> list[str]:
-        pat = re.compile(rf"^{re.escape(k)}\s*:\s*(.*)$")
-        out = []
-        replaced = False
-        for ln in lines_in:
-            if pat.match(ln.strip("\n")):
-                out.append(f"{k}: {v}\n")
-                replaced = True
-            else:
-                out.append(ln)
-        if not replaced:
-            # insert before closing ---
-            insert_at = len(out) - 1
-            out = out[:insert_at] + [f"{k}: {v}\n"] + out[insert_at:]
-        return out
-
-    for k, v in updates.items():
-        lines = set_key(lines, k, v)
-
-    return "".join(lines) + rest
-
-
-def process_pack(pack_path: str) -> None:
-    with open(pack_path, "r", encoding="utf-8") as f:
-        text = f.read()
-
-    # already has snapshot -> skip (prevents duplication)
-    if has_frontmatter_field(text, "snapshot_ref") and has_frontmatter_field(text, "snapshot_hash_sha256"):
-        return
-
-    urls = extract_urls(text)
-    if not urls:
-        return
-
-    url = urls[0]
-
-    try:
-        data = download(url)
-    except Exception as e:
-        print("[download fail]", url, e)
-        return
-
-    snapshot_path = save_snapshot(data)
-    h = sha256_bytes(data)
-
-    updated = upsert_frontmatter(
-        text,
-        {
-            "snapshot_ref": snapshot_path,
-            "snapshot_hash_sha256": h,
-            "retrieved_at": datetime.now(JST).isoformat(),
-            "evidence_level": "2",
-        },
-    )
-
-    with open(pack_path, "w", encoding="utf-8") as f:
-        f.write(updated)
-
-    print("[ok] snapshot saved:", snapshot_path, "->", os.path.basename(pack_path))
-
-
-def main() -> None:
-    if not os.path.exists(PACK_DIR):
-        return
-
-    for name in sorted(os.listdir(PACK_DIR)):
-        if not name.endswith(".md"):
-            continue
-        process_pack(os.path.join(PACK_DIR, name))
-
-
-if __name__ == "__main__":
-    main()
+          echo "[error] failed to push after retries"
+          exit 1
