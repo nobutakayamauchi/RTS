@@ -6,28 +6,24 @@ on:
       - "RTS Sentinel Analyze"
       - "RTS Issue -> Incident File"
       - "RTS Issue Close -> Incident Close"
-      # ここに「監視したい本命だけ」追加していく
+      - "pages build and deployment"
+      - "RTS Heartbeat (Lightweight)"
     types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: write
+  actions: read
 
-# 同時実行で競合して push 失敗しないようにする（超重要）
+# 同時実行で main push が競合しないようにする
 concurrency:
-  group: rts-escalation-recorder
+  group: rts-escalation-recorder-main
   cancel-in-progress: true
 
 jobs:
-  record_escalation:
+  escalation:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
-    # ✅ ここが「pages build拾わない」キモ
-    # github-pages[bot] 由来は全部無視（Pagesの連鎖を断ち切る）
-    if: >
-      github.event.workflow_run.conclusion != 'success' &&
-      github.event.workflow_run.conclusion != 'skipped' &&
-      github.event.workflow_run.actor.login != 'github-pages[bot]'
 
     steps:
       - name: Checkout
@@ -40,12 +36,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Record Evidence Pack
+      - name: Record failure evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-
-          # workflow_run から拾う
           TARGET_WORKFLOW: ${{ github.event.workflow_run.name }}
           TARGET_RUN_ID: ${{ github.event.workflow_run.id }}
           TARGET_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
@@ -53,32 +47,31 @@ jobs:
           TARGET_BRANCH: ${{ github.event.workflow_run.head_branch }}
           TARGET_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           TARGET_ACTOR: ${{ github.event.workflow_run.actor.login }}
-
-          # 検知チューニング（安全側）
-          WINDOW_N: "10"
-          FAIL_THRESHOLD_LAST_N: "3"
-          BURST_MINUTES: "10"
+          # --- knobs (必要なら後で調整) ---
+          WINDOW_N: "12"
+          FAIL_THRESHOLD_LAST_N: "1"
+          BURST_MINUTES: "30"
           BURST_FAIL_THRESHOLD: "2"
-
-          # ✅ 重要ワークフロー限定（保険）
-          IMPORTANT_ONLY: "true"
-          IMPORTANT_WORKFLOWS: "RTS Sentinel Analyze,RTS Issue -> Incident File,RTS Issue Close -> Incident Close"
-
+          IMPORTANT_ONLY: "false"
+          IMPORTANT_WORKFLOWS: ""
         run: |
           python scripts/rts_escalation.py
 
-      - name: Commit Evidence Pack
+      - name: Commit evidence
         run: |
           git config user.name "rts-bot"
-          git config user.email "rts-bot@users.noreply.github.com"
+          git config user.email "actions@github.com"
 
-          git add incidents/evidence_snapshots || true
+          git add incidents || true
 
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No evidence changes"
             exit 0
           fi
 
-          git commit -m "RTS: escalation evidence pack"
-          git pull --rebase
-          git push
+          git commit -m "RTS: escalation evidence (run ${{ github.run_id }})"
+
+          # ★競合対策：他workflowのpushを取り込んでからpush
+          git pull --rebase origin main
+
+          git push origin HEAD:main
