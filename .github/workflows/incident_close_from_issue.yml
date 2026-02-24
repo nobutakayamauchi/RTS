@@ -23,19 +23,46 @@ jobs:
         with:
           python-version: "3.11"
 
+      ##################################################
+      # Incident Close 作成
+      ##################################################
+
       - name: Close Incident File
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           python scripts/close_incident_from_issue.py
 
+      ##################################################
+      # Commit Incident
+      ##################################################
+
       - name: Commit Incident Update
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions@users.noreply.github.com"
+          git config user.email "github-actions@github.com"
 
           git add incidents || true
 
-          git diff --cached --quiet || git commit -m "RTS auto close incident from Issue #${{ github.event.issue.number }}"
+          git diff --cached --quiet || git commit -m "RTS Incident Closed from Issue #${{ github.event.issue.number }}"
+
+          git push
+
+      ##################################################
+      # ⭐ Phase4 Sentinel 即時監査
+      ##################################################
+
+      - name: Run RTS Sentinel Analyze
+        run: |
+          python scripts/analyze.py
+
+      - name: Commit Analyze Report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+
+          git add analyze/index.md || true
+
+          git diff --cached --quiet || git commit -m "RTS Sentinel Analyze Update (close trigger)"
 
           git push
