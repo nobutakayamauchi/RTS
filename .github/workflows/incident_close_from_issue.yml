@@ -1,0 +1,41 @@
+name: RTS Issue Close -> Incident Close
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  close_incident:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Close Incident File
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          python scripts/close_incident_from_issue.py
+
+      - name: Commit Incident Update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@users.noreply.github.com"
+
+          git add incidents || true
+
+          git diff --cached --quiet || git commit -m "RTS auto close incident from Issue #${{ github.event.issue.number }}"
+
+          git push
