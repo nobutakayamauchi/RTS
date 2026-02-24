@@ -1,0 +1,58 @@
+name: RTS Escalation Recorder
+
+on:
+  workflow_run:
+    workflows:
+      - pages-build-deployment
+      - RTS Sentinel Analyze
+      - RTS Issue -> Incident File
+      - RTS Issue Close -> Incident Close
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+
+  escalation:
+
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Record failure evidence
+        run: |
+
+          mkdir -p incidents/evidence_packs
+
+          TS=$(date -u +"%Y%m%d_%H%M")
+
+          FILE="incidents/evidence_packs/EP_${TS}.md"
+
+          echo "# RTS Evidence Pack" > $FILE
+
+          echo "workflow=${{ github.event.workflow_run.name }}" >> $FILE
+
+          echo "result=${{ github.event.workflow_run.conclusion }}" >> $FILE
+
+          echo "actor=${{ github.event.workflow_run.actor.login }}" >> $FILE
+
+          echo "run=https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}" >> $FILE
+
+      - name: Commit evidence
+        run: |
+
+          git config user.name "rts-bot"
+          git config user.email "bot@users.noreply.github.com"
+
+          git add incidents || true
+
+          git diff --cached --quiet || git commit -m "RTS evidence"
+
+          git push
