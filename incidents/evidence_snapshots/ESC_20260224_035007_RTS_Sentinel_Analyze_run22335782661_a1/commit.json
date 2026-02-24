@@ -1,0 +1,101 @@
+{
+  "author": {
+    "avatar_url": "https://avatars.githubusercontent.com/u/256066413?v=4",
+    "events_url": "https://api.github.com/users/nobutakayamauchi/events{/privacy}",
+    "followers_url": "https://api.github.com/users/nobutakayamauchi/followers",
+    "following_url": "https://api.github.com/users/nobutakayamauchi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nobutakayamauchi/gists{/gist_id}",
+    "gravatar_id": "",
+    "html_url": "https://github.com/nobutakayamauchi",
+    "id": 256066413,
+    "login": "nobutakayamauchi",
+    "node_id": "U_kgDOD0NDbQ",
+    "organizations_url": "https://api.github.com/users/nobutakayamauchi/orgs",
+    "received_events_url": "https://api.github.com/users/nobutakayamauchi/received_events",
+    "repos_url": "https://api.github.com/users/nobutakayamauchi/repos",
+    "site_admin": false,
+    "starred_url": "https://api.github.com/users/nobutakayamauchi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nobutakayamauchi/subscriptions",
+    "type": "User",
+    "url": "https://api.github.com/users/nobutakayamauchi",
+    "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/nobutakayamauchi/RTS/commits/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d/comments",
+  "commit": {
+    "author": {
+      "date": "2026-02-24T03:49:45Z",
+      "email": "ultimaterisingson@gmail.com",
+      "name": "nobutakayamauchi"
+    },
+    "comment_count": 0,
+    "committer": {
+      "date": "2026-02-24T03:49:45Z",
+      "email": "noreply@github.com",
+      "name": "GitHub"
+    },
+    "message": "Update rts_heartbeat.yml",
+    "tree": {
+      "sha": "06e081c40c0dfb90ae9133d7aa9f8372c90c215c",
+      "url": "https://api.github.com/repos/nobutakayamauchi/RTS/git/trees/06e081c40c0dfb90ae9133d7aa9f8372c90c215c"
+    },
+    "url": "https://api.github.com/repos/nobutakayamauchi/RTS/git/commits/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d",
+    "verification": {
+      "payload": "tree 06e081c40c0dfb90ae9133d7aa9f8372c90c215c\nparent 9de9211c049b4fde267c4a4a0367ee905c32a09f\nauthor nobutakayamauchi <ultimaterisingson@gmail.com> 1771904985 +0900\ncommitter GitHub <noreply@github.com> 1771904985 +0900\n\nUpdate rts_heartbeat.yml",
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJpnR/ZCRC1aQ7uu5UhlAAAG+oQAAvzeua7YQCu8qj1iWosAMLJ\nRmVfUM3Va8HEGUo84oXmLzE9oWKXW4HMe8da8yemoXAbG3VZhQ1qkZzpt6twnYTW\nVaLfrYi1Tf610QqtJKrYlC9y4OnMMQGnK/sVwjfHGnVmTkfnfqAGm3WEdWALzrkU\nzRctAJ/4HDDl7lYAcWdVwUryjW5dRA12oyANihawfPvGHGNM/cLXFV/TovMHU9ri\noZrTpz9HJIrQqo6UyX6hPwwK/UFF3o1akuvMvWIS7XNKt4NEGbjVJKQWzJNStF0M\nvZnWT6nsNCvvMjNnAr4kf7ZPw/kfwq8J52RJjxbg8q15jGdiXmbIvViC8KkF+Uu6\nHt0+LdZJjigBxypcNULN3ifqDZuRK38FdUDdSGrANVSjm7UTb36UQTE/IuwQ5SiN\n2Ye2kiJOxb6RifkcHkSpUeEPejottNkBG+iN3h60sTtK1Sd8Yh1FTmzq4xxuJm2l\njOjxyjnqmACOGNmeD2O9OYvySja+rcTrhUObZeHQMv+b7jFPFs5CSQKjP6Nk4/m9\nT3qAYKyfsgSk1G6UNessdqShsareVnebEnvm/NpDgJNE51teyaYyTkzVD24BC48A\nanM3ShGLl/F37eTCyoxT0Q8NzK1V5yX8YQ9sy9bM3tuc/jZiE5lmC28bUrQ8Fq9u\nUHxk7/+ciW/DhyNfWXMk\n=U8JD\n-----END PGP SIGNATURE-----\n",
+      "verified": true,
+      "verified_at": "2026-02-24T03:49:46Z"
+    }
+  },
+  "committer": {
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "gravatar_id": "",
+    "html_url": "https://github.com/web-flow",
+    "id": 19864447,
+    "login": "web-flow",
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "site_admin": false,
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "type": "User",
+    "url": "https://api.github.com/users/web-flow",
+    "user_view_type": "public"
+  },
+  "files": [
+    {
+      "additions": 11,
+      "blob_url": "https://github.com/nobutakayamauchi/RTS/blob/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d/.github%2Fworkflows%2Frts_heartbeat.yml",
+      "changes": 52,
+      "contents_url": "https://api.github.com/repos/nobutakayamauchi/RTS/contents/.github%2Fworkflows%2Frts_heartbeat.yml?ref=35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d",
+      "deletions": 41,
+      "filename": ".github/workflows/rts_heartbeat.yml",
+      "patch": "@@ -3,13 +3,11 @@ name: RTS Heartbeat (Lightweight)\n on:\n   workflow_dispatch:\n   schedule:\n-    # 30分おき（必要なら */15 に変更OK）\n     - cron: \"*/30 * * * *\"\n \n permissions:\n   contents: write\n \n-# 同時実行を止める（競合の根本対策）\n concurrency:\n   group: rts-heartbeat-main\n   cancel-in-progress: true\n@@ -24,54 +22,26 @@ jobs:\n         uses: actions/checkout@v4\n         with:\n           fetch-depth: 0\n-          persist-credentials: true\n \n       - name: Append heartbeat line (always)\n         run: |\n           mkdir -p logs\n-          ts=\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"\n-          echo \"- ${ts} heartbeat run_id=${GITHUB_RUN_ID}\" >> logs/HEARTBEAT_LOG.md\n+          echo \"$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") heartbeat\" >> logs/heartbeat.log\n \n-      - name: Commit heartbeat (with rebase + retry)\n-        env:\n-          BRANCH: main\n+      - name: Commit heartbeat (safe)\n         run: |\n-          set -euo pipefail\n-\n           git config user.name \"rts-bot\"\n           git config user.email \"rts-bot@users.noreply.github.com\"\n \n-          # 競合しやすいので、pull(rebase) -> commit -> push をリトライ\n-          for i in 1 2 3; do\n-            echo \"[try $i] sync with origin/${BRANCH}\"\n-            git fetch origin \"${BRANCH}\"\n-\n-            # リベース（コンフリクトが起きたらabortして次のtryへ）\n-            if ! git pull --rebase origin \"${BRANCH}\"; then\n-              echo \"[warn] rebase failed, aborting rebase and retry...\"\n-              git rebase --abort || true\n-              sleep $((i * 2))\n-              continue\n-            fi\n-\n-            git add logs/HEARTBEAT_LOG.md || true\n-\n-            if git diff --cached --quiet; then\n-              echo \"[ok] no changes to commit\"\n-              exit 0\n-            fi\n-\n-            git commit -m \"RTS: heartbeat (run ${GITHUB_RUN_ID})\" || true\n+          git add logs/heartbeat.log || true\n \n-            echo \"[try $i] pushing...\"\n-            if git push origin \"HEAD:${BRANCH}\"; then\n-              echo \"[ok] push succeeded\"\n-              exit 0\n-            fi\n+          if git diff --cached --quiet; then\n+            echo \"[ok] no changes\"\n+            exit 0\n+          fi\n \n-            echo \"[warn] push failed, retrying after backoff...\"\n-            sleep $((i * 3))\n-          done\n+          git commit -m \"RTS: heartbeat\" || exit 0\n \n-          echo \"[error] push failed after retries\"\n-          exit 1\n+          # fetch-first問題の根治\n+          git pull --rebase origin main\n+          git push origin HEAD:main",
+      "raw_url": "https://github.com/nobutakayamauchi/RTS/raw/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d/.github%2Fworkflows%2Frts_heartbeat.yml",
+      "sha": "4ac599877a2d9e962d51df8c86d0c27a543e9a36",
+      "status": "modified"
+    }
+  ],
+  "html_url": "https://github.com/nobutakayamauchi/RTS/commit/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d",
+  "node_id": "C_kwDOQ9ZIHtoAKDM1ZGU2YjRjYWIwYWUxNGQ3ZDNkZGEyMzZkY2Y1Y2ZkMWViYjQyN2Q",
+  "parents": [
+    {
+      "html_url": "https://github.com/nobutakayamauchi/RTS/commit/9de9211c049b4fde267c4a4a0367ee905c32a09f",
+      "sha": "9de9211c049b4fde267c4a4a0367ee905c32a09f",
+      "url": "https://api.github.com/repos/nobutakayamauchi/RTS/commits/9de9211c049b4fde267c4a4a0367ee905c32a09f"
+    }
+  ],
+  "sha": "35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d",
+  "stats": {
+    "additions": 11,
+    "deletions": 41,
+    "total": 52
+  },
+  "url": "https://api.github.com/repos/nobutakayamauchi/RTS/commits/35de6b4cab0ae14d7d3dda236dcf5cfd1ebb427d"
+}

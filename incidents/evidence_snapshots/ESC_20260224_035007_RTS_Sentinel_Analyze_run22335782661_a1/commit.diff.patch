@@ -1,0 +1,84 @@
+diff --git a/.github/workflows/rts_heartbeat.yml b/.github/workflows/rts_heartbeat.yml
+index c96cadc..4ac5998 100644
+--- a/.github/workflows/rts_heartbeat.yml
++++ b/.github/workflows/rts_heartbeat.yml
+@@ -3,13 +3,11 @@ name: RTS Heartbeat (Lightweight)
+ on:
+   workflow_dispatch:
+   schedule:
+-    # 30分おき（必要なら */15 に変更OK）
+     - cron: "*/30 * * * *"
+ 
+ permissions:
+   contents: write
+ 
+-# 同時実行を止める（競合の根本対策）
+ concurrency:
+   group: rts-heartbeat-main
+   cancel-in-progress: true
+@@ -24,54 +22,26 @@ jobs:
+         uses: actions/checkout@v4
+         with:
+           fetch-depth: 0
+-          persist-credentials: true
+ 
+       - name: Append heartbeat line (always)
+         run: |
+           mkdir -p logs
+-          ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+-          echo "- ${ts} heartbeat run_id=${GITHUB_RUN_ID}" >> logs/HEARTBEAT_LOG.md
++          echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ") heartbeat" >> logs/heartbeat.log
+ 
+-      - name: Commit heartbeat (with rebase + retry)
+-        env:
+-          BRANCH: main
++      - name: Commit heartbeat (safe)
+         run: |
+-          set -euo pipefail
+-
+           git config user.name "rts-bot"
+           git config user.email "rts-bot@users.noreply.github.com"
+ 
+-          # 競合しやすいので、pull(rebase) -> commit -> push をリトライ
+-          for i in 1 2 3; do
+-            echo "[try $i] sync with origin/${BRANCH}"
+-            git fetch origin "${BRANCH}"
+-
+-            # リベース（コンフリクトが起きたらabortして次のtryへ）
+-            if ! git pull --rebase origin "${BRANCH}"; then
+-              echo "[warn] rebase failed, aborting rebase and retry..."
+-              git rebase --abort || true
+-              sleep $((i * 2))
+-              continue
+-            fi
+-
+-            git add logs/HEARTBEAT_LOG.md || true
+-
+-            if git diff --cached --quiet; then
+-              echo "[ok] no changes to commit"
+-              exit 0
+-            fi
+-
+-            git commit -m "RTS: heartbeat (run ${GITHUB_RUN_ID})" || true
++          git add logs/heartbeat.log || true
+ 
+-            echo "[try $i] pushing..."
+-            if git push origin "HEAD:${BRANCH}"; then
+-              echo "[ok] push succeeded"
+-              exit 0
+-            fi
++          if git diff --cached --quiet; then
++            echo "[ok] no changes"
++            exit 0
++          fi
+ 
+-            echo "[warn] push failed, retrying after backoff..."
+-            sleep $((i * 3))
+-          done
++          git commit -m "RTS: heartbeat" || exit 0
+ 
+-          echo "[error] push failed after retries"
+-          exit 1
++          # fetch-first問題の根治
++          git pull --rebase origin main
++          git push origin HEAD:main
