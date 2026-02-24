@@ -11,79 +11,136 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   snapshot:
-
     runs-on: ubuntu-latest
-
     timeout-minutes: 10
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      ###############################################################
-      # Snapshot Collector (INLINE PYTHON)
-      ###############################################################
-
-      - name: Run Snapshot Collector
+      - name: Run Snapshot Collector (create snapshot + update incident drafts)
+        env:
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
         run: |
+          python - << 'PYTHON'
+          import os, re, json, hashlib, datetime
+          from pathlib import Path
 
-          python << 'PYTHON'
+          ROOT = Path(".").resolve()
+          SNAP_DIR = ROOT / "incidents" / "evidence_snapshots"
+          INC_DIR  = ROOT / "incidents"
 
-          import os
-          import json
-          import hashlib
-          import datetime
+          SNAP_DIR.mkdir(parents=True, exist_ok=True)
 
-          base="incidents/evidence_snapshots"
+          # --- Build snapshot payload (simple + stable) ---
+          now_utc = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+          repo = os.environ.get("REPO", "")
+          run_id = os.environ.get("RUN_ID", "")
+          server_url = os.environ.get("SERVER_URL", "https://github.com")
+          ref_name = os.environ.get("REF_NAME", "")
+          actor = os.environ.get("ACTOR", "rts-bot")
 
-          os.makedirs(base,exist_ok=True)
+          run_url = f"{server_url}/{repo}/actions/runs/{run_id}" if repo and run_id else ""
 
-          now=datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-
-          filename=f"SNAP_{now}.bin"
-
-          path=os.path.join(base,filename)
-
-          payload={
-            "created_at":now,
-            "actor":"rts-bot",
-            "type":"snapshot"
+          payload = {
+            "schema": "RTS-SNAPSHOT-V1",
+            "created_at_utc": now_utc,
+            "repo": repo,
+            "ref": ref_name,
+            "actor": actor,
+            "run_id": run_id,
+            "run_url": run_url,
+            "notes": "Auto-generated snapshot for evidence preservation."
           }
 
-          data=json.dumps(payload,indent=2).encode()
+          data = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+          sha = hashlib.sha256(data).hexdigest()
 
-          with open(path,"wb") as f:
-              f.write(data)
+          # File name: SNAP_YYYYMMDD_HHMMSS_run<id>_L2.json
+          ts = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+          fname = f"SNAP_{ts}_run{run_id}_L2.json" if run_id else f"SNAP_{ts}_L2.json"
+          snap_path = SNAP_DIR / fname
 
-          sha=hashlib.sha256(data).hexdigest()
+          # Write snapshot
+          snap_path.write_bytes(data)
 
-          print("Snapshot created:",path)
-          print("sha256:",sha)
+          print("Snapshot created:", str(snap_path))
+          print("sha256:", sha)
+
+          # --- Update all incident drafts (or none if not present) ---
+          # Target: files like incidents/*_DRAFT.md
+          drafts = sorted([p for p in INC_DIR.glob("*_DRAFT.md") if p.is_file()])
+
+          python_script_url = f"{server_url}/{repo}/blob/main/scripts/rts_snapshot_collector.py" if repo else ""
+
+          def upsert_block(text: str, key: str, value: str) -> str:
+            # Supports bullet list style:
+            # - key: value
+            # or:
+            # - key:
+            #   value
+            pattern_inline = re.compile(rf"(^\s*-\s*{re.escape(key)}\s*:\s*).*$", re.MULTILINE)
+            pattern_block  = re.compile(rf"(^\s*-\s*{re.escape(key)}\s*:\s*\n)(^\s+.*\n)?", re.MULTILINE)
+
+            if pattern_inline.search(text):
+              return pattern_inline.sub(rf"\1{value}", text)
+
+            if pattern_block.search(text):
+              def repl(m):
+                return m.group(1) + f"  {value}\n"
+              return pattern_block.sub(repl, text)
+
+            # insert before "## Analysis" if exists, else append at end
+            anchor = "## Analysis"
+            insertion = f"- {key}: {value}\n"
+            if anchor in text:
+              return text.replace(anchor, insertion + "\n" + anchor, 1)
+            return text.rstrip() + "\n\n" + insertion
+
+          for p in drafts:
+            t = p.read_text(encoding="utf-8")
+
+            # Ensure Evidence section exists; if not, create minimal structure
+            if "## Evidence" not in t:
+              t = "# RTS Incident Draft (From Escalation)\n\n## Evidence (Links)\n\n## Analysis (Link)\n\n## Conclusion (Fill later)\n"
+
+            # Upsert fields in Evidence section area (simple global upsert, safe enough)
+            t = upsert_block(t, "snapshot_ref", f"incidents/evidence_snapshots/{fname}")
+            t = upsert_block(t, "snapshot_hash_sha256", sha)
+            if python_script_url:
+              t = upsert_block(t, "python_script", python_script_url)
+            if run_url:
+              t = upsert_block(t, "run_url", run_url)
+
+            p.write_text(t, encoding="utf-8")
+            print("Updated incident draft:", p.name)
 
           PYTHON
 
-      ###############################################################
-      # SAFE COMMIT (NO REBASE)
-      ###############################################################
-
-      - name: Commit evidence
+      - name: Commit evidence (safe)
         run: |
-
           git config user.name "rts-bot"
-          git config user.email "actions@github.com"
+          git config user.email "actions@users.noreply.github.com"
 
-          git add incidents/evidence_snapshots || true
+          # Only commit if there are changes
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
 
-          git commit -m "RTS Snapshot Collector auto snapshot" || echo "No changes"
-
+          git add incidents/evidence_snapshots incidents/*.md || true
+          git commit -m "RTS Snapshot Collector (Level2): add snapshot + link drafts"
           git push
