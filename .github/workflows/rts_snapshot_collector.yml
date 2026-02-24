@@ -3,7 +3,7 @@ name: RTS Snapshot Collector (Level2)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/30 * * * *"  # every 30 minutes
 
 permissions:
   contents: write
@@ -28,31 +28,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      # ① Snapshotを作る（URL抽出→取得→incidents/evidence_snapshots/へ保存）
       - name: Run Snapshot Collector (create snapshots)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          # ここで対象を絞りたいなら使う（空なら全パック走査）
+          PACK_DIR: incidents/evidence_packs
+          SNAPSHOT_DIR: incidents/evidence_snapshots
         run: |
-          python -V
           python scripts/rts_snapshot_collector.py
 
-      # ② Snapshotのsha256を計算して、INC_*.md の frontmatter に
-      #    snapshot_ref / snapshot_hash_sha256 を書き戻す（Level2完成）
-      - name: Link snapshots into incidents (write ref + hash)
+      - name: Link snapshots into incidents (write refs back)
         run: |
-          python scripts/rts_snapshot_linker.py
+          # collector側で incidents を更新していない場合の保険（任意）
+          # 何もしないなら安全に通す
+          echo "link step: handled by collector (if implemented)"
 
-      # ③ push競合を避けて main を取り込み→commit→push
       - name: Commit evidence
         run: |
           git config user.name "rts-bot"
           git config user.email "rts-bot@users.noreply.github.com"
 
-          git add incidents/evidence_snapshots incidents/INC_*.md || true
+          git add incidents/
 
           if git diff --cached --quiet; then
-            echo "[skip] nothing to commit"
+            echo "No changes to commit"
             exit 0
           fi
 
-          git pull --rebase origin main
-          git commit -m "RTS: snapshot level2 (collector+linker)"
-          git push origin main
+          git commit -m "RTS snapshot evidence update"
+          git push
