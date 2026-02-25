@@ -1,12 +1,24 @@
 # RTS — Execution Audit for AI Workflows
 
-RTS turns AI execution into verifiable operational memory.
+---
 
-Start in 60 seconds:
+## 👉 Start RTS in 60 seconds
 
-👉 starter/python → python START_HERE.py
+Open:
 
-RTS turns AI execution into verifiable operational memory.
+starter/python
+
+Then run:
+
+python START_HERE.py
+
+Execution memory begins immediately.
+
+See also:
+
+START.md
+
+---
 
 Run long GPT workflows without losing reasoning continuity.
 Audit agent behaviour structurally.
