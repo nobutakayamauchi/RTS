@@ -23,3 +23,5 @@ runs/
 evolution/
 
 Execution history becomes operational memory.
+
+Execution history survives session resets and device changes.
