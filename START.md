@@ -7,7 +7,7 @@ No telemetry.
 
 1. Open:
 
-starter/python
+starter/python (Windows / Mac / Linux / Android Termux supported)
 
 2. Follow README.md
 
