@@ -13,6 +13,48 @@ RTS prevents that.
 
 ---
 
+## What You Can Do With RTS
+
+RTS turns AI execution into operational memory.
+
+You can:
+
+• Run long GPT or AI workflows without losing reasoning continuity.
+
+• Preserve research progress across session resets.
+
+• Capture execution history as verifiable evidence.
+
+• Audit agent behavior structurally (ZERO protocol).
+
+• Freeze incidents into immutable snapshots.
+
+• Reconstruct operational decisions from public logs.
+
+• Maintain rollback capability across experiments.
+
+RTS is designed for:
+
+• AI researchers running long reasoning experiments.
+
+• Operators managing GPT workflows or agent systems.
+
+• Builders developing autonomous workflows.
+
+• Anyone treating AI execution as infrastructure.
+
+RTS runs locally.
+
+No cloud dependency.
+No telemetry.
+You remain the operator.
+
+Quick start:
+
+python START_HERE.py
+
+Execution memory begins immediately.
+
 ## What RTS Does
 
 RTS automatically:
