@@ -1,0 +1,27 @@
+{
+  "generated_at_utc": "2026-02-25T03:51:16+00:00",
+  "runs_count": 1,
+  "counts": {
+    "SPAGHETTI": 1
+  },
+  "items": [
+    {
+      "name": "RUN_TEMPLATE.md",
+      "relpath": "runs/RUN_TEMPLATE.md",
+      "run_id": "- created_at:",
+      "mode": "auto | semi | manual",
+      "success_flag": "unknown",
+      "config_fingerprint": null,
+      "span_count": 2,
+      "fail_count": 0,
+      "drift_count": 0,
+      "warn_count": 0,
+      "missing_status_rate": 1.0,
+      "classification": "SPAGHETTI",
+      "spaghetti_reason_codes": [
+        "HIGH_MISSING_STATUS"
+      ],
+      "conflict_keys": []
+    }
+  ]
+}
