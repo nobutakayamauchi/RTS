@@ -1,431 +1,391 @@
 #!/usr/bin/env python3
-# RTS Agent Analyze v0
-# Execution Path Observer (Structure-only)
-#
-# RTS does not judge semantics.
-# RTS reveals structure.
-#
-# Output:
-#   analysis/agent_index.md
-#
-# Classification (5-tier):
-#   - FAIL       : any span status=fail
-#   - DRIFT      : any span status=drift OR suspicious WARN accumulation
-#   - SPAGHETTI  : "worked once" risk (looping / excessive retries / unstable path)
-#   - OK         : clean run (no drift/fail/spaghetti) but not explicitly verified
-#   - VERIFIED   : explicitly marked success_flag true (or equivalent) + clean structure
+# -*- coding: utf-8 -*-
+
+"""
+RTS Agent Analyze (Zero-Complete)
+- Generates analyze/agent_index.md by scanning Run logs.
+- Adds SUCCESS evaluation + SPAGHETTI detection (structure-only).
+- No signature compare (v1). This is v0 "zero-complete".
+
+Supported Run log locations (auto-detected):
+- logs/RUN_*.md
+- logs/runs/*.md
+- runs/*.md
+
+Supported Run format (YAML-ish markdown):
+
+# RUN
+- run_id: 2026-02-25_142233_clientA_agentX
+- created_at: 2026-02-25T14:22:33+09:00
+- operator: Nobutaka Yamauchi
+- system: agentX
+- goal: ...
+- mode: auto | semi | manual
+- success_flag: unknown | verified
+
+## SPAN 000
+- span_id: "000"
+- parent_span_id: null
+- node_type: planner
+- status: ok | warn | fail | drift | verified
+- tool_name: web.search   (optional)
+
+(Any missing fields are tolerated.)
+"""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from pathlib import Path
+import os
 import re
-from typing import Dict, List, Optional, Tuple
+import json
+import hashlib
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
 
 
-# -----------------------------
-# Paths
-# -----------------------------
-ROOT = Path(__file__).resolve().parents[1]
-RUNS_DIR = ROOT / "runs"
-OUTPUT = ROOT / "analysis" / "agent_index.md"
+# -----------------------
+# Paths (repo-relative)
+# -----------------------
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ANALYZE_DIR = REPO_ROOT / "analyze"
+ANALYZE_DIR.mkdir(parents=True, exist_ok=True)
+
+OUTPUT_MD = ANALYZE_DIR / "agent_index.md"
+OUTPUT_JSON = ANALYZE_DIR / "agent_index.json"  # optional machine-read
 
 
-# -----------------------------
-# Regex (robust, markdown-ish)
-# -----------------------------
-# Matches span header like:
-#   ## SPAN 000
-#   ## SPAN 010
-SPAN_HDR_RE = re.compile(r"(?m)^\s*##\s*SPAN\s+(\d{1,4})\s*$")
-
-# YAML-ish bullet styles:
-# - key: value
-# - key:
-#   value
-KEY_LINE_RE = re.compile(r"(?m)^\s*[-*]\s*([a-zA-Z0-9_]+)\s*:\s*(.*)\s*$")
-
-# Specific fields (keep forgiving)
-STATUS_RE = re.compile(r"(?im)^\s*[-*]\s*status\s*:\s*(ok|warn|fail|drift)\s*$")
-NODE_RE = re.compile(r"(?im)^\s*[-*]\s*node_type\s*:\s*([a-zA-Z0-9_]+)\s*$")
-PARENT_RE = re.compile(r"(?im)^\s*[-*]\s*parent_span_id\s*:\s*(null|\"[0-9]+\"|[0-9]+)\s*$")
-ORDER_RE = re.compile(r"(?im)^\s*[-*]\s*order_index\s*:\s*([0-9]+)\s*$")
-TOOL_RE = re.compile(r"(?im)^\s*[-*]\s*tool_name\s*:\s*(.+?)\s*$")
-ERROR_RE = re.compile(r"(?im)^\s*[-*]\s*error\s*:\s*(.+?)\s*$")
-
-# Run header fields (top section bullets)
-RUN_ID_RE = re.compile(r"(?im)^\s*[-*]\s*run_id\s*:\s*(.+?)\s*$")
-SUCCESS_FLAG_RE = re.compile(r"(?im)^\s*[-*]\s*success_flag\s*:\s*(true|false|unknown)\s*$")
-MODE_RE = re.compile(r"(?im)^\s*[-*]\s*mode\s*:\s*(auto|semi|manual)\s*$")
-CONFIG_FP_RE = re.compile(r"(?im)^\s*[-*]\s*config_(fingerprint|fingerprint)\s*:\s*(.+?)\s*$")
+# -----------------------
+# Utilities
+# -----------------------
+def _safe_lower(s: Optional[str]) -> str:
+    return (s or "").strip().lower()
 
 
-# -----------------------------
-# Data
-# -----------------------------
-@dataclass
-class Span:
-    span_id: str
-    parent_span_id: Optional[str]
-    node_type: str
-    status: str
-    order_index: Optional[int]
-    tool_name: Optional[str]
-    error: Optional[str]
+def _now_iso() -> str:
+    # Keep timezone naive; GitHub Actions logs are UTC anyway
+    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-@dataclass
-class RunSummary:
-    name: str
-    relpath: str
-    run_id: str
-    mode: str
-    success_flag: str
-    config_fp: str
-    spans: List[Span]
-    mtime_iso: str
-    classification: str
-    reason: str
-    loop_score: int
-    drift_count: int
-    fail_count: int
-    warn_count: int
-
-
-# -----------------------------
-# Helpers
-# -----------------------------
-def now_utc_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
-
-
-def safe_read_text(path: Path) -> str:
-    # smartphone-friendly: ignore decode errors rather than crashing
+def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def normalize_span_id(raw: str) -> str:
-    # pad to 3 digits by default; allow larger but keep stable
-    try:
-        n = int(raw)
-        if n < 0:
-            return raw
-        if n < 1000:
-            return str(n).zfill(3)
-        return str(n)  # 1000+ keep as-is
-    except Exception:
-        return raw
+def _sha256_bytes(b: bytes) -> str:
+    h = hashlib.sha256()
+    h.update(b)
+    return h.hexdigest()
 
 
-def parse_parent(v: str) -> Optional[str]:
-    v = v.strip()
-    if v.lower() == "null":
-        return None
-    v = v.strip('"')
-    return normalize_span_id(v) if v else None
+def _sha256_file(path: Path) -> str:
+    return _sha256_bytes(path.read_bytes())
 
 
-def parse_run_header(text: str) -> Tuple[str, str, str, str]:
-    run_id = ""
-    mode = "unknown"
-    success_flag = "unknown"
-    config_fp = ""
+# -----------------------
+# Run discovery
+# -----------------------
+def discover_run_files() -> List[Path]:
+    patterns = [
+        REPO_ROOT / "logs",
+        REPO_ROOT / "logs" / "runs",
+        REPO_ROOT / "runs",
+    ]
 
-    m = RUN_ID_RE.search(text)
-    if m:
-        run_id = m.group(1).strip().strip('"')
+    files: List[Path] = []
 
-    m = MODE_RE.search(text)
-    if m:
-        mode = m.group(1).strip().lower()
+    # logs/RUN_*.md
+    logs_dir = REPO_ROOT / "logs"
+    if logs_dir.exists():
+        files.extend(sorted(logs_dir.glob("RUN_*.md")))
 
-    m = SUCCESS_FLAG_RE.search(text)
-    if m:
-        success_flag = m.group(1).strip().lower()
+    # logs/runs/*.md
+    logs_runs = REPO_ROOT / "logs" / "runs"
+    if logs_runs.exists():
+        files.extend(sorted(logs_runs.glob("*.md")))
 
-    m = CONFIG_FP_RE.search(text)
-    if m:
-        config_fp = m.group(2).strip().strip('"')
+    # runs/*.md
+    runs_dir = REPO_ROOT / "runs"
+    if runs_dir.exists():
+        files.extend(sorted(runs_dir.glob("*.md")))
 
-    return run_id, mode, success_flag, config_fp
-
-
-def split_spans(text: str) -> List[Tuple[str, str]]:
-    """
-    Returns list of (span_id, span_block_text).
-    We locate span headers and slice blocks.
-    """
-    matches = list(SPAN_HDR_RE.finditer(text))
-    out: List[Tuple[str, str]] = []
-    if not matches:
-        return out
-
-    for i, m in enumerate(matches):
-        sid = normalize_span_id(m.group(1))
-        start = m.end()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        block = text[start:end]
-        out.append((sid, block))
-    return out
+    # de-dup
+    uniq = []
+    seen = set()
+    for f in files:
+        rp = str(f.resolve())
+        if rp not in seen:
+            uniq.append(f)
+            seen.add(rp)
+    return uniq
 
 
-def parse_span_block(span_id: str, block: str) -> Span:
-    # defaults
-    status = "ok"
-    node_type = "other"
-    parent = None
-    order_index = None
-    tool_name = None
-    error = None
-
-    m = STATUS_RE.search(block)
-    if m:
-        status = m.group(1).lower()
-
-    m = NODE_RE.search(block)
-    if m:
-        node_type = m.group(1).strip().lower()
-
-    m = PARENT_RE.search(block)
-    if m:
-        parent = parse_parent(m.group(1))
-
-    m = ORDER_RE.search(block)
-    if m:
-        try:
-            order_index = int(m.group(1))
-        except Exception:
-            order_index = None
-
-    m = TOOL_RE.search(block)
-    if m:
-        tool_name = m.group(1).strip()
-
-    m = ERROR_RE.search(block)
-    if m:
-        error = m.group(1).strip()
-
-    return Span(
-        span_id=span_id,
-        parent_span_id=parent,
-        node_type=node_type,
-        status=status,
-        order_index=order_index,
-        tool_name=tool_name,
-        error=error,
-    )
+# -----------------------
+# Parsing (YAML-ish list lines)
+# -----------------------
+KV_LINE = re.compile(r"^\s*-\s*([A-Za-z0-9_]+)\s*:\s*(.*)\s*$")
+SPAN_HEADER = re.compile(r"^\s*##\s*SPAN\s+([0-9A-Za-z_\-]+)\s*$", re.IGNORECASE)
+RUN_HEADER = re.compile(r"^\s*#\s*RUN\s*$", re.IGNORECASE)
 
 
-def detect_loops(spans: List[Span]) -> int:
-    """
-    Structure-only loop/risk score.
-    Higher = more likely 'SPAGHETTI' (miracle alignment / retry storm / hidden instability).
-    """
-    if not spans:
-        return 0
-
-    score = 0
-    node_seq = [s.node_type for s in spans]
-
-    # 1) consecutive repeats
-    consec = 1
-    for i in range(1, len(node_seq)):
-        if node_seq[i] == node_seq[i - 1]:
-            consec += 1
-            if consec >= 3:
-                score += 2  # repeated same node type 3+ times in a row
-        else:
-            consec = 1
-
-    # 2) excessive executor/tool_call ratios
-    exec_count = sum(1 for s in spans if s.node_type == "executor")
-    tool_count = sum(1 for s in spans if s.node_type == "tool_call")
-    retr_count = sum(1 for s in spans if s.node_type == "retrieval")
-
-    total = max(1, len(spans))
-    if exec_count / total > 0.70 and total >= 10:
-        score += 3
-    if tool_count / total > 0.60 and total >= 10:
-        score += 3
-    if retr_count / total > 0.60 and total >= 10:
-        score += 2
-
-    # 3) repeated tool_name (retry storm)
-    tool_names = [s.tool_name for s in spans if s.tool_name]
-    if tool_names:
-        freq: Dict[str, int] = {}
-        for t in tool_names:
-            freq[t] = freq.get(t, 0) + 1
-        max_tool = max(freq.values())
-        if max_tool >= 5:
-            score += 4
-        elif max_tool >= 3:
-            score += 2
-
-    # 4) span count too large (cheap guardrail)
-    # (world-use assumption: you don't want to eyeball 200+ spans per run)
-    if total >= 200:
-        score += 8
-    elif total >= 80:
-        score += 4
-    elif total >= 40:
-        score += 2
-
-    # 5) parent structure anomalies (missing parents)
-    span_ids = {s.span_id for s in spans}
-    missing_parent = sum(
-        1 for s in spans if s.parent_span_id is not None and s.parent_span_id not in span_ids
-    )
-    if missing_parent >= 1:
-        score += 3
-
-    return score
-
-
-def classify_run(success_flag: str, spans: List[Span]) -> Tuple[str, str, int, int, int, int]:
+def parse_run_markdown(md: str) -> Tuple[Dict[str, str], List[Dict[str, str]]]:
     """
     Returns:
-      (classification, reason, loop_score, drift_count, fail_count, warn_count)
+      run_meta: dict
+      spans: list of dict (each span fields)
     """
-    fail_count = sum(1 for s in spans if s.status == "fail")
-    drift_count = sum(1 for s in spans if s.status == "drift")
-    warn_count = sum(1 for s in spans if s.status == "warn")
-    loop_score = detect_loops(spans)
+    lines = md.splitlines()
 
-    if fail_count > 0:
-        return ("FAIL", f"{fail_count} span(s) failed", loop_score, drift_count, fail_count, warn_count)
+    run_meta: Dict[str, str] = {}
+    spans: List[Dict[str, str]] = []
 
-    # drift is explicit, and warn can be "soft drift" if it accumulates
-    if drift_count > 0:
-        return ("DRIFT", f"{drift_count} span(s) drift", loop_score, drift_count, fail_count, warn_count)
+    in_run = False
+    current_span: Optional[Dict[str, str]] = None
 
-    if warn_count >= 2:
-        return ("DRIFT", f"{warn_count} warnings (soft drift)", loop_score, drift_count, fail_count, warn_count)
+    for line in lines:
+        if RUN_HEADER.match(line):
+            in_run = True
+            current_span = None
+            continue
 
-    # spaghetti = structure looks OK but risky (loops/retries/excess)
-    if loop_score >= 6:
-        return ("SPAGHETTI", f"loop/risk score={loop_score}", loop_score, drift_count, fail_count, warn_count)
+        m_span = SPAN_HEADER.match(line)
+        if m_span:
+            # close previous span
+            if current_span is not None:
+                spans.append(current_span)
+            current_span = {"span_header": m_span.group(1)}
+            continue
 
-    # verified only if explicitly flagged and structure clean
-    if success_flag == "true":
-        return ("VERIFIED", "success_flag=true + clean structure", loop_score, drift_count, fail_count, warn_count)
+        m_kv = KV_LINE.match(line)
+        if m_kv:
+            k = m_kv.group(1).strip()
+            v = m_kv.group(2).strip()
 
-    return ("OK", "no fail/drift detected", loop_score, drift_count, fail_count, warn_count)
+            # normalize null-ish
+            if _safe_lower(v) in {"null", "none", ""}:
+                v = ""
 
+            if current_span is not None:
+                current_span[k] = v
+            elif in_run:
+                run_meta[k] = v
 
-def collect_runs() -> List[Path]:
-    if not RUNS_DIR.exists():
-        return []
-    # Scale: thousands ok; tens of thousands still ok (simple filesystem + parse)
-    return sorted(RUNS_DIR.glob("RUN_*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if current_span is not None:
+        spans.append(current_span)
 
-
-def md_link(text: str, href: str) -> str:
-    return f"[{text}]({href})"
-
-
-def to_rel(p: Path) -> str:
-    try:
-        return str(p.relative_to(ROOT)).replace("\\", "/")
-    except Exception:
-        return str(p).replace("\\", "/")
+    return run_meta, spans
 
 
-def parse_run_file(path: Path) -> RunSummary:
-    text = safe_read_text(path)
-
-    run_id, mode, success_flag, config_fp = parse_run_header(text)
-    if not run_id:
-        # fallback to filename (stable)
-        run_id = path.stem.replace("RUN_", "")
-
-    span_blocks = split_spans(text)
-    spans: List[Span] = [parse_span_block(sid, block) for (sid, block) in span_blocks]
-
-    classification, reason, loop_score, drift_count, fail_count, warn_count = classify_run(success_flag, spans)
-
-    mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat(timespec="seconds")
-
-    return RunSummary(
-        name=path.name,
-        relpath=to_rel(path),
-        run_id=run_id,
-        mode=mode,
-        success_flag=success_flag,
-        config_fp=config_fp,
-        spans=spans,
-        mtime_iso=mtime,
-        classification=classification,
-        reason=reason,
-        loop_score=loop_score,
-        drift_count=drift_count,
-        fail_count=fail_count,
-        warn_count=warn_count,
-    )
+# -----------------------
+# Classification (Zero-complete)
+# -----------------------
+def _is_fail(st: str) -> bool:
+    return _safe_lower(st) == "fail"
 
 
-def write_index(items: List[RunSummary]) -> None:
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+def _is_drift(st: str) -> bool:
+    return _safe_lower(st) == "drift"
 
-    generated = now_utc_iso()
-    total = len(items)
 
-    # summary counts
-    counts: Dict[str, int] = {}
-    for it in items:
-        counts[it.classification] = counts.get(it.classification, 0) + 1
+def _is_verified(st: str) -> bool:
+    return _safe_lower(st) == "verified"
 
+
+def _count_missing(spans: List[Dict[str, str]]) -> int:
+    missing = 0
+    for s in spans:
+        node = s.get("node_type", "")
+        st = s.get("status", "")
+        if not _safe_lower(node) or not _safe_lower(st):
+            missing += 1
+    return missing
+
+
+def _extract_tool_names(spans: List[Dict[str, str]]) -> List[str]:
+    tools = []
+    for s in spans:
+        tool = (s.get("tool_name", "") or "").strip()
+        tools.append(tool)
+    return tools
+
+
+def _tool_call_ratio(spans: List[Dict[str, str]]) -> float:
+    tools = _extract_tool_names(spans)
+    tool_calls = sum(1 for t in tools if t)
+    return tool_calls / max(1, len(spans))
+
+
+def _max_consecutive_same_tool(spans: List[Dict[str, str]]) -> int:
+    tools = _extract_tool_names(spans)
+    best = 0
+    cur = 0
+    prev = None
+    for t in tools:
+        if t and t == prev:
+            cur += 1
+        else:
+            cur = 1 if t else 0
+        prev = t if t else None
+        best = max(best, cur)
+    return best
+
+
+def classify_run(
+    spans: List[Dict[str, str]],
+    run_success_flag: str = "unknown",
+    *,
+    spaghetti_span_threshold: int = 80,
+    spaghetti_tool_ratio_threshold: float = 0.60,
+    spaghetti_same_tool_streak: int = 4,
+    spaghetti_missing_ratio_threshold: float = 0.20,
+) -> Tuple[str, List[str]]:
+    """
+    Returns: (classification: str, reasons: list[str])
+
+    Labels:
+      FAIL | DRIFT | SPAGHETTI | OK | VERIFIED
+
+    Notes:
+      - VERIFIED is explicit only in zero-complete:
+        - run header: success_flag: verified
+        - or any span has status: verified
+      - No signature compare (v1)
+      - Structure-only spaghetti heuristics
+    """
+    reasons: List[str] = []
+
+    statuses = [_safe_lower(s.get("status", "")) for s in spans]
+
+    if any(_is_fail(st) for st in statuses):
+        return "FAIL", ["fail_span_detected"]
+
+    if any(_is_drift(st) for st in statuses):
+        return "DRIFT", ["drift_span_detected"]
+
+    # verified explicit
+    if _safe_lower(run_success_flag) == "verified" or any(_is_verified(st) for st in statuses):
+        return "VERIFIED", ["explicit_verified_marker"]
+
+    # spaghetti heuristics (structure-only)
+    span_count = len(spans)
+    if span_count >= spaghetti_span_threshold:
+        reasons.append(f"span_count_high:{span_count}")
+
+    ratio = _tool_call_ratio(spans)
+    if ratio > spaghetti_tool_ratio_threshold:
+        reasons.append(f"tool_call_ratio_high:{ratio:.2f}")
+
+    streak = _max_consecutive_same_tool(spans)
+    if streak >= spaghetti_same_tool_streak:
+        reasons.append(f"same_tool_streak:{streak}")
+
+    missing = _count_missing(spans)
+    missing_ratio = missing / max(1, span_count)
+    if missing_ratio > spaghetti_missing_ratio_threshold:
+        reasons.append(f"missing_fields_ratio:{missing_ratio:.2f}")
+
+    if reasons:
+        return "SPAGHETTI", reasons
+
+    return "OK", ["no_anomaly_detected"]
+
+
+# -----------------------
+# Report generation
+# -----------------------
+def make_md_index(rows: List[Dict[str, str]]) -> str:
     lines: List[str] = []
-    lines.append("# RTS Agent Analyze Index")
+    lines.append("# RTS Agent Index")
     lines.append("")
-    lines.append(f"- generated_at_utc: {generated}")
-    lines.append(f"- runs_dir: {to_rel(RUNS_DIR)}")
-    lines.append(f"- runs_count: {total}")
+    lines.append(f"- generated_at: {_now_iso()}")
     lines.append("")
-    lines.append("RTS observes agent execution paths. Structure only. No semantic judging.")
+    lines.append("This page lists Runs and their structural evaluation.")
     lines.append("")
-
-    # counts
-    lines.append("## Summary")
+    lines.append("## Legend")
+    lines.append("- VERIFIED: explicitly marked verified (no signature compare in v0)")
+    lines.append("- OK: no fail/drift/spaghetti signals")
+    lines.append("- DRIFT: explicit drift spans exist")
+    lines.append("- SPAGHETTI: success-looking but structurally suspicious")
+    lines.append("- FAIL: at least one fail span")
     lines.append("")
-    for k in ["VERIFIED", "OK", "DRIFT", "SPAGHETTI", "FAIL"]:
-        lines.append(f"- {k}: {counts.get(k, 0)}")
-    lines.append("")
-    lines.append("> Definitions: VERIFIED=explicit clean success. OK=clean. DRIFT=soft anomaly. SPAGHETTI=miracle alignment risk. FAIL=hard failure.")
-    lines.append("")
-
-    # table
     lines.append("## Runs")
     lines.append("")
-    lines.append("| Run | Class | Spans | Fail | Drift | Warn | LoopScore | Mode | Updated(UTC) | Notes |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|---|---|---|")
+    lines.append("| created_at | run_id | system | mode | result | reasons | source |")
+    lines.append("|---|---|---|---|---|---|---|")
 
-    for it in items:
-        href = f"../{it.relpath}"
-        run_cell = md_link(it.name, href)
-        notes = it.reason.replace("|", " ")
+    for r in rows:
+        created_at = r.get("created_at", "")
+        run_id = r.get("run_id", "")
+        system = r.get("system", "") or r.get("agent_stack", "") or ""
+        mode = r.get("mode", "")
+        result = r.get("classification", "")
+        reasons = r.get("reasons", "")
+        src = r.get("source_path", "")
+
+        # Make repo-relative link
+        src_link = src.replace(str(REPO_ROOT) + os.sep, "")
         lines.append(
-            f"| {run_cell} | {it.classification} | {len(it.spans)} | {it.fail_count} | {it.drift_count} | {it.warn_count} | {it.loop_score} | {it.mode} | {it.mtime_iso} | {notes} |"
+            f"| {created_at} | `{run_id}` | {system} | {mode} | **{result}** | {reasons} | `{src_link}` |"
         )
 
     lines.append("")
-    lines.append("## Operator Notes")
+    lines.append("## Notes")
+    lines.append("- This is v0 zero-complete. v1 adds Success Signature compare.")
     lines.append("")
-    lines.append("- This report is structure-first. It does not assert correctness of outputs.")
-    lines.append("- If you need stronger auditability: attach evidence links or snapshot hashes per span/run.")
-    lines.append("- Use SPAGHETTI as a warning: it may pass once but likely fails on replay.")
-    lines.append("")
-
-    OUTPUT.write_text("\n".join(lines), encoding="utf-8")
+    return "\n".join(lines)
 
 
-def main() -> None:
-    runs = collect_runs()
-    items = [parse_run_file(p) for p in runs]
-    write_index(items)
-    print(f"[OK] RTS Agent Analyze wrote: {to_rel(OUTPUT)} (runs={len(items)})")
+def build_index() -> int:
+    run_files = discover_run_files()
+    rows: List[Dict[str, str]] = []
+
+    for f in run_files:
+        md = _read_text(f)
+        meta, spans = parse_run_markdown(md)
+
+        run_id = meta.get("run_id", "") or f.stem
+        created_at = meta.get("created_at", "") or meta.get("timestamp_start", "")
+        mode = meta.get("mode", "")
+        system = meta.get("system", "") or meta.get("agent_stack", "")
+
+        success_flag = meta.get("success_flag", "unknown")
+
+        cls, reasons = classify_run(spans, run_success_flag=success_flag)
+
+        row = {
+            "run_id": run_id,
+            "created_at": created_at,
+            "mode": mode,
+            "system": system,
+            "classification": cls,
+            "reasons": ", ".join(reasons[:4]),  # keep short
+            "source_path": str(f.resolve()),
+            "span_count": str(len(spans)),
+            "file_sha256": _sha256_file(f),
+        }
+        rows.append(row)
+
+    # Sort: newest-ish first (created_at string sort may be rough; fallback by filename)
+    def _sort_key(r: Dict[str, str]):
+        return (r.get("created_at", ""), r.get("run_id", ""))
+
+    rows_sorted = sorted(rows, key=_sort_key, reverse=True)
+
+    OUTPUT_MD.write_text(make_md_index(rows_sorted), encoding="utf-8")
+    OUTPUT_JSON.write_text(json.dumps(rows_sorted, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    print(f"[OK] wrote: {OUTPUT_MD}")
+    print(f"[OK] wrote: {OUTPUT_JSON}")
+    print(f"[OK] runs scanned: {len(rows_sorted)}")
+    return 0
+
+
+def main() -> int:
+    try:
+        return build_index()
+    except Exception as e:
+        print("[ERROR]", e)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
