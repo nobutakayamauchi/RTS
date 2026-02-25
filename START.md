@@ -14,3 +14,12 @@ starter/python
 python START_HERE.py
 
 Execution memory begins immediately.
+
+RTS creates:
+
+logs/
+memory/
+runs/
+evolution/
+
+Execution history becomes operational memory.
