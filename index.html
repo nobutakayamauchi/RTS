@@ -101,7 +101,7 @@
       color:#0b1220;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      font-weight:800;
+      font-weight:850;
     }
 
     /* Card shell */
@@ -141,7 +141,7 @@
       background:var(--chip);
       border:1px solid var(--line);
       color:var(--chipInk);
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
       margin:0 0 10px;
     }
@@ -160,14 +160,14 @@
       line-height:1.45;
       margin:0 0 10px;
       color:var(--muted);
-      font-weight:700;
+      font-weight:750;
     }
     .def{
       font-size:14px;
       line-height:1.5;
       margin:0 0 12px;
       color:var(--muted);
-      font-weight:750;
+      font-weight:800;
     }
     .def b{ color:#0b1220 }
     .lead{
@@ -175,7 +175,7 @@
       line-height:1.55;
       margin:0 0 14px;
       color:#0b1220;
-      font-weight:750;
+      font-weight:800;
     }
 
     .ctaBox{
@@ -185,7 +185,6 @@
       background: rgba(240,246,255,.72);
       border:1px solid var(--line);
     }
-
     .ctaRow{
       display:flex;
       gap:10px;
@@ -329,33 +328,37 @@
       -webkit-overflow-scrolling:touch;
     }
 
-    /* Start block layout (key: never breaks on iPhone) */
+    /* ✅ Translation-safe: never translate code */
+    .notranslate{
+      translate: no;
+    }
+
+    /* ✅ Start block: ALWAYS vertical (never overlaps on translation) */
     .steps{
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:14px;
       margin-top:8px;
     }
     .stepRow{
-      display:grid;
-      grid-template-columns: 92px 1fr;
-      align-items:center;
-      gap:10px;
-      min-height:34px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:flex-start;
     }
     .stepLabel{
       color: var(--muted);
       font-size:13.5px;
       font-weight:950;
-      white-space:nowrap; /* prevents “RTS / creates” split */
     }
 
-    /* Always 2x2 on mobile; on desktop still looks fine */
+    /* ✅ Chips: ALWAYS 2x2 (no孤立) */
     .pillGrid{
       display:grid;
       grid-template-columns: repeat(2, minmax(0,1fr));
       gap:8px;
       width:100%;
+      max-width:420px;
     }
     .pillGrid .codePill{
       width:100%;
@@ -443,8 +446,7 @@
       .def{ font-size:13.5px; }
       .lead{ font-size:15px; }
 
-      .stepRow{ grid-template-columns: 86px 1fr; }
-      .stepLabel{ font-size:13px; }
+      .pillGrid{ max-width: 100%; }
     }
   </style>
 </head>
@@ -482,7 +484,6 @@
                 Open Public Repository →
               </a>
 
-              <!-- ✅ this is the ONLY “start?” prompt trigger (no overlay auto) -->
               <button class="btn btnSecondary" id="btnStartRTS" type="button">
                 Start RTS →
               </button>
@@ -567,21 +568,25 @@
             <div class="steps">
               <div class="stepRow">
                 <div class="stepLabel">Open:</div>
-                <div><span class="codePill">starter/python</span></div>
+                <div>
+                  <span class="codePill notranslate" translate="no">starter/python</span>
+                </div>
               </div>
 
               <div class="stepRow">
                 <div class="stepLabel">Then run:</div>
-                <div><span class="codePill">python START_HERE.py</span></div>
+                <div>
+                  <span class="codePill notranslate" translate="no">python START_HERE.py</span>
+                </div>
               </div>
 
               <div class="stepRow">
                 <div class="stepLabel">RTS creates:</div>
                 <div class="pillGrid">
-                  <span class="codePill">logs/</span>
-                  <span class="codePill">memory/</span>
-                  <span class="codePill">runs/</span>
-                  <span class="codePill">evolution/</span>
+                  <span class="codePill notranslate" translate="no">logs/</span>
+                  <span class="codePill notranslate" translate="no">memory/</span>
+                  <span class="codePill notranslate" translate="no">runs/</span>
+                  <span class="codePill notranslate" translate="no">evolution/</span>
                 </div>
               </div>
             </div>
