@@ -42,6 +42,7 @@
     html{
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
+      scroll-behavior:smooth;
     }
 
     body{
@@ -203,6 +204,7 @@
       -webkit-tap-highlight-color: transparent;
       min-width: 220px;
       flex: 1 1 220px;
+      cursor:pointer;
     }
     .btn:active{ transform: scale(.99) }
     .btnPrimary{
@@ -411,6 +413,110 @@
       font-size:12px;
     }
 
+    /* =========================
+       ✅ RTS “Start?” modal
+       ========================= */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(2,10,26,.40);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding: 16px;
+      z-index:9999;
+    }
+    .modalOverlay.isOpen{ display:flex; }
+
+    .modalCard{
+      width: min(560px, 100%);
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 18px 60px rgba(2,10,26,.28);
+      overflow:hidden;
+    }
+    .modalTop{
+      padding:14px 16px 10px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .modalIcon{
+      width:40px;height:40px;border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.15) 40%, rgba(0,0,0,.12) 80%),
+                  linear-gradient(135deg, #0b1220, #111827);
+      box-shadow: var(--shadow2);
+      flex: 0 0 auto;
+    }
+    .modalTitle{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:-0.01em;
+      color:#0b1220;
+    }
+    .modalText{
+      margin:6px 0 0;
+      font-size:13.5px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:650;
+    }
+    .modalBody{
+      padding: 0 16px 12px;
+    }
+    .modalList{
+      margin:10px 0 0;
+      padding-left: 18px;
+      color:#111827;
+      font-size:13.5px;
+      line-height:1.5;
+    }
+    .modalFoot{
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      background: rgba(240,246,255,.55);
+    }
+    .modalBtn{
+      flex: 1 1 200px;
+      min-width: 200px;
+      padding:12px 14px;
+      border-radius: 14px;
+      font-weight: 900;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.92);
+      color:#0b1220;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+    }
+    .modalBtnPrimary{
+      background: linear-gradient(180deg, #111827, #0b1220);
+      color:#fff;
+      box-shadow: 0 10px 24px rgba(2,10,26,.22);
+    }
+    .modalBtn:active{ transform: scale(.99); }
+    .modalFine{
+      margin:10px 0 0;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+    }
+    .modalFine code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      background: rgba(2,10,26,.06);
+      border:1px solid var(--line);
+      padding:2px 6px;
+      border-radius: 8px;
+      color:#0b1220;
+    }
+
     /* responsive */
     @media (max-width: 860px){
       .hero{ grid-template-columns: 1fr; }
@@ -436,6 +542,9 @@
 
       .stepRow{ grid-template-columns: 68px 1fr; }
       .stepLabel{ font-size:13px; }
+
+      .modalOverlay{ align-items:flex-end; }
+      .modalBtn{ min-width: 0; flex:1 1 160px; }
     }
   </style>
 </head>
@@ -663,5 +772,98 @@
       </div>
     </div>
   </div>
+
+  <!-- ✅ Start? Modal (Operator chooses) -->
+  <div class="modalOverlay" id="rtsModal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="rtsModalTitle" aria-describedby="rtsModalDesc">
+      <div class="modalTop">
+        <div class="modalIcon" aria-hidden="true"></div>
+        <div>
+          <h3 class="modalTitle" id="rtsModalTitle">Start RTS now?</h3>
+          <p class="modalText" id="rtsModalDesc">
+            RTS never installs anything automatically. You choose what to run.
+          </p>
+        </div>
+      </div>
+
+      <div class="modalBody">
+        <ul class="modalList">
+          <li><b>Yes</b>: jump to the start guide (<code>#start</code>)</li>
+          <li><b>No</b>: leave this page (Google)</li>
+        </ul>
+        <p class="modalFine">
+          Public-first • No telemetry • All code is visible on GitHub.
+        </p>
+      </div>
+
+      <div class="modalFoot">
+        <button class="modalBtn" id="btnNo" type="button">No → Google</button>
+        <button class="modalBtn modalBtnPrimary" id="btnYes" type="button">Yes → Start RTS</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const MODAL_KEY = "rts_start_prompted_v1";
+      const modal = document.getElementById("rtsModal");
+      const btnYes = document.getElementById("btnYes");
+      const btnNo = document.getElementById("btnNo");
+
+      function openModal(){
+        modal.classList.add("isOpen");
+        modal.setAttribute("aria-hidden","false");
+        // focus for accessibility
+        setTimeout(() => btnYes.focus(), 50);
+        // lock background scroll
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal(){
+        modal.classList.remove("isOpen");
+        modal.setAttribute("aria-hidden","true");
+        document.body.style.overflow = "";
+      }
+
+      function goStart(){
+        closeModal();
+        // mark this session/day so it doesn't annoy users repeatedly
+        try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
+        // jump
+        location.hash = "start";
+      }
+
+      function goGoogle(){
+        try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
+        location.href = "https://www.google.com";
+      }
+
+      // open on first page load (session-based)
+      window.addEventListener("load", () => {
+        let prompted = false;
+        try { prompted = sessionStorage.getItem(MODAL_KEY) === "1"; } catch(e){}
+        if(!prompted) openModal();
+      });
+
+      btnYes.addEventListener("click", goStart);
+      btnNo.addEventListener("click", goGoogle);
+
+      // click outside closes (but does NOT redirect)
+      modal.addEventListener("click", (e) => {
+        if(e.target === modal){
+          closeModal();
+          try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
+        }
+      });
+
+      // ESC closes (desktop)
+      window.addEventListener("keydown", (e) => {
+        if(e.key === "Escape" && modal.classList.contains("isOpen")){
+          closeModal();
+          try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
