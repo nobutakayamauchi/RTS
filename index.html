@@ -2,445 +2,608 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RTS — Real-Time Trust System</title>
-  <meta name="description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>RTS — Execution OS for AI Operators</title>
+  <meta name="description" content="RTS turns AI execution into verifiable operational memory. Public-first. No telemetry. Built for long GPT workflows and research iterations." />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://nobutakayamauchi.github.io/RTS/" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="RTS — Real-Time Trust System" />
-  <meta property="og:description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
+  <meta property="og:title" content="RTS — Execution OS for AI Operators" />
+  <meta property="og:description" content="Execution becomes memory. Memory becomes identity. RTS preserves reasoning continuity across AI sessions." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nobutakayamauchi.github.io/RTS/" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="RTS — Real-Time Trust System" />
-  <meta name="twitter:description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
+  <meta name="twitter:title" content="RTS — Execution OS for AI Operators" />
+  <meta name="twitter:description" content="RTS turns AI execution into verifiable operational memory." />
 
   <style>
     :root{
-      --bg0:#f5f7ff;
-      --bg1:#eef1ff;
-      --ink:#0b1220;
-      --muted:#4b5565;
-      --line:#e6e9ff;
+      --bg0:#0b1020;
+      --bg1:#0f1731;
       --card:#ffffff;
-      --shadow:0 18px 50px rgba(16,24,40,.12);
-      --shadow2:0 10px 25px rgba(16,24,40,.10);
-      --accent:#2b6fff;
-      --btn:#0b1220;
-      --btnText:#fff;
-      --radius:22px;
-      --radius2:16px;
+      --ink:#0f172a;
+      --muted:#4b5563;
+      --line:rgba(15,23,42,.10);
+      --shadow:0 18px 60px rgba(2,6,23,.25);
+      --shadow2:0 10px 30px rgba(2,6,23,.18);
+
+      --accent:#2f6bff;
+      --accent2:#6ee7ff;
+
+      --radius:18px;
+      --radius2:24px;
+
       --max:980px;
+
+      --h1: clamp(34px, 6vw, 52px);
+      --h2: clamp(22px, 3.4vw, 30px);
+      --p: 16px;
     }
 
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--ink);
       background:
-        radial-gradient(1200px 800px at 20% 0%, var(--bg1) 0%, var(--bg0) 55%, #ffffff 100%);
+        radial-gradient(900px 500px at 20% 10%, rgba(110,231,255,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(47,107,255,.25), transparent 60%),
+        linear-gradient(180deg, #eef2ff 0%, #f8fafc 40%, #eef2ff 100%);
     }
 
-    a{color:var(--accent); text-decoration:none}
-    a:hover{text-decoration:underline}
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
 
-    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 56px}
+    .wrap{
+      width:100%;
+      max-width:var(--max);
+      margin:0 auto;
+      padding: 22px 18px 70px;
+    }
+
+    /* Top bar */
     .topbar{
-      display:flex; align-items:center; gap:12px;
-      padding:10px 0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin: 8px 0 18px;
     }
     .brand{
-      font-weight:900; letter-spacing:.06em;
-      display:flex; align-items:center; gap:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .brandMark{
+      width:34px;height:34px;
+      border-radius:12px;
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,255,255,.75), transparent 60%),
+        linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      box-shadow: var(--shadow2);
     }
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:rgba(255,255,255,.7);
-      font-size:12px; font-weight:700;
-      color:#2a3447;
-      backdrop-filter:saturate(120%) blur(6px);
-    }
-
-    /* Safe background decoration (won't break mobile) */
-    .bgDecor{
-      position:fixed;
-      inset:auto auto 0 0;
-      width:min(520px, 60vw);
-      height:min(520px, 60vw);
-      background:linear-gradient(140deg, rgba(43,111,255,.16), rgba(43,111,255,0));
-      filter:blur(10px);
-      border-radius:999px;
-      transform:translate(-22%, 28%);
-      pointer-events:none;
-      z-index:-1;
-    }
-    .bgDecor2{
-      position:fixed;
-      inset:0 0 auto auto;
-      width:min(560px, 62vw);
-      height:min(560px, 62vw);
-      background:linear-gradient(220deg, rgba(0,0,0,.10), rgba(0,0,0,0));
-      filter:blur(14px);
-      border-radius:999px;
-      transform:translate(22%, -18%);
-      pointer-events:none;
-      z-index:-1;
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:18px;
-      align-items:stretch;
-      margin-top:8px;
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .heroMain{padding:26px}
-    .kicker{
-      font-weight:900;
-      font-size:14px;
-      letter-spacing:.06em;
-      color:#2a3447;
-      opacity:.9;
-      margin:0 0 10px;
-    }
-    h1{
-      margin:0 0 12px;
-      font-size:56px;
-      line-height:1.02;
-      letter-spacing:-.03em;
-    }
-    .sub{
-      margin:0 0 14px;
-      color:var(--muted);
-      font-size:16px;
-      line-height:1.6;
-      font-weight:650;
-    }
-    .tagline{
-      margin:0 0 18px;
-      color:#2a3447;
-      font-size:16px;
-      line-height:1.6;
-      font-weight:800;
-    }
-
-    .ctaBox{
-      margin-top:18px;
-      border:1px solid var(--line);
-      border-radius:var(--radius2);
-      background:linear-gradient(180deg, rgba(245,247,255,.8), rgba(255,255,255,1));
-      padding:14px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .btnRow{display:flex; gap:10px; flex-wrap:wrap}
-    .btn{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
       gap:8px;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:900;
-      font-size:14px;
-      border:1px solid #111;
-      background:var(--btn);
-      color:var(--btnText);
-      text-decoration:none;
-      flex:1 1 200px;
-    }
-    .btn:hover{text-decoration:none; filter:brightness(1.03)}
-    .btn.secondary{
-      background:#fff;
-      color:#111;
-      border:1px solid var(--line);
-      font-weight:900;
-    }
-    .note{
-      margin:0;
-      font-size:12.5px;
-      color:var(--muted);
-      line-height:1.5;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.65);
+      border:1px solid rgba(15,23,42,.08);
+      font-size:12px;
+      color: rgba(15,23,42,.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      white-space:nowrap;
     }
 
-    .why{padding:22px}
-    .why h2{margin:0 0 8px; font-size:26px; letter-spacing:-.02em}
-    .why p{margin:0 0 14px; color:var(--muted); line-height:1.6; font-weight:650}
-    .grid2{
+    /* Hero */
+    .hero{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+      margin-top: 10px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .heroMain{
+      padding: 26px 22px 22px;
+      position:relative;
+    }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      font-size:12px;
+      color: rgba(15,23,42,.72);
+      background: rgba(47,107,255,.10);
+      border:1px solid rgba(47,107,255,.18);
+      padding:8px 12px;
+      border-radius:999px;
+    }
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: var(--h1);
+      line-height: 1.03;
+      letter-spacing: -0.04em;
+    }
+    .sub{
+      margin: 0 0 14px;
+      color: rgba(15,23,42,.75);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 44ch;
+      font-weight: 560;
+    }
+    .tagline{
+      margin: 0 0 18px;
+      color: rgba(75,85,99,.95);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    /* HERO CTA – side-by-side "god layout" */
+    .ctaBox{
+      background: rgba(2,6,23,.04);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .ctaRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.14);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: .01em;
+      user-select:none;
+    }
+    .btnPrimary{
+      color:#fff;
+      background: linear-gradient(135deg, #111827 0%, #0b1227 40%, #0b1020 100%);
+      border-color: rgba(15,23,42,.20);
+      box-shadow: 0 14px 30px rgba(2,6,23,.25);
+      text-decoration:none !important;
+    }
+    .btnPrimary:hover{ filter: brightness(1.04); }
+
+    .btnGhost{
+      background: #fff;
+      color: rgba(15,23,42,.90);
+      text-decoration:none !important;
+    }
+    .btnGhost:hover{ background: rgba(255,255,255,.9); }
+
+    .hint{
+      font-size: 12px;
+      color: rgba(75,85,99,.95);
+      line-height: 1.5;
+    }
+
+    /* Side card */
+    .heroSide{
+      padding: 18px 16px 16px;
+      display:flex;
+      flex-direction:column;
       gap:12px;
     }
-    .mini{
-      border:1px solid var(--line);
-      border-radius:var(--radius2);
-      padding:14px;
-      background:#fff;
-      box-shadow:var(--shadow2);
+    .miniTitle{
+      font-weight:900;
+      font-size: 14px;
+      letter-spacing: .01em;
     }
-    .mini h3{margin:0 0 8px; font-size:16px}
-    .mini ul{margin:0; padding-left:18px; color:#2a3447; font-weight:650; line-height:1.6}
-    .mini li{margin:4px 0}
-
-    .section{margin-top:18px}
-    .sectionTitle{
-      margin:0 0 10px;
-      font-size:28px;
-      letter-spacing:-.02em;
+    .miniList{
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(15,23,42,.78);
+      font-size: 13px;
+      line-height: 1.6;
     }
-
-    .startCard{padding:18px}
-    .startGrid{
+    .miniGrid{
       display:grid;
-      grid-template-columns:1fr;
+      grid-template-columns: 1fr;
       gap:10px;
     }
-    .codePill{
-      display:inline-flex;
-      padding:10px 12px;
-      border-radius:14px;
-      background:#0b1220;
-      color:#fff;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      font-size:13px;
-      font-weight:800;
-      border:1px solid #0b1220;
-      width:fit-content;
+    .miniBox{
+      background: rgba(2,6,23,.04);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      padding: 12px 12px;
     }
     .kv{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size: 12px;
+      color: rgba(75,85,99,.95);
     }
-    .smallMuted{color:var(--muted); font-size:13px; line-height:1.55; font-weight:650; margin:0}
+    .kv b{ color: rgba(15,23,42,.86); font-weight: 800; }
 
-    .support{padding:18px}
-    .support p{margin:0 0 12px; color:var(--muted); line-height:1.6; font-weight:650}
+    /* Sections */
+    .section{
+      margin-top: 16px;
+      padding: 20px 18px;
+    }
+    h2{
+      margin: 0 0 10px;
+      font-size: var(--h2);
+      line-height: 1.15;
+      letter-spacing:-0.02em;
+    }
+    p{
+      margin: 0 0 10px;
+      font-size: var(--p);
+      line-height: 1.7;
+      color: rgba(15,23,42,.78);
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .box{
+      background: rgba(2,6,23,.035);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      padding: 14px 14px;
+    }
+    .box h3{
+      margin:0 0 8px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .box ul{
+      margin:0;
+      padding-left: 18px;
+      color: rgba(15,23,42,.78);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* Start in 60 seconds */
+    .steps{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .codePill{
+      display:inline-flex;
+      align-items:center;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(2,6,23,.06);
+      border:1px solid rgba(15,23,42,.10);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      color: rgba(2,6,23,.86);
+      white-space:nowrap;
+    }
+
+    .splitRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .note{
+      font-size: 12px;
+      color: rgba(75,85,99,.95);
+      line-height: 1.55;
+    }
+
+    /* Support */
     .supportGrid{
       display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
     }
-    .supportItem{
-      border:1px solid var(--line);
-      border-radius:var(--radius2);
-      padding:14px;
-      background:#fff;
-      box-shadow:var(--shadow2);
+    .supportCard{
+      background: rgba(2,6,23,.035);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      padding: 16px 14px;
     }
-    .supportItem h3{margin:0 0 6px; font-size:16px}
-    .supportItem .btn{flex:0 0 auto; width:100%}
+    .supportCard h3{
+      margin:0 0 6px;
+      font-size: 14px;
+      font-weight: 950;
+    }
+    .supportCard p{
+      margin:0 0 12px;
+      font-size: 13px;
+      color: rgba(15,23,42,.76);
+    }
+    .supportCard .btn{
+      width: 100%;
+    }
 
-    .links{padding:18px}
-    .links h2{margin:0 0 10px; font-size:26px}
-    .linkBox{
-      border:1px solid var(--line);
-      border-radius:var(--radius2);
-      background:#fff;
-      box-shadow:var(--shadow2);
-      padding:14px;
+    /* Links */
+    .linksGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
     }
-    .row{margin:10px 0}
-    .row strong{display:block; margin-bottom:4px}
-    .mono{
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      font-size:12.5px;
-      word-break:break-all;
+    .linkRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(2,6,23,.03);
+      border: 1px solid rgba(15,23,42,.10);
+      flex-wrap:wrap;
+    }
+    .linkRow b{
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(15,23,42,.86);
+      min-width: 150px;
+    }
+    .linkRow a{
+      font-size: 13px;
+      color: rgba(15,23,42,.78);
+      word-break: break-all;
     }
 
     .footer{
-      margin-top:18px;
+      margin-top: 14px;
       text-align:center;
-      color:#6b7280;
-      font-size:12.5px;
-      font-weight:650;
-      padding:14px 0 0;
+      color: rgba(75,85,99,.85);
+      font-size: 12px;
     }
 
-    /* Responsive */
-    @media (max-width: 920px){
-      h1{font-size:50px}
-      .hero{grid-template-columns:1fr}
-      .grid2{grid-template-columns:1fr}
-    }
-    @media (max-width: 480px){
-      h1{font-size:44px}
-      .heroMain{padding:22px}
-      .why{padding:18px}
-      .card{box-shadow:var(--shadow2)}
-      .bgDecor,.bgDecor2{display:none} /* safest on iPhone */
+    /* Mobile */
+    @media (max-width: 860px){
+      .hero{ grid-template-columns: 1fr; }
+      .ctaRow{ grid-template-columns: 1fr; }
+      .grid2{ grid-template-columns: 1fr; }
+      .splitRow{ grid-template-columns: 1fr; }
+      .supportGrid{ grid-template-columns: 1fr; }
+      .linkRow b{ min-width: auto; }
     }
   </style>
 </head>
 
 <body>
-  <div class="bgDecor"></div>
-  <div class="bgDecor2"></div>
-
-  <main class="wrap">
+  <div class="wrap">
     <div class="topbar">
-      <div class="brand">RTS</div>
-      <div class="pill">EXECUTION OS FOR AI OPERATORS</div>
+      <div class="brand">
+        <div class="brandMark" aria-hidden="true"></div>
+        <div>RTS</div>
+        <div class="pill">EXECUTION OS FOR AI OPERATORS</div>
+      </div>
+      <div class="pill">Public-first • No telemetry</div>
     </div>
 
-    <section class="hero">
+    <div class="hero">
       <div class="card heroMain">
-        <p class="kicker">RTS — Real-Time Trust System</p>
+        <div class="kicker">RTS — Real-Time Trust System</div>
+
         <h1>Execution becomes memory.<br/>Memory becomes identity.</h1>
 
-        <p class="sub">AI workflows forget. RTS remembers.</p>
-        <p class="tagline">Execution OS for operators running long GPT workflows and research iterations.</p>
+        <div class="sub">AI workflows forget. RTS remembers.</div>
+        <div class="tagline">
+          Execution OS for operators running long GPT workflows and research iterations.
+        </div>
 
         <div class="ctaBox">
-          <div class="btnRow">
-            <a class="btn" href="https://github.com/nobutakayamauchi/RTS">Open Public Repository →</a>
-            <a class="btn secondary" href="https://nobutakayamauchi.github.io/RTS/memory/">View Operational Memory →</a>
+          <!-- GOD LAYOUT: side-by-side CTA -->
+          <div class="ctaRow">
+            <a class="btn btnPrimary" href="https://github.com/nobutakayamauchi/RTS" target="_blank" rel="noopener">
+              Open Public Repository →
+            </a>
+            <a class="btn btnGhost" href="https://nobutakayamauchi.github.io/RTS/memory/" target="_blank" rel="noopener">
+              View Operational Memory →
+            </a>
           </div>
+
+          <div class="hint">
+            Public-first. No paywall required to start.<br/>
+            If you want to support RTS development, see “Support RTS” below.
+          </div>
+        </div>
+      </div>
+
+      <div class="card heroSide">
+        <div class="miniBox">
+          <div class="miniTitle">What RTS Records</div>
+          <ul class="miniList">
+            <li>Reasoning decisions</li>
+            <li>Execution context</li>
+            <li>Operational outcomes</li>
+            <li>Iteration history</li>
+            <li>Evolution experiments</li>
+          </ul>
+        </div>
+
+        <div class="miniGrid">
+          <div class="miniBox">
+            <div class="kv"><b>Runs</b><span>Local-first</span></div>
+            <div class="kv"><b>Telemetry</b><span>None</span></div>
+            <div class="kv"><b>Scope</b><span>Audit + continuity</span></div>
+          </div>
+          <div class="miniBox">
+            <div class="miniTitle">Quick Links</div>
+            <ul class="miniList">
+              <li><a href="https://nobutakayamauchi.github.io/RTS/search.html" target="_blank" rel="noopener">Operational Search</a></li>
+              <li><a href="https://github.com/nobutakayamauchi/RTS/tree/main/logs" target="_blank" rel="noopener">Execution Logs</a></li>
+              <li><a href="https://github.com/nobutakayamauchi/RTS/tree/main/incidents" target="_blank" rel="noopener">Incident Intelligence</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Why RTS?</h2>
+      <p>
+        Modern AI workflows restart thinking every session. Ideas disappear. Decisions fragment. Execution history is lost.
+        <b>RTS preserves reasoning continuity across AI sessions.</b>
+      </p>
+
+      <div class="grid2">
+        <div class="box">
+          <h3>Built for AI Operators</h3>
+          <ul>
+            <li>AI researchers running long experiments</li>
+            <li>GPT workflow builders</li>
+            <li>Startup operators</li>
+            <li>Prompt / agent engineers</li>
+            <li>Anyone treating AI execution as infrastructure</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>What RTS Does</h3>
+          <ul>
+            <li>Captures execution history</li>
+            <li>Preserves reasoning decisions</li>
+            <li>Freezes incidents (hash + archive)</li>
+            <li>Separates evidence from analysis</li>
+            <li>Enables rollback and audit trails</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Start in 60 seconds</h2>
+      <p>RTS runs fully local. No cloud dependency. No telemetry.</p>
+
+      <div class="steps">
+        <div class="box">
+          <h3>Local run</h3>
           <p class="note">
-            Public-first. No paywall required to start. If you want to support RTS development, see “Support RTS” below.
-          </p>
-        </div>
-      </div>
-
-      <div class="card why">
-        <h2>Why RTS?</h2>
-        <p>
-          Modern AI workflows restart thinking every session. Ideas disappear. Decisions fragment. Execution history is lost.
-          <br/><strong>RTS preserves reasoning continuity across AI sessions.</strong>
-        </p>
-
-        <div class="grid2">
-          <div class="mini">
-            <h3>Built for AI Operators</h3>
-            <ul>
-              <li>AI researchers running long experiments</li>
-              <li>GPT workflow builders</li>
-              <li>Startup operators</li>
-              <li>Prompt / agent engineers</li>
-              <li>Anyone treating AI execution as infrastructure</li>
-            </ul>
-          </div>
-          <div class="mini">
-            <h3>What RTS Records</h3>
-            <ul>
-              <li>Reasoning decisions</li>
-              <li>Execution context</li>
-              <li>Operational outcomes</li>
-              <li>Iteration history</li>
-              <li>Evolution experiments</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="sectionTitle">Start in 60 seconds</h2>
-      <div class="card startCard">
-        <div class="startGrid">
-          <p class="smallMuted"><strong>Local run</strong> — RTS runs fully local. No cloud dependency. No telemetry.</p>
-
-          <div class="kv">
-            <span class="smallMuted"><strong>Open:</strong></span>
+            Open:
             <span class="codePill">starter/python</span>
-          </div>
-
-          <div class="kv">
-            <span class="smallMuted"><strong>Then run:</strong></span>
-            <span class="codePill">python START_HERE.py</span>
-          </div>
-
-          <p class="smallMuted"><strong>RTS creates:</strong> <span class="mono">logs/ memory/ runs/ evolution/</span></p>
-
-          <p class="smallMuted">
-            Platforms: <strong>Windows / Mac / Linux / Android (Termux supported)</strong><br/>
-            iPhone: use a synced environment (Mac/PC) or a remote dev box; iOS cannot run full Python reliably without external tooling.
           </p>
+          <p class="note">
+            Then run:
+            <span class="codePill">python START_HERE.py</span>
+          </p>
+          <p class="note">
+            RTS creates:
+            <span class="codePill">logs/</span>
+            <span class="codePill">memory/</span>
+            <span class="codePill">runs/</span>
+            <span class="codePill">evolution/</span>
+          </p>
+          <p class="note">
+            Execution history becomes operational memory.<br/>
+            Execution history survives session resets and device changes.
+          </p>
+        </div>
 
-          <p class="smallMuted">Prefer a short guide? See: <a href="https://github.com/nobutakayamauchi/RTS/blob/main/START.md">START.md</a></p>
+        <div class="box">
+          <h3>Platforms</h3>
+          <ul>
+            <li>Windows / Mac / Linux</li>
+            <li>Android (Termux supported)</li>
+            <li>iPhone: use a synced environment (Mac/PC) or a remote dev box — iOS cannot run full Python reliably without external tooling.</li>
+          </ul>
+          <p class="note" style="margin-top:10px;">
+            Prefer a short guide? See: <b>START.md</b>
+          </p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section class="section">
-      <h2 class="sectionTitle">Support RTS</h2>
-      <div class="card support">
-        <p>
-          RTS is public infrastructure for reproducible AI execution. If RTS helps your research, operations, or workflows, consider supporting development.
-        </p>
+    <div class="card section">
+      <h2>Support RTS</h2>
+      <p>
+        RTS is public infrastructure for reproducible AI execution.
+        If RTS helps your research, operations, or workflows, consider supporting development.
+      </p>
 
-        <div class="supportGrid">
-          <div class="supportItem">
-            <h3>1) Sponsor (recommended)</h3>
-            <p class="smallMuted">Keep RTS public. Fund maintenance, audits, and new capabilities.</p>
-            <!-- TODO: replace with your GitHub Sponsors URL -->
-            <a class="btn" href="https://github.com/sponsors/nobutakayamauchi">Become a Sponsor →</a>
-          </div>
+      <div class="supportGrid">
+        <div class="supportCard">
+          <h3>1) Sponsor (recommended)</h3>
+          <p>Keep RTS public. Fund maintenance, audits, and new capabilities.</p>
+          <!-- TODO: replace with your actual sponsor link -->
+          <a class="btn btnPrimary" href="https://github.com/sponsors/nobutakayamauchi" target="_blank" rel="noopener">
+            Become a Sponsor →
+          </a>
+        </div>
 
-          <div class="supportItem">
-            <h3>2) Research / org collaboration</h3>
-            <p class="smallMuted">For labs, companies, or teams that want RTS deployment / governance alignment / audit design.</p>
-            <!-- TODO: replace with your contact URL (e.g., mailto:, form, or issue template) -->
-            <a class="btn secondary" href="https://github.com/nobutakayamauchi/RTS/issues/new">Contact for Collaboration →</a>
-          </div>
-
-          <div class="supportItem">
-            <h3>Optional: Operator Kit (disabled)</h3>
-            <p class="smallMuted">
-              If you ship a paid bundle later, keep it optional — not the main CTA.
-              (Leave this section as a placeholder until contents are truly additional value.)
-            </p>
-            <!-- Intentionally no purchase link here -->
-          </div>
+        <div class="supportCard">
+          <h3>2) Research / org collaboration</h3>
+          <p>For labs/companies/teams that want RTS deployment / governance alignment / audit design.</p>
+          <!-- TODO: replace with your contact link -->
+          <a class="btn btnGhost" href="mailto:your-email@example.com?subject=RTS%20Collaboration" target="_blank" rel="noopener">
+            Contact for Collaboration →
+          </a>
         </div>
       </div>
-    </section>
 
-    <section class="section">
-      <div class="card links">
-        <h2>Official Links</h2>
-        <div class="linkBox">
-          <div class="row">
-            <strong>Repository</strong>
-            <div class="mono"><a href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a></div>
-          </div>
-          <div class="row">
-            <strong>Pages</strong>
-            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/">https://nobutakayamauchi.github.io/RTS/</a></div>
-          </div>
-          <div class="row">
-            <strong>Operational Memory</strong>
-            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/memory/">https://nobutakayamauchi.github.io/RTS/memory/</a></div>
-          </div>
-          <div class="row">
-            <strong>Search</strong>
-            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/search.html">https://nobutakayamauchi.github.io/RTS/search.html</a></div>
-          </div>
+      <p class="note" style="margin-top:10px;">
+        Optional: If you later sell a paid “Operator Kit”, keep it optional — not the main CTA.
+      </p>
+    </div>
+
+    <div class="card section">
+      <h2>Official Links</h2>
+
+      <div class="linksGrid">
+        <div class="linkRow">
+          <b>Repository</b>
+          <a href="https://github.com/nobutakayamauchi/RTS" target="_blank" rel="noopener">https://github.com/nobutakayamauchi/RTS</a>
         </div>
-
-        <div class="footer">
-          Creator: Nobutaka Yamauchi ・ Public execution logs available on GitHub ・ MIT License — 2026
+        <div class="linkRow">
+          <b>Pages</b>
+          <a href="https://nobutakayamauchi.github.io/RTS/" target="_blank" rel="noopener">https://nobutakayamauchi.github.io/RTS/</a>
+        </div>
+        <div class="linkRow">
+          <b>Operational Memory</b>
+          <a href="https://nobutakayamauchi.github.io/RTS/memory/" target="_blank" rel="noopener">https://nobutakayamauchi.github.io/RTS/memory/</a>
+        </div>
+        <div class="linkRow">
+          <b>Search</b>
+          <a href="https://nobutakayamauchi.github.io/RTS/search.html" target="_blank" rel="noopener">https://nobutakayamauchi.github.io/RTS/search.html</a>
         </div>
       </div>
-    </section>
-  </main>
+
+      <div class="footer">
+        Creator: Nobutaka Yamauchi · Public execution logs available on GitHub · MIT License — 2026
+      </div>
+    </div>
+  </div>
 </body>
 </html>
