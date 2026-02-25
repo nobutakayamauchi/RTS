@@ -4,315 +4,331 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RTS — Real-Time Trust System</title>
-  <meta name="description" content="Execution becomes memory. RTS turns AI execution into verifiable operational memory." />
+  <meta name="description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
 
-  <!-- Canonical / URL -->
+  <!-- Canonical -->
   <link rel="canonical" href="https://nobutakayamauchi.github.io/RTS/" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="RTS — Real-Time Trust System" />
-  <meta property="og:description" content="Execution becomes memory. RTS turns AI execution into verifiable operational memory." />
+  <meta property="og:description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nobutakayamauchi.github.io/RTS/" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="RTS — Real-Time Trust System" />
-  <meta name="twitter:description" content="Execution becomes memory. RTS turns AI execution into verifiable operational memory." />
+  <meta name="twitter:description" content="Execution becomes memory. RTS preserves operational history for AI workflows." />
 
   <style>
     :root{
-      --bg:#f4f7ff;
-      --fg:#0b0b18;
-      --muted:#586070;
-      --line:#e7eaf7;
-      --accent:#7eaaff;
-
+      --bg0:#f5f7ff;
+      --bg1:#eef1ff;
+      --ink:#0b1220;
+      --muted:#4b5565;
+      --line:#e6e9ff;
       --card:#ffffff;
-      --shadow: 0 14px 40px rgba(16,22,55,.10);
-      --shadow2: 0 10px 22px rgba(16,22,55,.08);
-      --btn:#111;
+      --shadow:0 18px 50px rgba(16,24,40,.12);
+      --shadow2:0 10px 25px rgba(16,24,40,.10);
+      --accent:#2b6fff;
+      --btn:#0b1220;
       --btnText:#fff;
-
-      --radius:18px;
-      --radius2:22px;
+      --radius:22px;
+      --radius2:16px;
       --max:980px;
     }
 
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 20% 0%, #e8edff 0%, transparent 60%),
-                  radial-gradient(1200px 700px at 90% 10%, #eef2ff 0%, transparent 55%),
-                  var(--bg);
-      color:var(--fg);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 800px at 20% 0%, var(--bg1) 0%, var(--bg0) 55%, #ffffff 100%);
     }
 
-    a{color:var(--fg); text-decoration:none}
+    a{color:var(--accent); text-decoration:none}
     a:hover{text-decoration:underline}
 
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 56px}
     .topbar{
-      padding:18px 18px 0 18px;
-      display:flex;
-      justify-content:center;
-    }
-    .topbarInner{
-      width:100%;
-      max-width:var(--max);
-      display:flex;
-      align-items:center;
-      gap:12px;
+      display:flex; align-items:center; gap:12px;
+      padding:10px 0 18px;
     }
     .brand{
-      font-weight:900;
-      letter-spacing:.2px;
-      display:flex;
-      align-items:center;
-      gap:10px;
+      font-weight:900; letter-spacing:.06em;
+      display:flex; align-items:center; gap:10px;
     }
     .pill{
-      display:inline-flex;
-      align-items:center;
+      display:inline-flex; align-items:center; gap:8px;
       padding:8px 12px;
       border:1px solid var(--line);
       border-radius:999px;
-      background:rgba(255,255,255,.65);
-      font-size:12px;
-      color:var(--muted);
-      font-weight:600;
+      background:rgba(255,255,255,.7);
+      font-size:12px; font-weight:700;
+      color:#2a3447;
+      backdrop-filter:saturate(120%) blur(6px);
     }
 
-    main{
-      padding:18px 18px 64px 18px;
-      display:flex;
-      justify-content:center;
+    /* Safe background decoration (won't break mobile) */
+    .bgDecor{
+      position:fixed;
+      inset:auto auto 0 0;
+      width:min(520px, 60vw);
+      height:min(520px, 60vw);
+      background:linear-gradient(140deg, rgba(43,111,255,.16), rgba(43,111,255,0));
+      filter:blur(10px);
+      border-radius:999px;
+      transform:translate(-22%, 28%);
+      pointer-events:none;
+      z-index:-1;
     }
-    .wrap{
-      width:100%;
-      max-width:var(--max);
+    .bgDecor2{
+      position:fixed;
+      inset:0 0 auto auto;
+      width:min(560px, 62vw);
+      height:min(560px, 62vw);
+      background:linear-gradient(220deg, rgba(0,0,0,.10), rgba(0,0,0,0));
+      filter:blur(14px);
+      border-radius:999px;
+      transform:translate(22%, -18%);
+      pointer-events:none;
+      z-index:-1;
     }
 
     .hero{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
       margin-top:8px;
+    }
+    .card{
       background:var(--card);
       border:1px solid var(--line);
-      border-radius:var(--radius2);
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:26px;
       overflow:hidden;
     }
-    .heroGrid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:18px;
-      align-items:start;
-    }
-    @media (max-width: 860px){
-      .heroGrid{grid-template-columns:1fr}
-    }
-
+    .heroMain{padding:26px}
     .kicker{
-      font-weight:800;
-      color:#0b0b18;
-      opacity:.9;
-      letter-spacing:.2px;
-      margin:0 0 8px 0;
+      font-weight:900;
       font-size:14px;
+      letter-spacing:.06em;
+      color:#2a3447;
+      opacity:.9;
+      margin:0 0 10px;
     }
     h1{
-      margin:0;
-      font-size:44px;
-      line-height:1.06;
-      letter-spacing:-.02em;
+      margin:0 0 12px;
+      font-size:56px;
+      line-height:1.02;
+      letter-spacing:-.03em;
     }
     .sub{
-      margin:14px 0 0 0;
+      margin:0 0 14px;
       color:var(--muted);
-      font-size:18px;
-      line-height:1.55;
-      font-weight:600;
+      font-size:16px;
+      line-height:1.6;
+      font-weight:650;
     }
-    .mantra{
-      margin:10px 0 0 0;
-      color:#2b3446;
-      font-size:18px;
-      line-height:1.55;
-      font-weight:700;
+    .tagline{
+      margin:0 0 18px;
+      color:#2a3447;
+      font-size:16px;
+      line-height:1.6;
+      font-weight:800;
     }
 
     .ctaBox{
-      background:#f7f9ff;
+      margin-top:18px;
       border:1px solid var(--line);
-      border-radius:16px;
-      padding:16px;
-    }
-
-    .btnRow{
+      border-radius:var(--radius2);
+      background:linear-gradient(180deg, rgba(245,247,255,.8), rgba(255,255,255,1));
+      padding:14px;
       display:flex;
+      flex-direction:column;
       gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
     }
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap}
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:14px 16px;
+      gap:8px;
+      padding:12px 14px;
       border-radius:14px;
-      font-weight:800;
+      font-weight:900;
+      font-size:14px;
       border:1px solid #111;
       background:var(--btn);
       color:var(--btnText);
-      min-width: 240px;
+      text-decoration:none;
+      flex:1 1 200px;
     }
-    .btn:hover{opacity:.92; text-decoration:none}
-    .btnSecondary{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:14px 16px;
-      border-radius:14px;
-      font-weight:800;
-      border:1px solid var(--line);
+    .btn:hover{text-decoration:none; filter:brightness(1.03)}
+    .btn.secondary{
       background:#fff;
       color:#111;
-      min-width: 240px;
+      border:1px solid var(--line);
+      font-weight:900;
     }
-    .btnSecondary:hover{background:#fbfbff; text-decoration:none}
-    .fine{
-      margin:10px 0 0 0;
+    .note{
+      margin:0;
+      font-size:12.5px;
       color:var(--muted);
-      font-size:13px;
       line-height:1.5;
-      font-weight:600;
     }
 
-    .section{
-      margin-top:18px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius2);
-      box-shadow:var(--shadow2);
-      padding:22px;
-    }
-    .section h2{
-      margin:0 0 12px 0;
-      font-size:28px;
-      letter-spacing:-.01em;
-    }
+    .why{padding:22px}
+    .why h2{margin:0 0 8px; font-size:26px; letter-spacing:-.02em}
+    .why p{margin:0 0 14px; color:var(--muted); line-height:1.6; font-weight:650}
     .grid2{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:14px;
+      gap:12px;
     }
-    @media (max-width: 860px){
-      .grid2{grid-template-columns:1fr}
-    }
-    .card{
+    .mini{
       border:1px solid var(--line);
-      border-radius:16px;
-      padding:16px;
-      background:#fff;
-    }
-    .card h3{
-      margin:0 0 10px 0;
-      font-size:18px;
-    }
-    ul{margin:0; padding-left:18px}
-    li{margin:6px 0; color:#2b3446; font-weight:650}
-
-    .hr{
-      height:1px;
-      background:var(--line);
-      margin:16px 0;
-    }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight:800;
-      font-size:13px;
-      padding:6px 10px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:#f7f9ff;
-      display:inline-block;
-      margin:6px 0;
-    }
-
-    .linksRow{
-      display:flex;
-      gap:18px;
-      flex-wrap:wrap;
-      margin-top:8px;
-    }
-    .linkBox{
-      flex:1 1 280px;
-      border:1px solid var(--line);
-      border-radius:16px;
+      border-radius:var(--radius2);
       padding:14px;
       background:#fff;
+      box-shadow:var(--shadow2);
     }
-    .linkBox strong{display:block; margin-bottom:6px}
-    .footer{
-      margin-top:16px;
-      color:var(--muted);
-      font-weight:650;
+    .mini h3{margin:0 0 8px; font-size:16px}
+    .mini ul{margin:0; padding-left:18px; color:#2a3447; font-weight:650; line-height:1.6}
+    .mini li{margin:4px 0}
+
+    .section{margin-top:18px}
+    .sectionTitle{
+      margin:0 0 10px;
+      font-size:28px;
+      letter-spacing:-.02em;
+    }
+
+    .startCard{padding:18px}
+    .startGrid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .codePill{
+      display:inline-flex;
+      padding:10px 12px;
+      border-radius:14px;
+      background:#0b1220;
+      color:#fff;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
       font-size:13px;
+      font-weight:800;
+      border:1px solid #0b1220;
+      width:fit-content;
+    }
+    .kv{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .smallMuted{color:var(--muted); font-size:13px; line-height:1.55; font-weight:650; margin:0}
+
+    .support{padding:18px}
+    .support p{margin:0 0 12px; color:var(--muted); line-height:1.6; font-weight:650}
+    .supportGrid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .supportItem{
+      border:1px solid var(--line);
+      border-radius:var(--radius2);
+      padding:14px;
+      background:#fff;
+      box-shadow:var(--shadow2);
+    }
+    .supportItem h3{margin:0 0 6px; font-size:16px}
+    .supportItem .btn{flex:0 0 auto; width:100%}
+
+    .links{padding:18px}
+    .links h2{margin:0 0 10px; font-size:26px}
+    .linkBox{
+      border:1px solid var(--line);
+      border-radius:var(--radius2);
+      background:#fff;
+      box-shadow:var(--shadow2);
+      padding:14px;
+    }
+    .row{margin:10px 0}
+    .row strong{display:block; margin-bottom:4px}
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12.5px;
+      word-break:break-all;
+    }
+
+    .footer{
+      margin-top:18px;
       text-align:center;
-      padding:12px 0 0 0;
+      color:#6b7280;
+      font-size:12.5px;
+      font-weight:650;
+      padding:14px 0 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      h1{font-size:50px}
+      .hero{grid-template-columns:1fr}
+      .grid2{grid-template-columns:1fr}
+    }
+    @media (max-width: 480px){
+      h1{font-size:44px}
+      .heroMain{padding:22px}
+      .why{padding:18px}
+      .card{box-shadow:var(--shadow2)}
+      .bgDecor,.bgDecor2{display:none} /* safest on iPhone */
     }
   </style>
 </head>
 
 <body>
-  <div class="topbar">
-    <div class="topbarInner">
-      <div class="brand">
-        <span style="font-size:18px;">RTS</span>
-        <span class="pill">EXECUTION OS FOR AI OPERATORS</span>
-      </div>
+  <div class="bgDecor"></div>
+  <div class="bgDecor2"></div>
+
+  <main class="wrap">
+    <div class="topbar">
+      <div class="brand">RTS</div>
+      <div class="pill">EXECUTION OS FOR AI OPERATORS</div>
     </div>
-  </div>
 
-  <main>
-    <div class="wrap">
-      <!-- HERO -->
-      <section class="hero">
-        <div class="heroGrid">
-          <div>
-            <p class="kicker">RTS — Real-Time Trust System</p>
-            <h1>Execution becomes memory.<br/>Memory becomes identity.</h1>
-            <p class="sub">AI workflows forget. RTS remembers.</p>
-            <p class="mantra">Execution OS for operators running long GPT workflows and research iterations.</p>
+    <section class="hero">
+      <div class="card heroMain">
+        <p class="kicker">RTS — Real-Time Trust System</p>
+        <h1>Execution becomes memory.<br/>Memory becomes identity.</h1>
+
+        <p class="sub">AI workflows forget. RTS remembers.</p>
+        <p class="tagline">Execution OS for operators running long GPT workflows and research iterations.</p>
+
+        <div class="ctaBox">
+          <div class="btnRow">
+            <a class="btn" href="https://github.com/nobutakayamauchi/RTS">Open Public Repository →</a>
+            <a class="btn secondary" href="https://nobutakayamauchi.github.io/RTS/memory/">View Operational Memory →</a>
           </div>
-
-          <div class="ctaBox">
-            <div class="btnRow">
-              <!-- ✅ Public first -->
-              <a class="btn" href="https://github.com/nobutakayamauchi/RTS">Open Public Repository →</a>
-              <a class="btnSecondary" href="https://nobutakayamauchi.github.io/RTS/memory/">View Operational Memory →</a>
-            </div>
-
-            <p class="fine">
-              Public-first. No paywall required to start.<br/>
-              If you want to support RTS development, see “Support RTS” below.
-            </p>
-          </div>
+          <p class="note">
+            Public-first. No paywall required to start. If you want to support RTS development, see “Support RTS” below.
+          </p>
         </div>
-      </section>
+      </div>
 
-      <!-- WHY -->
-      <section class="section" id="why">
+      <div class="card why">
         <h2>Why RTS?</h2>
-        <p class="sub" style="margin-top:0;">
+        <p>
           Modern AI workflows restart thinking every session. Ideas disappear. Decisions fragment. Execution history is lost.
           <br/><strong>RTS preserves reasoning continuity across AI sessions.</strong>
         </p>
 
-        <div class="grid2" style="margin-top:14px;">
-          <div class="card">
+        <div class="grid2">
+          <div class="mini">
             <h3>Built for AI Operators</h3>
             <ul>
               <li>AI researchers running long experiments</li>
@@ -322,8 +338,7 @@
               <li>Anyone treating AI execution as infrastructure</li>
             </ul>
           </div>
-
-          <div class="card">
+          <div class="mini">
             <h3>What RTS Records</h3>
             <ul>
               <li>Reasoning decisions</li>
@@ -334,123 +349,98 @@
             </ul>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- START -->
-      <section class="section" id="start">
-        <h2>Start in 60 seconds</h2>
+    <section class="section">
+      <h2 class="sectionTitle">Start in 60 seconds</h2>
+      <div class="card startCard">
+        <div class="startGrid">
+          <p class="smallMuted"><strong>Local run</strong> — RTS runs fully local. No cloud dependency. No telemetry.</p>
 
-        <div class="card">
-          <h3>Local run</h3>
-          <p class="fine" style="margin:0 0 10px 0;">
-            RTS runs fully local. No cloud dependency. No telemetry.
-          </p>
+          <div class="kv">
+            <span class="smallMuted"><strong>Open:</strong></span>
+            <span class="codePill">starter/python</span>
+          </div>
 
-          <p class="fine" style="margin:0;">Open:</p>
-          <div class="mono">starter/python</div>
-          <p class="fine" style="margin:10px 0 0 0;">Then run:</p>
-          <div class="mono">python START_HERE.py</div>
+          <div class="kv">
+            <span class="smallMuted"><strong>Then run:</strong></span>
+            <span class="codePill">python START_HERE.py</span>
+          </div>
 
-          <div class="hr"></div>
+          <p class="smallMuted"><strong>RTS creates:</strong> <span class="mono">logs/ memory/ runs/ evolution/</span></p>
 
-          <p class="fine" style="margin:0;">RTS creates:</p>
-          <div class="mono">logs/ memory/ runs/ evolution/</div>
-
-          <p class="fine" style="margin:10px 0 0 0;">
-            Execution history becomes operational memory.<br/>
-            Execution history survives session resets and device changes.
-          </p>
-
-          <div class="hr"></div>
-
-          <p class="fine" style="margin:0;">
-            Platforms: Windows / Mac / Linux / Android (Termux supported).<br/>
+          <p class="smallMuted">
+            Platforms: <strong>Windows / Mac / Linux / Android (Termux supported)</strong><br/>
             iPhone: use a synced environment (Mac/PC) or a remote dev box; iOS cannot run full Python reliably without external tooling.
           </p>
+
+          <p class="smallMuted">Prefer a short guide? See: <a href="https://github.com/nobutakayamauchi/RTS/blob/main/START.md">START.md</a></p>
         </div>
+      </div>
+    </section>
 
-        <div class="hr"></div>
-        <p class="fine" style="margin:0;">
-          Prefer a short guide? See:
-          <a href="https://github.com/nobutakayamauchi/RTS/blob/main/START.md">START.md</a>
-        </p>
-      </section>
-
-      <!-- SUPPORT (REPLACES PRO) -->
-      <section class="section" id="support">
-        <h2>Support RTS</h2>
-        <p class="sub" style="margin-top:0;">
-          RTS is public infrastructure for reproducible AI execution.
-          If RTS helps your research, operations, or workflows, consider supporting development.
+    <section class="section">
+      <h2 class="sectionTitle">Support RTS</h2>
+      <div class="card support">
+        <p>
+          RTS is public infrastructure for reproducible AI execution. If RTS helps your research, operations, or workflows, consider supporting development.
         </p>
 
-        <div class="grid2" style="margin-top:14px;">
-          <div class="card">
+        <div class="supportGrid">
+          <div class="supportItem">
             <h3>1) Sponsor (recommended)</h3>
-            <p class="fine" style="margin:0 0 10px 0;">
-              Keep RTS public. Fund maintenance, audits, and new capabilities.
-            </p>
+            <p class="smallMuted">Keep RTS public. Fund maintenance, audits, and new capabilities.</p>
             <!-- TODO: replace with your GitHub Sponsors URL -->
             <a class="btn" href="https://github.com/sponsors/nobutakayamauchi">Become a Sponsor →</a>
           </div>
 
-          <div class="card">
+          <div class="supportItem">
             <h3>2) Research / org collaboration</h3>
-            <p class="fine" style="margin:0 0 10px 0;">
-              For labs, companies, or teams that want RTS deployment / governance alignment / audit design.
+            <p class="smallMuted">For labs, companies, or teams that want RTS deployment / governance alignment / audit design.</p>
+            <!-- TODO: replace with your contact URL (e.g., mailto:, form, or issue template) -->
+            <a class="btn secondary" href="https://github.com/nobutakayamauchi/RTS/issues/new">Contact for Collaboration →</a>
+          </div>
+
+          <div class="supportItem">
+            <h3>Optional: Operator Kit (disabled)</h3>
+            <p class="smallMuted">
+              If you ship a paid bundle later, keep it optional — not the main CTA.
+              (Leave this section as a placeholder until contents are truly additional value.)
             </p>
-            <!-- TODO: replace with your contact -->
-            <a class="btnSecondary" href="mailto:contact@example.com">Contact for Collaboration →</a>
+            <!-- Intentionally no purchase link here -->
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="hr"></div>
-
-        <div class="card">
-          <h3>Optional: Operator Kit</h3>
-          <p class="fine" style="margin:0 0 10px 0;">
-            If you still want an optional paid bundle later, keep it as “Optional”, not the main CTA.
-          </p>
-          <!-- TODO: if you keep Gumroad, put it here (optional / low priority) -->
-          <!-- <a class="btnSecondary" href="https://rising...">Optional Operator Kit →</a> -->
-          <p class="fine" style="margin:0;">
-            (Hidden by default — enable only when you decide the contents are truly additional value.)
-          </p>
-        </div>
-      </section>
-
-      <!-- LINKS -->
-      <section class="section" id="links">
+    <section class="section">
+      <div class="card links">
         <h2>Official Links</h2>
-
-        <div class="linksRow">
-          <div class="linkBox">
+        <div class="linkBox">
+          <div class="row">
             <strong>Repository</strong>
-            <a href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a>
+            <div class="mono"><a href="https://github.com/nobutakayamauchi/RTS">https://github.com/nobutakayamauchi/RTS</a></div>
           </div>
-
-          <div class="linkBox">
+          <div class="row">
             <strong>Pages</strong>
-            <a href="https://nobutakayamauchi.github.io/RTS/">https://nobutakayamauchi.github.io/RTS/</a>
+            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/">https://nobutakayamauchi.github.io/RTS/</a></div>
           </div>
-
-          <div class="linkBox">
+          <div class="row">
             <strong>Operational Memory</strong>
-            <a href="https://nobutakayamauchi.github.io/RTS/memory/">https://nobutakayamauchi.github.io/RTS/memory/</a>
+            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/memory/">https://nobutakayamauchi.github.io/RTS/memory/</a></div>
           </div>
-
-          <div class="linkBox">
+          <div class="row">
             <strong>Search</strong>
-            <a href="https://nobutakayamauchi.github.io/RTS/search.html">https://nobutakayamauchi.github.io/RTS/search.html</a>
+            <div class="mono"><a href="https://nobutakayamauchi.github.io/RTS/search.html">https://nobutakayamauchi.github.io/RTS/search.html</a></div>
           </div>
         </div>
 
         <div class="footer">
           Creator: Nobutaka Yamauchi ・ Public execution logs available on GitHub ・ MIT License — 2026
         </div>
-      </section>
-
-    </div>
+      </div>
+    </section>
   </main>
 </body>
 </html>
