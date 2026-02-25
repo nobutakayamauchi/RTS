@@ -1,41 +1,37 @@
-# RTS — Real Time Trust System
+# **RTS — Real Time Trust System**
 
-## Executive Summary
+## **Executive Summary**
 
-RTS (Real Time Trust System) is an execution-memory operating framework
-for long-running AI collaboration, GPT workflows, and research operations.
+RTS (Real Time Trust System) is an execution-memory operating framework for long-running AI collaboration, GPT workflows, and research operations.
 
-Modern AI sessions reset.
-Reasoning fragments.
-Execution history disappears.
+Modern AI sessions restart. Reasoning fragments. Execution history disappears.
 
 RTS converts execution itself into verifiable operational memory.
 
-RTS does not control agents.
-RTS observes execution.
+RTS does not control agents. RTS observes execution.
 
 Execution history becomes infrastructure.
 
-Core capabilities:
-
-• Evidence-first execution logging  
-• Incident intelligence archive  
-• Structural agent audit (ZERO protocol)  
-• Immutable provenance reconstruction  
-• Canonical VERIFIED reference runs
+**Core capabilities**
+- Evidence-first execution logging
+- Incident intelligence archive
+- Structural agent execution audit (ZERO protocol)
+- Immutable provenance reconstruction
+- Canonical VERIFIED reference runs
 
 RTS transforms temporary AI collaboration into continuous operational identity.
 
 Execution becomes memory.  
 Memory becomes operational identity.
 
-## Final Public Execution Edition
+---
+
+## **Final Public Execution Edition**
 
 Execution becomes memory.  
 Memory becomes operational identity.
 
-Modern AI collaboration restarts.
-
+Modern AI collaboration restarts.  
 Reasoning fragments.  
 Execution history disappears.
 
@@ -52,7 +48,7 @@ RTS is execution memory infrastructure for AI operators.
 
 ---
 
-## What RTS Is
+## **What RTS Is**
 
 RTS (Real Time Trust System) is an execution-memory operating framework designed to preserve reasoning continuity inside AI workflows.
 
@@ -60,8 +56,7 @@ RTS is not an agent controller.
 
 RTS is an observability and reconstruction layer.
 
-Agent behavior may be chaotic.
-
+Agent behavior may be chaotic.  
 RTS must never be chaotic.
 
 RTS records.  
@@ -72,18 +67,13 @@ Nothing more. Nothing less.
 
 ---
 
-## Start in 3 Steps
+## **Start in 3 Steps**
 
 1. Fork or clone the repository.
-
-2. Run:
-
-`python START_HERE.py`
-
+2. Run: `python START_HERE.py`
 3. Begin logging execution.
 
 RTS prepares:
-
 - logs/
 - incidents/
 - memory/
@@ -97,7 +87,7 @@ Nothing uploads without explicit GitHub push.
 
 ---
 
-## Operational Model
+## **Operational Model**
 
 CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
@@ -109,7 +99,7 @@ It never replaces human judgement.
 
 ---
 
-## Core Capabilities
+## **Core Capabilities**
 
 - Execution Logging (evidence-first)
 - Incident Intelligence
@@ -121,7 +111,7 @@ AI collaboration becomes reproducible.
 
 ---
 
-## Directory Structure
+## **Directory Structure**
 
 logs/  
 → execution evidence
@@ -150,22 +140,18 @@ analysis/
 docs/  
 → governance and genesis records
 
-Entry:
-
-`python START_HERE.py`
+Entry: `python START_HERE.py`
 
 ---
 
-## Why RTS Exists
+## **Why RTS Exists**
 
 AI workflows suffer from:
-
 - conversational reset loss
 - reasoning fragmentation
 - execution discontinuity
 
 Operators lose:
-
 - prompts
 - debugging context
 - research continuity
@@ -179,29 +165,25 @@ Memory becomes identity.
 
 ---
 
-## Public Operational Evidence
+## **Public Operational Evidence**
 
-### Operational Memory
-
+### **Operational Memory**
 https://nobutakayamauchi.github.io/RTS/memory/
 
-### Execution Logs
-
+### **Execution Logs**
 https://github.com/nobutakayamauchi/RTS/tree/main/logs
 
-### Incident Intelligence
-
+### **Incident Intelligence**
 https://github.com/nobutakayamauchi/RTS/tree/main/incidents
 
-### Operational Search
-
+### **Operational Search**
 https://nobutakayamauchi.github.io/RTS/search.html
 
 RTS functions as a continuously auditable operational record.
 
 ---
 
-## Academic Reference
+## **Academic Reference**
 
 Real Time Trust System (RTS), Yamauchi N. (2026).
 
@@ -211,10 +193,9 @@ RTS is released as a public operational research artifact.
 
 ---
 
-## Integrity Protection
+## **Integrity Protection**
 
 Removal or falsification of:
-
 - authorship attribution
 - execution logs
 - provenance records
@@ -227,7 +208,7 @@ Misrepresentation is not.
 
 ---
 
-## License
+## **License**
 
 MIT License
 
@@ -235,38 +216,33 @@ Copyright (c) 2026 Nobutaka Yamauchi
 
 ---
 
-## Creator Statement
+## **Creator Statement**
 
 RTS exists to prevent loss of thinking.
 
-Ideas should survive execution.
-
+Ideas should survive execution.  
 History should survive iteration.
 
 Continuity creates trust.
 
 ---
 
-## Genesis and Audit Provenance
+## **Genesis and Audit Provenance**
 
 RTS evolved through live operational execution.
 
-### Operational evolution record
-
+### **Operational evolution record**
 docs/genesis/GENESIS_TO_ZERO.md
 
-### Agent execution structural audit
-
+### **Agent execution structural audit**
 analysis/agent_index.md
 
-### Canonical verified structural reference
-
+### **Canonical verified structural reference**
 runs/RUN_VERIFIED_GOLD.md
 
 RTS treats execution history itself as provenance evidence.
 
 Evidence is publicly reproducible through:
-
 - GitHub commit history
 - GitHub Actions execution logs
 - incident archives
