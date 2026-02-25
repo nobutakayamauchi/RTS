@@ -1,7 +1,7 @@
 # RTS — Execution Audit for AI Workflows
 
 ---
-
+Execution history survives session resets, agent swaps, and device changes.
 ## 👉 Start RTS in 60 seconds
 
 Open:
