@@ -1,6 +1,6 @@
 # RTS Analysis Index
 
-- generated_at_utc: `2026-02-25T09:08:23.280636+00:00`
+- generated_at_utc: `2026-02-25T09:18:35.134114+00:00`
 - incidents_count: `15`
 
 RTS generates evidence-first operational memory. It does not infer causes beyond what is recorded.
