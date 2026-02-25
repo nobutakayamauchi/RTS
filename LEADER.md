@@ -17,6 +17,8 @@ It never replaces human judgement.
 
 Human authority remains final.
 
+RTS is execution memory infrastructure for AI operators.
+
 ---
 
 ## What RTS Is
@@ -86,23 +88,32 @@ AI collaboration becomes reproducible.
 
 ## Directory Structure
 
-logs/ → execution evidence
+logs/  
+→ execution evidence
 
-incidents/ → failure intelligence archive
+incidents/  
+→ failure intelligence archive
 
-radar/ → incident radar signals
+radar/  
+→ incident radar signals
 
-memory/ → operational index
+memory/  
+→ operational index
 
-evolution/ → experimentation history
+evolution/  
+→ experimentation history
 
-vibecode/ → workflow execution space
+vibecode/  
+→ workflow execution space
 
-runs/ → agent run records
+runs/  
+→ agent run records
 
-analysis/ → audit index outputs
+analysis/  
+→ audit index outputs
 
-docs/ → governance and genesis records
+docs/  
+→ governance and genesis records
 
 Entry:
 
@@ -135,19 +146,19 @@ Memory becomes identity.
 
 ## Public Operational Evidence
 
-Operational Memory:
+Operational Memory
 
 https://nobutakayamauchi.github.io/RTS/memory/
 
-Execution Logs:
+Execution Logs
 
 https://github.com/nobutakayamauchi/RTS/tree/main/logs
 
-Incident Intelligence:
+Incident Intelligence
 
 https://github.com/nobutakayamauchi/RTS/tree/main/incidents
 
-Operational Search:
+Operational Search
 
 https://nobutakayamauchi.github.io/RTS/search.html
 
@@ -194,7 +205,8 @@ Copyright (c) 2026 Nobutaka Yamauchi
 RTS exists to prevent loss of thinking.
 
 Ideas should survive execution.  
-History should survive iteration.  
+History should survive iteration.
+
 Continuity creates trust.
 
 ---
@@ -235,5 +247,8 @@ No retrospective narrative rewriting was performed.
 Human operator judgement remains final.
 
 RTS observes execution.
+
+Execution became memory.  
+Memory became identity.
 
 END.
