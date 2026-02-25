@@ -274,4 +274,6 @@ RTS observes execution.
 Execution became memory.  
 Memory became identity.
 
+History remains verifiable.
+
 END.
