@@ -1,26 +1,25 @@
-RTS — Real Time Trust System
+# RTS — Real Time Trust System
 
-Final Public Execution Edition
+## Final Public Execution Edition
 
-Execution becomes memory.
+Execution becomes memory.  
 Memory becomes operational identity.
 
-Modern AI collaboration restarts.
-Reasoning fragments.
-Execution history disappears.
+Modern AI collaboration restarts.  
+Reasoning fragments. Execution history disappears.
 
 RTS converts execution itself into verifiable operational memory.
 
 Execution history becomes infrastructure.
 
-RTS observes execution.
+RTS observes execution.  
 It never replaces human judgement.
 
 Human authority remains final.
 
-⸻
+---
 
-What RTS Is
+## What RTS Is
 
 RTS (Real Time Trust System) is an execution-memory operating framework designed to preserve reasoning continuity inside AI workflows.
 
@@ -34,30 +33,34 @@ RTS records. RTS structures. RTS enables rollback.
 
 Nothing more. Nothing less.
 
-⸻
+---
 
-Start in 3 Steps
-	1.	Fork or clone the repository.
-	2.	Run:
+## Start in 3 Steps
 
-python START_HERE.py
-	3.	Begin logging execution.
+1. Fork or clone the repository.
+
+2. Run:
+
+`python START_HERE.py`
+
+3. Begin logging execution.
 
 RTS prepares:
-	•	logs/
-	•	incidents/
-	•	memory/
-	•	evolution/
-	•	vibecode/
-	•	runs/
-	•	analysis/
-	•	docs/
+
+- logs/
+- incidents/
+- memory/
+- evolution/
+- vibecode/
+- runs/
+- analysis/
+- docs/
 
 Nothing uploads without explicit GitHub push.
 
-⸻
+---
 
-Operational Model
+## Operational Model
 
 CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
@@ -67,20 +70,21 @@ RTS observes execution.
 
 It never replaces human judgement.
 
-⸻
+---
 
-Core Capabilities
-	•	Execution Logging (evidence-first)
-	•	Incident Intelligence (failure becomes artifact)
-	•	Evidence Collection (URL / snapshot hash / issue linkage)
-	•	Workflow Memory Preservation
-	•	Autonomous Audit Trail
+## Core Capabilities
+
+- Execution Logging (evidence-first)
+- Incident Intelligence (failure becomes artifact)
+- Evidence Collection (URL / snapshot hash / issue linkage)
+- Workflow Memory Preservation
+- Autonomous Audit Trail
 
 AI collaboration becomes reproducible.
 
-⸻
+---
 
-Directory Structure
+## Directory Structure
 
 logs/ → execution evidence
 
@@ -102,22 +106,24 @@ docs/ → governance and genesis records
 
 Entry:
 
-python START_HERE.py
+`python START_HERE.py`
 
-⸻
+---
 
-Why RTS Exists
+## Why RTS Exists
 
 AI workflows suffer from:
-	•	conversational reset loss
-	•	reasoning fragmentation
-	•	execution discontinuity
+
+- conversational reset loss
+- reasoning fragmentation
+- execution discontinuity
 
 Operators lose:
-	•	prompts
-	•	debugging context
-	•	research continuity
-	•	decision history
+
+- prompts
+- debugging context
+- research continuity
+- decision history
 
 RTS preserves thinking.
 
@@ -125,9 +131,9 @@ Execution becomes memory.
 
 Memory becomes identity.
 
-⸻
+---
 
-Public Operational Evidence
+## Public Operational Evidence
 
 Operational Memory:
 
@@ -147,9 +153,9 @@ https://nobutakayamauchi.github.io/RTS/search.html
 
 RTS functions as a continuously auditable operational record.
 
-⸻
+---
 
-Academic Reference
+## Academic Reference
 
 Real Time Trust System (RTS), Yamauchi N. (2026).
 
@@ -157,14 +163,15 @@ Repository execution history serves as provenance evidence.
 
 RTS is released as a public operational research artifact.
 
-⸻
+---
 
-Integrity Protection
+## Integrity Protection
 
 Removal or falsification of:
-	•	authorship attribution
-	•	execution logs
-	•	provenance records
+
+- authorship attribution
+- execution logs
+- provenance records
 
 is considered repository integrity violation.
 
@@ -172,29 +179,27 @@ Forks permitted.
 
 Misrepresentation is not.
 
-⸻
+---
 
-License
+## License
 
 MIT License
 
 Copyright (c) 2026 Nobutaka Yamauchi
 
-⸻
+---
 
-Creator Statement
+## Creator Statement
 
 RTS exists to prevent loss of thinking.
 
-Ideas should survive execution.
-
-History should survive iteration.
-
+Ideas should survive execution.  
+History should survive iteration.  
 Continuity creates trust.
 
-⸻
+---
 
-Genesis and Audit Provenance
+## Genesis and Audit Provenance
 
 RTS evolved through live operational execution.
 
@@ -213,10 +218,11 @@ runs/RUN_VERIFIED_GOLD.md
 RTS treats execution history itself as provenance evidence.
 
 Evidence is publicly reproducible through:
-	•	GitHub commit history
-	•	GitHub Actions execution logs
-	•	incident archives
-	•	immutable snapshot hashes
+
+- GitHub commit history
+- GitHub Actions execution logs
+- incident archives
+- immutable snapshot hashes
 
 Execution history itself becomes audit material.
 
