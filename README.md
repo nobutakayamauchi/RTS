@@ -1,9 +1,16 @@
 # RTS — Execution Audit for AI Workflows
 
-AI agents break.
+RTS turns AI execution into verifiable operational memory.
 
-Sessions reset.  
-Logs disappear.  
+Run long GPT workflows without losing reasoning continuity.
+Audit agent behaviour structurally.
+Preserve research progress across session resets.
+
+Execution becomes infrastructure.
+
+AI agents break.
+Sessions reset.
+Logs disappear.
 Reasoning fragments.
 
 If you run long AI workflows, research loops, or GPT agents,
