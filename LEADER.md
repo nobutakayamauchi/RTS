@@ -16,6 +16,8 @@ Execution history becomes infrastructure.
 RTS observes execution.
 It never replaces human judgement.
 
+Human authority remains final.
+
 ⸻
 
 What RTS Is
@@ -26,15 +28,11 @@ RTS is not an agent controller.
 
 RTS is an observability and reconstruction layer.
 
-Agent behavior may be chaotic.
-RTS must never be chaotic.
+Agent behavior may be chaotic. RTS must never be chaotic.
 
-RTS records.
-RTS structures.
-RTS enables rollback.
+RTS records. RTS structures. RTS enables rollback.
 
-Nothing more.
-Nothing less.
+Nothing more. Nothing less.
 
 ⸻
 
@@ -53,6 +51,7 @@ RTS prepares:
 	•	vibecode/
 	•	runs/
 	•	analysis/
+	•	docs/
 
 Nothing uploads without explicit GitHub push.
 
@@ -219,10 +218,16 @@ Evidence is publicly reproducible through:
 	•	incident archives
 	•	immutable snapshot hashes
 
+Execution history itself becomes audit material.
+
 Genesis reconstruction is evidence-derived.
+
+All claims are traceable to public execution evidence.
 
 No retrospective narrative rewriting was performed.
 
 Human operator judgement remains final.
 
 RTS observes execution.
+
+END.
