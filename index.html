@@ -224,20 +224,30 @@
       color:var(--muted);
     }
 
+    /* ✅ ここが「ボタン押したら起動」用 */
     .miniJump{
       margin:10px 0 0;
-      font-size:13px;
-      line-height:1.4;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
-    .miniJump a{
-      color:#0b1220;
-      font-weight:800;
-      text-decoration:none;
+    .miniBtn{
       display:inline-flex;
       align-items:center;
-      gap:6px;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.92);
+      color:#0b1220;
+      font-weight:900;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+      flex: 1 1 200px;
     }
-    .miniJump a:hover{ text-decoration:underline; }
+    .miniBtn:active{ transform: scale(.99) }
 
     /* right side */
     .heroRight{
@@ -339,7 +349,7 @@
       -webkit-overflow-scrolling:touch;
     }
 
-    /* ✅ Local run: iPhoneで崩れない整列 */
+    /* Local run layout */
     .steps{
       display:flex;
       flex-direction:column;
@@ -356,7 +366,7 @@
     .stepLabel{
       color: var(--muted);
       font-size:13.5px;
-      font-weight:700;
+      font-weight:800;
     }
     .pillGroup{
       display:flex;
@@ -364,6 +374,7 @@
       gap:8px;
     }
 
+    /* support */
     .supportGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -393,6 +404,7 @@
       padding:12px 14px;
     }
 
+    /* links */
     .links .row{
       border-radius: var(--radius2);
       border:1px solid var(--line);
@@ -414,7 +426,7 @@
     }
 
     /* =========================
-       ✅ RTS “Start?” modal
+       ✅ RTS “Start?” modal (NO auto)
        ========================= */
     .modalOverlay{
       position:fixed;
@@ -437,6 +449,20 @@
       border-radius: 20px;
       box-shadow: 0 18px 60px rgba(2,10,26,.28);
       overflow:hidden;
+      position:relative;
+    }
+    .modalClose{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:36px;height:36px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.92);
+      cursor:pointer;
+      font-weight:900;
+      color:#0b1220;
+      -webkit-tap-highlight-color: transparent;
     }
     .modalTop{
       padding:14px 16px 10px;
@@ -465,15 +491,27 @@
       color:var(--muted);
       font-weight:650;
     }
-    .modalBody{
-      padding: 0 16px 12px;
-    }
+    .modalBody{ padding: 0 16px 12px; }
     .modalList{
       margin:10px 0 0;
       padding-left: 18px;
       color:#111827;
       font-size:13.5px;
       line-height:1.5;
+    }
+    .modalFine{
+      margin:10px 0 0;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+    }
+    .modalFine code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      background: rgba(2,10,26,.06);
+      border:1px solid var(--line);
+      padding:2px 6px;
+      border-radius: 8px;
+      color:#0b1220;
     }
     .modalFoot{
       border-top: 1px solid var(--line);
@@ -502,20 +540,6 @@
       box-shadow: 0 10px 24px rgba(2,10,26,.22);
     }
     .modalBtn:active{ transform: scale(.99); }
-    .modalFine{
-      margin:10px 0 0;
-      font-size:12px;
-      line-height:1.45;
-      color:var(--muted);
-    }
-    .modalFine code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      background: rgba(2,10,26,.06);
-      border:1px solid var(--line);
-      padding:2px 6px;
-      border-radius: 8px;
-      color:#0b1220;
-    }
 
     /* responsive */
     @media (max-width: 860px){
@@ -543,8 +567,20 @@
       .stepRow{ grid-template-columns: 68px 1fr; }
       .stepLabel{ font-size:13px; }
 
-      .modalOverlay{ align-items:flex-end; }
+      /* ✅ ここが解決点：RTS creates を2列にして孤立を消す */
+      .pillGroup{
+        display:grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap:8px;
+      }
+      .pillGroup .codePill{
+        width:100%;
+        justify-content:center;
+        overflow-x:hidden; /* 短いので不要。見た目優先 */
+      }
+
       .modalBtn{ min-width: 0; flex:1 1 160px; }
+      .miniBtn{ flex: 1 1 160px; }
     }
   </style>
 </head>
@@ -585,11 +621,15 @@
                 View Operational Memory →
               </a>
             </div>
+
             <div class="ctaNote">
               Public-first. No paywall required to start. If you want to support RTS development, see “Support RTS” below.
             </div>
+
+            <!-- ✅ ここ：押した時だけオーバーレイ起動 -->
             <div class="miniJump">
-              <a href="#start">Start in 60 seconds →</a>
+              <button class="miniBtn" id="btnStartPrompt" type="button">Start RTS →</button>
+              <a class="miniBtn" href="#start" style="text-decoration:none;">Skip prompt → #start</a>
             </div>
           </div>
         </div>
@@ -773,9 +813,11 @@
     </div>
   </div>
 
-  <!-- ✅ Start? Modal (Operator chooses) -->
+  <!-- ✅ Start? Modal (NO auto) -->
   <div class="modalOverlay" id="rtsModal" aria-hidden="true">
     <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="rtsModalTitle" aria-describedby="rtsModalDesc">
+      <button class="modalClose" id="btnClose" type="button" aria-label="Close">×</button>
+
       <div class="modalTop">
         <div class="modalIcon" aria-hidden="true"></div>
         <div>
@@ -798,25 +840,24 @@
 
       <div class="modalFoot">
         <button class="modalBtn" id="btnNo" type="button">No → Google</button>
-        <button class="modalBtn modalBtnPrimary" id="btnYes" type="button">Yes → Start RTS</button>
+        <button class="modalBtn modalBtnPrimary" id="btnYes" type="button">Yes → Start</button>
       </div>
     </div>
   </div>
 
   <script>
     (function(){
-      const MODAL_KEY = "rts_start_prompted_v1";
       const modal = document.getElementById("rtsModal");
+      const openBtn = document.getElementById("btnStartPrompt");
       const btnYes = document.getElementById("btnYes");
       const btnNo = document.getElementById("btnNo");
+      const btnClose = document.getElementById("btnClose");
 
       function openModal(){
         modal.classList.add("isOpen");
         modal.setAttribute("aria-hidden","false");
-        // focus for accessibility
-        setTimeout(() => btnYes.focus(), 50);
-        // lock background scroll
         document.body.style.overflow = "hidden";
+        setTimeout(() => btnYes.focus(), 30);
       }
 
       function closeModal(){
@@ -827,41 +868,28 @@
 
       function goStart(){
         closeModal();
-        // mark this session/day so it doesn't annoy users repeatedly
-        try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
-        // jump
         location.hash = "start";
       }
 
       function goGoogle(){
-        try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
         location.href = "https://www.google.com";
       }
 
-      // open on first page load (session-based)
-      window.addEventListener("load", () => {
-        let prompted = false;
-        try { prompted = sessionStorage.getItem(MODAL_KEY) === "1"; } catch(e){}
-        if(!prompted) openModal();
-      });
+      // ✅ 重要：自動では開かない。ボタン押下でだけ開く。
+      openBtn.addEventListener("click", openModal);
 
       btnYes.addEventListener("click", goStart);
       btnNo.addEventListener("click", goGoogle);
+      btnClose.addEventListener("click", closeModal);
 
-      // click outside closes (but does NOT redirect)
+      // outside click closes (no redirect)
       modal.addEventListener("click", (e) => {
-        if(e.target === modal){
-          closeModal();
-          try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
-        }
+        if(e.target === modal) closeModal();
       });
 
-      // ESC closes (desktop)
+      // ESC closes
       window.addEventListener("keydown", (e) => {
-        if(e.key === "Escape" && modal.classList.contains("isOpen")){
-          closeModal();
-          try { sessionStorage.setItem(MODAL_KEY, "1"); } catch(e){}
-        }
+        if(e.key === "Escape" && modal.classList.contains("isOpen")) closeModal();
       });
     })();
   </script>
