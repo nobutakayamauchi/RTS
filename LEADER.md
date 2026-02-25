@@ -147,3 +147,21 @@ RTS exists to prevent loss of thinking.
 
 Ideas should survive execution. History should survive iteration.
 Continuity creates trust.
+
+## Genesis & Audit Provenance
+
+RTS evolved through live operational execution.
+
+Operational evolution record:
+
+docs/genesis/GENESIS_TO_ZERO.md
+
+Agent execution structural audit:
+
+analysis/agent_index.md
+
+Canonical verified structural reference:
+
+runs/RUN_VERIFIED_GOLD.md
+
+RTS treats execution history itself as provenance evidence.
