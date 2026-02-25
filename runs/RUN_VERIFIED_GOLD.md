@@ -34,16 +34,20 @@ Run → Span Tree → Artifacts → Flags
 - action_type: initialize
 - intent: prepare verification run
 - status: ok
+
 - timestamp_start: 2026-02-25T13:05:01Z
 - timestamp_end: 2026-02-25T13:05:02Z
 - duration_ms: 1000
-- input_hash: aaaaa11111
+
+- input_hash: aaaa11111
 - output_hash: bbbbb22222
+
 - input_ref: memory/index.md
 - output_ref: analysis/agent_index.md
+
 - tool_name: internal
 
-### evidence:
+evidence:
 
 - error:
 
@@ -58,16 +62,20 @@ Run → Span Tree → Artifacts → Flags
 - agent_name: RTS Sentinel
 - action_type: analyze_runs
 - intent: structural audit
+
 - status: ok
+
 - timestamp_start: 2026-02-25T13:05:03Z
 - timestamp_end: 2026-02-25T13:05:05Z
 - duration_ms: 2000
+
 - input_hash: ccccc33333
 - output_hash: ddddd44444
+
 - input_ref: runs/
 - output_ref: analysis/agent_index.md
 
-### evidence:
+evidence:
 
 - error:
 
@@ -103,5 +111,4 @@ Run → Span Tree → Artifacts → Flags
 
 Human operator judgment remains final.
 
-VERIFIED:
-explicitly_marked: true
+verified: true
