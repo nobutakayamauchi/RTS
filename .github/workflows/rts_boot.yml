@@ -1,0 +1,37 @@
+name: RTS BOOT
+
+on:
+  workflow_dispatch:
+
+jobs:
+  boot:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install deps
+      run: |
+        pip install -r requirements.txt || true
+
+    - name: Start RTS
+      run: |
+        python START_HERE.py
+
+    - name: Commit results
+      run: |
+        git config user.name "actions-user"
+        git config user.email "actions@github.com"
+
+        git add .
+
+        git commit -m "RTS boot execution" || echo "no changes"
+
+        git push
