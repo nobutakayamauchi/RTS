@@ -38,7 +38,7 @@
     *{ box-sizing:border-box }
     html,body{ height:100% }
 
-    /* ✅ iOS Safari の “勝手に文字デカくする” を殺す（最重要） */
+    /* ✅ iOS Safari の勝手な文字拡大を止める */
     html{
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
@@ -62,6 +62,7 @@
       padding:18px 16px 44px;
     }
 
+    /* top bar */
     .topbar{
       display:flex;
       align-items:center;
@@ -102,6 +103,7 @@
       -webkit-backdrop-filter: blur(8px);
     }
 
+    /* cards */
     .card{
       background:rgba(255,255,255,.84);
       border:1px solid var(--line);
@@ -115,6 +117,7 @@
       border-radius: calc(var(--radius) - 6px);
     }
 
+    /* hero */
     .hero{
       display:grid;
       grid-template-columns: 1.05fr .95fr;
@@ -137,15 +140,12 @@
       margin:0 0 10px;
     }
 
-    /* ✅ タイトル：iPhoneで “デカすぎ” を確実に防ぐ */
     .h1{
       font-weight: 850;
-      font-size: clamp(34px, 4.6vw + 10px, 52px); /* desktop〜tablet */
+      font-size: clamp(34px, 4.6vw + 10px, 52px);
       line-height: 1.02;
       letter-spacing: -0.035em;
       margin:6px 0 10px;
-
-      /* 読みやすさ＋iPhoneでの暴れ防止 */
       max-inline-size: 16ch;
       text-wrap: balance;
     }
@@ -153,10 +153,20 @@
     .sub{
       font-size:17px;
       line-height:1.45;
-      margin:0 0 12px;
+      margin:0 0 10px;
       color:var(--muted);
       font-weight:600;
     }
+
+    .def{
+      font-size:14px;
+      line-height:1.5;
+      margin:0 0 12px;
+      color:var(--muted);
+      font-weight:650;
+    }
+    .def b{ color:#0b1220 }
+
     .lead{
       font-size:16px;
       line-height:1.55;
@@ -212,6 +222,22 @@
       color:var(--muted);
     }
 
+    .miniJump{
+      margin:10px 0 0;
+      font-size:13px;
+      line-height:1.4;
+    }
+    .miniJump a{
+      color:#0b1220;
+      font-weight:800;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .miniJump a:hover{ text-decoration:underline; }
+
+    /* right side */
     .heroRight{
       padding:18px;
       display:flex;
@@ -253,6 +279,7 @@
     }
     .quick a:hover{ text-decoration:underline }
 
+    /* sections */
     .section{
       margin-top:14px;
       padding:16px;
@@ -293,6 +320,7 @@
       line-height:1.55;
     }
 
+    /* chips */
     .codePill{
       display:inline-flex;
       align-items:center;
@@ -303,6 +331,35 @@
       border-radius: 12px;
       font-size:13px;
       color:#0b1220;
+      max-width:100%;
+      white-space:nowrap;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    /* ✅ Local run: iPhoneで崩れない整列 */
+    .steps{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:8px;
+    }
+    .stepRow{
+      display:grid;
+      grid-template-columns: 76px 1fr;
+      align-items:center;
+      gap:10px;
+      min-height:34px;
+    }
+    .stepLabel{
+      color: var(--muted);
+      font-size:13.5px;
+      font-weight:700;
+    }
+    .pillGroup{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
 
     .supportGrid{
@@ -354,6 +411,7 @@
       font-size:12px;
     }
 
+    /* responsive */
     @media (max-width: 860px){
       .hero{ grid-template-columns: 1fr; }
       .badges{ justify-content:flex-start; }
@@ -362,7 +420,7 @@
       .btn{ min-width: 0; flex: 1 1 180px; }
     }
 
-    /* ✅ iPhone特化：ここで “確実に” タイトルを締める（重要） */
+    /* iPhone */
     @media (max-width: 430px){
       .wrap{ padding:14px 14px 40px; }
       .hero{ padding:14px; gap:12px; }
@@ -373,7 +431,11 @@
         max-inline-size: 15ch;
       }
       .sub{ font-size:16px; }
+      .def{ font-size:13.5px; }
       .lead{ font-size:15px; }
+
+      .stepRow{ grid-template-columns: 68px 1fr; }
+      .stepLabel{ font-size:13px; }
     }
   </style>
 </head>
@@ -402,6 +464,7 @@
           </h1>
 
           <div class="sub">AI workflows forget. RTS remembers.</div>
+          <div class="def"><b>GitHub-native</b> evidence + operational memory for long-running AI workflows.</div>
           <div class="lead">Execution OS for operators running long GPT workflows and research iterations.</div>
 
           <div class="ctaBox">
@@ -415,6 +478,9 @@
             </div>
             <div class="ctaNote">
               Public-first. No paywall required to start. If you want to support RTS development, see “Support RTS” below.
+            </div>
+            <div class="miniJump">
+              <a href="#start">Start in 60 seconds →</a>
             </div>
           </div>
         </div>
@@ -449,7 +515,6 @@
         </div>
       </div>
 
-      <!-- ↓ 以下は元のまま（省略せず貼り続けてOK） -->
       <div class="section">
         <h2>Why RTS?</h2>
         <p>
@@ -489,22 +554,30 @@
         <div class="grid2">
           <div class="box">
             <h3>Local run</h3>
-            <p style="margin:0 0 10px;color:var(--muted);font-size:13.5px;">
-              Open:
-              <span class="codePill">starter/python</span>
-            </p>
-            <p style="margin:0 0 10px;color:var(--muted);font-size:13.5px;">
-              Then run:
-              <span class="codePill">python START_HERE.py</span>
-            </p>
-            <p style="margin:0;color:var(--muted);font-size:13.5px;">
-              RTS creates:
-              <span class="codePill">logs/</span>
-              <span class="codePill">memory/</span>
-              <span class="codePill">runs/</span>
-              <span class="codePill">evolution/</span>
-            </p>
-            <p style="margin:10px 0 0;color:var(--muted);font-size:13.5px;">
+
+            <div class="steps">
+              <div class="stepRow">
+                <div class="stepLabel">Open:</div>
+                <div><span class="codePill">starter/python</span></div>
+              </div>
+
+              <div class="stepRow">
+                <div class="stepLabel">Then run:</div>
+                <div><span class="codePill">python START_HERE.py</span></div>
+              </div>
+
+              <div class="stepRow">
+                <div class="stepLabel">RTS creates:</div>
+                <div class="pillGroup">
+                  <span class="codePill">logs/</span>
+                  <span class="codePill">memory/</span>
+                  <span class="codePill">runs/</span>
+                  <span class="codePill">evolution/</span>
+                </div>
+              </div>
+            </div>
+
+            <p style="margin:12px 0 0;color:var(--muted);font-size:13.5px;">
               Execution history becomes operational memory. Survives session resets and device changes.
             </p>
           </div>
@@ -588,7 +661,6 @@
           Creator: Nobutaka Yamauchi • Public execution logs available on GitHub • MIT License — 2026
         </div>
       </div>
-
     </div>
   </div>
 </body>
