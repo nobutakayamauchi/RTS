@@ -226,11 +226,11 @@ RTS evolved through live operational execution.
 
 docs/genesis/GENESIS_TO_ZERO.md
 
-### Agent structural audit
+### Agent execution structural audit
 
 analysis/agent_index.md
 
-### Canonical verified reference
+### Canonical verified structural reference
 
 runs/RUN_VERIFIED_GOLD.md
 
