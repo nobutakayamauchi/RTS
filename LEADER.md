@@ -1,12 +1,23 @@
 # **RTS — Real Time Trust System**
 
 ## **Executive Summary**
+RTS turns AI execution into verifiable operational memory.
+RTS is execution-memory infrastructure for AI operators.
 
-RTS (Real Time Trust System) is an execution-memory operating framework for long-running AI collaboration, GPT workflows, and research operations.
+It preserves reasoning continuity.
+
+It audits agent execution structure.
+
+It reconstructs operational provenance from public evidence.
+All claims remain traceable to public execution evidence.
+
+RTS (Real Time Trust System) is an execution-memory infrastructure
+designed for long-running AI collaboration, GPT workflows,
+and research operations.
 
 Modern AI sessions restart. Reasoning fragments. Execution history disappears.
 
-RTS converts execution itself into verifiable operational memory.
+
 
 RTS does not control agents. RTS observes execution.
 
