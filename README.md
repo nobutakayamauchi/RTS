@@ -2,6 +2,12 @@
 
 RTS turns AI execution into verifiable operational memory.
 
+Start in 60 seconds:
+
+👉 starter/python → python START_HERE.py
+
+RTS turns AI execution into verifiable operational memory.
+
 Run long GPT workflows without losing reasoning continuity.
 Audit agent behaviour structurally.
 Preserve research progress across session resets.
