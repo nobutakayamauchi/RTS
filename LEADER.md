@@ -5,8 +5,10 @@
 Execution becomes memory.  
 Memory becomes operational identity.
 
-Modern AI collaboration restarts.  
-Reasoning fragments. Execution history disappears.
+Modern AI collaboration restarts.
+
+Reasoning fragments.  
+Execution history disappears.
 
 RTS converts execution itself into verifiable operational memory.
 
@@ -29,9 +31,13 @@ RTS is not an agent controller.
 
 RTS is an observability and reconstruction layer.
 
-Agent behavior may be chaotic. RTS must never be chaotic.
+Agent behavior may be chaotic.
 
-RTS records. RTS structures. RTS enables rollback.
+RTS must never be chaotic.
+
+RTS records.  
+RTS structures.  
+RTS enables rollback.
 
 Nothing more. Nothing less.
 
@@ -77,7 +83,7 @@ It never replaces human judgement.
 ## Core Capabilities
 
 - Execution Logging (evidence-first)
-- Incident Intelligence (failure becomes artifact)
+- Incident Intelligence
 - Evidence Collection (URL / snapshot hash / issue linkage)
 - Workflow Memory Preservation
 - Autonomous Audit Trail
@@ -146,19 +152,19 @@ Memory becomes identity.
 
 ## Public Operational Evidence
 
-Operational Memory
+### Operational Memory
 
 https://nobutakayamauchi.github.io/RTS/memory/
 
-Execution Logs
+### Execution Logs
 
 https://github.com/nobutakayamauchi/RTS/tree/main/logs
 
-Incident Intelligence
+### Incident Intelligence
 
 https://github.com/nobutakayamauchi/RTS/tree/main/incidents
 
-Operational Search
+### Operational Search
 
 https://nobutakayamauchi.github.io/RTS/search.html
 
@@ -204,7 +210,8 @@ Copyright (c) 2026 Nobutaka Yamauchi
 
 RTS exists to prevent loss of thinking.
 
-Ideas should survive execution.  
+Ideas should survive execution.
+
 History should survive iteration.
 
 Continuity creates trust.
@@ -215,15 +222,15 @@ Continuity creates trust.
 
 RTS evolved through live operational execution.
 
-Operational evolution record:
+### Operational evolution record
 
 docs/genesis/GENESIS_TO_ZERO.md
 
-Agent execution structural audit:
+### Agent structural audit
 
 analysis/agent_index.md
 
-Canonical verified structural reference:
+### Canonical verified reference
 
 runs/RUN_VERIFIED_GOLD.md
 
