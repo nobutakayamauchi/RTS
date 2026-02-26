@@ -1,25 +1,25 @@
 {
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T12:40:28Z",
+  "updated_at_utc": "2026-02-26T12:45:45Z",
   "counts": {
-    "sentinel.run": 11,
-    "sentinel.run.start": 1,
-    "sentinel.run.end": 1
+    "sentinel.run": 12,
+    "sentinel.run.start": 2,
+    "sentinel.run.end": 2
   },
   "ledger_integrity": {
     "status": "OK",
     "issues": []
   },
+  "sentinel": {
+    "end_kinds": [
+      "sentinel.run.end",
+      "sentinel.run"
+    ],
+    "start_kind": "sentinel.run.start",
+    "dangling_run_ids": [],
+    "dangling_runs": 0
+  },
   "latest": [
-    {
-      "ts": "2026-02-26T11:29:12Z",
-      "kind": "sentinel.run",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": "22440128387",
-      "status": "success",
-      "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6",
-      "note": "analysis updated"
-    },
     {
       "ts": "2026-02-26T11:57:59Z",
       "kind": "sentinel.run",
@@ -76,11 +76,20 @@
     },
     {
       "ts": "2026-02-26T12:40:28Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22442485844",
       "status": "success",
       "commit": "cbf108bce8e3c267278400c2171b1857d4117ff4",
+      "note": "run ended"
+    },
+    {
+      "ts": "2026-02-26T12:45:45Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22442666766",
+      "status": "success",
+      "commit": "90e35fad393216d96a52b43863e16ae367b94f70",
       "note": "run ended"
     }
   ],
@@ -97,21 +106,24 @@
     "burst_fail": false,
     "recovery_speed_runs": null,
     "flip_frequency_last_n": 0.0,
-    "flips_in_last_n": 0
+    "flips_in_last_n": 0,
+    "dangling_runs": 0
   },
   "mutation_latest": {
     "rule_version": "2026-02",
     "weights": {
-      "w1_fail_density_delta": 0.4,
-      "w2_streak_length": 0.3,
-      "w3_burst_spike": 0.2,
-      "w4_flip_frequency": 0.1
+      "w1_fail_density_delta": 0.35,
+      "w2_streak_length": 0.25,
+      "w3_burst_spike": 0.15,
+      "w4_flip_frequency": 0.1,
+      "w5_dangling_runs": 0.15
     },
     "components": {
       "fail_density_delta": 0.0,
       "streak_length": 0.0,
       "burst_spike": 0.0,
-      "flip_frequency": 0.0
+      "flip_frequency": 0.0,
+      "dangling_runs": 0.0
     },
     "mutation_score": 0.0,
     "breakpoint": false,
