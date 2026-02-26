@@ -64,10 +64,33 @@ It observes and formalizes execution.
 
 Run locally:
 
-```bash
-cd starter/python
-python START_HERE.py
+    cd starter/python
+    python START_HERE.py
 
-Execution without provenance creates structural fragility.
+Execution memory begins immediately.  
+No configuration required.
 
+---
+
+## Operational Principles
+
+- Tool-agnostic  
+- GitHub-native  
+- Local-first  
+- No telemetry  
+- Open protocol  
+
+RTS runs locally.  
+You remain the operator.
+
+---
+
+Execution without provenance creates structural fragility.  
 RTS introduces structural continuity.
+
+---
+
+## License
+
+MIT License  
+Copyright (c) 2026 Nobutaka Yamauchi
