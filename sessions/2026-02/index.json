@@ -1,8 +1,8 @@
 {
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T10:10:32Z",
+  "updated_at_utc": "2026-02-26T10:23:21Z",
   "counts": {
-    "sentinel.run": 4
+    "sentinel.run": 5
   },
   "latest": [
     {
@@ -39,6 +39,15 @@
       "run_id": "22437452809",
       "status": "success",
       "commit": "cee83ccefb1b377f2646c6e8431ca284c1c34f69",
+      "note": "analysis updated"
+    },
+    {
+      "ts": "2026-02-26T10:23:21Z",
+      "kind": "sentinel.run",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22437902951",
+      "status": "success",
+      "commit": "192cabcbb5738f06ffe1ccb1396c403332a5096d",
       "note": "analysis updated"
     }
   ]
