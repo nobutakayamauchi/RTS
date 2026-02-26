@@ -1,6 +1,6 @@
 # RTS Agent Analyze ZERO — Index
 
-- generated_at_utc: 2026-02-26T00:40:33+00:00
+- generated_at_utc: 2026-02-26T00:47:46+00:00
 - runs_count: 1
 
 RTS observes agent execution structure only. No semantics. No judging.
