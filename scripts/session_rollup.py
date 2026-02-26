@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-RTS Sessions rollup (FULL REPLACE) — START/END aware
+RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix + index snapshots
 - Read sessions/<YYYY-MM>/session_*.jsonl (JSON Lines)
 - Validate ledger (parseable JSON, required keys, ts parseable)
 - Sort events by timestamp
@@ -21,7 +21,9 @@ RTS Sessions rollup (FULL REPLACE) — START/END aware
 - Write:
     sessions/<YYYY-MM>/index.json
     sessions/<YYYY-MM>/index.md
-    incidents/evidence_snapshots/ESC_<YYYYMMDD>_<RULE>.md  (when breakpoint triggered)
+    sessions/<YYYY-MM>/index_snapshot.json   (NEW)
+    sessions/<YYYY-MM>/index_snapshot.md     (NEW)
+    incidents/evidence_snapshots/ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>.md (collision-free)
 
 Usage:
   python scripts/session_rollup.py 2026-02
@@ -43,8 +45,12 @@ from typing import Any, Dict, List, Optional, Tuple
 # Time / parsing utilities
 # =========================
 
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(microsecond=0)
+
+
 def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return utc_now().isoformat().replace("+00:00", "Z")
 
 
 def parse_ts(ts: str) -> datetime:
@@ -57,6 +63,12 @@ def parse_ts(ts: str) -> datetime:
 def yyyymmdd_from_ts(ts: str) -> str:
     d = parse_ts(ts).astimezone(timezone.utc)
     return d.strftime("%Y%m%d")
+
+
+def hhmmssz_from_ts(ts: str) -> str:
+    # "2026-02-26T11:58:41Z" -> "115841Z"
+    d = parse_ts(ts).astimezone(timezone.utc)
+    return d.strftime("%H%M%SZ")
 
 
 def safe_load_json_line(line: str) -> Optional[Dict[str, Any]]:
@@ -161,12 +173,6 @@ START_KIND = "sentinel.run.start"
 
 
 def split_sentinel_stream(events: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[str]]:
-    """
-    Returns: (start_events, end_events, dangling_run_ids)
-    - start_events: kind==sentinel.run.start
-    - end_events: kind in END_KINDS (end preferred but include legacy)
-    - dangling_run_ids: run_ids that have START but no END within the month stream
-    """
     starts = [e for e in events if e.get("kind") == START_KIND and e.get("run_id")]
     ends = [e for e in events if e.get("kind") in END_KINDS and e.get("run_id")]
 
@@ -178,9 +184,6 @@ def split_sentinel_stream(events: List[Dict[str, Any]]) -> Tuple[List[Dict[str, 
 
 
 def end_stream_dedup_by_run_id(end_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    If both sentinel.run and sentinel.run.end exist for same run_id, keep the later ts.
-    """
     best: Dict[str, Dict[str, Any]] = {}
     for e in end_events:
         rid = str(e.get("run_id"))
@@ -189,14 +192,11 @@ def end_stream_dedup_by_run_id(end_events: List[Dict[str, Any]]) -> List[Dict[st
         if rid not in best:
             best[rid] = e
             continue
-        # pick later timestamp
         try:
             if parse_ts(str(e["ts"])) >= parse_ts(str(best[rid]["ts"])):
                 best[rid] = e
         except Exception:
-            # if ts broken, keep existing
             pass
-    # return sorted by ts
     out = list(best.values())
     out.sort(key=lambda x: parse_ts(str(x["ts"])))
     return out
@@ -246,13 +246,8 @@ def compute_transitions_and_metrics(
     dangling_run_ids: List[str],
     rule_version: str = "2026-02",
 ) -> Tuple[List[Transition], Optional[EscalationMetrics], Optional[MutationScore]]:
-    """
-    Operates on END stream (sentinel.run.end preferred; fallback sentinel.run).
-    Also incorporates dangling starts (START without END).
-    """
     end_stream = end_stream_dedup_by_run_id(end_events)
     if not end_stream:
-        # still produce dangling info if any
         if dangling_run_ids:
             t = Transition(
                 ts=utc_now_iso(),
@@ -281,7 +276,6 @@ def compute_transitions_and_metrics(
     statuses = [normalize_status(e) for e in end_stream]
     times = [str(e["ts"]) for e in end_stream]
 
-    # Params
     WINDOW_N = 20
     BURST_K = 5
     BURST_B = 3
@@ -305,7 +299,6 @@ def compute_transitions_and_metrics(
 
     transitions: List[Transition] = []
 
-    # add dangling as a transition (structural)
     if dangling_run_ids:
         transitions.append(
             Transition(
@@ -317,7 +310,6 @@ def compute_transitions_and_metrics(
             )
         )
 
-    # 1) status flip
     flips_idx: List[int] = []
     for i in range(1, len(end_stream)):
         ps, cs = statuses[i - 1], statuses[i]
@@ -336,7 +328,6 @@ def compute_transitions_and_metrics(
                 )
             )
 
-    # 2) streak start/end
     for i in range(1, len(statuses)):
         ps, cs = statuses[i - 1], statuses[i]
         prev_fail = is_failure_status(ps)
@@ -366,7 +357,6 @@ def compute_transitions_and_metrics(
                 )
             )
 
-    # 3) density spike
     def window_density(end_i: int, n: int) -> float:
         start = max(0, end_i - n + 1)
         w = fails[start:end_i + 1]
@@ -395,7 +385,6 @@ def compute_transitions_and_metrics(
     transitions.sort(key=lambda t: parse_ts(t.ts))
     latest_transitions = transitions[-12:]
 
-    # ---- Metrics (latest) ----
     last_i = len(end_stream) - 1
     n_eff = min(WINDOW_N, len(end_stream))
     last_window = fails[-n_eff:]
@@ -431,7 +420,6 @@ def compute_transitions_and_metrics(
         dangling_runs=int(len(dangling_run_ids)),
     )
 
-    # ---- Mutation scoring ----
     density_now = fail_density
     prev_end = last_i - n_eff
     density_prev = window_density(prev_end, WINDOW_N) if prev_end >= 0 else 0.0
@@ -448,7 +436,6 @@ def compute_transitions_and_metrics(
     burst_spike = 1.0 if burst_fail else 0.0
     flip_freq = flip_frequency_last_n
 
-    # dangling component (normalized)
     dangling_n = len(dangling_run_ids)
     DANGLING_CAP = 3
     dangling_norm = min(dangling_n, DANGLING_CAP) / float(DANGLING_CAP)
@@ -514,7 +501,7 @@ def compute_transitions_and_metrics(
 
 
 # =========================
-# Evidence pack
+# Evidence pack (collision-free)
 # =========================
 
 def write_evidence_pack(
@@ -528,7 +515,14 @@ def write_evidence_pack(
 ) -> Optional[str]:
     os.makedirs(os.path.join("incidents", "evidence_snapshots"), exist_ok=True)
     rule = mutation.rule_version.replace("-", "")
-    path = os.path.join("incidents", "evidence_snapshots", f"ESC_{day_tag}_{rule}.md")
+
+    # collision-free suffix
+    try:
+        time_tag = hhmmssz_from_ts(updated_at_utc)
+    except Exception:
+        time_tag = utc_now().strftime("%H%M%SZ")
+
+    path = os.path.join("incidents", "evidence_snapshots", f"ESC_{day_tag}_{rule}_{time_tag}.md")
 
     lines: List[str] = []
     lines.append(f"# Evidence Snapshot — {month} / {day_tag}")
@@ -693,6 +687,30 @@ def render_index_md(
 
 
 # =========================
+# Snapshot writers (NEW)
+# =========================
+
+def write_index_snapshots(month_dir: str, index_obj: Dict[str, Any], index_md: str) -> Tuple[str, str]:
+    """
+    Writes:
+      - sessions/<month>/index_snapshot.json
+      - sessions/<month>/index_snapshot.md
+    These are "freeze points" for artifact bundling / later forensic replay.
+    """
+    snap_json = os.path.join(month_dir, "index_snapshot.json")
+    snap_md = os.path.join(month_dir, "index_snapshot.md")
+
+    with open(snap_json, "w", encoding="utf-8") as f:
+        json.dump(index_obj, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+    with open(snap_md, "w", encoding="utf-8") as f:
+        f.write(index_md + "\n")
+
+    return snap_json, snap_md
+
+
+# =========================
 # Main
 # =========================
 
@@ -712,9 +730,8 @@ def main() -> int:
     issues = validate_month_ledgers(ledger_paths)
     counts = count_by_kind(events)
 
-    starts, ends, dangling_run_ids = split_sentinel_stream(events)
+    _, ends, dangling_run_ids = split_sentinel_stream(events)
 
-    # Latest tail: END stream only (dedup by run_id, end preferred)
     end_stream = end_stream_dedup_by_run_id(ends)
     latest_tail = tail(end_stream, n=8)
 
@@ -732,7 +749,7 @@ def main() -> int:
             if latest_tail:
                 day_tag = yyyymmdd_from_ts(str(latest_tail[-1].get("ts")))
             else:
-                day_tag = datetime.now(timezone.utc).strftime("%Y%m%d")
+                day_tag = utc_now().strftime("%Y%m%d")
         evidence_path = write_evidence_pack(
             month=month,
             day_tag=day_tag,
@@ -779,9 +796,6 @@ def main() -> int:
     index_json_path = os.path.join(month_dir, "index.json")
     index_md_path = os.path.join(month_dir, "index.md")
 
-    with open(index_json_path, "w", encoding="utf-8") as f:
-        json.dump(index_obj, f, ensure_ascii=False, indent=2)
-
     md = render_index_md(
         month=month,
         updated_at_utc=updated_at_utc,
@@ -793,15 +807,24 @@ def main() -> int:
         metrics=metrics,
         mutation=mutation,
     )
+
+    with open(index_json_path, "w", encoding="utf-8") as f:
+        json.dump(index_obj, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
     with open(index_md_path, "w", encoding="utf-8") as f:
         f.write(md + "\n")
 
+    # NEW: freeze snapshots
+    snap_json, snap_md = write_index_snapshots(month_dir, index_obj, md)
+
     print(f"Wrote: {index_json_path}")
     print(f"Wrote: {index_md_path}")
+    print(f"Wrote: {snap_json}")
+    print(f"Wrote: {snap_md}")
     if evidence_path:
         print(f"Wrote: {evidence_path}")
 
-    # corruption should be visible (non-zero)
     if issues:
         return 3
     return 0
