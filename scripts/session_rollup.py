@@ -3,28 +3,17 @@
 
 """
 RTS Sessions rollup (FULL REPLACE)
-— START/END aware + evidence collision fix + index snapshots + evidence links
-— Evidence now includes ledger integrity + ledger fingerprint (sha256)
+— START/END aware + run_attempt-safe + evidence_index integration + snapshots
 
-- Read sessions/<YYYY-MM>/session_*.jsonl (JSON Lines)
-- Validate ledger (parseable JSON, required keys, ts parseable)
-- Sort events by timestamp
-- Compute:
-    * Counts by kind
-    * Latest tail (sentinel.run.end preferred; fallback sentinel.run)
-    * Transitions (END stream):
-        - status flip
-        - failure streak start/end
-        - failure density spike
-        - dangling run (START exists but END missing)
-    * Escalation metrics + Mutation scoring + breakpoint reasons
-    * Evidence index: list evidence snapshots for the month, link in index.md
-- Write:
-    sessions/<YYYY-MM>/index.json
-    sessions/<YYYY-MM>/index.md
-    sessions/<YYYY-MM>/index_snapshot.json
-    sessions/<YYYY-MM>/index_snapshot.md
-    incidents/evidence_snapshots/ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>.md (collision-free)
+What this script guarantees (Observed/Enforced Spec v0.2 compatible):
+- sessions/<YYYY-MM>/index.json + index.md
+- sessions/<YYYY-MM>/index_snapshot.json + index_snapshot.md
+- evidence is linked into index.*:
+    * evidence_latest
+    * evidence_index (up to 200)
+- Evidence generation (ESC) is OPTIONAL and only happens on breakpoint.
+- Prefer sessions/<YYYY-MM>/evidence_index.json as source-of-truth
+  (produced by scripts/evidence_index_build.py). Fallback to directory scan.
 
 Usage:
   python scripts/session_rollup.py 2026-02
@@ -51,10 +40,8 @@ from typing import Any, Dict, List, Optional, Tuple
 def utc_now() -> datetime:
     return datetime.now(timezone.utc).replace(microsecond=0)
 
-
 def utc_now_iso() -> str:
     return utc_now().isoformat().replace("+00:00", "Z")
-
 
 def parse_ts(ts: str) -> datetime:
     s = str(ts).strip()
@@ -62,16 +49,17 @@ def parse_ts(ts: str) -> datetime:
         return datetime.fromisoformat(s.replace("Z", "+00:00"))
     return datetime.fromisoformat(s)
 
-
 def yyyymmdd_from_ts(ts: str) -> str:
     d = parse_ts(ts).astimezone(timezone.utc)
     return d.strftime("%Y%m%d")
-
 
 def hhmmssz_from_ts(ts: str) -> str:
     d = parse_ts(ts).astimezone(timezone.utc)
     return d.strftime("%H%M%SZ")
 
+def month_from_ts(ts: str) -> str:
+    d = parse_ts(ts).astimezone(timezone.utc)
+    return d.strftime("%Y-%m")
 
 def safe_load_json_line(line: str) -> Optional[Dict[str, Any]]:
     line = line.strip()
@@ -85,7 +73,7 @@ def safe_load_json_line(line: str) -> Optional[Dict[str, Any]]:
 
 
 # =========================
-# Hash utilities (NEW)
+# Hash utilities
 # =========================
 
 def sha256_bytes(b: bytes) -> str:
@@ -93,14 +81,12 @@ def sha256_bytes(b: bytes) -> str:
     h.update(b)
     return h.hexdigest()
 
-
 def sha256_file(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
-
 
 def ledger_fingerprint(ledger_paths: List[str]) -> Dict[str, Any]:
     """
@@ -115,7 +101,6 @@ def ledger_fingerprint(ledger_paths: List[str]) -> Dict[str, Any]:
             continue
         items.append({"file": os.path.basename(p), "sha256": sha256_file(p)})
 
-    # aggregate hash (stable)
     agg_payload = "\n".join([f'{it["sha256"]}  {it["file"]}' for it in items]).encode("utf-8")
     agg = sha256_bytes(agg_payload) if items else ""
     return {"aggregate_sha256": agg, "files": items}
@@ -127,14 +112,11 @@ def ledger_fingerprint(ledger_paths: List[str]) -> Dict[str, Any]:
 
 REQUIRED_KEYS = ("ts", "kind")
 
-
 def normalize_status(e: Dict[str, Any]) -> str:
     v = e.get("conclusion") or e.get("status") or ""
     return str(v).strip().lower()
 
-
 def is_failure_status(status: str) -> bool:
-    # default: everything except "success" is treated as failure
     s = str(status).lower()
     return s != "success"
 
@@ -147,8 +129,14 @@ class LedgerIssue:
     message: str
 
 
-def validate_month_ledgers(jsonl_paths: List[str]) -> List[LedgerIssue]:
+def validate_month_ledgers(jsonl_paths: List[str]) -> Tuple[List[LedgerIssue], int, int]:
+    """
+    Returns (issues, parsed_lines, invalid_lines)
+    """
     issues: List[LedgerIssue] = []
+    parsed_lines = 0
+    invalid_lines = 0
+
     for p in jsonl_paths:
         base = os.path.basename(p)
         with open(p, "r", encoding="utf-8") as f:
@@ -157,23 +145,35 @@ def validate_month_ledgers(jsonl_paths: List[str]) -> List[LedgerIssue]:
                     continue
                 obj = safe_load_json_line(line)
                 if obj is None:
+                    invalid_lines += 1
                     issues.append(LedgerIssue(base, i, "ERROR", "invalid JSON"))
                     continue
+
+                parsed_lines += 1
+
                 for k in REQUIRED_KEYS:
                     if k not in obj:
                         issues.append(LedgerIssue(base, i, "ERROR", f"missing key: {k}"))
+
                 try:
                     parse_ts(str(obj.get("ts", "")))
                 except Exception:
                     issues.append(LedgerIssue(base, i, "ERROR", "unparseable ts"))
-    return issues
+
+    return issues, parsed_lines, invalid_lines
 
 
-def ledger_integrity_summary(issues: List[LedgerIssue]) -> Dict[str, Any]:
+def ledger_integrity_summary(issues: List[LedgerIssue], parsed_lines: int, invalid_lines: int) -> Dict[str, Any]:
     err = sum(1 for x in issues if x.severity == "ERROR")
     warn = sum(1 for x in issues if x.severity == "WARN")
     status = "DEGRADED" if issues else "OK"
-    return {"status": status, "errors": err, "warnings": warn}
+    return {
+        "status": status,
+        "errors": err,
+        "warnings": warn,
+        "parsed_lines": parsed_lines,
+        "invalid_lines": invalid_lines,
+    }
 
 
 def read_month_events(month: str) -> Tuple[List[Dict[str, Any]], List[str], List[str]]:
@@ -194,6 +194,7 @@ def read_month_events(month: str) -> Tuple[List[Dict[str, Any]], List[str], List
                     continue
                 events.append(obj)
 
+    # Sort by timestamp
     events.sort(key=lambda e: parse_ts(str(e["ts"])))
     return events, [os.path.basename(p) for p in jsonl_paths], jsonl_paths
 
@@ -211,38 +212,59 @@ def tail(items: List[Any], n: int = 12) -> List[Any]:
 
 
 # =========================
-# START/END modeling
+# START/END modeling (run_key)
 # =========================
 
 END_KINDS = ("sentinel.run.end", "sentinel.run")   # end preferred; legacy supported
 START_KIND = "sentinel.run.start"
+
+def run_key(e: Dict[str, Any]) -> str:
+    rid = str(e.get("run_id") or "").strip()
+    ra = e.get("run_attempt")
+    if ra is None or str(ra).strip() == "":
+        # some legacy payloads do not have run_attempt
+        return rid
+    return f"{rid}:{int(ra)}"
 
 
 def split_sentinel_stream(events: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[str]]:
     starts = [e for e in events if e.get("kind") == START_KIND and e.get("run_id")]
     ends = [e for e in events if e.get("kind") in END_KINDS and e.get("run_id")]
 
-    start_ids = {str(e.get("run_id")) for e in starts}
-    end_ids = {str(e.get("run_id")) for e in ends}
+    start_keys = {run_key(e) for e in starts if run_key(e)}
+    end_keys = {run_key(e) for e in ends if run_key(e)}
 
-    dangling = sorted(list(start_ids - end_ids))
+    dangling = sorted(list(start_keys - end_keys))
     return starts, ends, dangling
 
 
-def end_stream_dedup_by_run_id(end_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def end_stream_dedup(end_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Dedup by run_key, choose newest ts.
+    If ts ties, prefer sentinel.run.end over sentinel.run.
+    """
     best: Dict[str, Dict[str, Any]] = {}
     for e in end_events:
-        rid = str(e.get("run_id"))
-        if not rid:
+        rk = run_key(e)
+        if not rk:
             continue
-        if rid not in best:
-            best[rid] = e
+        if rk not in best:
+            best[rk] = e
             continue
+
         try:
-            if parse_ts(str(e["ts"])) >= parse_ts(str(best[rid]["ts"])):
-                best[rid] = e
+            ts_new = parse_ts(str(e["ts"]))
+            ts_old = parse_ts(str(best[rk]["ts"]))
+            if ts_new > ts_old:
+                best[rk] = e
+            elif ts_new == ts_old:
+                # prefer end kind
+                if str(e.get("kind")) == "sentinel.run.end" and str(best[rk].get("kind")) != "sentinel.run.end":
+                    best[rk] = e
         except Exception:
+            # if parsing fails, keep old
             pass
+
     out = list(best.values())
     out.sort(key=lambda x: parse_ts(str(x["ts"])))
     return out
@@ -260,6 +282,7 @@ class Transition:
     title: str
     detail: str
     run_id: Optional[str] = None
+    run_attempt: Optional[int] = None
     commit: Optional[str] = None
 
 
@@ -289,29 +312,30 @@ class MutationScore:
 
 def compute_transitions_and_metrics(
     end_events: List[Dict[str, Any]],
-    dangling_run_ids: List[str],
+    dangling_run_keys: List[str],
     rule_version: str = "2026-02",
 ) -> Tuple[List[Transition], Optional[EscalationMetrics], Optional[MutationScore]]:
-    end_stream = end_stream_dedup_by_run_id(end_events)
+
+    end_stream = end_stream_dedup(end_events)
     if not end_stream:
-        if dangling_run_ids:
+        if dangling_run_keys:
             t = Transition(
                 ts=utc_now_iso(),
                 kind="sentinel.run",
                 severity="HIGH",
                 title="dangling runs detected (start without end)",
-                detail=f"dangling_run_ids={','.join(dangling_run_ids[:8])}" + (" ..." if len(dangling_run_ids) > 8 else ""),
+                detail=f"dangling_run_keys={','.join(dangling_run_keys[:8])}" + (" ..." if len(dangling_run_keys) > 8 else ""),
             )
             metrics = EscalationMetrics(
                 window_n=20, fail_count_last_n=0, fail_density=0.0,
                 burst_window_k=5, burst_threshold_b=3, burst_fail=False,
                 recovery_speed_runs=None, flip_frequency_last_n=0.0, flips_in_last_n=0,
-                dangling_runs=len(dangling_run_ids),
+                dangling_runs=len(dangling_run_keys),
             )
             mutation = MutationScore(
                 rule_version=rule_version,
                 weights={"w_dangling_runs": 1.0},
-                components={"dangling_runs": float(len(dangling_run_ids))},
+                components={"dangling_runs": float(len(dangling_run_keys))},
                 mutation_score=1.0,
                 breakpoint=True,
                 breakpoint_reasons=["dangling_run_detected"],
@@ -321,6 +345,7 @@ def compute_transitions_and_metrics(
 
     statuses = [normalize_status(e) for e in end_stream]
     times = [str(e["ts"]) for e in end_stream]
+    fails = [1 if is_failure_status(s) else 0 for s in statuses]
 
     WINDOW_N = 20
     BURST_K = 5
@@ -328,31 +353,32 @@ def compute_transitions_and_metrics(
     SPIKE_DENSITY_DELTA = 0.20
     FLIP_WINDOW_N = 20
 
-    fails = [1 if is_failure_status(s) else 0 for s in statuses]
-
     def mk_detail(e: Dict[str, Any]) -> str:
         wf = str(e.get("workflow") or "RTS Sentinel Analyze").strip()
         rid = str(e.get("run_id") or "").strip()
+        ra = e.get("run_attempt")
         commit = str(e.get("commit") or "").strip()
         parts = []
         if wf:
             parts.append(f"workflow={wf}")
         if rid:
             parts.append(f"run={rid}")
+        if ra is not None:
+            parts.append(f"attempt={ra}")
         if commit:
             parts.append(f"commit={commit}")
         return " ".join(parts).strip()
 
     transitions: List[Transition] = []
 
-    if dangling_run_ids:
+    if dangling_run_keys:
         transitions.append(
             Transition(
                 ts=times[-1],
                 kind="sentinel.run",
                 severity="HIGH",
                 title="dangling runs detected (start without end)",
-                detail=f"dangling_runs={len(dangling_run_ids)} ids={','.join(dangling_run_ids[:8])}" + (" ..." if len(dangling_run_ids) > 8 else ""),
+                detail=f"dangling_runs={len(dangling_run_keys)} keys={','.join(dangling_run_keys[:8])}" + (" ..." if len(dangling_run_keys) > 8 else ""),
             )
         )
 
@@ -370,10 +396,12 @@ def compute_transitions_and_metrics(
                     title=f"status flip: {ps} → {cs}",
                     detail=mk_detail(end_stream[i]),
                     run_id=str(end_stream[i].get("run_id")) if end_stream[i].get("run_id") else None,
+                    run_attempt=int(end_stream[i].get("run_attempt")) if end_stream[i].get("run_attempt") is not None else None,
                     commit=str(end_stream[i].get("commit")) if end_stream[i].get("commit") else None,
                 )
             )
 
+    # streak start/end
     for i in range(1, len(statuses)):
         ps, cs = statuses[i - 1], statuses[i]
         prev_fail = is_failure_status(ps)
@@ -387,6 +415,7 @@ def compute_transitions_and_metrics(
                     title="failure streak started",
                     detail=mk_detail(end_stream[i]),
                     run_id=str(end_stream[i].get("run_id")) if end_stream[i].get("run_id") else None,
+                    run_attempt=int(end_stream[i].get("run_attempt")) if end_stream[i].get("run_attempt") is not None else None,
                     commit=str(end_stream[i].get("commit")) if end_stream[i].get("commit") else None,
                 )
             )
@@ -399,6 +428,7 @@ def compute_transitions_and_metrics(
                     title="failure streak ended (recovery)",
                     detail=mk_detail(end_stream[i]),
                     run_id=str(end_stream[i].get("run_id")) if end_stream[i].get("run_id") else None,
+                    run_attempt=int(end_stream[i].get("run_attempt")) if end_stream[i].get("run_attempt") is not None else None,
                     commit=str(end_stream[i].get("commit")) if end_stream[i].get("commit") else None,
                 )
             )
@@ -406,10 +436,9 @@ def compute_transitions_and_metrics(
     def window_density(end_i: int, n: int) -> float:
         start = max(0, end_i - n + 1)
         w = fails[start:end_i + 1]
-        if not w:
-            return 0.0
-        return sum(w) / float(len(w))
+        return (sum(w) / float(len(w))) if w else 0.0
 
+    # density spike detection
     for i in range(len(end_stream)):
         if i < 2:
             continue
@@ -424,6 +453,7 @@ def compute_transitions_and_metrics(
                     title="failure density spike",
                     detail=f"fail_density_last_{WINDOW_N}={dn:.3f} (+{(dn-dp):.3f}) {mk_detail(end_stream[i])}".strip(),
                     run_id=str(end_stream[i].get("run_id")) if end_stream[i].get("run_id") else None,
+                    run_attempt=int(end_stream[i].get("run_attempt")) if end_stream[i].get("run_attempt") is not None else None,
                     commit=str(end_stream[i].get("commit")) if end_stream[i].get("commit") else None,
                 )
             )
@@ -435,27 +465,34 @@ def compute_transitions_and_metrics(
     n_eff = min(WINDOW_N, len(end_stream))
     last_window = fails[-n_eff:]
     fail_count_last_n = sum(last_window)
-    fail_density = fail_count_last_n / float(n_eff) if n_eff else 0.0
+    fail_density = (fail_count_last_n / float(n_eff)) if n_eff else 0.0
 
     k_eff = min(BURST_K, len(end_stream))
-    burst_window = fails[-k_eff:]
-    burst_fail = sum(burst_window) >= BURST_B
-
-    recovery_speed_runs: Optional[int] = None
-    last_end: Optional[int] = None
-    for i in range(1, len(end_stream)):
-        if is_failure_status(statuses[i - 1]) and (not is_failure_status(statuses[i])):
-            last_end = i
-    if last_end is not None:
-        recovery_speed_runs = 0
+    burst_fail = (sum(fails[-k_eff:]) >= BURST_B) if k_eff else False
 
     fn_eff = min(FLIP_WINDOW_N, len(end_stream))
     flips_in_last_n = sum(1 for idx in flips_idx if idx >= (len(end_stream) - fn_eff))
-    flip_frequency_last_n = flips_in_last_n / float(fn_eff) if fn_eff else 0.0
+    flip_frequency_last_n = (flips_in_last_n / float(fn_eff)) if fn_eff else 0.0
+
+    # recovery_speed_runs: from last failure to next success (0 means already recovered)
+    recovery_speed_runs: Optional[int] = None
+    last_fail_idx: Optional[int] = None
+    for i in range(len(end_stream) - 1, -1, -1):
+        if is_failure_status(statuses[i]):
+            last_fail_idx = i
+            break
+    if last_fail_idx is not None:
+        # find first success after that
+        for j in range(last_fail_idx + 1, len(end_stream)):
+            if not is_failure_status(statuses[j]):
+                recovery_speed_runs = j - last_fail_idx
+                break
+        if recovery_speed_runs is None:
+            recovery_speed_runs = None
 
     metrics = EscalationMetrics(
         window_n=WINDOW_N,
-        fail_count_last_n=fail_count_last_n,
+        fail_count_last_n=int(fail_count_last_n),
         fail_density=float(fail_density),
         burst_window_k=BURST_K,
         burst_threshold_b=BURST_B,
@@ -463,9 +500,10 @@ def compute_transitions_and_metrics(
         recovery_speed_runs=recovery_speed_runs,
         flip_frequency_last_n=float(flip_frequency_last_n),
         flips_in_last_n=int(flips_in_last_n),
-        dangling_runs=int(len(dangling_run_ids)),
+        dangling_runs=int(len(dangling_run_keys)),
     )
 
+    # mutation scoring
     density_now = fail_density
     prev_end = last_i - n_eff
     density_prev = window_density(prev_end, WINDOW_N) if prev_end >= 0 else 0.0
@@ -482,7 +520,7 @@ def compute_transitions_and_metrics(
     burst_spike = 1.0 if burst_fail else 0.0
     flip_freq = flip_frequency_last_n
 
-    dangling_n = len(dangling_run_ids)
+    dangling_n = len(dangling_run_keys)
     DANGLING_CAP = 3
     dangling_norm = min(dangling_n, DANGLING_CAP) / float(DANGLING_CAP)
 
@@ -547,22 +585,75 @@ def compute_transitions_and_metrics(
 
 
 # =========================
-# Evidence pack + evidence index
+# Evidence index integration
+# =========================
+
+def load_evidence_index_month(month: str) -> Tuple[Optional[str], List[Dict[str, Any]]]:
+    """
+    Prefer sessions/<YYYY-MM>/evidence_index.json as source-of-truth.
+    It is built by scripts/evidence_index_build.py.
+    """
+    p = os.path.join("sessions", month, "evidence_index.json")
+    if not os.path.isfile(p):
+        return None, []
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            obj = json.load(f)
+
+        latest = obj.get("latest")
+        items = obj.get("evidence") or obj.get("items") or []
+
+        evidence_latest_file = None
+        if isinstance(latest, dict):
+            evidence_latest_file = latest.get("file") or os.path.basename(str(latest.get("path") or ""))
+
+        out: List[Dict[str, Any]] = []
+        for it in items:
+            if not isinstance(it, dict):
+                continue
+            file = it.get("file")
+            if not file:
+                path = it.get("path") or ""
+                file = os.path.basename(str(path))
+            if not file:
+                continue
+            day = str(it.get("day") or "")
+            time = str(it.get("time") or it.get("hhmmss") or "")
+            rule = str(it.get("rule") or "")
+            rel = it.get("rel")
+            if not rel:
+                rel = os.path.join("..", "..", "incidents", "evidence_snapshots", file)
+            out.append({"day": day, "time": time, "rule": rule, "file": file, "rel": rel})
+
+        # If latest was missing, pick newest item
+        if not evidence_latest_file and out:
+            evidence_latest_file = out[-1]["file"]
+
+        # sort stable (day/time)
+        out.sort(key=lambda x: (x.get("day",""), x.get("time",""), x.get("file","")))
+        return evidence_latest_file, out
+    except Exception:
+        return None, []
+
+
+# =========================
+# Evidence directory scan fallback
 # =========================
 
 def evidence_month_prefix(month: str) -> str:
     return month.replace("-", "")
-
 
 def list_evidence_for_month(month: str) -> List[Dict[str, Any]]:
     base = os.path.join("incidents", "evidence_snapshots")
     if not os.path.isdir(base):
         return []
     pref = evidence_month_prefix(month)
+
+    # Accept: ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>*.md (allow extra suffix like _run... etc)
     paths = sorted(glob(os.path.join(base, f"ESC_{pref}[0-9][0-9]_*_*.md")))
 
     out: List[Dict[str, Any]] = []
-    rx = re.compile(r"^ESC_(\d{8})_([0-9A-Za-z]+)_(\d{6}Z)\.md$")
+    rx = re.compile(r"^ESC_(\d{8})_([0-9A-Za-z]+)_(\d{6}Z).*\.md$")
     for p in paths:
         fn = os.path.basename(p)
         m = rx.match(fn)
@@ -574,12 +665,15 @@ def list_evidence_for_month(month: str) -> List[Dict[str, Any]]:
             "time": t,
             "rule": rule,
             "file": fn,
-            "path": p,
             "rel": os.path.join("..", "..", "incidents", "evidence_snapshots", fn),
         })
-    out.sort(key=lambda x: (x["day"], x["time"]))
+    out.sort(key=lambda x: (x["day"], x["time"], x["file"]))
     return out
 
+
+# =========================
+# Evidence pack writer (ESC)
+# =========================
 
 def write_evidence_pack(
     month: str,
@@ -588,8 +682,7 @@ def write_evidence_pack(
     metrics: EscalationMetrics,
     mutation: MutationScore,
     latest_tail: List[Dict[str, Any]],
-    dangling_run_ids: List[str],
-    # NEW:
+    dangling_run_keys: List[str],
     integrity: Dict[str, Any],
     fp: Dict[str, Any],
     ledger_files: List[str],
@@ -597,6 +690,7 @@ def write_evidence_pack(
     os.makedirs(os.path.join("incidents", "evidence_snapshots"), exist_ok=True)
     rule = mutation.rule_version.replace("-", "")
 
+    # collision safe: use updated_at_utc -> HHMMSSZ
     try:
         time_tag = hhmmssz_from_ts(updated_at_utc)
     except Exception:
@@ -605,20 +699,22 @@ def write_evidence_pack(
     path = os.path.join("incidents", "evidence_snapshots", f"ESC_{day_tag}_{rule}_{time_tag}.md")
 
     lines: List[str] = []
-    lines.append(f"# Evidence Snapshot — {month} / {day_tag}")
+    lines.append(f"# Evidence Snapshot (ESC) — {month} / {day_tag}")
     lines.append("")
     lines.append(f"- updated_at_utc: `{updated_at_utc}`")
     lines.append(f"- rule_version: `{mutation.rule_version}`")
     lines.append("")
 
-    # NEW: Integrity + fingerprint (THE FIX)
     lines.append("## Ledger Integrity (evidence provenance)")
     lines.append("")
     lines.append(f"- status: **{integrity.get('status','')}**")
     lines.append(f"- errors: `{integrity.get('errors', 0)}`")
     lines.append(f"- warnings: `{integrity.get('warnings', 0)}`")
+    lines.append(f"- parsed_lines: `{integrity.get('parsed_lines', 0)}`")
+    lines.append(f"- invalid_lines: `{integrity.get('invalid_lines', 0)}`")
     lines.append(f"- ledger_fingerprint_sha256: `{fp.get('aggregate_sha256','')}`")
     lines.append("")
+
     lines.append("### Ledgers used")
     lines.append("")
     if ledger_files:
@@ -627,6 +723,7 @@ def write_evidence_pack(
     else:
         lines.append("- (none)")
     lines.append("")
+
     lines.append("### Ledger file digests (sha256)")
     lines.append("")
     if fp.get("files"):
@@ -649,13 +746,14 @@ def write_evidence_pack(
     lines.append(f"- flip_frequency_last_n: `{metrics.flip_frequency_last_n:.3f}`")
     lines.append(f"- dangling_runs: `{metrics.dangling_runs}`")
     lines.append("")
-    if dangling_run_ids:
+
+    if dangling_run_keys:
         lines.append("## Dangling Runs (START without END)")
         lines.append("")
-        for rid in dangling_run_ids[:20]:
-            lines.append(f"- `{rid}`")
-        if len(dangling_run_ids) > 20:
-            lines.append(f"- ... ({len(dangling_run_ids)} total)")
+        for rk in dangling_run_keys[:20]:
+            lines.append(f"- `{rk}`")
+        if len(dangling_run_keys) > 20:
+            lines.append(f"- ... ({len(dangling_run_keys)} total)")
         lines.append("")
 
     lines.append("## Mutation")
@@ -664,23 +762,33 @@ def write_evidence_pack(
     lines.append(f"- reasons: `{', '.join(mutation.breakpoint_reasons) if mutation.breakpoint_reasons else '(none)'}`")
     lines.append(f"- mutation_score: `{mutation.mutation_score:.3f}`")
     lines.append("")
-    lines.append("## Last N END Events (tail)")
+
+    lines.append("## Recent Runs (tail)")
     lines.append("")
     for e in latest_tail:
         ts = str(e.get("ts", ""))
         rid = str(e.get("run_id", ""))
+        ra = e.get("run_attempt")
         st = str((e.get("conclusion") or e.get("status") or "")).strip()
         commit = str(e.get("commit", "")).strip()
         k = str(e.get("kind", "")).strip()
-        lines.append(f"- `{ts}` `{k}` run={rid} status={st} commit={commit}".strip())
+        line = f"- `{ts}` `{k}` run={rid}"
+        if ra is not None:
+            line += f" attempt={ra}"
+        if st:
+            line += f" status={st}"
+        if commit:
+            line += f" commit={commit}"
+        lines.append(line)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+
     return path
 
 
 # =========================
-# Index render (Evidence Links added)
+# Index render
 # =========================
 
 def render_index_md(
@@ -691,6 +799,7 @@ def render_index_md(
     transitions: List[Transition],
     raw_ledgers: List[str],
     issues: List[LedgerIssue],
+    integrity: Dict[str, Any],
     metrics: Optional[EscalationMetrics],
     mutation: Optional[MutationScore],
     evidence_items: List[Dict[str, Any]],
@@ -705,9 +814,9 @@ def render_index_md(
     lines.append("## Ledger Integrity")
     lines.append("")
     if issues:
-        err = sum(1 for x in issues if x.severity == "ERROR")
-        warn = sum(1 for x in issues if x.severity == "WARN")
-        lines.append(f"- status: **DEGRADED** (errors={err}, warnings={warn})")
+        lines.append(f"- status: **DEGRADED** (errors={integrity.get('errors',0)}, warnings={integrity.get('warnings',0)})")
+        lines.append(f"- parsed_lines: `{integrity.get('parsed_lines',0)}`")
+        lines.append(f"- invalid_lines: `{integrity.get('invalid_lines',0)}`")
         lines.append("")
         lines.append("### Issues (latest)")
         lines.append("")
@@ -715,6 +824,8 @@ def render_index_md(
             lines.append(f"- `{it.file}:{it.line_no}` **{it.severity}** — {it.message}")
     else:
         lines.append("- status: **OK**")
+        lines.append(f"- parsed_lines: `{integrity.get('parsed_lines',0)}`")
+        lines.append(f"- invalid_lines: `{integrity.get('invalid_lines',0)}`")
     lines.append("")
 
     lines.append("## Counts")
@@ -751,36 +862,40 @@ def render_index_md(
         lines.append("### Recent (latest 12)")
         lines.append("")
         for it in evidence_items[-12:][::-1]:
-            rel = it["rel"]
-            fn = it["file"]
-            lines.append(f"- `{it['day']}` `{it['time']}` rule=`{it['rule']}` — [{fn}]({rel})")
+            rel = it.get("rel") or os.path.join("..", "..", "incidents", "evidence_snapshots", it["file"])
+            lines.append(f"- `{it.get('day','')}` `{it.get('time','')}` rule=`{it.get('rule','')}` — [{it['file']}]({rel})")
     else:
         lines.append("- (none)")
     lines.append("")
 
     lines.append("## Latest (tail)")
     lines.append("")
-    for e in latest_tail:
-        ts = str(e.get("ts", ""))
-        kind = str(e.get("kind", ""))
-        wf = str(e.get("workflow", ""))
-        rid = str(e.get("run_id", ""))
-        st = str((e.get("conclusion") or e.get("status") or ""))
-        commit = str(e.get("commit", ""))
-        note = str(e.get("note", "")).strip()
-        s = f"- `{ts}` `{kind}`"
-        if wf:
-            s += f" workflow={wf}"
-        if rid:
-            s += f" run={rid}"
-        if st:
-            s += f" status={st}"
-        if commit:
-            s += f" commit={commit}"
-        if note:
-            s += f" — {note}"
-        lines.append(s)
-    if not latest_tail:
+    if latest_tail:
+        for e in latest_tail:
+            ts = str(e.get("ts", ""))
+            kind = str(e.get("kind", ""))
+            wf = str(e.get("workflow", ""))
+            rid = str(e.get("run_id", ""))
+            ra = e.get("run_attempt")
+            st = str((e.get("conclusion") or e.get("status") or ""))
+            commit = str(e.get("commit", ""))
+            note = str(e.get("note", "")).strip()
+
+            s = f"- `{ts}` `{kind}`"
+            if wf:
+                s += f" workflow={wf}"
+            if rid:
+                s += f" run={rid}"
+            if ra is not None:
+                s += f" attempt={ra}"
+            if st:
+                s += f" status={st}"
+            if commit:
+                s += f" commit={commit}"
+            if note:
+                s += f" — {note}"
+            lines.append(s)
+    else:
         lines.append("- (none)")
     lines.append("")
 
@@ -798,9 +913,10 @@ def render_index_md(
 
     lines.append("## Raw ledgers")
     lines.append("")
-    for fn in raw_ledgers:
-        lines.append(f"- `{fn}`")
-    if not raw_ledgers:
+    if raw_ledgers:
+        for fn in raw_ledgers:
+            lines.append(f"- `{fn}`")
+    else:
         lines.append("- (none)")
     lines.append("")
 
@@ -842,21 +958,24 @@ def main() -> int:
 
     events, raw_ledgers, ledger_paths = read_month_events(month)
 
-    issues = validate_month_ledgers(ledger_paths)
-    integrity = ledger_integrity_summary(issues)
+    issues, parsed_lines, invalid_lines = validate_month_ledgers(ledger_paths)
+    integrity = ledger_integrity_summary(issues, parsed_lines, invalid_lines)
     fp = ledger_fingerprint(ledger_paths)
 
     counts = count_by_kind(events)
 
-    _, ends, dangling_run_ids = split_sentinel_stream(events)
+    _starts, ends, dangling_run_keys = split_sentinel_stream(events)
 
-    end_stream = end_stream_dedup_by_run_id(ends)
+    end_stream = end_stream_dedup(ends)
     latest_tail = tail(end_stream, n=8)
+
+    # If rule version should be month-based, keep it aligned to target month.
+    rule_version = month
 
     transitions, metrics, mutation = compute_transitions_and_metrics(
         end_events=ends,
-        dangling_run_ids=dangling_run_ids,
-        rule_version="2026-02",
+        dangling_run_keys=dangling_run_keys,
+        rule_version=rule_version,
     )
 
     updated_at_utc = utc_now_iso()
@@ -864,13 +983,20 @@ def main() -> int:
     evidence_path: Optional[str] = None
     evidence_latest_file: Optional[str] = None
 
-    # If breakpoint, write evidence file (collision-free) + include integrity+fingerprint
+    # If breakpoint: write ESC
     if metrics and mutation and mutation.breakpoint:
+        # day_tag must be consistent with month (avoid mismatch)
         if day_tag is None:
             if latest_tail:
-                day_tag = yyyymmdd_from_ts(str(latest_tail[-1].get("ts")))
+                candidate = yyyymmdd_from_ts(str(latest_tail[-1].get("ts")))
+                # if candidate month differs from target month, fallback to now
+                if month_from_ts(str(latest_tail[-1].get("ts"))) == month:
+                    day_tag = candidate
+                else:
+                    day_tag = utc_now().strftime("%Y%m%d")
             else:
                 day_tag = utc_now().strftime("%Y%m%d")
+
         evidence_path = write_evidence_pack(
             month=month,
             day_tag=day_tag,
@@ -878,7 +1004,7 @@ def main() -> int:
             metrics=metrics,
             mutation=mutation,
             latest_tail=tail(end_stream, n=12),
-            dangling_run_ids=dangling_run_ids,
+            dangling_run_keys=dangling_run_keys,
             integrity=integrity,
             fp=fp,
             ledger_files=raw_ledgers,
@@ -886,7 +1012,12 @@ def main() -> int:
         if evidence_path:
             evidence_latest_file = os.path.basename(evidence_path)
 
-    evidence_items = list_evidence_for_month(month)
+    # Evidence: prefer sessions/<month>/evidence_index.json, fallback to directory scan
+    ei_latest, ei_items = load_evidence_index_month(month)
+    evidence_items = ei_items[:] if ei_items else list_evidence_for_month(month)
+
+    if not evidence_latest_file:
+        evidence_latest_file = ei_latest
     if not evidence_latest_file and evidence_items:
         evidence_latest_file = evidence_items[-1]["file"]
 
@@ -897,14 +1028,15 @@ def main() -> int:
         "ledger_integrity": {
             "status": "DEGRADED" if issues else "OK",
             "issues": [asdict(x) for x in issues[-200:]],
-            # NEW: fingerprint exposed in index too (handy)
+            "parsed_lines": parsed_lines,
+            "invalid_lines": invalid_lines,
             "fingerprint_sha256": fp.get("aggregate_sha256", ""),
         },
         "sentinel": {
             "end_kinds": list(END_KINDS),
             "start_kind": START_KIND,
-            "dangling_run_ids": dangling_run_ids[:200],
-            "dangling_runs": len(dangling_run_ids),
+            "dangling_run_ids": dangling_run_keys[:200],
+            "dangling_runs": len(dangling_run_keys),
         },
         "latest": [
             {
@@ -912,6 +1044,7 @@ def main() -> int:
                 "kind": e.get("kind"),
                 "workflow": e.get("workflow"),
                 "run_id": e.get("run_id"),
+                "run_attempt": e.get("run_attempt"),
                 "status": e.get("conclusion") or e.get("status"),
                 "commit": e.get("commit"),
                 "note": e.get("note"),
@@ -924,8 +1057,15 @@ def main() -> int:
         "mutation_latest": asdict(mutation) if mutation else None,
         "evidence_latest": evidence_latest_file,
         "evidence_index": [
-            {"day": it["day"], "time": it["time"], "rule": it["rule"], "file": it["file"], "rel": it["rel"]}
+            {
+                "day": it.get("day", ""),
+                "time": it.get("time", ""),
+                "rule": it.get("rule", ""),
+                "file": it.get("file", ""),
+                "rel": it.get("rel", os.path.join("..", "..", "incidents", "evidence_snapshots", it.get("file", ""))),
+            }
             for it in evidence_items[-200:]
+            if it.get("file")
         ],
     }
 
@@ -940,6 +1080,7 @@ def main() -> int:
         transitions=transitions,
         raw_ledgers=raw_ledgers,
         issues=issues,
+        integrity=integrity,
         metrics=metrics,
         mutation=mutation,
         evidence_items=evidence_items,
