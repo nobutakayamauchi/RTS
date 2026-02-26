@@ -1,9 +1,8 @@
 {
-  "schema": "RTS-SESSIONS-INDEX-V1",
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T11:58:41Z",
+  "updated_at_utc": "2026-02-26T12:06:41Z",
   "counts": {
-    "sentinel.run": 6
+    "sentinel.run": 7
   },
   "latest": [
     {
@@ -13,9 +12,6 @@
       "run_id": "22437452809",
       "status": "success",
       "commit": "cee83ccefb1b377f2646c6e8431ca284c1c34f69",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
       "note": "analysis updated"
     },
     {
@@ -25,9 +21,6 @@
       "run_id": "22437902951",
       "status": "success",
       "commit": "192cabcbb5738f06ffe1ccb1396c403332a5096d",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
       "note": "analysis updated"
     },
     {
@@ -35,14 +28,8 @@
       "kind": "sentinel.run",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22440084054",
-      "run_attempt": 1,
       "status": "success",
       "commit": "a80c4ceb14f7d26504a288ca1a0dab92ee265b3d",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
-      "event": "push",
-      "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22440084054",
       "note": "analysis updated"
     },
     {
@@ -50,14 +37,8 @@
       "kind": "sentinel.run",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22440128387",
-      "run_attempt": 1,
       "status": "success",
       "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
-      "event": "workflow_dispatch",
-      "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22440128387",
       "note": "analysis updated"
     },
     {
@@ -65,14 +46,8 @@
       "kind": "sentinel.run",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22441061513",
-      "run_number": 216,
-      "run_attempt": 1,
       "status": "success",
       "commit": "e3ac9ea570c5e3f42d2e371ab07297a435d58224",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
-      "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22441061513",
       "note": "analysis updated"
     },
     {
@@ -80,18 +55,21 @@
       "kind": "sentinel.run",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22441083428",
-      "run_number": 217,
-      "run_attempt": 1,
       "status": "success",
       "commit": "ffb9095552af48162c5a361afaa541a41d2bf11e",
-      "actor": "nobutakayamauchi",
-      "repo": "nobutakayamauchi/RTS",
-      "ref": "main",
-      "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22441083428",
+      "note": "analysis updated"
+    },
+    {
+      "ts": "2026-02-26T12:06:41Z",
+      "kind": "sentinel.run",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22441345387",
+      "status": "success",
+      "commit": "063838e9e28526f0191a109187a2a66c0c4d85c3",
       "note": "analysis updated"
     }
   ],
-  "transitions_latest": [],
+  "transitions": [],
   "raw_ledgers": [
     "session_20260226.jsonl"
   ]
