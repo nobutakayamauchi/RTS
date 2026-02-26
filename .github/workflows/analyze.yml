@@ -51,6 +51,50 @@ jobs:
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
+      # =========================================================
+      # TWO-PHASE LEDGER WRITE (START)  ★穴を潰す核心
+      # =========================================================
+      - name: Build RUN_START payload
+        env:
+          WORKFLOW_NAME: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          REPO: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          HEAD_SHA: ${{ github.sha }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          python - <<'PY'
+          import json, os, datetime
+          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+          run_id = os.environ["RUN_ID"]
+          repo = os.environ["REPO"]
+          payload = {
+            "ts": ts,
+            "kind": "sentinel.run.start",
+            "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
+            "run_id": str(run_id),
+            "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
+            "commit": os.environ.get("HEAD_SHA", ""),
+            "actor": os.environ.get("ACTOR", ""),
+            "repo": repo,
+            "ref": os.environ.get("REF_NAME", ""),
+            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
+            "note": "run started",
+          }
+          with open("/tmp/session_payload_start.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+          print("wrote /tmp/session_payload_start.json")
+          PY
+          cat /tmp/session_payload_start.json
+
+      - name: Append RUN_START
+        run: |
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
+
       # -------------------------------
       # RTS Analysis
       # -------------------------------
@@ -63,7 +107,7 @@ jobs:
           python scripts/rts_agent_analyze.py
 
       # -------------------------------
-      # Commit analysis results (if changed) — keep as-is
+      # Commit analysis results (if changed)
       # -------------------------------
       - name: Commit analysis results (if changed)
         run: |
@@ -75,28 +119,24 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No analysis changes."
-            exit 0
+          else
+            git commit -m "RTS automated analysis update" || true
+
+            for i in 1 2 3; do
+              git pull --rebase origin main || true
+              if git push origin main; then
+                echo "push ok"
+                break
+              fi
+              echo "push failed, retry..."
+              sleep 2
+            done
           fi
 
-          git commit -m "RTS automated analysis update" || true
-
-          for i in 1 2 3; do
-            git pull --rebase origin main || true
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            echo "push failed, retry..."
-            sleep 2
-          done
-
-          echo "push failed after retries"
-          exit 1
-
-      # -------------------------------
-      # Build session event payload (ALWAYS) — include actual job status
-      # -------------------------------
-      - name: Build session event payload
+      # =========================================================
+      # TWO-PHASE LEDGER WRITE (END)  ★必ず走る
+      # =========================================================
+      - name: Build RUN_END payloads (sentinel.run + sentinel.run.end)
         if: always()
         env:
           WORKFLOW_NAME: ${{ github.workflow }}
@@ -115,37 +155,56 @@ jobs:
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
           run_id = os.environ["RUN_ID"]
           repo = os.environ["REPO"]
-          payload = {
+          status = (os.environ.get("JOB_STATUS","") or "").lower()
+
+          base = {
             "ts": ts,
-            "kind": "sentinel.run",
             "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
             "run_id": str(run_id),
             "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
             "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
-            "status": (os.environ.get("JOB_STATUS", "") or "").lower(),  # success/failure/cancelled
+            "status": status,  # success/failure/cancelled
             "commit": os.environ.get("HEAD_SHA", ""),
             "actor": os.environ.get("ACTOR", ""),
             "repo": repo,
             "ref": os.environ.get("REF_NAME", ""),
             "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
-            "note": "analysis updated",
+            "note": "run ended",
           }
-          with open("/tmp/session_payload.json", "w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
-          print("wrote /tmp/session_payload.json")
-          PY
-          cat /tmp/session_payload.json
 
-      # -------------------------------
-      # Append session ledger (NEW API)
-      # -------------------------------
-      - name: Append session ledger
+          # legacy kind (compat): sentinel.run
+          payload_run = dict(base)
+          payload_run["kind"] = "sentinel.run"
+
+          # explicit end marker: sentinel.run.end
+          payload_end = dict(base)
+          payload_end["kind"] = "sentinel.run.end"
+
+          with open("/tmp/session_payload.json", "w", encoding="utf-8") as f:
+            json.dump(payload_run, f, ensure_ascii=False, indent=2)
+          with open("/tmp/session_payload_end.json", "w", encoding="utf-8") as f:
+            json.dump(payload_end, f, ensure_ascii=False, indent=2)
+
+          print("wrote /tmp/session_payload.json (sentinel.run)")
+          print("wrote /tmp/session_payload_end.json (sentinel.run.end)")
+          PY
+          echo "---- /tmp/session_payload.json ----"
+          cat /tmp/session_payload.json
+          echo "---- /tmp/session_payload_end.json ----"
+          cat /tmp/session_payload_end.json
+
+      - name: Append RUN_END (sentinel.run)
         if: always()
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload.json"
 
+      - name: Append RUN_END marker (sentinel.run.end)
+        if: always()
+        run: |
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
+
       # -------------------------------
-      # Rollup monthly index (do not swallow real errors)
+      # Rollup monthly index
       # -------------------------------
       - name: Rollup monthly index
         if: always()
@@ -163,7 +222,6 @@ jobs:
 
       - name: Detect packed artifact
         if: always()
-        id: detect_artifact
         run: |
           if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
             echo "HAS_SESSION_ARTIFACT=true" >> $GITHUB_ENV
