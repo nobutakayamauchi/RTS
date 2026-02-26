@@ -44,7 +44,15 @@ jobs:
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
       # -------------------------------
-      # RTS Analysis (existing)
+      # Session month/day (UTC)
+      # -------------------------------
+      - name: Set session month + day (UTC)
+        run: |
+          echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
+          echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
+
+      # -------------------------------
+      # RTS Analysis
       # -------------------------------
       - name: Run RTS Evidence Analysis
         run: |
@@ -54,6 +62,9 @@ jobs:
         run: |
           python scripts/rts_agent_analyze.py
 
+      # -------------------------------
+      # Commit analysis results (if changed) — keep as-is
+      # -------------------------------
       - name: Commit analysis results (if changed)
         run: |
           set -e
@@ -69,7 +80,6 @@ jobs:
 
           git commit -m "RTS automated analysis update" || true
 
-          # rebase + retry push (avoid races)
           for i in 1 2 3; do
             git pull --rebase origin main || true
             if git push origin main; then
@@ -84,15 +94,10 @@ jobs:
           exit 1
 
       # -------------------------------
-      # Session ledger (human-first)
+      # Build session event payload (ALWAYS) — include actual job status
       # -------------------------------
-      - name: Set session month + day
-        run: |
-          echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
-          echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
-
-      # ✅ FIX: sed を廃止して Python で payload を生成（/ を含んでも壊れない）
       - name: Build session event payload
+        if: always()
         env:
           WORKFLOW_NAME: ${{ github.workflow }}
           RUN_ID: ${{ github.run_id }}
@@ -103,6 +108,7 @@ jobs:
           ACTOR: ${{ github.actor }}
           HEAD_SHA: ${{ github.sha }}
           SERVER_URL: ${{ github.server_url }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           python - <<'PY'
           import json, os, datetime
@@ -113,10 +119,10 @@ jobs:
             "ts": ts,
             "kind": "sentinel.run",
             "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
-            "run_id": run_id,
+            "run_id": str(run_id),
             "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
             "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
-            "status": "success",  # workflow内なのでここは "success" でOK。失敗時は Escalation Recorder が拾う
+            "status": (os.environ.get("JOB_STATUS", "") or "").lower(),  # success/failure/cancelled
             "commit": os.environ.get("HEAD_SHA", ""),
             "actor": os.environ.get("ACTOR", ""),
             "repo": repo,
@@ -130,24 +136,33 @@ jobs:
           PY
           cat /tmp/session_payload.json
 
+      # -------------------------------
+      # Append session ledger (NEW API)
+      # -------------------------------
       - name: Append session ledger
+        if: always()
         run: |
-          mkdir -p "sessions/${SESSION_MONTH}"
-          python scripts/session_append.py "/tmp/session_payload.json" "sessions/${SESSION_MONTH}/session_${SESSION_DAY}.jsonl"
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload.json"
 
+      # -------------------------------
+      # Rollup monthly index (do not swallow real errors)
+      # -------------------------------
       - name: Rollup monthly index
+        if: always()
         run: |
-          python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}" || python scripts/session_rollup.py "${SESSION_MONTH}" || true
+          python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
 
       # -------------------------------
       # Raw logs -> Artifact (not git)
       # -------------------------------
       - name: Pack raw session logs
+        if: always()
         continue-on-error: true
         run: |
           python scripts/session_artifact_pack.py "${SESSION_MONTH}" || true
 
       - name: Detect packed artifact
+        if: always()
         id: detect_artifact
         run: |
           if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
@@ -157,7 +172,7 @@ jobs:
           fi
 
       - name: Upload raw session artifact
-        if: env.HAS_SESSION_ARTIFACT == 'true'
+        if: always() && env.HAS_SESSION_ARTIFACT == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: rts-session-raw-${{ env.SESSION_MONTH }}
@@ -168,13 +183,15 @@ jobs:
       # -------------------------------
       # Commit sessions/ indexes (human-first)
       # -------------------------------
-      - name: Commit session indexes (if changed)
+      - name: Commit session outputs (if changed)
+        if: always()
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          git add "sessions/${SESSION_MONTH}/index.md" "sessions/${SESSION_MONTH}/index.json" "sessions/${SESSION_MONTH}/checksums.sha256" "sessions/${SESSION_MONTH}/session_${SESSION_DAY}.jsonl" || true
+          git add "sessions/${SESSION_MONTH}/" || true
+          git add "incidents/evidence_snapshots/" || true
 
           if git diff --cached --quiet; then
             echo "No session changes."
