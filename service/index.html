@@ -1,223 +1,158 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RTS Service — Logging Design Support (S Plan)</title>
-  <meta name="description" content="RTS Service: structural logging design support for AI execution. Async audit + reconstruction to restore reproducibility." />
-  <style>
-    :root{
-      --bg:#0b0f14; --fg:#e9eef5; --muted:#aab6c5; --line:#1f2a37;
-      --accent:#7dd3fc; --accent2:#a78bfa; --warn:#fca5a5;
-      --card:#0f1720;
-    }
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      background:linear-gradient(180deg,#070a0f, #0b0f14 25%, #0b0f14);
-      color:var(--fg); line-height:1.6;}
-    a{color:var(--accent); text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 64px}
-    .top{display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap}
-    .badge{border:1px solid var(--line); background:rgba(125,211,252,0.06); color:var(--accent);
-      padding:6px 10px; border-radius:999px; font-size:12px}
-    .hero{margin-top:18px;padding:22px;border:1px solid var(--line); background:rgba(15,23,32,0.6); border-radius:14px}
-    h1{margin:0 0 10px;font-size:28px;letter-spacing:0.2px}
-    h2{margin:26px 0 10px;font-size:18px}
-    p{margin:10px 0;color:var(--fg)}
-    .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
-    @media(min-width:860px){.grid{grid-template-columns:1.2fr 0.8fr}}
-    .card{border:1px solid var(--line); background:rgba(15,23,32,0.72); border-radius:14px; padding:16px}
-    .cta{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
-    .btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--line)}
-    .btn.primary{background:linear-gradient(135deg, rgba(125,211,252,0.16), rgba(167,139,250,0.14));
-      border-color:rgba(125,211,252,0.35)}
-    .btn.ghost{background:rgba(255,255,255,0.03)}
-    .list{margin:10px 0 0;padding-left:18px}
-    .list li{margin:6px 0}
-    .hr{height:1px;background:var(--line);margin:20px 0}
-    .small{font-size:12px;color:var(--muted)}
-    .warning{border-left:3px solid var(--warn); padding-left:10px; color:#ffe4e6}
-    .kpi{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
-    .pill{border:1px solid var(--line); padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.03); font-size:12px}
-    .footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:12px}
-    code{background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:6px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RTS 支援（Sプラン）</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --panel:#111827;
+  --line:#1f2937;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#60a5fa;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+}
+
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+  padding:40px 20px 80px;
+}
+
+h1{
+  font-size:28px;
+  margin-bottom:16px;
+  font-weight:600;
+}
+
+h2{
+  font-size:18px;
+  margin-top:40px;
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:20px;
+  margin-top:20px;
+}
+
+ul{
+  padding-left:18px;
+}
+
+button, .btn{
+  display:inline-block;
+  padding:10px 16px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--text);
+  text-decoration:none;
+  margin-top:12px;
+}
+
+.btn.primary{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+
+.small{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.footer{
+  margin-top:60px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
+<div class="wrap">
 
-    <div class="top">
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
-        <div class="badge">RTS Service</div>
-        <div class="badge">Async-first / No Zoom by default</div>
-        <div class="badge">Capacity: 2 active slots</div>
-      </div>
-      <div class="small">
-        Operator: Nobutaka Yamauchi (Trade name: RisingSon)
-      </div>
-    </div>
+<h1>RTS 支援（Sプラン）</h1>
 
-    <div class="hero">
-      <h1>Logging Design Support for AI Execution (S Plan)</h1>
-      <p class="muted">
-        RTS itself is public. This page is for paid support: I read your logs, reconstruct what happened,
-        and design a safe, reproducible execution path — without expanding scope into endless branches.
-      </p>
+<p>
+RTS自体は公開されています。<br>
+このページは有料のログ設計支援です。
+</p>
 
-      <div class="kpi">
-        <div class="pill">Deliverable: 1 route made runnable</div>
-        <div class="pill">Format: RTS blocks + action map</div>
-        <div class="pill">Lead time: 3–7 days (depending on backlog)</div>
-      </div>
+<p>
+既存ログを読み、構造的に再構築し、<br>
+<strong>1ルートを実行可能な状態に整理</strong>します。
+</p>
 
-      <div class="cta">
-        <!-- TODO: Replace with Stripe payment link -->
-        <a class="btn primary" href="#apply">Apply / Join Waitlist</a>
-        <a class="btn ghost" href="https://nobutakayamauchi.github.io/RTS/" target="_blank" rel="noopener">RTS (Public)</a>
-        <a class="btn ghost" href="#pricing">Pricing</a>
-      </div>
+<div class="card">
+<strong>成果物</strong>
+<ul>
+<li>Decisionログ整理</li>
+<li>環境・制約の明文化</li>
+<li>実行可能な1ルート設計</li>
+<li>7日間アクションマップ</li>
+</ul>
 
-      <p class="small warning" style="margin-top:12px">
-        If you are currently in a “high-rotation / overdrive” state (sleep loss, caffeine spikes, blurred focus),
-        do not force execution. A good system prevents collapse — it does not reward it.
-      </p>
-    </div>
+<p class="small">
+※ブランチ拡張は含みません（1ルート限定）
+</p>
+</div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Who this is for</h2>
-        <ul class="list">
-          <li>You can “build with AI”, but reproducibility collapsed: you can’t explain why it worked yesterday.</li>
-          <li>You’re shipping under responsibility (work, clients, team) and need defensible decisions.</li>
-          <li>Your AI workflow became a tangled graph (branches) and you need a single runnable line.</li>
-          <li>You want to restore <b>execution with provenance</b> — not more tools.</li>
-        </ul>
+<h2>対象</h2>
+<ul>
+<li>AIで成果は出るが再現性が崩壊している</li>
+<li>説明責任が必要な立場にある</li>
+<li>構造的に整理したい</li>
+</ul>
 
-        <h2>Who this is NOT for</h2>
-        <ul class="list">
-          <li>If you want me to “build everything” or run multiple parallel branches for a fixed fee.</li>
-          <li>If you need live meetings as default. (Zoom is optional add-on.)</li>
-          <li>If you can’t share logs / artifacts at all. (RTS needs evidence.)</li>
-        </ul>
+<h2>価格</h2>
 
-        <div class="hr"></div>
+<div class="card">
+<p><strong>40,000円 / 1件</strong></p>
+<p>同時受付：最大2件</p>
+<p>納期目安：3〜7日</p>
+<p>基本：非同期（Zoomなし）</p>
+</div>
 
-        <h2>What you get (S Plan)</h2>
-        <ul class="list">
-          <li><b>Structural audit</b> of your current workflow/logs (where reproducibility breaks).</li>
-          <li><b>Reconstruction</b>: what happened, what was decided, what was missing.</li>
-          <li><b>One-route design</b>: select the most valuable line and make it runnable.</li>
-          <li><b>RTS deliverables</b>:
-            <ul class="list">
-              <li>Decision Log (D#)</li>
-              <li>Information Environment Log (InfoEnv)</li>
-              <li>Risk/Safety Log</li>
-              <li>Next 7-day execution map</li>
-            </ul>
-          </li>
-          <li><b>Q&A</b> via async messages for a limited window (see scope).</li>
-        </ul>
+<h2>オプション</h2>
+<ul>
+<li>30分解説セッション：+15,000円</li>
+<li>解説動画作成：+20,000円</li>
+</ul>
 
-        <h2>Scope boundaries (important)</h2>
-        <ul class="list">
-          <li>This is <b>not</b> multi-branch “everything rescue”. One route only.</li>
-          <li>If your project is a “bundle of routes” (stakeholders / network / external vendors),
-              it may be classified as <b>Corporate scope</b>.</li>
-          <li>If scope expands after audit, I will tell you early. You can stop without pressure.</li>
-        </ul>
+<h2>流れ</h2>
+<ol>
+<li>応募（ログ提出）</li>
+<li>適合確認</li>
+<li>決済（Stripe）</li>
+<li>構造監査・再設計</li>
+<li>納品</li>
+</ol>
 
-      </div>
+<a href="YOUR_WAITLIST_URL" class="btn primary">応募 / ウェイトリスト</a>
 
-      <div class="card" id="pricing">
-        <h2>Pricing</h2>
-        <p class="muted">
-          The goal is to keep quality high and capacity controlled.
-        </p>
+<div class="footer">
+<a href="../legal/tokusho/">特定商取引法表記</a> ・
+<a href="../legal/privacy/">プライバシー</a> ・
+<a href="../legal/terms/">利用規約</a>
+<br><br>
+© 2026 risingson / Nobutaka Yamauchi
+</div>
 
-        <h3 style="margin:10px 0 6px;font-size:16px">S Plan (Personal)</h3>
-        <ul class="list">
-          <li><b>$300</b> (or JPY equivalent)</li>
-          <li>Capacity: <b>2 active clients</b> at a time</li>
-          <li>Delivery: 3–7 days (backlog dependent)</li>
-          <li>Async-first (no live call by default)</li>
-        </ul>
-
-        <div class="hr"></div>
-
-        <h3 style="margin:10px 0 6px;font-size:16px">Optional Add-ons</h3>
-        <ul class="list">
-          <li><b>30-min walkthrough call</b> (Zoom): +$150</li>
-          <li><b>Explainer video</b> (screen-recorded, ~10–20 min): +$200</li>
-          <li><b>Extra route</b> (second runnable line): priced separately after audit</li>
-        </ul>
-
-        <div class="hr"></div>
-
-        <h2>Process</h2>
-        <ol class="list">
-          <li><b>Apply</b> (waitlist form) + submit your current artifacts/logs.</li>
-          <li><b>Fit check</b>: I confirm whether S Plan is appropriate (or corporate scope).</li>
-          <li><b>Payment</b>: you receive a Stripe link.</li>
-          <li><b>Audit & reconstruction</b> (async).</li>
-          <li><b>Delivery</b>: RTS blocks + one-route execution map.</li>
-        </ol>
-
-        <div class="cta" style="margin-top:12px" id="apply">
-          <!-- TODO: Replace with your Google Form / Notion / simple HTML form endpoint -->
-          <a class="btn primary" href="YOUR_WAITLIST_FORM_URL">Join Waitlist</a>
-          <!-- TODO: Replace with Stripe Payment Link once created -->
-          <a class="btn ghost" href="YOUR_STRIPE_PAYMENT_LINK">Pay (when slot available)</a>
-        </div>
-
-        <p class="small" style="margin-top:10px">
-          Note: If you don’t have a slot yet, use <b>Join Waitlist</b> first.
-        </p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:14px">
-      <h2>What I need from you</h2>
-      <ul class="list">
-        <li>Current objective (what outcome you want in 7 days).</li>
-        <li>Artifacts: documents, prompts, repos, screenshots, logs (anything you have).</li>
-        <li>Your constraints: time, tools, devices, team size, “don’t touch this” boundaries.</li>
-      </ul>
-
-      <h2>FAQ</h2>
-      <p><b>Q: Can you guarantee results?</b><br/>
-        A: No. What I guarantee is <b>structural clarity</b>, a <b>runnable route</b>, and a log-based reconstruction
-        that improves reproducibility and decision defensibility.
-      </p>
-
-      <p><b>Q: Is this consulting?</b><br/>
-        A: It’s closer to <b>external audit + reconstruction</b>. Less talk, more deliverables.
-      </p>
-
-      <p><b>Q: Why no Zoom by default?</b><br/>
-        A: Live sessions create instant-answer pressure and reduce audit quality. Async produces better structure.
-      </p>
-
-      <p><b>Q: Can a company apply?</b><br/>
-        A: Yes, but corporate scope typically starts higher. If it’s “personal but actually a company machine”,
-        I will classify it as corporate for fairness and workload control.
-      </p>
-    </div>
-
-    <div class="footer">
-      <div>
-        <b>Legal:</b> This page describes a service. RTS repository remains public/open for self-use.
-      </div>
-      <div style="margin-top:8px">
-        <a href="../legal/tokusho/" class="small">Act on Specified Commercial Transactions (Japan)</a>
-        &nbsp;·&nbsp;
-        <a href="../legal/privacy/" class="small">Privacy</a>
-        &nbsp;·&nbsp;
-        <a href="../legal/terms/" class="small">Terms</a>
-      </div>
-    </div>
-
-  </div>
+</div>
 </body>
 </html>
