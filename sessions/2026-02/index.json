@@ -1,9 +1,9 @@
 {
   "schema": "RTS-SESSIONS-INDEX-V1",
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T11:57:59Z",
+  "updated_at_utc": "2026-02-26T11:58:41Z",
   "counts": {
-    "sentinel.run": 5
+    "sentinel.run": 6
   },
   "latest": [
     {
@@ -73,6 +73,21 @@
       "repo": "nobutakayamauchi/RTS",
       "ref": "main",
       "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22441061513",
+      "note": "analysis updated"
+    },
+    {
+      "ts": "2026-02-26T11:58:41Z",
+      "kind": "sentinel.run",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22441083428",
+      "run_number": 217,
+      "run_attempt": 1,
+      "status": "success",
+      "commit": "ffb9095552af48162c5a361afaa541a41d2bf11e",
+      "actor": "nobutakayamauchi",
+      "repo": "nobutakayamauchi/RTS",
+      "ref": "main",
+      "run_url": "https://github.com/nobutakayamauchi/RTS/actions/runs/22441083428",
       "note": "analysis updated"
     }
   ],
