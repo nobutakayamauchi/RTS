@@ -12,7 +12,7 @@ RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix 
     * Transitions (END stream):
         - status flip
         - failure streak start/end
-        - failure density spike
+        - failure density spike (rolling window)
         - dangling run (START exists but END missing)
     * Escalation metrics + Mutation scoring + breakpoint reasons
     * Evidence index: list evidence snapshots for the month, link in index.md
@@ -110,21 +110,25 @@ def validate_month_ledgers(jsonl_paths: List[str]) -> List[LedgerIssue]:
     issues: List[LedgerIssue] = []
     for p in jsonl_paths:
         base = os.path.basename(p)
-        with open(p, "r", encoding="utf-8") as f:
-            for i, line in enumerate(f, start=1):
-                if not line.strip():
-                    continue
-                obj = safe_load_json_line(line)
-                if obj is None:
-                    issues.append(LedgerIssue(base, i, "ERROR", "invalid JSON"))
-                    continue
-                for k in REQUIRED_KEYS:
-                    if k not in obj:
-                        issues.append(LedgerIssue(base, i, "ERROR", f"missing key: {k}"))
-                try:
-                    parse_ts(str(obj.get("ts", "")))
-                except Exception:
-                    issues.append(LedgerIssue(base, i, "ERROR", "unparseable ts"))
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                for i, line in enumerate(f, start=1):
+                    if not line.strip():
+                        continue
+                    obj = safe_load_json_line(line)
+                    if obj is None:
+                        issues.append(LedgerIssue(base, i, "ERROR", "invalid JSON"))
+                        continue
+                    for k in REQUIRED_KEYS:
+                        if k not in obj:
+                            issues.append(LedgerIssue(base, i, "ERROR", f"missing key: {k}"))
+                    try:
+                        parse_ts(str(obj.get("ts", "")))
+                    except Exception:
+                        issues.append(LedgerIssue(base, i, "ERROR", "unparseable ts"))
+        except FileNotFoundError:
+            # race-safe
+            continue
     return issues
 
 
@@ -182,6 +186,9 @@ def split_sentinel_stream(events: List[Dict[str, Any]]) -> Tuple[List[Dict[str, 
 
 
 def end_stream_dedup_by_run_id(end_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    If both sentinel.run and sentinel.run.end exist for same run_id, keep the later ts.
+    """
     best: Dict[str, Dict[str, Any]] = {}
     for e in end_events:
         rid = str(e.get("run_id"))
@@ -304,7 +311,8 @@ def compute_transitions_and_metrics(
                 kind="sentinel.run",
                 severity="HIGH",
                 title="dangling runs detected (start without end)",
-                detail=f"dangling_runs={len(dangling_run_ids)} ids={','.join(dangling_run_ids[:8])}" + (" ..." if len(dangling_run_ids) > 8 else ""),
+                detail=f"dangling_runs={len(dangling_run_ids)} ids={','.join(dangling_run_ids[:8])}"
+                       + (" ..." if len(dangling_run_ids) > 8 else ""),
             )
         )
 
@@ -394,12 +402,9 @@ def compute_transitions_and_metrics(
     burst_fail = sum(burst_window) >= BURST_B
 
     recovery_speed_runs: Optional[int] = None
-    last_end: Optional[int] = None
     for i in range(1, len(end_stream)):
         if is_failure_status(statuses[i - 1]) and (not is_failure_status(statuses[i])):
-            last_end = i
-    if last_end is not None:
-        recovery_speed_runs = 0
+            recovery_speed_runs = 0
 
     fn_eff = min(FLIP_WINDOW_N, len(end_stream))
     flips_in_last_n = sum(1 for idx in flips_idx if idx >= (len(end_stream) - fn_eff))
@@ -499,7 +504,7 @@ def compute_transitions_and_metrics(
 
 
 # =========================
-# Evidence pack + evidence index (NEW)
+# Evidence pack + evidence index
 # =========================
 
 def evidence_month_prefix(month: str) -> str:
@@ -667,11 +672,9 @@ def render_index_md(
         lines.append("- (none)")
     lines.append("")
 
-    # NEW: Evidence section
     lines.append("## Evidence Snapshots")
     lines.append("")
     if evidence_latest_file:
-        # link from sessions/<month>/index.md to incidents/...
         rel = os.path.join("..", "..", "incidents", "evidence_snapshots", evidence_latest_file)
         lines.append(f"- latest: [{evidence_latest_file}]({rel})")
     else:
@@ -791,7 +794,6 @@ def main() -> int:
     evidence_path: Optional[str] = None
     evidence_latest_file: Optional[str] = None
 
-    # If breakpoint, write evidence file (collision-free)
     if metrics and mutation and mutation.breakpoint:
         if day_tag is None:
             if latest_tail:
@@ -810,7 +812,6 @@ def main() -> int:
         if evidence_path:
             evidence_latest_file = os.path.basename(evidence_path)
 
-    # Collect evidence list for the month (and also find latest if exists)
     evidence_items = list_evidence_for_month(month)
     if not evidence_latest_file and evidence_items:
         evidence_latest_file = evidence_items[-1]["file"]
