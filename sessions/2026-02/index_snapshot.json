@@ -1,15 +1,17 @@
 {
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T21:58:46Z",
+  "updated_at_utc": "2026-02-26T22:28:28Z",
   "counts": {
-    "sentinel.run": 32,
-    "sentinel.run.start": 22,
-    "sentinel.run.end": 22
+    "sentinel.run": 33,
+    "sentinel.run.start": 23,
+    "sentinel.run.end": 23
   },
   "ledger_integrity": {
     "status": "OK",
     "issues": [],
-    "fingerprint_sha256": "70412e2e9b36eed8a6b05356d6a1f8418e8b1cceac75ce981c2e67dc89244023"
+    "parsed_lines": 79,
+    "invalid_lines": 0,
+    "fingerprint_sha256": "da4a1d19f6fc511c2e2b4bb9a384753f0d36f05c85dab59ed35dd464ee1961de"
   },
   "sentinel": {
     "end_kinds": [
@@ -22,75 +24,83 @@
   },
   "latest": [
     {
-      "ts": "2026-02-26T14:25:15Z",
-      "kind": "sentinel.run",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": "22446288497",
-      "status": "success",
-      "commit": "a85270976c44961a42f3eb69b514759d6e220b2c",
-      "note": "analysis finished"
-    },
-    {
       "ts": "2026-02-26T14:30:52Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22446503556",
+      "run_attempt": 1,
       "status": "success",
       "commit": "9b1cc3122c8db165c20cec6d133f2538fc2709d0",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T14:34:29Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22446640444",
+      "run_attempt": 1,
       "status": "success",
       "commit": "4b227a92a9357904ee0fc6d403ba73f8dcb58a70",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T14:39:45Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22446842762",
+      "run_attempt": 1,
       "status": "success",
       "commit": "cfdbe273867e7e7aaab976e3d7777241414bb727",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T14:40:42Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22446879098",
+      "run_attempt": 1,
       "status": "success",
       "commit": "9c18c83c5685bdf44d66acae7db954474f884b1b",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T21:53:08Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22462808291",
+      "run_attempt": 1,
       "status": "success",
       "commit": "a3b7c6ec68eefc1a57347354c67257130f8819c0",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T21:57:27Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22462951432",
+      "run_attempt": 1,
       "status": "success",
       "commit": "5f9ca3daf89817c87c8a355f79beb81c8f51647c",
       "note": "analysis finished"
     },
     {
       "ts": "2026-02-26T21:58:46Z",
-      "kind": "sentinel.run",
+      "kind": "sentinel.run.end",
       "workflow": "RTS Sentinel Analyze",
       "run_id": "22462992740",
+      "run_attempt": 1,
       "status": "success",
       "commit": "6a4aa48f059e4f818f2465a4ae1aee53a86cba14",
+      "note": "analysis finished"
+    },
+    {
+      "ts": "2026-02-26T22:28:28Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22463943180",
+      "run_attempt": 1,
+      "status": "success",
+      "commit": "26a8b7e71726aeb5241e474cc01d3f33b39b08e0",
       "note": "analysis finished"
     }
   ],
@@ -130,6 +140,196 @@
     "breakpoint": false,
     "breakpoint_reasons": []
   },
-  "evidence_latest": null,
-  "evidence_index": []
+  "evidence_latest": "ESC_20260226_124730_RTS_Sentinel_Analyze_run22442719190_a1.md",
+  "evidence_index": [
+    {
+      "day": "20260224",
+      "time": "024016Z",
+      "rule": "",
+      "file": "ESC_20260224_024016_RTS_Sentinel_Analyze_run22334273204_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260224_024016_RTS_Sentinel_Analyze_run22334273204_a1.md"
+    },
+    {
+      "day": "20260224",
+      "time": "034805Z",
+      "rule": "",
+      "file": "ESC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_a1",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260224_034805_RTS_Sentinel_Analyze_run22335738840_a1"
+    },
+    {
+      "day": "20260224",
+      "time": "034927Z",
+      "rule": "",
+      "file": "ESC_20260224_034927_RTS_Sentinel_Analyze_run22335769087_a1",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260224_034927_RTS_Sentinel_Analyze_run22335769087_a1"
+    },
+    {
+      "day": "20260224",
+      "time": "035007Z",
+      "rule": "",
+      "file": "ESC_20260224_035007_RTS_Sentinel_Analyze_run22335782661_a1",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260224_035007_RTS_Sentinel_Analyze_run22335782661_a1"
+    },
+    {
+      "day": "20260226",
+      "time": "091038Z",
+      "rule": "",
+      "file": "ESC_20260226_091038_RTS_Sentinel_Analyze_run22435361981_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_091038_RTS_Sentinel_Analyze_run22435361981_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "091145Z",
+      "rule": "",
+      "file": "ESC_20260226_091145_RTS_Sentinel_Analyze_run22435402028_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_091145_RTS_Sentinel_Analyze_run22435402028_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "091225Z",
+      "rule": "",
+      "file": "ESC_20260226_091225_RTS_Sentinel_Analyze_run22435425165_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_091225_RTS_Sentinel_Analyze_run22435425165_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "091300Z",
+      "rule": "",
+      "file": "ESC_20260226_091300_RTS_Sentinel_Analyze_run22435444552_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_091300_RTS_Sentinel_Analyze_run22435444552_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "091647Z",
+      "rule": "",
+      "file": "ESC_20260226_091647_RTS_Sentinel_Analyze_run22435578128_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_091647_RTS_Sentinel_Analyze_run22435578128_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "092557Z",
+      "rule": "",
+      "file": "ESC_20260226_092557_RTS_Sentinel_Analyze_run22435906512_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_092557_RTS_Sentinel_Analyze_run22435906512_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "094542Z",
+      "rule": "",
+      "file": "ESC_20260226_094542_RTS_Sentinel_Analyze_run22436595555_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_094542_RTS_Sentinel_Analyze_run22436595555_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "094646Z",
+      "rule": "",
+      "file": "ESC_20260226_094646_RTS_Sentinel_Analyze_run22436633522_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_094646_RTS_Sentinel_Analyze_run22436633522_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "101048Z",
+      "rule": "",
+      "file": "ESC_20260226_101048_RTS_Sentinel_Analyze_run22437452809_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_101048_RTS_Sentinel_Analyze_run22437452809_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "102336Z",
+      "rule": "",
+      "file": "ESC_20260226_102336_RTS_Sentinel_Analyze_run22437902951_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_102336_RTS_Sentinel_Analyze_run22437902951_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "112255Z",
+      "rule": "",
+      "file": "ESC_20260226_112255_RTS_Sentinel_Analyze_run22439910465_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_112255_RTS_Sentinel_Analyze_run22439910465_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "112814Z",
+      "rule": "",
+      "file": "ESC_20260226_112814_RTS_Sentinel_Analyze_run22440084054_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_112814_RTS_Sentinel_Analyze_run22440084054_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "112927Z",
+      "rule": "",
+      "file": "ESC_20260226_112927_RTS_Sentinel_Analyze_run22440128387_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_112927_RTS_Sentinel_Analyze_run22440128387_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "115813Z",
+      "rule": "",
+      "file": "ESC_20260226_115813_RTS_Sentinel_Analyze_run22441061513_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_115813_RTS_Sentinel_Analyze_run22441061513_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "115858Z",
+      "rule": "",
+      "file": "ESC_20260226_115858_RTS_Sentinel_Analyze_run22441083428_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_115858_RTS_Sentinel_Analyze_run22441083428_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "120658Z",
+      "rule": "",
+      "file": "ESC_20260226_120658_RTS_Sentinel_Analyze_run22441345387_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_120658_RTS_Sentinel_Analyze_run22441345387_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "122120Z",
+      "rule": "",
+      "file": "ESC_20260226_122120_RTS_Sentinel_Analyze_run22441826069_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_122120_RTS_Sentinel_Analyze_run22441826069_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "122353Z",
+      "rule": "",
+      "file": "ESC_20260226_122353_RTS_Sentinel_Analyze_run22441911482_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_122353_RTS_Sentinel_Analyze_run22441911482_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "122824Z",
+      "rule": "",
+      "file": "ESC_20260226_122824_RTS_Sentinel_Analyze_run22442068220_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_122824_RTS_Sentinel_Analyze_run22442068220_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "123446Z",
+      "rule": "",
+      "file": "ESC_20260226_123446_RTS_Sentinel_Analyze_run22442286562_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_123446_RTS_Sentinel_Analyze_run22442286562_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "124046Z",
+      "rule": "",
+      "file": "ESC_20260226_124046_RTS_Sentinel_Analyze_run22442485844_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_124046_RTS_Sentinel_Analyze_run22442485844_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "124602Z",
+      "rule": "",
+      "file": "ESC_20260226_124602_RTS_Sentinel_Analyze_run22442666766_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_124602_RTS_Sentinel_Analyze_run22442666766_a1.md"
+    },
+    {
+      "day": "20260226",
+      "time": "124730Z",
+      "rule": "",
+      "file": "ESC_20260226_124730_RTS_Sentinel_Analyze_run22442719190_a1.md",
+      "rel": "../../incidents/evidence_snapshots/ESC_20260226_124730_RTS_Sentinel_Analyze_run22442719190_a1.md"
+    }
+  ]
 }
