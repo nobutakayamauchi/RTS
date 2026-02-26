@@ -2,25 +2,19 @@
 # -*- coding: utf-8 -*-
 
 """
-RTS Session Append (FULL REPLACE)
+RTS Session Append (FULL REPLACE) — Month-wide idempotency
 
 Append exactly one JSON event (one line) into:
   sessions/<YYYY-MM>/session_<YYYYMMDD>.jsonl
 
 Hard rules:
 - No sed, no YAML logic, Python-only JSON generation
-- Idempotent on run_id for kind=sentinel.run (default)
-- Always write UTC ISO ts with Z
+- Idempotent on (kind, run_id) across the entire month directory (prevents UTC-day split duplicates)
+- Always write UTC ISO ts with Z (if absent)
 - Update sessions/<YYYY-MM>/checksums.sha256 over all files in that month dir
 
 Usage:
-  python scripts/session_append.py 2026-02 payload.json
-
-payload.json must be a JSON object. Minimal required keys:
-  - kind
-  - ts (optional; will be set if absent)
-Optional keys:
-  - run_id, status/conclusion, workflow, commit, repo, note, etc.
+  python scripts/session_append.py YYYY-MM payload.json
 """
 
 from __future__ import annotations
@@ -31,7 +25,11 @@ import os
 import sys
 from datetime import datetime, timezone
 from glob import glob
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Set, Tuple
+
+
+# ---- config: dedupe scope ----
+DEDUPE_KINDS = {"sentinel.run", "sentinel.run.start", "sentinel.run.end"}
 
 
 def utc_now_iso() -> str:
@@ -79,21 +77,6 @@ def ledger_path_for(month: str, day: str) -> str:
     return os.path.join("sessions", month, f"session_{day}.jsonl")
 
 
-def already_has_run_id(path: str, kind: str, run_id: str) -> bool:
-    if not run_id:
-        return False
-    if not os.path.exists(path):
-        return False
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            obj = safe_load_json_line(line)
-            if not obj:
-                continue
-            if str(obj.get("kind", "")) == kind and str(obj.get("run_id", "")) == run_id:
-                return True
-    return False
-
-
 def sha256_file(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -105,7 +88,7 @@ def sha256_file(path: str) -> str:
 def update_month_checksums(month_dir: str) -> str:
     """
     Compute checksums for all files in month_dir except checksums.sha256 itself.
-    Output format: "<sha256>  <relative_filename>"
+    Output format: "<sha256>  <filename>"
     """
     out_path = os.path.join(month_dir, "checksums.sha256")
     files = sorted(
@@ -122,22 +105,39 @@ def update_month_checksums(month_dir: str) -> str:
 
 
 def normalize_event(payload: Dict[str, Any]) -> Dict[str, Any]:
-    # minimal required
     kind = str(payload.get("kind", "")).strip()
     if not kind:
         raise ValueError("payload.kind is required")
 
-    # ts: set if absent
     ts = payload.get("ts")
     if not ts:
         payload["ts"] = utc_now_iso()
     else:
-        # validate parseable
-        _ = parse_ts(str(ts))
+        _ = parse_ts(str(ts))  # validate parseable
 
-    # standardize: keep both status & conclusion if provided, but prefer conclusion later in rollup
-    # no mutation here: append is write-only
     return payload
+
+
+def build_month_run_id_index(month_dir: str) -> Set[Tuple[str, str]]:
+    """
+    Scan all session_*.jsonl in the month dir and return a set of (kind, run_id)
+    for kinds in DEDUPE_KINDS only.
+    """
+    idx: Set[Tuple[str, str]] = set()
+    paths = sorted(glob(os.path.join(month_dir, "session_*.jsonl")))
+    for p in paths:
+        with open(p, "r", encoding="utf-8") as f:
+            for line in f:
+                obj = safe_load_json_line(line)
+                if not obj:
+                    continue
+                k = str(obj.get("kind", "")).strip()
+                rid = str(obj.get("run_id", "")).strip()
+                if not rid:
+                    continue
+                if k in DEDUPE_KINDS:
+                    idx.add((k, rid))
+    return idx
 
 
 def main() -> int:
@@ -151,27 +151,27 @@ def main() -> int:
     payload = load_json(payload_path)
     payload = normalize_event(payload)
 
-    ts = str(payload["ts"])
-    day = yyyymmdd_from_ts(ts)
-
     month_dir = ensure_month_dir(month)
-    ledger_path = ledger_path_for(month, day)
 
-    # Idempotency rule (default): dedupe by (kind, run_id) when run_id exists
-    kind = str(payload.get("kind", ""))
+    kind = str(payload.get("kind", "")).strip()
     run_id = str(payload.get("run_id", "")).strip()
 
-    if run_id and already_has_run_id(ledger_path, kind, run_id):
-        # still update checksums? No: no file changed. But safe to do anyway.
-        print(f"Skip append (duplicate run_id): kind={kind} run_id={run_id} file={ledger_path}")
-        return 0
+    # Month-wide idempotency for sentinel kinds only
+    if run_id and kind in DEDUPE_KINDS:
+        idx = build_month_run_id_index(month_dir)
+        if (kind, run_id) in idx:
+            print(f"Skip append (duplicate in month): kind={kind} run_id={run_id} month={month}")
+            return 0
+
+    ts = str(payload["ts"])
+    day = yyyymmdd_from_ts(ts)
+    ledger_path = ledger_path_for(month, day)
 
     # append one line (compact json)
     line = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     with open(ledger_path, "a", encoding="utf-8") as f:
         f.write(line + "\n")
 
-    # update checksums
     chk = update_month_checksums(month_dir)
 
     print(f"Appended: {ledger_path}")
