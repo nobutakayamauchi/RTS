@@ -2,27 +2,25 @@
 # -*- coding: utf-8 -*-
 
 """
-RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix + index snapshots
+RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix + index snapshots + evidence links
 - Read sessions/<YYYY-MM>/session_*.jsonl (JSON Lines)
 - Validate ledger (parseable JSON, required keys, ts parseable)
 - Sort events by timestamp
 - Compute:
     * Counts by kind
     * Latest tail (sentinel.run.end preferred; fallback sentinel.run)
-    * Transitions:
-        - status flip (success<->failure) for END stream
-        - failure streak start/end for END stream
-        - failure density spike (rolling window) for END stream
+    * Transitions (END stream):
+        - status flip
+        - failure streak start/end
+        - failure density spike
         - dangling run (START exists but END missing)
-    * Escalation metrics:
-        - fail_count_last_n, fail_density, burst_fail, recovery_speed, flip_frequency
-        - dangling_runs (count)
-    * Mutation scoring (explainable components + weights) + breakpoint reasons
+    * Escalation metrics + Mutation scoring + breakpoint reasons
+    * Evidence index: list evidence snapshots for the month, link in index.md
 - Write:
     sessions/<YYYY-MM>/index.json
     sessions/<YYYY-MM>/index.md
-    sessions/<YYYY-MM>/index_snapshot.json   (NEW)
-    sessions/<YYYY-MM>/index_snapshot.md     (NEW)
+    sessions/<YYYY-MM>/index_snapshot.json
+    sessions/<YYYY-MM>/index_snapshot.md
     incidents/evidence_snapshots/ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>.md (collision-free)
 
 Usage:
@@ -34,6 +32,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
@@ -66,7 +65,6 @@ def yyyymmdd_from_ts(ts: str) -> str:
 
 
 def hhmmssz_from_ts(ts: str) -> str:
-    # "2026-02-26T11:58:41Z" -> "115841Z"
     d = parse_ts(ts).astimezone(timezone.utc)
     return d.strftime("%H%M%SZ")
 
@@ -501,8 +499,46 @@ def compute_transitions_and_metrics(
 
 
 # =========================
-# Evidence pack (collision-free)
+# Evidence pack + evidence index (NEW)
 # =========================
+
+def evidence_month_prefix(month: str) -> str:
+    # month "2026-02" -> "202602"
+    return month.replace("-", "")
+
+
+def list_evidence_for_month(month: str) -> List[Dict[str, Any]]:
+    """
+    Collect evidence snapshots for this month only.
+    Filename format:
+      ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>.md
+    Returns list sorted by (day, time) ascending.
+    """
+    base = os.path.join("incidents", "evidence_snapshots")
+    if not os.path.isdir(base):
+        return []
+    pref = evidence_month_prefix(month)
+    paths = sorted(glob(os.path.join(base, f"ESC_{pref}[0-9][0-9]_*_*.md")))
+
+    out: List[Dict[str, Any]] = []
+    rx = re.compile(r"^ESC_(\d{8})_([0-9A-Za-z]+)_(\d{6}Z)\.md$")
+    for p in paths:
+        fn = os.path.basename(p)
+        m = rx.match(fn)
+        if not m:
+            continue
+        day, rule, t = m.group(1), m.group(2), m.group(3)
+        out.append({
+            "day": day,
+            "time": t,
+            "rule": rule,
+            "file": fn,
+            "path": p,
+            "rel": os.path.join("..", "..", "incidents", "evidence_snapshots", fn),
+        })
+    out.sort(key=lambda x: (x["day"], x["time"]))
+    return out
+
 
 def write_evidence_pack(
     month: str,
@@ -556,14 +592,6 @@ def write_evidence_pack(
     lines.append(f"- reasons: `{', '.join(mutation.breakpoint_reasons) if mutation.breakpoint_reasons else '(none)'}`")
     lines.append(f"- mutation_score: `{mutation.mutation_score:.3f}`")
     lines.append("")
-    lines.append("### Components")
-    for k in sorted(mutation.components.keys()):
-        lines.append(f"- `{k}`: {mutation.components[k]:.6f}")
-    lines.append("")
-    lines.append("### Weights")
-    for k in sorted(mutation.weights.keys()):
-        lines.append(f"- `{k}`: {mutation.weights[k]:.6f}")
-    lines.append("")
     lines.append("## Last N END Events (tail)")
     lines.append("")
     for e in latest_tail:
@@ -580,7 +608,7 @@ def write_evidence_pack(
 
 
 # =========================
-# Index render
+# Index render (Evidence Links added)
 # =========================
 
 def render_index_md(
@@ -593,6 +621,8 @@ def render_index_md(
     issues: List[LedgerIssue],
     metrics: Optional[EscalationMetrics],
     mutation: Optional[MutationScore],
+    evidence_items: List[Dict[str, Any]],
+    evidence_latest_file: Optional[str],
 ) -> str:
     lines: List[str] = []
     lines.append(f"# RTS Sessions — {month}")
@@ -633,6 +663,27 @@ def render_index_md(
         lines.append(f"- mutation_score: `{mutation.mutation_score:.3f}` (breakpoint={mutation.breakpoint})")
         if mutation.breakpoint_reasons:
             lines.append(f"- breakpoint_reasons: `{', '.join(mutation.breakpoint_reasons)}`")
+    else:
+        lines.append("- (none)")
+    lines.append("")
+
+    # NEW: Evidence section
+    lines.append("## Evidence Snapshots")
+    lines.append("")
+    if evidence_latest_file:
+        # link from sessions/<month>/index.md to incidents/...
+        rel = os.path.join("..", "..", "incidents", "evidence_snapshots", evidence_latest_file)
+        lines.append(f"- latest: [{evidence_latest_file}]({rel})")
+    else:
+        lines.append("- latest: (none)")
+    lines.append("")
+    if evidence_items:
+        lines.append("### Recent (latest 12)")
+        lines.append("")
+        for it in evidence_items[-12:][::-1]:
+            rel = it["rel"]
+            fn = it["file"]
+            lines.append(f"- `{it['day']}` `{it['time']}` rule=`{it['rule']}` — [{fn}]({rel})")
     else:
         lines.append("- (none)")
     lines.append("")
@@ -687,16 +738,10 @@ def render_index_md(
 
 
 # =========================
-# Snapshot writers (NEW)
+# Snapshot writers
 # =========================
 
 def write_index_snapshots(month_dir: str, index_obj: Dict[str, Any], index_md: str) -> Tuple[str, str]:
-    """
-    Writes:
-      - sessions/<month>/index_snapshot.json
-      - sessions/<month>/index_snapshot.md
-    These are "freeze points" for artifact bundling / later forensic replay.
-    """
     snap_json = os.path.join(month_dir, "index_snapshot.json")
     snap_md = os.path.join(month_dir, "index_snapshot.md")
 
@@ -744,6 +789,9 @@ def main() -> int:
     updated_at_utc = utc_now_iso()
 
     evidence_path: Optional[str] = None
+    evidence_latest_file: Optional[str] = None
+
+    # If breakpoint, write evidence file (collision-free)
     if metrics and mutation and mutation.breakpoint:
         if day_tag is None:
             if latest_tail:
@@ -759,6 +807,13 @@ def main() -> int:
             latest_tail=tail(end_stream, n=12),
             dangling_run_ids=dangling_run_ids,
         )
+        if evidence_path:
+            evidence_latest_file = os.path.basename(evidence_path)
+
+    # Collect evidence list for the month (and also find latest if exists)
+    evidence_items = list_evidence_for_month(month)
+    if not evidence_latest_file and evidence_items:
+        evidence_latest_file = evidence_items[-1]["file"]
 
     index_obj: Dict[str, Any] = {
         "month": month,
@@ -790,7 +845,11 @@ def main() -> int:
         "raw_ledgers": raw_ledgers,
         "metrics_latest": asdict(metrics) if metrics else None,
         "mutation_latest": asdict(mutation) if mutation else None,
-        "evidence_latest": evidence_path,
+        "evidence_latest": evidence_latest_file,
+        "evidence_index": [
+            {"day": it["day"], "time": it["time"], "rule": it["rule"], "file": it["file"], "rel": it["rel"]}
+            for it in evidence_items[-200:]
+        ],
     }
 
     index_json_path = os.path.join(month_dir, "index.json")
@@ -806,6 +865,8 @@ def main() -> int:
         issues=issues,
         metrics=metrics,
         mutation=mutation,
+        evidence_items=evidence_items,
+        evidence_latest_file=evidence_latest_file,
     )
 
     with open(index_json_path, "w", encoding="utf-8") as f:
@@ -815,7 +876,6 @@ def main() -> int:
     with open(index_md_path, "w", encoding="utf-8") as f:
         f.write(md + "\n")
 
-    # NEW: freeze snapshots
     snap_json, snap_md = write_index_snapshots(month_dir, index_obj, md)
 
     print(f"Wrote: {index_json_path}")
