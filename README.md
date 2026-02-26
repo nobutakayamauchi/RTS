@@ -67,3 +67,7 @@ Run locally:
 ```bash
 cd starter/python
 python START_HERE.py
+
+Execution without provenance creates structural fragility.
+
+RTS introduces structural continuity.
