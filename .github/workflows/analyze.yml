@@ -99,7 +99,7 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
       # -------------------------------
-      # RTS Analysis
+      # RTS Analysis (do not block END/rollup)
       # -------------------------------
       - name: Run RTS Evidence Analysis
         run: |
@@ -108,37 +108,6 @@ jobs:
       - name: Run RTS Agent Analyze
         run: |
           python scripts/rts_agent_analyze.py
-
-      # -------------------------------
-      # Commit analysis results (if changed)
-      # -------------------------------
-      - name: Commit analysis results (if changed)
-        run: |
-          set -e
-          git config user.name "github-actions"
-          git config user.email "actions@users.noreply.github.com"
-
-          git add analysis/ || true
-
-          if git diff --cached --quiet; then
-            echo "No analysis changes."
-            exit 0
-          fi
-
-          git commit -m "RTS automated analysis update" || true
-
-          for i in 1 2 3; do
-            git pull --rebase origin main || true
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            echo "push failed, retry..."
-            sleep 2
-          done
-
-          echo "push failed after retries"
-          exit 1
 
       # -------------------------------
       # RUN_END (sentinel.run.end + legacy marker)
@@ -162,7 +131,7 @@ jobs:
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
           run_id = str(os.environ.get("RUN_ID",""))
           repo = os.environ.get("REPO","")
-          status = (os.environ.get("JOB_STATUS","") or "").lower()  # success/failure/cancelled
+          status = (os.environ.get("JOB_STATUS","") or "").lower()
           base = {
             "ts": ts,
             "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
@@ -177,18 +146,12 @@ jobs:
             "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
             "note": "analysis finished",
           }
-
-          end_payload = dict(base)
-          end_payload["kind"] = "sentinel.run.end"
-
-          legacy_payload = dict(base)
-          legacy_payload["kind"] = "sentinel.run"  # legacy compatibility
-
+          end_payload = dict(base); end_payload["kind"] = "sentinel.run.end"
+          legacy_payload = dict(base); legacy_payload["kind"] = "sentinel.run"
           with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
             json.dump(end_payload,f,ensure_ascii=False,indent=2)
           with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
             json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
-
           print("wrote /tmp/session_payload_end.json")
           print("wrote /tmp/session_payload_legacy.json")
           PY
@@ -245,7 +208,7 @@ jobs:
       # -------------------------------
       # Evidence Auto Cull (SAFE)
       # -------------------------------
-      - name: Evidence Auto Cull
+      - name: Evidence Auto Cull (safe)
         if: always()
         shell: bash
         run: |
@@ -253,27 +216,34 @@ jobs:
           python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
-      # Commit sessions/ indexes (human-first)
+      # Single Commit & Push (analysis + sessions + evidence)
       # -------------------------------
-      - name: Commit session outputs (if changed)
+      - name: Commit outputs (analysis + sessions + evidence) if changed
         if: always()
+        shell: bash
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
+          # Stage ALL relevant outputs (including deletions by cull)
+          git add analysis/ || true
           git add "sessions/${SESSION_MONTH}/" || true
-          git add "incidents/evidence_snapshots/" || true
+          git add -A "incidents/evidence_snapshots/" || true
 
           if git diff --cached --quiet; then
-            echo "No session changes."
+            echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "RTS: session ledger update (${SESSION_MONTH})" || true
+          git commit -m "RTS: automated update (${SESSION_MONTH})" || true
 
+          # Safe sync + retry
           for i in 1 2 3; do
+            git stash -u || true
             git pull --rebase origin main || true
+            git stash pop || true
+
             if git push origin main; then
               echo "push ok"
               exit 0
