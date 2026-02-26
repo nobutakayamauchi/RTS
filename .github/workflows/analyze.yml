@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - main
-
   schedule:
     - cron: "0 3 * * *"
-
   workflow_dispatch:
 
 permissions:
@@ -35,109 +33,74 @@ jobs:
         with:
           python-version: "3.11"
 
-      # -----------------------------
-      # Install deps (safe empty)
-      # -----------------------------
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
 
       # -----------------------------
-      # RTS Evidence Analyze
+      # Core Analysis
       # -----------------------------
       - name: Run RTS Evidence Analysis
         run: |
           python scripts/rts_analysis_engine.py
 
-      # -----------------------------
-      # RTS Agent Path Analyze ⭐ NEW
-      # -----------------------------
       - name: Run RTS Agent Analyze
         run: |
           python scripts/rts_agent_analyze.py
 
       # -----------------------------
-      # Commit auto generated files
+      # Session Ledger Append
       # -----------------------------
-      - name: Commit analysis results
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-          git add analysis/
-
-          git diff --cached --quiet || git commit -m "RTS automated analysis update"
-
-          git push
-
-                # --------------------------------
-      # Build session event JSON
-      # --------------------------------
       - name: Build session event payload
         run: |
-          mkdir -p scripts
-          cat > scripts/_tmp_event.json << EOF
-          {
-            "kind": "sentinel.run",
-            "workflow": "RTS Sentinel Analyze",
-            "status": "success",
-            "run_id": "${{ github.run_id }}",
-            "commit": "${{ github.sha }}",
-            "actor": "${{ github.actor }}",
-            "ts": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-            "note": "analysis updated"
-          }
-          EOF
+          python scripts/session_append.py
 
-      # --------------------------------
-      # Append raw session ledger
-      # --------------------------------
-      - name: Append session ledger
+      - name: Update checksums
         run: |
-          python scripts/session_append.py scripts/_tmp_event.json
+          if ls sessions/*/session_*.jsonl 1> /dev/null 2>&1; then
+            find sessions -name "session_*.jsonl" -exec sha256sum {} \; > sessions/$(date -u +%Y-%m)/checksums.sha256
+          fi
 
-      # --------------------------------
-      # Determine month
-      # --------------------------------
+      # -----------------------------
+      # Rollup (Proof page generation)
+      # -----------------------------
       - name: Set session month
         id: month
         run: |
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
 
-      # --------------------------------
-      # Rollup monthly index
-      # --------------------------------
       - name: Rollup monthly index
         run: |
           python scripts/session_rollup.py "$SESSION_MONTH"
 
-      # --------------------------------
-      # Pack raw logs
-      # --------------------------------
+      # -----------------------------
+      # Pack raw logs as artifact
+      # -----------------------------
       - name: Pack raw session logs
         run: |
-          python scripts/session_artifact_pack.py "$SESSION_MONTH"
+          mkdir -p artifact
+          if ls sessions/$SESSION_MONTH/session_*.jsonl 1> /dev/null 2>&1; then
+            tar -czf artifact/rts-sessions-$SESSION_MONTH.tar.gz sessions/$SESSION_MONTH/session_*.jsonl
+          fi
 
-      # --------------------------------
-      # Upload raw logs as artifact
-      # --------------------------------
       - name: Upload raw session artifact
         uses: actions/upload-artifact@v4
         with:
           name: rts-sessions-${{ env.SESSION_MONTH }}
-          path: sessions/${{ env.SESSION_MONTH }}/sessions_${{ env.SESSION_MONTH }}.zip
+          path: artifact/
 
-      # --------------------------------
-      # Commit light session index only
-      # --------------------------------
-      - name: Commit session index
+      # -----------------------------
+      # Commit generated files
+      # -----------------------------
+      - name: Commit changes
         run: |
           git config user.name "github-actions"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.email "actions@github.com"
 
-          git add sessions/${SESSION_MONTH}/index.json || true
-          git add sessions/${SESSION_MONTH}/index.md || true
-          git add sessions/${SESSION_MONTH}/checksums.sha256 || true
+          git add sessions/
+          git add analysis/
 
-          git diff --cached --quiet || git commit -m "RTS: update session ledger (${SESSION_MONTH})"
+          git diff --cached --quiet || git commit -m "RTS: automated analysis + session rollup"
+
+          git pull --rebase origin main || true
           git push
