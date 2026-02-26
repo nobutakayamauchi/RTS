@@ -15,10 +15,10 @@ AI systems increase execution speed.
 
 They do not preserve:
 
-- why a decision was made
-- which assumptions were active
-- which alternatives were rejected
-- what constraints influenced the action
+- why a decision was made  
+- which assumptions were active  
+- which alternatives were rejected  
+- what constraints influenced the action  
 
 When execution scales, traceability collapses.
 
@@ -32,14 +32,17 @@ RTS converts execution into structured provenance blocks.
 
 Each block records:
 
-- Context
-- Decision
-- Constraint
-- Assumption
-- Action
-- Outcome
+- Context  
+- Decision  
+- Constraint  
+- Assumption  
+- Action  
+- Outcome  
 
 This enables reconstruction of the decision environment — not just the output.
+
+Execution becomes traceable.  
+Incidents become reproducible.
 
 ---
 
@@ -47,10 +50,10 @@ This enables reconstruction of the decision environment — not just the output.
 
 RTS is not:
 
-- memory embedding
-- vector retrieval
-- workflow automation
-- monitoring software
+- memory embedding  
+- vector retrieval  
+- workflow automation  
+- monitoring software  
 
 It does not control agents.  
 It observes and formalizes execution.
@@ -62,5 +65,5 @@ It observes and formalizes execution.
 Run locally:
 
 ```bash
-starter/python
+cd starter/python
 python START_HERE.py
