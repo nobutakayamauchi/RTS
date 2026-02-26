@@ -2,10 +2,9 @@ name: RTS Sentinel Analyze
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   schedule:
-    - cron: "0 3 * * *" # 03:00 UTC daily
+    - cron: "0 3 * * *" # 03:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -22,246 +21,136 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      # ------------------------------------------------------------
-      # Checkout
-      # ------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ------------------------------------------------------------
-      # Python
-      # ------------------------------------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # ------------------------------------------------------------
-      # Install deps (safe empty)
-      # ------------------------------------------------------------
-      - name: Install dependencies
-        shell: bash
+      - name: Install dependencies (safe)
         run: |
-          set -euo pipefail
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            python -m pip install -r requirements.txt
-          else
-            echo "No requirements.txt — skipping."
-          fi
+          # requirements が無い運用でも落ちないようにする
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
-      # ------------------------------------------------------------
-      # RTS Evidence Analyze (existing pipeline)
-      # ------------------------------------------------------------
+      # ----------------------------
+      # RTS Analysis (existing)
+      # ----------------------------
       - name: Run RTS Evidence Analysis
-        shell: bash
         run: |
-          set -euo pipefail
-          python scripts/rts_analysis_engine.py || true
+          python scripts/rts_analysis_engine.py
 
-      # ------------------------------------------------------------
-      # RTS Agent Analyze (existing pipeline)
-      # ------------------------------------------------------------
       - name: Run RTS Agent Analyze
-        shell: bash
         run: |
-          set -euo pipefail
-          python scripts/rts_agent_analyze.py || true
+          python scripts/rts_agent_analyze.py
 
-      # ------------------------------------------------------------
-      # Commit analysis results (analysis/)
-      # ------------------------------------------------------------
       - name: Commit analysis results
-        shell: bash
         run: |
-          set -euo pipefail
-          git config user.name "actions-user"
+          set -e
+          git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          # Add only analysis outputs
-          if [ -d analysis ]; then
-            git add analysis/
-          fi
-
-          # Exit clean if no staged changes
+          git add analysis/ || true
           if git diff --cached --quiet; then
-            echo "No analysis changes to commit."
+            echo "No analysis changes."
             exit 0
           fi
 
           git commit -m "RTS automated analysis update"
+          git pull --rebase origin main
+          git push origin main
 
-          # Robust push (rebase if needed)
-          for i in 1 2 3; do
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            echo "push failed, retrying..."
-            git pull --rebase origin main || true
-            sleep 2
-          done
-
-          echo "push failed after retries"
-          exit 1
-
-      # ------------------------------------------------------------
-      # Build session event payload (NO-ARG crash-proof)
-      # ------------------------------------------------------------
-      - name: Build session event payload
-        id: session_payload
-        shell: bash
-        run: |
-          set -euo pipefail
-          PAYLOAD="/tmp/rts_session_event.json"
-
-          python - <<'PY' > "$PAYLOAD"
-import json, os, datetime
-
-def env(k, d=""):
-  return os.environ.get(k, d)
-
-run_id = env("GITHUB_RUN_ID")
-workflow = env("GITHUB_WORKFLOW")
-sha = env("GITHUB_SHA")
-ref = env("GITHUB_REF")
-actor = env("GITHUB_ACTOR")
-repo = env("GITHUB_REPOSITORY")
-server = env("GITHUB_SERVER_URL", "https://github.com")
-
-payload = {
-  "schema": "RTS-SESSION-EVENT-V1",
-  "created_at_utc": datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
-  "kind": "sentinel.run",
-  "repo": repo,
-  "ref": ref,
-  "actor": actor,
-  "workflow": workflow,
-  "run_id": run_id,
-  "status": "success",
-  "commit": sha,
-  "run_url": f"{server}/{repo}/actions/runs/{run_id}",
-  "note": "analysis updated"
-}
-
-print(json.dumps(payload, ensure_ascii=False))
-PY
-
-          echo "payload_path=$PAYLOAD" >> "$GITHUB_OUTPUT"
-          echo "payload:"
-          cat "$PAYLOAD"
-
-      # ------------------------------------------------------------
-      # Append session ledger (writes sessions/YYYY-MM/session_YYYYMMDD.jsonl)
-      # ------------------------------------------------------------
-      - name: Append session ledger
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/session_append.py "${{ steps.session_payload.outputs.payload_path }}"
-
-      # ------------------------------------------------------------
-      # Set session month (YYYY-MM)
-      # ------------------------------------------------------------
+      # ----------------------------
+      # Session ledger (human-first)
+      # ----------------------------
       - name: Set session month
-        id: session_month
-        shell: bash
         run: |
-          set -euo pipefail
-          MONTH="$(date -u +'%Y-%m')"
-          echo "month=$MONTH" >> "$GITHUB_OUTPUT"
-          echo "SESSION_MONTH=$MONTH" >> "$GITHUB_ENV"
-          echo "month=$MONTH"
+          echo "SESSION_MONTH=$(date -u +%Y-%m)" >> "$GITHUB_ENV"
 
-      # ------------------------------------------------------------
-      # Rollup monthly index (sessions/YYYY-MM/index.md + index.json + checksums)
-      # ------------------------------------------------------------
-      - name: Rollup monthly index
-        shell: bash
+      - name: Build session event payload (json)
         run: |
-          set -euo pipefail
+          cat > /tmp/session_payload.json <<'JSON'
+          {
+            "ts": "__TS__",
+            "kind": "sentinel.run",
+            "workflow": "__WORKFLOW__",
+            "run_id": "__RUN_ID__",
+            "status": "__STATUS__",
+            "commit": "__COMMIT__",
+            "actor": "__ACTOR__",
+            "repo": "__REPO__",
+            "ref": "__REF__",
+            "note": "analysis updated"
+          }
+          JSON
+
+          TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          sed -i "s/__TS__/${TS}/" /tmp/session_payload.json
+          sed -i "s/__WORKFLOW__/RTS Sentinel Analyze/" /tmp/session_payload.json
+          sed -i "s/__RUN_ID__/${GITHUB_RUN_ID}/" /tmp/session_payload.json
+          sed -i "s/__STATUS__/success/" /tmp/session_payload.json
+          sed -i "s/__COMMIT__/${GITHUB_SHA}/" /tmp/session_payload.json
+          sed -i "s/__ACTOR__/${GITHUB_ACTOR}/" /tmp/session_payload.json
+          sed -i "s#__REPO__#${GITHUB_REPOSITORY}#" /tmp/session_payload.json
+          sed -i "s/__REF__/${GITHUB_REF_NAME}/" /tmp/session_payload.json
+
+          cat /tmp/session_payload.json
+
+      - name: Append session ledger
+        run: |
+          python scripts/session_append.py /tmp/session_payload.json
+
+      - name: Rollup monthly index
+        run: |
           python scripts/session_rollup.py "$SESSION_MONTH"
 
-      # ------------------------------------------------------------
-      # Pack raw session logs (artifact) — never fail if missing
-      # ------------------------------------------------------------
-      - name: Pack raw session logs
-        id: raw_pack
-        shell: bash
+      # ----------------------------
+      # Raw logs -> Artifact (not git)
+      # ----------------------------
+      - name: Pack raw session logs (optional)
+        continue-on-error: true
         run: |
-          set -euo pipefail
+          python scripts/session_artifact_pack.py "$SESSION_MONTH"
 
-          OUT_DIR="/tmp/rts_artifacts"
-          mkdir -p "$OUT_DIR"
-
-          # Preferred: your packer script (month arg)
-          if [ -f "scripts/session_artifact_pack.py" ]; then
-            python scripts/session_artifact_pack.py "$SESSION_MONTH" || true
-          fi
-
-          # Fallback: always create a tar.gz of the month folder if it exists
-          MONTH_DIR="sessions/$SESSION_MONTH"
-          TAR_PATH="$OUT_DIR/rts_sessions_${SESSION_MONTH}.tar.gz"
-
-          if [ -d "$MONTH_DIR" ]; then
-            tar -czf "$TAR_PATH" "$MONTH_DIR"
-            echo "artifact_path=$TAR_PATH" >> "$GITHUB_OUTPUT"
-            echo "created $TAR_PATH"
+      - name: Detect packed artifact
+        run: |
+          if ls "sessions/${SESSION_MONTH}/artifacts/"*.zip >/dev/null 2>&1; then
+            echo "HAS_SESSION_ARTIFACT=1" >> "$GITHUB_ENV"
           else
-            echo "No sessions folder for $SESSION_MONTH — skipping tar."
-            echo "artifact_path=" >> "$GITHUB_OUTPUT"
+            echo "HAS_SESSION_ARTIFACT=0" >> "$GITHUB_ENV"
           fi
 
-      # ------------------------------------------------------------
-      # Upload raw session artifact (only if created)
-      # ------------------------------------------------------------
       - name: Upload raw session artifact
-        if: ${{ steps.raw_pack.outputs.artifact_path != '' }}
+        if: env.HAS_SESSION_ARTIFACT == '1'
         uses: actions/upload-artifact@v4
         with:
-          name: rts-sessions-${{ steps.session_month.outputs.month }}
-          path: ${{ steps.raw_pack.outputs.artifact_path }}
+          name: rts-session-raw-${{ env.SESSION_MONTH }}-${{ github.run_id }}
+          path: sessions/${{ env.SESSION_MONTH }}/artifacts/*.zip
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 14
 
-      # ------------------------------------------------------------
-      # Commit sessions index + ledgers (repo-side “one sheet” truth)
-      # ------------------------------------------------------------
+      # ----------------------------
+      # Commit sessions/ (indexes + checksums + ledger)
+      # ----------------------------
       - name: Commit session index
-        shell: bash
         run: |
-          set -euo pipefail
-          git config user.name "actions-user"
+          set -e
+          git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          MONTH_DIR="sessions/$SESSION_MONTH"
-          if [ ! -d "$MONTH_DIR" ]; then
-            echo "No $MONTH_DIR — nothing to commit."
-            exit 0
-          fi
-
-          git add "$MONTH_DIR/"
+          git add "sessions/${SESSION_MONTH}/index.md" "sessions/${SESSION_MONTH}/index.json" "sessions/${SESSION_MONTH}/checksums.sha256" || true
+          git add sessions/"${SESSION_MONTH}"/session_*.jsonl || true
 
           if git diff --cached --quiet; then
-            echo "No session changes to commit."
+            echo "No session changes."
             exit 0
           fi
 
           git commit -m "RTS: session ledger update (${SESSION_MONTH})"
-
-          # Robust push (rebase if needed)
-          for i in 1 2 3; do
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            echo "push failed, retrying..."
-            git pull --rebase origin main || true
-            sleep 2
-          done
-
-          echo "push failed after retries"
-          exit 1
-        
+          git pull --rebase origin main
+          git push origin main
