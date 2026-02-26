@@ -1,0 +1,18 @@
+{
+  "month": "2026-02",
+  "updated_at_utc": "2026-02-26T09:12:44Z",
+  "counts": {
+    "sentinel.run": 1
+  },
+  "latest": [
+    {
+      "ts": "2026-02-26T09:12:44Z",
+      "kind": "sentinel.run",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22435444552",
+      "status": "success",
+      "commit": "ef7604d215ae054b4abcebe9b00f5534f05daf5b",
+      "note": "analysis updated"
+    }
+  ]
+}
