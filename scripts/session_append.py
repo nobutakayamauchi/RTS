@@ -1,49 +1,41 @@
-# scripts/session_append.py
-import json, os, sys
-from datetime import datetime, timezone
+#!/usr/bin/env python3
+import json
+import os
+import sys
+from datetime import datetime
 
-def utc_now():
-    return datetime.now(timezone.utc).isoformat().replace("+00:00","Z")
+def parse_ts(ts: str) -> datetime:
+    # expecting "YYYY-MM-DDTHH:MM:SSZ"
+    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
 
-def month_dir(ts: str):
-    return ts[:7]  # YYYY-MM
+def main() -> None:
+    if len(sys.argv) < 2:
+        print("usage: session_append.py PAYLOAD_JSON_PATH [LEDGER_JSONL_PATH]", file=sys.stderr)
+        sys.exit(2)
 
-def day_str(ts: str):
-    return ts[:10].replace("-", "")  # YYYYMMDD
-
-def main():
-    payload_path = sys.argv[1]  # JSON 1件（ファイル）で渡す
+    payload_path = sys.argv[1]
     with open(payload_path, "r", encoding="utf-8") as f:
-        ev = json.load(f)
+        payload = json.load(f)
 
-    ev.setdefault("ts", utc_now())
-    yymm = month_dir(ev["ts"])
-    yyyymmdd = day_str(ev["ts"])
+    ts = payload.get("ts")
+    if not ts:
+        print("payload missing ts", file=sys.stderr)
+        sys.exit(2)
 
-    base = os.path.join("sessions", yymm)
-    os.makedirs(base, exist_ok=True)
+    dt = parse_ts(ts)
+    month = dt.strftime("%Y-%m")
+    day = dt.strftime("%Y%m%d")
 
-    raw_path = os.path.join(base, f"session_{yyyymmdd}.jsonl")
-    with open(raw_path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(ev, ensure_ascii=False) + "\n")
+    default_ledger = os.path.join("sessions", month, f"session_{day}.jsonl")
+    ledger_path = sys.argv[2] if len(sys.argv) >= 3 else default_ledger
 
-    # update index.json (light)
-    index_path = os.path.join(base, "index.json")
-    idx = {"month": yymm, "updated_at_utc": ev["ts"], "counts": {}, "latest": []}
-    if os.path.exists(index_path):
-        with open(index_path, "r", encoding="utf-8") as f:
-            idx = json.load(f)
+    os.makedirs(os.path.dirname(ledger_path), exist_ok=True)
 
-    kind = ev.get("kind", "unknown")
-    idx["counts"][kind] = int(idx["counts"].get(kind, 0)) + 1
-    idx["updated_at_utc"] = ev["ts"]
+    line = json.dumps(payload, ensure_ascii=False)
+    with open(ledger_path, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
-    # keep last 30 event summaries
-    summary = {k: ev.get(k) for k in ["ts","kind","workflow","run_id","status","commit","note"] if k in ev}
-    idx["latest"] = (idx.get("latest", []) + [summary])[-30:]
-
-    with open(index_path, "w", encoding="utf-8") as f:
-        json.dump(idx, f, ensure_ascii=False, indent=2)
+    print(f"appended: {ledger_path}")
 
 if __name__ == "__main__":
     main()
