@@ -69,3 +69,75 @@ jobs:
           git diff --cached --quiet || git commit -m "RTS automated analysis update"
 
           git push
+
+                # --------------------------------
+      # Build session event JSON
+      # --------------------------------
+      - name: Build session event payload
+        run: |
+          mkdir -p scripts
+          cat > scripts/_tmp_event.json << EOF
+          {
+            "kind": "sentinel.run",
+            "workflow": "RTS Sentinel Analyze",
+            "status": "success",
+            "run_id": "${{ github.run_id }}",
+            "commit": "${{ github.sha }}",
+            "actor": "${{ github.actor }}",
+            "ts": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "note": "analysis updated"
+          }
+          EOF
+
+      # --------------------------------
+      # Append raw session ledger
+      # --------------------------------
+      - name: Append session ledger
+        run: |
+          python scripts/session_append.py scripts/_tmp_event.json
+
+      # --------------------------------
+      # Determine month
+      # --------------------------------
+      - name: Set session month
+        id: month
+        run: |
+          echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
+
+      # --------------------------------
+      # Rollup monthly index
+      # --------------------------------
+      - name: Rollup monthly index
+        run: |
+          python scripts/session_rollup.py "$SESSION_MONTH"
+
+      # --------------------------------
+      # Pack raw logs
+      # --------------------------------
+      - name: Pack raw session logs
+        run: |
+          python scripts/session_artifact_pack.py "$SESSION_MONTH"
+
+      # --------------------------------
+      # Upload raw logs as artifact
+      # --------------------------------
+      - name: Upload raw session artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rts-sessions-${{ env.SESSION_MONTH }}
+          path: sessions/${{ env.SESSION_MONTH }}/sessions_${{ env.SESSION_MONTH }}.zip
+
+      # --------------------------------
+      # Commit light session index only
+      # --------------------------------
+      - name: Commit session index
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add sessions/${SESSION_MONTH}/index.json || true
+          git add sessions/${SESSION_MONTH}/index.md || true
+          git add sessions/${SESSION_MONTH}/checksums.sha256 || true
+
+          git diff --cached --quiet || git commit -m "RTS: update session ledger (${SESSION_MONTH})"
+          git push
