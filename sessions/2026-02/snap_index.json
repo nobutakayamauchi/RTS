@@ -1,0 +1,252 @@
+{
+  "month": "2026-02",
+  "kind": "SNAP",
+  "updated_at_utc": "2026-02-26T21:57:27Z",
+  "latest": {
+    "kind": "SNAP",
+    "day": "20260226",
+    "time": "064908Z",
+    "file": "SNAP_20260226_064908_run22431174702_L2.json",
+    "rel": "../../incidents/evidence_snapshots/SNAP_20260226_064908_run22431174702_L2.json"
+  },
+  "items": [
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "062545Z",
+      "file": "SNAP_20260224_062545_run22339331300_L2.json",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_062545_run22339331300_L2.json"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "125843Z",
+      "file": "SNAP_20260224_125843_RTS_Sentinel_Analyze_run22335968749_a1_L2.json",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_125843_RTS_Sentinel_Analyze_run22335968749_a1_L2.json"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143642Z",
+      "file": "SNAP_20260224_143642.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143642.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143643Z",
+      "file": "SNAP_20260224_143643.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143643.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143644Z",
+      "file": "SNAP_20260224_143644.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143644.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143645Z",
+      "file": "SNAP_20260224_143645.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143645.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143646Z",
+      "file": "SNAP_20260224_143646.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143646.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143647Z",
+      "file": "SNAP_20260224_143647.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143647.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143648Z",
+      "file": "SNAP_20260224_143648.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143648.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143649Z",
+      "file": "SNAP_20260224_143649.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143649.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143650Z",
+      "file": "SNAP_20260224_143650.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143650.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143651Z",
+      "file": "SNAP_20260224_143651.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143651.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143652Z",
+      "file": "SNAP_20260224_143652.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143652.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143653Z",
+      "file": "SNAP_20260224_143653.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143653.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143654Z",
+      "file": "SNAP_20260224_143654.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143654.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143655Z",
+      "file": "SNAP_20260224_143655.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143655.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "143656Z",
+      "file": "SNAP_20260224_143656.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_143656.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145707Z",
+      "file": "SNAP_20260224_145707.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145707.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145708Z",
+      "file": "SNAP_20260224_145708.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145708.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145709Z",
+      "file": "SNAP_20260224_145709.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145709.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145710Z",
+      "file": "SNAP_20260224_145710.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145710.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145711Z",
+      "file": "SNAP_20260224_145711.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145711.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145712Z",
+      "file": "SNAP_20260224_145712.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145712.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145713Z",
+      "file": "SNAP_20260224_145713.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145713.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145714Z",
+      "file": "SNAP_20260224_145714.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145714.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145715Z",
+      "file": "SNAP_20260224_145715.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145715.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145716Z",
+      "file": "SNAP_20260224_145716.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145716.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145717Z",
+      "file": "SNAP_20260224_145717.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145717.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145718Z",
+      "file": "SNAP_20260224_145718.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145718.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145719Z",
+      "file": "SNAP_20260224_145719.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145719.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145720Z",
+      "file": "SNAP_20260224_145720.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145720.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145721Z",
+      "file": "SNAP_20260224_145721.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145721.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260224",
+      "time": "145722Z",
+      "file": "SNAP_20260224_145722.bin",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260224_145722.bin"
+    },
+    {
+      "kind": "SNAP",
+      "day": "20260226",
+      "time": "064908Z",
+      "file": "SNAP_20260226_064908_run22431174702_L2.json",
+      "rel": "../../incidents/evidence_snapshots/SNAP_20260226_064908_run22431174702_L2.json"
+    }
+  ]
+}
