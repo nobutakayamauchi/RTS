@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   actions: read
+  issues: write
 
 concurrency:
   group: rts-sentinel-analyze-main
@@ -99,15 +100,45 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
       # -------------------------------
-      # RTS Analysis (do not block END/rollup)
+      # RTS Analysis
       # -------------------------------
       - name: Run RTS Evidence Analysis
+        if: always()
         run: |
           python scripts/rts_analysis_engine.py
 
       - name: Run RTS Agent Analyze
+        if: always()
         run: |
           python scripts/rts_agent_analyze.py
+
+      # -------------------------------
+      # Commit analysis results (if changed)
+      # -------------------------------
+      - name: Commit analysis results (if changed)
+        if: always()
+        run: |
+          set -e
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add analysis/ || true
+
+          if git diff --cached --quiet; then
+            echo "No analysis changes."
+          else
+            git commit -m "RTS automated analysis update" || true
+
+            for i in 1 2 3; do
+              git pull --rebase origin main || true
+              if git push origin main; then
+                echo "push ok"
+                break
+              fi
+              echo "push failed, retry..."
+              sleep 2
+            done
+          fi
 
       # -------------------------------
       # RUN_END (sentinel.run.end + legacy marker)
@@ -131,7 +162,7 @@ jobs:
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
           run_id = str(os.environ.get("RUN_ID",""))
           repo = os.environ.get("REPO","")
-          status = (os.environ.get("JOB_STATUS","") or "").lower()
+          status = (os.environ.get("JOB_STATUS","") or "").lower()  # success/failure/cancelled
           base = {
             "ts": ts,
             "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
@@ -146,12 +177,18 @@ jobs:
             "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
             "note": "analysis finished",
           }
-          end_payload = dict(base); end_payload["kind"] = "sentinel.run.end"
-          legacy_payload = dict(base); legacy_payload["kind"] = "sentinel.run"
+
+          end_payload = dict(base)
+          end_payload["kind"] = "sentinel.run.end"
+
+          legacy_payload = dict(base)
+          legacy_payload["kind"] = "sentinel.run"  # legacy compatibility
+
           with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
             json.dump(end_payload,f,ensure_ascii=False,indent=2)
           with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
             json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
+
           print("wrote /tmp/session_payload_end.json")
           print("wrote /tmp/session_payload_legacy.json")
           PY
@@ -170,12 +207,33 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
       # -------------------------------
-      # Rollup monthly index
+      # Rollup monthly index (writes sessions/<month>/index.* + snapshots + evidence links)
       # -------------------------------
       - name: Rollup monthly index
         if: always()
         run: |
           python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
+
+      # -------------------------------
+      # SNAP Index Rebuild (safe)
+      # -------------------------------
+      - name: SNAP Index Rebuild (safe)
+        if: always()
+        run: |
+          python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
+
+      # -------------------------------
+      # Escalation Issue Create (L3)
+      #   - reads sessions/<month>/index.json
+      #   - creates issue only if breakpoint
+      #   - drops marker incidents/escalations_issued/...
+      # -------------------------------
+      - name: Escalation Issue Create (L3)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/escalation_issue_create.py "${SESSION_MONTH}" || true
 
       # -------------------------------
       # Raw logs -> Artifact (not git)
@@ -188,7 +246,6 @@ jobs:
 
       - name: Detect packed artifact
         if: always()
-        id: detect_artifact
         run: |
           if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
             echo "HAS_SESSION_ARTIFACT=true" >> $GITHUB_ENV
@@ -216,34 +273,29 @@ jobs:
           python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
-      # Single Commit & Push (analysis + sessions + evidence)
+      # Commit outputs (analysis + sessions + incidents markers + evidence snapshots + snap index)
       # -------------------------------
-      - name: Commit outputs (analysis + sessions + evidence) if changed
+      - name: Commit outputs (analysis + sessions + incidents)
         if: always()
-        shell: bash
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          # Stage ALL relevant outputs (including deletions by cull)
           git add analysis/ || true
           git add "sessions/${SESSION_MONTH}/" || true
-          git add -A "incidents/evidence_snapshots/" || true
+          git add "incidents/evidence_snapshots/" || true
+          git add "incidents/escalations_issued/" || true
 
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No output changes."
             exit 0
           fi
 
-          git commit -m "RTS: automated update (${SESSION_MONTH})" || true
+          git commit -m "RTS: outputs update (${SESSION_MONTH})" || true
 
-          # Safe sync + retry
           for i in 1 2 3; do
-            git stash -u || true
             git pull --rebase origin main || true
-            git stash pop || true
-
             if git push origin main; then
               echo "push ok"
               exit 0
