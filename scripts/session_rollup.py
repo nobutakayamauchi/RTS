@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix + index snapshots + evidence links
+RTS Sessions rollup (FULL REPLACE)
+— START/END aware + evidence collision fix + index snapshots + evidence links
+— Evidence now includes ledger integrity + ledger fingerprint (sha256)
+
 - Read sessions/<YYYY-MM>/session_*.jsonl (JSON Lines)
 - Validate ledger (parseable JSON, required keys, ts parseable)
 - Sort events by timestamp
@@ -12,7 +15,7 @@ RTS Sessions rollup (FULL REPLACE) — START/END aware + evidence collision fix 
     * Transitions (END stream):
         - status flip
         - failure streak start/end
-        - failure density spike (rolling window)
+        - failure density spike
         - dangling run (START exists but END missing)
     * Escalation metrics + Mutation scoring + breakpoint reasons
     * Evidence index: list evidence snapshots for the month, link in index.md
@@ -30,6 +33,7 @@ Usage:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -81,6 +85,43 @@ def safe_load_json_line(line: str) -> Optional[Dict[str, Any]]:
 
 
 # =========================
+# Hash utilities (NEW)
+# =========================
+
+def sha256_bytes(b: bytes) -> str:
+    h = hashlib.sha256()
+    h.update(b)
+    return h.hexdigest()
+
+
+def sha256_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def ledger_fingerprint(ledger_paths: List[str]) -> Dict[str, Any]:
+    """
+    Evidence must be able to say:
+    - which ledger files were used
+    - what their digests were
+    - a stable aggregate fingerprint (sha256 over the digest list)
+    """
+    items = []
+    for p in sorted(ledger_paths):
+        if not os.path.isfile(p):
+            continue
+        items.append({"file": os.path.basename(p), "sha256": sha256_file(p)})
+
+    # aggregate hash (stable)
+    agg_payload = "\n".join([f'{it["sha256"]}  {it["file"]}' for it in items]).encode("utf-8")
+    agg = sha256_bytes(agg_payload) if items else ""
+    return {"aggregate_sha256": agg, "files": items}
+
+
+# =========================
 # Validation / normalization
 # =========================
 
@@ -110,26 +151,29 @@ def validate_month_ledgers(jsonl_paths: List[str]) -> List[LedgerIssue]:
     issues: List[LedgerIssue] = []
     for p in jsonl_paths:
         base = os.path.basename(p)
-        try:
-            with open(p, "r", encoding="utf-8") as f:
-                for i, line in enumerate(f, start=1):
-                    if not line.strip():
-                        continue
-                    obj = safe_load_json_line(line)
-                    if obj is None:
-                        issues.append(LedgerIssue(base, i, "ERROR", "invalid JSON"))
-                        continue
-                    for k in REQUIRED_KEYS:
-                        if k not in obj:
-                            issues.append(LedgerIssue(base, i, "ERROR", f"missing key: {k}"))
-                    try:
-                        parse_ts(str(obj.get("ts", "")))
-                    except Exception:
-                        issues.append(LedgerIssue(base, i, "ERROR", "unparseable ts"))
-        except FileNotFoundError:
-            # race-safe
-            continue
+        with open(p, "r", encoding="utf-8") as f:
+            for i, line in enumerate(f, start=1):
+                if not line.strip():
+                    continue
+                obj = safe_load_json_line(line)
+                if obj is None:
+                    issues.append(LedgerIssue(base, i, "ERROR", "invalid JSON"))
+                    continue
+                for k in REQUIRED_KEYS:
+                    if k not in obj:
+                        issues.append(LedgerIssue(base, i, "ERROR", f"missing key: {k}"))
+                try:
+                    parse_ts(str(obj.get("ts", "")))
+                except Exception:
+                    issues.append(LedgerIssue(base, i, "ERROR", "unparseable ts"))
     return issues
+
+
+def ledger_integrity_summary(issues: List[LedgerIssue]) -> Dict[str, Any]:
+    err = sum(1 for x in issues if x.severity == "ERROR")
+    warn = sum(1 for x in issues if x.severity == "WARN")
+    status = "DEGRADED" if issues else "OK"
+    return {"status": status, "errors": err, "warnings": warn}
 
 
 def read_month_events(month: str) -> Tuple[List[Dict[str, Any]], List[str], List[str]]:
@@ -186,9 +230,6 @@ def split_sentinel_stream(events: List[Dict[str, Any]]) -> Tuple[List[Dict[str, 
 
 
 def end_stream_dedup_by_run_id(end_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    If both sentinel.run and sentinel.run.end exist for same run_id, keep the later ts.
-    """
     best: Dict[str, Dict[str, Any]] = {}
     for e in end_events:
         rid = str(e.get("run_id"))
@@ -311,8 +352,7 @@ def compute_transitions_and_metrics(
                 kind="sentinel.run",
                 severity="HIGH",
                 title="dangling runs detected (start without end)",
-                detail=f"dangling_runs={len(dangling_run_ids)} ids={','.join(dangling_run_ids[:8])}"
-                       + (" ..." if len(dangling_run_ids) > 8 else ""),
+                detail=f"dangling_runs={len(dangling_run_ids)} ids={','.join(dangling_run_ids[:8])}" + (" ..." if len(dangling_run_ids) > 8 else ""),
             )
         )
 
@@ -402,9 +442,12 @@ def compute_transitions_and_metrics(
     burst_fail = sum(burst_window) >= BURST_B
 
     recovery_speed_runs: Optional[int] = None
+    last_end: Optional[int] = None
     for i in range(1, len(end_stream)):
         if is_failure_status(statuses[i - 1]) and (not is_failure_status(statuses[i])):
-            recovery_speed_runs = 0
+            last_end = i
+    if last_end is not None:
+        recovery_speed_runs = 0
 
     fn_eff = min(FLIP_WINDOW_N, len(end_stream))
     flips_in_last_n = sum(1 for idx in flips_idx if idx >= (len(end_stream) - fn_eff))
@@ -508,17 +551,10 @@ def compute_transitions_and_metrics(
 # =========================
 
 def evidence_month_prefix(month: str) -> str:
-    # month "2026-02" -> "202602"
     return month.replace("-", "")
 
 
 def list_evidence_for_month(month: str) -> List[Dict[str, Any]]:
-    """
-    Collect evidence snapshots for this month only.
-    Filename format:
-      ESC_<YYYYMMDD>_<RULE>_<HHMMSSZ>.md
-    Returns list sorted by (day, time) ascending.
-    """
     base = os.path.join("incidents", "evidence_snapshots")
     if not os.path.isdir(base):
         return []
@@ -553,11 +589,14 @@ def write_evidence_pack(
     mutation: MutationScore,
     latest_tail: List[Dict[str, Any]],
     dangling_run_ids: List[str],
+    # NEW:
+    integrity: Dict[str, Any],
+    fp: Dict[str, Any],
+    ledger_files: List[str],
 ) -> Optional[str]:
     os.makedirs(os.path.join("incidents", "evidence_snapshots"), exist_ok=True)
     rule = mutation.rule_version.replace("-", "")
 
-    # collision-free suffix
     try:
         time_tag = hhmmssz_from_ts(updated_at_utc)
     except Exception:
@@ -571,6 +610,34 @@ def write_evidence_pack(
     lines.append(f"- updated_at_utc: `{updated_at_utc}`")
     lines.append(f"- rule_version: `{mutation.rule_version}`")
     lines.append("")
+
+    # NEW: Integrity + fingerprint (THE FIX)
+    lines.append("## Ledger Integrity (evidence provenance)")
+    lines.append("")
+    lines.append(f"- status: **{integrity.get('status','')}**")
+    lines.append(f"- errors: `{integrity.get('errors', 0)}`")
+    lines.append(f"- warnings: `{integrity.get('warnings', 0)}`")
+    lines.append(f"- ledger_fingerprint_sha256: `{fp.get('aggregate_sha256','')}`")
+    lines.append("")
+    lines.append("### Ledgers used")
+    lines.append("")
+    if ledger_files:
+        for fn in ledger_files:
+            lines.append(f"- `{fn}`")
+    else:
+        lines.append("- (none)")
+    lines.append("")
+    lines.append("### Ledger file digests (sha256)")
+    lines.append("")
+    if fp.get("files"):
+        for it in fp["files"][:24]:
+            lines.append(f"- `{it['file']}`: `{it['sha256']}`")
+        if len(fp["files"]) > 24:
+            lines.append(f"- ... ({len(fp['files'])} files)")
+    else:
+        lines.append("- (none)")
+    lines.append("")
+
     lines.append("## Escalation Metrics (latest)")
     lines.append("")
     lines.append(f"- window_n: `{metrics.window_n}`")
@@ -776,6 +843,9 @@ def main() -> int:
     events, raw_ledgers, ledger_paths = read_month_events(month)
 
     issues = validate_month_ledgers(ledger_paths)
+    integrity = ledger_integrity_summary(issues)
+    fp = ledger_fingerprint(ledger_paths)
+
     counts = count_by_kind(events)
 
     _, ends, dangling_run_ids = split_sentinel_stream(events)
@@ -794,6 +864,7 @@ def main() -> int:
     evidence_path: Optional[str] = None
     evidence_latest_file: Optional[str] = None
 
+    # If breakpoint, write evidence file (collision-free) + include integrity+fingerprint
     if metrics and mutation and mutation.breakpoint:
         if day_tag is None:
             if latest_tail:
@@ -808,6 +879,9 @@ def main() -> int:
             mutation=mutation,
             latest_tail=tail(end_stream, n=12),
             dangling_run_ids=dangling_run_ids,
+            integrity=integrity,
+            fp=fp,
+            ledger_files=raw_ledgers,
         )
         if evidence_path:
             evidence_latest_file = os.path.basename(evidence_path)
@@ -823,6 +897,8 @@ def main() -> int:
         "ledger_integrity": {
             "status": "DEGRADED" if issues else "OK",
             "issues": [asdict(x) for x in issues[-200:]],
+            # NEW: fingerprint exposed in index too (handy)
+            "fingerprint_sha256": fp.get("aggregate_sha256", ""),
         },
         "sentinel": {
             "end_kinds": list(END_KINDS),
@@ -886,6 +962,7 @@ def main() -> int:
     if evidence_path:
         print(f"Wrote: {evidence_path}")
 
+    # corruption should be visible (non-zero)
     if issues:
         return 3
     return 0
