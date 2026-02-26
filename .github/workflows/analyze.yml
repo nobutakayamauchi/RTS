@@ -207,7 +207,7 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
       # -------------------------------
-      # Rollup monthly index (writes sessions/<month>/index.* + snapshots + evidence links)
+      # Rollup monthly index
       # -------------------------------
       - name: Rollup monthly index
         if: always()
@@ -223,10 +223,17 @@ jobs:
           python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
 
       # -------------------------------
+      # SNAP Auto Cull (safe)
+      # -------------------------------
+      - name: SNAP Auto Cull (safe)
+        if: always()
+        shell: bash
+        run: |
+          set -e
+          python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
+
+      # -------------------------------
       # Escalation Issue Create (L3)
-      #   - reads sessions/<month>/index.json
-      #   - creates issue only if breakpoint
-      #   - drops marker incidents/escalations_issued/...
       # -------------------------------
       - name: Escalation Issue Create (L3)
         if: always()
@@ -263,7 +270,7 @@ jobs:
           retention-days: 14
 
       # -------------------------------
-      # Evidence Auto Cull (SAFE)
+      # Evidence Auto Cull (safe)
       # -------------------------------
       - name: Evidence Auto Cull (safe)
         if: always()
@@ -273,7 +280,7 @@ jobs:
           python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
-      # Commit outputs (analysis + sessions + incidents markers + evidence snapshots + snap index)
+      # Commit outputs (analysis + sessions + incidents)
       # -------------------------------
       - name: Commit outputs (analysis + sessions + incidents)
         if: always()
@@ -286,6 +293,7 @@ jobs:
           git add "sessions/${SESSION_MONTH}/" || true
           git add "incidents/evidence_snapshots/" || true
           git add "incidents/escalations_issued/" || true
+          git add "incidents/snapshots/" || true
 
           if git diff --cached --quiet; then
             echo "No output changes."
