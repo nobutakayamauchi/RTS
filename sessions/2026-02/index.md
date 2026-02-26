@@ -1,6 +1,6 @@
 # RTS Sessions — 2026-02
 
-- updated_at_utc: `2026-02-26T12:54:19Z`
+- updated_at_utc: `2026-02-26T12:59:43Z`
 
 ## Ledger Integrity
 
@@ -8,9 +8,9 @@
 
 ## Counts
 
-- `sentinel.run`: 14
-- `sentinel.run.end`: 4
-- `sentinel.run.start`: 4
+- `sentinel.run`: 15
+- `sentinel.run.end`: 5
+- `sentinel.run.start`: 5
 
 ## Metrics (latest)
 
@@ -22,9 +22,14 @@
 - dangling_runs: `0`
 - mutation_score: `0.000` (breakpoint=False)
 
+## Evidence Snapshots
+
+- latest: (none)
+
+- (none)
+
 ## Latest (tail)
 
-- `2026-02-26T12:06:41Z` `sentinel.run` workflow=RTS Sentinel Analyze run=22441345387 status=success commit=063838e9e28526f0191a109187a2a66c0c4d85c3 — analysis updated
 - `2026-02-26T12:21:03Z` `sentinel.run` workflow=RTS Sentinel Analyze run=22441826069 status=success commit=0f604c99a7c339ab76f9c3286054fd984459386f — analysis updated
 - `2026-02-26T12:28:10Z` `sentinel.run` workflow=RTS Sentinel Analyze run=22442068220 status=success commit=3bfae143a2467b34a1cadbc760648f7d3dc44daf — analysis updated
 - `2026-02-26T12:34:33Z` `sentinel.run` workflow=RTS Sentinel Analyze run=22442286562 status=success commit=0e1308e41418838b221cc4a201f5ead7b9ad134f — analysis updated
@@ -32,6 +37,7 @@
 - `2026-02-26T12:45:45Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22442666766 status=success commit=90e35fad393216d96a52b43863e16ae367b94f70 — run ended
 - `2026-02-26T12:47:15Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22442719190 status=success commit=838b45f2af4f2d7f1345667fa265ec06d4f71939 — run ended
 - `2026-02-26T12:54:19Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22442961553 status=success commit=0117f657eac4ecbc93c117fb0fc96a7131e251d6 — run ended
+- `2026-02-26T12:59:43Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22443149026 status=success commit=856e8ad523f67579473eae0d20f4c152d33c0be1 — run ended
 
 ## Transitions (latest)
 

@@ -1,10 +1,10 @@
 {
   "month": "2026-02",
-  "updated_at_utc": "2026-02-26T12:54:19Z",
+  "updated_at_utc": "2026-02-26T12:59:43Z",
   "counts": {
-    "sentinel.run": 14,
-    "sentinel.run.start": 4,
-    "sentinel.run.end": 4
+    "sentinel.run": 15,
+    "sentinel.run.start": 5,
+    "sentinel.run.end": 5
   },
   "ledger_integrity": {
     "status": "OK",
@@ -20,15 +20,6 @@
     "dangling_runs": 0
   },
   "latest": [
-    {
-      "ts": "2026-02-26T12:06:41Z",
-      "kind": "sentinel.run",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": "22441345387",
-      "status": "success",
-      "commit": "063838e9e28526f0191a109187a2a66c0c4d85c3",
-      "note": "analysis updated"
-    },
     {
       "ts": "2026-02-26T12:21:03Z",
       "kind": "sentinel.run",
@@ -91,6 +82,15 @@
       "status": "success",
       "commit": "0117f657eac4ecbc93c117fb0fc96a7131e251d6",
       "note": "run ended"
+    },
+    {
+      "ts": "2026-02-26T12:59:43Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22443149026",
+      "status": "success",
+      "commit": "856e8ad523f67579473eae0d20f4c152d33c0be1",
+      "note": "run ended"
     }
   ],
   "transitions": [],
@@ -129,5 +129,6 @@
     "breakpoint": false,
     "breakpoint_reasons": []
   },
-  "evidence_latest": null
+  "evidence_latest": null,
+  "evidence_index": []
 }
