@@ -1,173 +1,236 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RTS 支援（Sプラン）</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RTS — Structure Cut Service</title>
+<meta name="description" content="RTS Structure Cut: restore explainable decision continuity. Beta 2 cases at $700. Standard $1000.">
 
 <style>
 :root{
-  --bg:#f1f5f9;
-  --panel:#ffffff;
-  --line:#e2e8f0;
-  --text:#0f172a;
-  --muted:#64748b;
-  --accent:#2563eb;
+  --bg:#0e1116;
+  --card:#151a22;
+  --text:#e6edf3;
+  --muted:#9aa4b2;
+  --line:#232a36;
+  --accent:#5da9ff;
+  --max:960px;
+  --radius:14px;
 }
-
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
-  line-height:1.75;
+  line-height:1.7;
 }
-
-.wrap{
-  max-width:880px;
-  margin:0 auto;
-  padding:56px 24px 100px;
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+header{
+  padding:70px 0 40px;
+  border-bottom:1px solid var(--line);
 }
-
-h1{
-  font-size:28px;
-  margin-bottom:20px;
-  font-weight:600;
-  letter-spacing:-0.01em;
+h1{font-size:34px;margin:0 0 20px}
+p{margin:0 0 16px}
+.lead{color:var(--muted);font-size:18px}
+main{padding:40px 0 80px}
+.grid{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:28px;
 }
-
-h2{
-  font-size:18px;
-  margin-top:48px;
-  margin-bottom:14px;
-  font-weight:600;
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
 }
-
 .card{
-  background:var(--panel);
+  background:var(--card);
   border:1px solid var(--line);
+  border-radius:var(--radius);
   padding:24px;
-  margin-top:18px;
-  border-radius:6px;
 }
-
-ul{
-  padding-left:20px;
+h2{margin:0 0 14px;font-size:20px}
+h3{margin:24px 0 8px;font-size:15px;color:#cbd5e1}
+ul{margin:8px 0 0 18px}
+li{margin:6px 0}
+.price{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:20px;
 }
-
-li{
-  margin-bottom:8px;
-}
-
-ol{
-  padding-left:20px;
-}
-
-.btn{
-  display:inline-block;
-  padding:12px 20px;
-  margin-top:20px;
-  border-radius:6px;
-  text-decoration:none;
-  font-weight:500;
-  font-size:14px;
-}
-
-.btn.primary{
-  background:var(--accent);
-  color:#ffffff;
-  border:none;
-}
-
-.btn.primary:hover{
-  opacity:0.92;
-}
-
-.small{
+.tag{
   font-size:12px;
   color:var(--muted);
-  margin-top:8px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
 }
-
-.footer{
-  margin-top:80px;
-  padding-top:20px;
+.amount{
+  font-size:32px;
+  font-weight:700;
+  margin:6px 0;
+}
+.btn{
+  display:inline-block;
+  margin-top:12px;
+  padding:10px 16px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#1f2632;
+  font-weight:600;
+}
+.btn:hover{background:#2a3445;text-decoration:none}
+footer{
   border-top:1px solid var(--line);
-  font-size:12px;
+  padding:20px 0;
+  font-size:13px;
   color:var(--muted);
 }
 </style>
-  
+</head>
+
 <body>
+
+<header>
 <div class="wrap">
+<h1>Explain your decisions. Or lose control.</h1>
 
-<h1>RTS 支援（Sプラン）</h1>
-
-<p>
-RTS自体は公開されています。<br>
-このページは有料のログ設計支援です。
+<p class="lead">
+When you cannot explain your decisions, you are already losing.
 </p>
 
 <p>
-既存ログを読み、構造的に再構築し、<br>
-<strong>1ルートを実行可能な状態に整理</strong>します。
+It starts subtly.
 </p>
 
-<div class="card">
-<strong>成果物</strong>
 <ul>
-<li>Decisionログ整理</li>
-<li>環境・制約の明文化</li>
-<li>実行可能な1ルート設計</li>
-<li>7日間アクションマップ</li>
+<li>You tweak prompts.</li>
+<li>You refactor quickly.</li>
+<li>You move branches around.</li>
+<li>You “just try something.”</li>
 </ul>
 
-<p class="small">
-※ブランチ拡張は含みません（1ルート限定）
+<p>
+The system works.
 </p>
-</div>
 
-<h2>対象</h2>
+<p>
+Until it doesn’t.
+</p>
+
+<p>
+Then you realize:
+</p>
+
 <ul>
-<li>AIで成果は出るが再現性が崩壊している</li>
-<li>説明責任が必要な立場にある</li>
-<li>構造的に整理したい</li>
+<li>You don’t remember the conditions under which that choice was made.</li>
+<li>You don’t remember the trade-offs you accepted.</li>
+<li>You don’t remember the risks you ignored.</li>
+<li>You don’t remember the moment you switched direction.</li>
 </ul>
 
-<h2>価格</h2>
+<p>
+There is no decision trail.
+There is no structural memory.
+</p>
 
-<div class="card">
-<p><strong>40,000円 / 1件</strong></p>
-<p>同時受付：最大2件</p>
-<p>納期目安：3〜7日</p>
-<p>基本：非同期（Zoomなし）</p>
+<p>
+And without that, there is no accountability.
+No reproducibility.
+No long-term stability.
+</p>
+
+<p>
+RTS is not a logging tool.
+</p>
+
+<p>
+It is a decision accountability layer.
+</p>
+
+<p>
+It captures reasoning, context, hesitation, conviction,
+environmental conditions, and switching points —
+so that when pressure comes,
+you don’t collapse into guesswork.
+</p>
+
 </div>
+</header>
 
-<h2>オプション</h2>
+<main>
+<div class="wrap grid">
+
+<section class="card">
+<h2>What You Receive</h2>
+
 <ul>
-<li>30分解説セッション：+15,000円</li>
-<li>解説動画作成：+20,000円</li>
+<li>One executable decision line (what to run now)</li>
+<li>Structural map (branches, dependencies, kill/keep decisions)</li>
+<li>RTS-formatted decision provenance</li>
+<li>Collapse risk detection (where fragility lives)</li>
 </ul>
 
-<h2>流れ</h2>
-<ol>
-<li>応募（ログ提出）</li>
-<li>適合確認</li>
-<li>決済（Stripe）</li>
-<li>構造監査・再設計</li>
-<li>納品</li>
+<h3>Process</h3>
+
+<ol style="margin-left:18px">
+<li>Application</li>
+<li>Fit review (accepted only if a clean line is possible)</li>
+<li>Private payment link issued</li>
+<li>Asynchronous structure cut</li>
+<li>Delivery document pack</li>
 </ol>
 
-<a href="YOUR_WAITLIST_URL" class="btn primary">応募 / ウェイトリスト</a>
+<h3>Not Included</h3>
 
-<div class="footer">
-<a href="../legal/tokusho/">特定商取引法表記</a> ・
-<a href="../legal/privacy/">プライバシー</a> ・
-<a href="../legal/terms/">利用規約</a>
-<br><br>
-© 2026 risingson / Nobutaka Yamauchi
+<ul>
+<li>Live Zoom sessions (available as add-on)</li>
+<li>Full implementation outsourcing</li>
+<li>Unstructured back-and-forth</li>
+</ul>
+
+</section>
+
+<aside class="card">
+
+<h2>Pricing</h2>
+
+<div class="price">
+<div class="tag">Beta — 2 cases only</div>
+<div class="amount">$700</div>
+<div>Application required. Payment link sent after acceptance.</div>
 </div>
 
+<div class="price">
+<div class="tag">Standard</div>
+<div class="amount">$1000</div>
+<div>Available after beta validation.</div>
 </div>
+
+<a class="btn" href="YOUR_APPLICATION_FORM_URL" target="_blank">
+Apply
+</a>
+
+<h3>Operator</h3>
+<p>
+Yamauchi Nobutaka<br>
+Trade Name: risingson
+</p>
+
+</aside>
+
+</div>
+</main>
+
+<footer>
+<div class="wrap">
+© risingson / RTS —
+<a href="../legal/tokusho.html">Legal Notice</a> |
+<a href="../legal/privacy.html">Privacy</a> |
+<a href="../legal/terms.html">Terms</a>
+</div>
+</footer>
+
 </body>
 </html>
