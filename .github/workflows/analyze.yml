@@ -21,17 +21,17 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      # -------------------------
+      # -------------------------------
       # Checkout
-      # -------------------------
+      # -------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # -------------------------
+      # -------------------------------
       # Python
-      # -------------------------
+      # -------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -43,9 +43,9 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
-      # -------------------------
+      # -------------------------------
       # RTS Analysis (existing)
-      # -------------------------
+      # -------------------------------
       - name: Run RTS Evidence Analysis
         run: |
           python scripts/rts_analysis_engine.py
@@ -54,103 +54,144 @@ jobs:
         run: |
           python scripts/rts_agent_analyze.py
 
-      - name: Commit analysis results (analysis/)
+      - name: Commit analysis results (if changed)
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
           git add analysis/ || true
-          git diff --cached --quiet && echo "No analysis changes" && exit 0
 
-          git commit -m "RTS automated analysis update"
-          git pull --rebase origin main
-          git push origin main
+          if git diff --cached --quiet; then
+            echo "No analysis changes."
+            exit 0
+          fi
 
-      # ============================================================
-      # Session ledger (human-first, always)
-      # ============================================================
+          git commit -m "RTS automated analysis update" || true
 
+          # rebase + retry push (avoid races)
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            if git push origin main; then
+              echo "push ok"
+              exit 0
+            fi
+            echo "push failed, retry..."
+            sleep 2
+          done
+
+          echo "push failed after retries"
+          exit 1
+
+      # -------------------------------
+      # Session ledger (human-first)
+      # -------------------------------
       - name: Set session month + day
-        if: always()
         run: |
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
-      - name: Build session event payload (python)
-        if: always()
+      # ✅ FIX: sed を廃止して Python で payload を生成（/ を含んでも壊れない）
+      - name: Build session event payload
         env:
-          RTS_KIND: "sentinel.run"
-          RTS_NOTE: "analysis updated"
-          RTS_WORKFLOW: ${{ github.workflow }}
-          RTS_RUN_ID: ${{ github.run_id }}
-          RTS_RUN_ATTEMPT: ${{ github.run_attempt }}
-          RTS_REPO: ${{ github.repository }}
-          RTS_REF: ${{ github.ref_name }}
-          RTS_ACTOR: ${{ github.actor }}
-          RTS_COMMIT: ${{ github.sha }}
-          RTS_STATUS: ${{ job.status }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          REPO: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          HEAD_SHA: ${{ github.sha }}
+          SERVER_URL: ${{ github.server_url }}
         run: |
-          python scripts/session_payload.py /tmp/session_payload.json
+          python - <<'PY'
+          import json, os, datetime
+          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+          run_id = os.environ["RUN_ID"]
+          repo = os.environ["REPO"]
+          payload = {
+            "ts": ts,
+            "kind": "sentinel.run",
+            "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
+            "run_id": run_id,
+            "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
+            "status": "success",  # workflow内なのでここは "success" でOK。失敗時は Escalation Recorder が拾う
+            "commit": os.environ.get("HEAD_SHA", ""),
+            "actor": os.environ.get("ACTOR", ""),
+            "repo": repo,
+            "ref": os.environ.get("REF_NAME", ""),
+            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
+            "note": "analysis updated",
+          }
+          with open("/tmp/session_payload.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+          print("wrote /tmp/session_payload.json")
+          PY
           cat /tmp/session_payload.json
 
       - name: Append session ledger
-        if: always()
         run: |
-          python scripts/session_append.py /tmp/session_payload.json
+          mkdir -p "sessions/${SESSION_MONTH}"
+          python scripts/session_append.py "/tmp/session_payload.json" "sessions/${SESSION_MONTH}/session_${SESSION_DAY}.jsonl"
 
-      - name: Detect transitions (butterfly / breakpoints)
-        if: always()
+      - name: Rollup monthly index
         run: |
-          python scripts/session_transition.py "$SESSION_MONTH" "$SESSION_DAY"
+          python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}" || python scripts/session_rollup.py "${SESSION_MONTH}" || true
 
-      - name: Rollup monthly index (sessions/)
-        if: always()
-        run: |
-          python scripts/session_rollup.py "$SESSION_MONTH"
-
-      # -------------------------
-      # Raw logs -> Artifact (NOT git)
-      # -------------------------
+      # -------------------------------
+      # Raw logs -> Artifact (not git)
+      # -------------------------------
       - name: Pack raw session logs
-        if: always()
         continue-on-error: true
         run: |
-          python scripts/session_artifact_pack.py "$SESSION_MONTH"
+          python scripts/session_artifact_pack.py "${SESSION_MONTH}" || true
 
       - name: Detect packed artifact
-        if: always()
+        id: detect_artifact
         run: |
-          if ls "sessions/$SESSION_MONTH/"*.tar.gz >/dev/null 2>&1; then
+          if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
             echo "HAS_SESSION_ARTIFACT=true" >> $GITHUB_ENV
           else
             echo "HAS_SESSION_ARTIFACT=false" >> $GITHUB_ENV
           fi
 
       - name: Upload raw session artifact
-        if: always()
         if: env.HAS_SESSION_ARTIFACT == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: rts-session-raw-${{ env.SESSION_MONTH }}-${{ github.run_id }}
-          path: sessions/${{ env.SESSION_MONTH }}/*.tar.gz
+          name: rts-session-raw-${{ env.SESSION_MONTH }}
+          path: sessions/${{ env.SESSION_MONTH }}/raw_session_*.zip
           if-no-files-found: ignore
           retention-days: 14
 
-      # -------------------------
-      # Commit sessions indexes + ledgers (git)
-      # -------------------------
-      - name: Commit sessions (indexes + ledgers)
-        if: always()
+      # -------------------------------
+      # Commit sessions/ indexes (human-first)
+      # -------------------------------
+      - name: Commit session indexes (if changed)
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          git add "sessions/$SESSION_MONTH/" || true
+          git add "sessions/${SESSION_MONTH}/index.md" "sessions/${SESSION_MONTH}/index.json" "sessions/${SESSION_MONTH}/checksums.sha256" "sessions/${SESSION_MONTH}/session_${SESSION_DAY}.jsonl" || true
 
-          git diff --cached --quiet && echo "No session changes" && exit 0
+          if git diff --cached --quiet; then
+            echo "No session changes."
+            exit 0
+          fi
 
-          git commit -m "RTS: session ledger update ($SESSION_MONTH)"
-          git pull --rebase origin main
-          git push origin main
+          git commit -m "RTS: session ledger update (${SESSION_MONTH})" || true
+
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            if git push origin main; then
+              echo "push ok"
+              exit 0
+            fi
+            echo "push failed, retry..."
+            sleep 2
+          done
+
+          echo "push failed after retries"
+          exit 1
