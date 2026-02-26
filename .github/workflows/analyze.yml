@@ -10,7 +10,6 @@ on:
 permissions:
   contents: write
   actions: read
-  issues: write
 
 concurrency:
   group: rts-sentinel-analyze-main
@@ -23,7 +22,7 @@ jobs:
 
     steps:
       # -------------------------------
-      # Checkout
+      # 1) Checkout
       # -------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       # -------------------------------
-      # Python
+      # 2) Python
       # -------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -45,7 +44,7 @@ jobs:
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
       # -------------------------------
-      # Session month/day (UTC)
+      # 3) Session month/day (UTC)
       # -------------------------------
       - name: Set session month + day (UTC)
         run: |
@@ -53,7 +52,7 @@ jobs:
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
       # -------------------------------
-      # RUN_START (sentinel.run.start)
+      # 4) RUN_START (sentinel.run.start)
       # -------------------------------
       - name: Build RUN_START payload
         if: always()
@@ -92,7 +91,6 @@ jobs:
             json.dump(payload,f,ensure_ascii=False,indent=2)
           print("wrote /tmp/session_payload_start.json")
           PY
-          cat /tmp/session_payload_start.json
 
       - name: Append RUN_START
         if: always()
@@ -100,48 +98,18 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
       # -------------------------------
-      # RTS Analysis
+      # 5) RTS Analysis (your existing engines)
       # -------------------------------
       - name: Run RTS Evidence Analysis
-        if: always()
         run: |
           python scripts/rts_analysis_engine.py
 
       - name: Run RTS Agent Analyze
-        if: always()
         run: |
           python scripts/rts_agent_analyze.py
 
       # -------------------------------
-      # Commit analysis results (if changed)
-      # -------------------------------
-      - name: Commit analysis results (if changed)
-        if: always()
-        run: |
-          set -e
-          git config user.name "github-actions"
-          git config user.email "actions@users.noreply.github.com"
-
-          git add analysis/ || true
-
-          if git diff --cached --quiet; then
-            echo "No analysis changes."
-          else
-            git commit -m "RTS automated analysis update" || true
-
-            for i in 1 2 3; do
-              git pull --rebase origin main || true
-              if git push origin main; then
-                echo "push ok"
-                break
-              fi
-              echo "push failed, retry..."
-              sleep 2
-            done
-          fi
-
-      # -------------------------------
-      # RUN_END (sentinel.run.end + legacy marker)
+      # 6) RUN_END (sentinel.run.end + legacy marker)
       # -------------------------------
       - name: Build RUN_END payloads
         if: always()
@@ -162,7 +130,7 @@ jobs:
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
           run_id = str(os.environ.get("RUN_ID",""))
           repo = os.environ.get("REPO","")
-          status = (os.environ.get("JOB_STATUS","") or "").lower()  # success/failure/cancelled
+          status = (os.environ.get("JOB_STATUS","") or "").lower()
           base = {
             "ts": ts,
             "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
@@ -182,19 +150,15 @@ jobs:
           end_payload["kind"] = "sentinel.run.end"
 
           legacy_payload = dict(base)
-          legacy_payload["kind"] = "sentinel.run"  # legacy compatibility
+          legacy_payload["kind"] = "sentinel.run"
 
           with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
             json.dump(end_payload,f,ensure_ascii=False,indent=2)
           with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
             json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
 
-          print("wrote /tmp/session_payload_end.json")
-          print("wrote /tmp/session_payload_legacy.json")
+          print("wrote end + legacy payloads")
           PY
-          cat /tmp/session_payload_end.json
-          echo "-----"
-          cat /tmp/session_payload_legacy.json
 
       - name: Append RUN_END (sentinel.run.end)
         if: always()
@@ -207,7 +171,7 @@ jobs:
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
       # -------------------------------
-      # Rollup monthly index
+      # 7) Rollup monthly index (sessions/<month>/index.* + snapshot.*)
       # -------------------------------
       - name: Rollup monthly index
         if: always()
@@ -215,35 +179,32 @@ jobs:
           python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
 
       # -------------------------------
-      # SNAP Index Rebuild (safe)
+      # 8) SNAP Index Rebuild + SNAP Cull (safe)
       # -------------------------------
       - name: SNAP Index Rebuild (safe)
         if: always()
+        continue-on-error: true
         run: |
           python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
 
-      # -------------------------------
-      # SNAP Auto Cull (safe)
-      # -------------------------------
       - name: SNAP Auto Cull (safe)
         if: always()
-        shell: bash
+        continue-on-error: true
         run: |
-          set -e
           python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
-      # Escalation Issue Create (L3)
+      # 9) Evidence Index Rebuild (ESC + SNAP, tolerant)  ★これが新規の要
+      #   - scripts/evidence_index_build.py が必要です
       # -------------------------------
-      - name: Escalation Issue Create (L3)
+      - name: Build Evidence + SNAP Index (safe)
         if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
         run: |
-          python scripts/escalation_issue_create.py "${SESSION_MONTH}" || true
+          python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
 
       # -------------------------------
-      # Raw logs -> Artifact (not git)
+      # 10) Raw logs -> Artifact (not git)
       # -------------------------------
       - name: Pack raw session logs
         if: always()
@@ -270,17 +231,17 @@ jobs:
           retention-days: 14
 
       # -------------------------------
-      # Evidence Auto Cull (safe)
+      # 11) Evidence Auto Cull (safe)
       # -------------------------------
       - name: Evidence Auto Cull (safe)
         if: always()
-        shell: bash
+        continue-on-error: true
         run: |
-          set -e
           python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
-      # Commit outputs (analysis + sessions + incidents)
+      # 12) Commit outputs (analysis + sessions + incidents indexes)
+      #   - ここでまとめて1回だけ push する
       # -------------------------------
       - name: Commit outputs (analysis + sessions + incidents)
         if: always()
@@ -289,14 +250,13 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
+          # stage (存在しない場合でも落ちない)
           git add analysis/ || true
-          git add "sessions/${SESSION_MONTH}/" || true
-          git add "incidents/evidence_snapshots/" || true
-          git add "incidents/escalations_issued/" || true
-          git add "incidents/snapshots/" || true
+          git add sessions/ || true
+          git add incidents/evidence_snapshots/ || true
 
           if git diff --cached --quiet; then
-            echo "No output changes."
+            echo "No outputs changed."
             exit 0
           fi
 
