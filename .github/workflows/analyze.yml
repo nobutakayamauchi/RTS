@@ -51,10 +51,11 @@ jobs:
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
-      # =========================================================
-      # TWO-PHASE LEDGER WRITE (START)  ★穴を潰す核心
-      # =========================================================
+      # -------------------------------
+      # RUN_START (sentinel.run.start)
+      # -------------------------------
       - name: Build RUN_START payload
+        if: always()
         env:
           WORKFLOW_NAME: ${{ github.workflow }}
           RUN_ID: ${{ github.run_id }}
@@ -69,29 +70,31 @@ jobs:
           python - <<'PY'
           import json, os, datetime
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-          run_id = os.environ["RUN_ID"]
-          repo = os.environ["REPO"]
+          run_id = str(os.environ.get("RUN_ID",""))
+          repo = os.environ.get("REPO","")
           payload = {
             "ts": ts,
             "kind": "sentinel.run.start",
-            "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
-            "run_id": str(run_id),
-            "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
-            "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
-            "commit": os.environ.get("HEAD_SHA", ""),
-            "actor": os.environ.get("ACTOR", ""),
+            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
+            "run_id": run_id,
+            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status": "started",
+            "commit": os.environ.get("HEAD_SHA",""),
+            "actor": os.environ.get("ACTOR",""),
             "repo": repo,
-            "ref": os.environ.get("REF_NAME", ""),
+            "ref": os.environ.get("REF_NAME",""),
             "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
             "note": "run started",
           }
-          with open("/tmp/session_payload_start.json", "w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
+          with open("/tmp/session_payload_start.json","w",encoding="utf-8") as f:
+            json.dump(payload,f,ensure_ascii=False,indent=2)
           print("wrote /tmp/session_payload_start.json")
           PY
           cat /tmp/session_payload_start.json
 
       - name: Append RUN_START
+        if: always()
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
@@ -119,24 +122,28 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No analysis changes."
-          else
-            git commit -m "RTS automated analysis update" || true
-
-            for i in 1 2 3; do
-              git pull --rebase origin main || true
-              if git push origin main; then
-                echo "push ok"
-                break
-              fi
-              echo "push failed, retry..."
-              sleep 2
-            done
+            exit 0
           fi
 
-      # =========================================================
-      # TWO-PHASE LEDGER WRITE (END)  ★必ず走る
-      # =========================================================
-      - name: Build RUN_END payloads (sentinel.run + sentinel.run.end)
+          git commit -m "RTS automated analysis update" || true
+
+          for i in 1 2 3; do
+            git pull --rebase origin main || true
+            if git push origin main; then
+              echo "push ok"
+              exit 0
+            fi
+            echo "push failed, retry..."
+            sleep 2
+          done
+
+          echo "push failed after retries"
+          exit 1
+
+      # -------------------------------
+      # RUN_END (sentinel.run.end + legacy marker)
+      # -------------------------------
+      - name: Build RUN_END payloads
         if: always()
         env:
           WORKFLOW_NAME: ${{ github.workflow }}
@@ -153,55 +160,51 @@ jobs:
           python - <<'PY'
           import json, os, datetime
           ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-          run_id = os.environ["RUN_ID"]
-          repo = os.environ["REPO"]
-          status = (os.environ.get("JOB_STATUS","") or "").lower()
-
+          run_id = str(os.environ.get("RUN_ID",""))
+          repo = os.environ.get("REPO","")
+          status = (os.environ.get("JOB_STATUS","") or "").lower()  # success/failure/cancelled
           base = {
             "ts": ts,
-            "workflow": os.environ.get("WORKFLOW_NAME", "RTS Sentinel Analyze"),
-            "run_id": str(run_id),
-            "run_number": int(os.environ.get("RUN_NUMBER", "0") or 0),
-            "run_attempt": int(os.environ.get("RUN_ATTEMPT", "1") or 1),
-            "status": status,  # success/failure/cancelled
-            "commit": os.environ.get("HEAD_SHA", ""),
-            "actor": os.environ.get("ACTOR", ""),
+            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
+            "run_id": run_id,
+            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status": status,
+            "commit": os.environ.get("HEAD_SHA",""),
+            "actor": os.environ.get("ACTOR",""),
             "repo": repo,
-            "ref": os.environ.get("REF_NAME", ""),
+            "ref": os.environ.get("REF_NAME",""),
             "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
-            "note": "run ended",
+            "note": "analysis finished",
           }
 
-          # legacy kind (compat): sentinel.run
-          payload_run = dict(base)
-          payload_run["kind"] = "sentinel.run"
+          end_payload = dict(base)
+          end_payload["kind"] = "sentinel.run.end"
 
-          # explicit end marker: sentinel.run.end
-          payload_end = dict(base)
-          payload_end["kind"] = "sentinel.run.end"
+          legacy_payload = dict(base)
+          legacy_payload["kind"] = "sentinel.run"  # legacy compatibility
 
-          with open("/tmp/session_payload.json", "w", encoding="utf-8") as f:
-            json.dump(payload_run, f, ensure_ascii=False, indent=2)
-          with open("/tmp/session_payload_end.json", "w", encoding="utf-8") as f:
-            json.dump(payload_end, f, ensure_ascii=False, indent=2)
+          with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
+            json.dump(end_payload,f,ensure_ascii=False,indent=2)
+          with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
+            json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
 
-          print("wrote /tmp/session_payload.json (sentinel.run)")
-          print("wrote /tmp/session_payload_end.json (sentinel.run.end)")
+          print("wrote /tmp/session_payload_end.json")
+          print("wrote /tmp/session_payload_legacy.json")
           PY
-          echo "---- /tmp/session_payload.json ----"
-          cat /tmp/session_payload.json
-          echo "---- /tmp/session_payload_end.json ----"
           cat /tmp/session_payload_end.json
+          echo "-----"
+          cat /tmp/session_payload_legacy.json
 
-      - name: Append RUN_END (sentinel.run)
-        if: always()
-        run: |
-          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload.json"
-
-      - name: Append RUN_END marker (sentinel.run.end)
+      - name: Append RUN_END (sentinel.run.end)
         if: always()
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
+
+      - name: Append RUN_END marker (sentinel.run legacy)
+        if: always()
+        run: |
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
       # -------------------------------
       # Rollup monthly index
@@ -222,6 +225,7 @@ jobs:
 
       - name: Detect packed artifact
         if: always()
+        id: detect_artifact
         run: |
           if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
             echo "HAS_SESSION_ARTIFACT=true" >> $GITHUB_ENV
@@ -237,6 +241,16 @@ jobs:
           path: sessions/${{ env.SESSION_MONTH }}/raw_session_*.zip
           if-no-files-found: ignore
           retention-days: 14
+
+      # -------------------------------
+      # Evidence Auto Cull (SAFE)
+      # -------------------------------
+      - name: Evidence Auto Cull
+        if: always()
+        shell: bash
+        run: |
+          set -e
+          python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
       # -------------------------------
       # Commit sessions/ indexes (human-first)
