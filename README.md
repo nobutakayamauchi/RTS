@@ -4,7 +4,9 @@
 
 AI systems reproduce output.
 
-RTS reproduces decision state.
+RTS reproduces decision state — in Git.
+
+RTS is a minimal, Git-native protocol for structurally auditable AI execution.
 
 ---
 
@@ -17,23 +19,28 @@ Reconstructable.
 
 ---
 
-## The Problem
+## Why Now
 
-AI scales execution.
+AI agents are scaling.
 
-Trust does not scale automatically.
+Execution speed is increasing.  
+Human oversight is shrinking.
 
-Logs show what happened.
+When execution scales without structural provenance, fragility becomes systemic.
 
-They do not show why.
-
-Weeks later, output may be reproducible.
-
-Intent is not.
+RTS addresses that structural gap.
 
 ---
 
-## The Difference
+## What RTS Changes
+
+Traditional logging answers:
+
+What happened?
+
+RTS answers:
+
+What state was active when the decision happened?
 
 RTS models execution as state transitions.
 
@@ -45,8 +52,7 @@ Each execution captures:
 - Constraints
 - Outcome
 
-The unit is the transition.
-
+The unit is the transition.  
 Not the log line.
 
 ---
@@ -63,39 +69,127 @@ You may need RTS if you:
 - Need defensible escalation evidence
 - Build long-lived AI systems
 
-Not for demos.
+Not for short-lived demos.
 
 ---
 
 ## Architecture (High Level)
 
-RTS uses four layers:
+RTS uses four structural layers:
 
-1. Append-only session ledger
+1. Append-only session ledger (JSONL)
 2. Deterministic monthly index
 3. Immutable snapshot sealing
-4. Breakpoint-triggered evidence
+4. Breakpoint-triggered evidence snapshots
 
 Git-native.
 
-No SaaS.
-
+No SaaS.  
 No telemetry.
+
+---
+
+## Ledger Structure
+
+### Session Ledger
+
+Path:
+
+    sessions/YYYY-MM/session_YYYYMMDD.jsonl
+
+Properties:
+
+- Append-only
+- One event per line
+- Deterministic
+- Git-tracked
+
+Example event:
+
+    {
+      "ts": "2026-02-26T13:55:48Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": 22440128387,
+      "status": "success",
+      "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6"
+    }
+
+---
+
+### Monthly Index
+
+Paths:
+
+    sessions/YYYY-MM/index.json
+    sessions/YYYY-MM/index.md
+
+Aggregates:
+
+- Run transitions
+- Dangling runs
+- Mutation indicators
+- Evidence linkage
+
+---
+
+### Snapshot
+
+Path:
+
+    sessions/YYYY-MM/index_snapshot.*
+
+Seals structural state at a point in time.
+
+Enables diff and replay.
+
+---
+
+### Evidence Snapshot (ESC)
+
+Path:
+
+    incidents/evidence_snapshots/ESC_<date>_<rule>.md
+
+Generated when structural mutation crosses a defined threshold.
+
+Captures:
+
+- Escalation metrics
+- Mutation score
+- Transition tail
+- Ledger reference
+
+---
+
+## Escalation Logic
+
+RTS detects structural mutation.
+
+When mutation crosses a boundary:
+
+- Breakpoint is flagged
+- Evidence snapshot is generated
+- State is sealed
+
+This enables unambiguous reconstruction.
 
 ---
 
 ## Live Inspection
 
-This repository is public.
+This repository is public and actively generating structural evidence.
 
 You can:
 
-- Inspect ledgers
+- Inspect session ledgers
 - Verify transitions
 - Review evidence snapshots
 - Clone and replay locally
 
 Transparency over opinion.
+
+If you want an online walkthrough, open an Issue.
 
 ---
 
