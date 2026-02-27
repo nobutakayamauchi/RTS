@@ -1,298 +1,150 @@
 <!doctype html>
 <html lang="ja">
-
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RTS Services — Breakpoint Consulting</title>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>
-Breakpoint Consulting — RTS Services
-</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,system-ui,"SF Pro Text";
-background:#f3f4f6;
-color:#111827;
-}
-
-.wrap{
-max-width:820px;
-margin:auto;
-padding:18px;
-}
-
-.card{
-background:white;
-border-radius:18px;
-padding:22px;
-box-shadow:0 14px 34px rgba(0,0,0,.08);
-margin-bottom:18px;
-}
-
-h1{
-margin:6px 0 12px;
-font-size:30px;
-}
-
-h2{
-margin-top:22px;
-font-size:20px;
-}
-
-p{
-line-height:1.7;
-color:#374151;
-}
-
-ul{
-padding-left:18px;
-line-height:1.7;
-}
-
-.price{
-font-size:24px;
-font-weight:800;
-margin:10px 0;
-}
-
-/* CTA */
-
-.cta{
-display:inline-block;
-padding:14px 18px;
-border-radius:14px;
-background:#111827;
-color:white;
-text-decoration:none;
-font-weight:700;
-margin-top:12px;
-}
-
-.notice{
-margin-top:10px;
-font-size:13px;
-color:#6b7280;
-line-height:1.6;
-}
-
-.protocol{
-margin-top:12px;
-font-size:14px;
-}
-
-.protocol a{
-color:#2563eb;
-text-decoration:none;
-font-weight:600;
-}
-
-.footer{
-text-align:center;
-font-size:12px;
-color:#6b7280;
-margin-top:26px;
-}
-
-.footer a{
-color:#2563eb;
-text-decoration:none;
-margin:0 6px;
-}
-
-</style>
-
+  <style>
+    body{
+      margin:0;
+      font-family:-apple-system,system-ui,"SF Pro Text";
+      background:linear-gradient(180deg,#f3f6ff,#ffffff);
+      color:#0b1220;
+    }
+    .wrap{max-width:860px;margin:auto;padding:18px;}
+    .card{
+      background:#fff;border-radius:22px;padding:20px;
+      box-shadow:0 14px 44px rgba(2,10,26,.12);
+      margin-bottom:18px;
+    }
+    h1{font-size:28px;line-height:1.15;margin:0 0 8px;}
+    h2{font-size:18px;margin:18px 0 10px;}
+    p{color:#4b5563;line-height:1.7;margin:10px 0;}
+    ul{padding-left:18px;line-height:1.8;margin:0;}
+    .price{
+      font-size:26px;font-weight:800;margin:6px 0 0;
+    }
+    .muted{color:#6b7280;font-size:13px;line-height:1.6;}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-block;text-decoration:none;
+      background:#0b1220;color:#fff;
+      padding:12px 16px;border-radius:12px;
+      font-size:14px;font-weight:700;
+    }
+    .btn.ghost{background:#fff;color:#0b1220;border:1px solid rgba(11,18,32,.18);}
+    .hr{height:1px;background:rgba(11,18,32,.08);margin:18px 0;}
+    .footer{
+      text-align:center;font-size:12px;color:#6b7280;margin-top:20px;
+    }
+    .footer a{color:#1f3a8a;text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+    .note{
+      background:#f8fafc;border:1px solid rgba(11,18,32,.10);
+      padding:12px 14px;border-radius:14px;
+      color:#334155;font-size:13px;line-height:1.6;
+      margin-top:12px;
+    }
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      background:#eef3f7;padding:2px 6px;border-radius:8px;
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="wrap">
-
-<div class="card">
-
-<h1>
-
-Breakpoint Consulting（ブレイクポイント・コンサルティング）
-
-</h1>
-
-<p>
-
-固定価格の診断型コンサルティングです。
-
-現状の混線点（Breakpoint）を特定し、
-
-再現可能な状態整理と次の打ち手を納品します。
-
-</p>
-
-
-<!-- ⭐ Rulebook導線（追加） -->
-
-<div class="protocol">
-
-RTS Protocolについて →
-
-<a href="../spec/rulebook/">
-
-RTS Rulebook
-
-</a>
-
-</div>
-
-
-<h2>価格</h2>
-
-<div class="price">
-
-49,500円（税込）
-
-</div>
-
-
-<h2>サービス内容</h2>
-
-<p>
-
-AI活用・業務構造・意思決定ログ状態を診断する
-
-固定価格型コンサルティング役務提供です。
-
-</p>
-
-
-<h2>納品物</h2>
-
-<ul>
-
-<li>構造診断レポート（PDF）</li>
-
-<li>優先順位付きアクションリスト</li>
-
-<li>リスク要因整理ドキュメント</li>
-
-<li>次ステップ実行計画</li>
-
-<li>納品時オンライン説明（最大90分）</li>
-
-</ul>
-
-
-<h2>提供形式</h2>
-
-<ul>
-
-<li>Zoomオンラインセッション</li>
-
-<li>PDF納品</li>
-
-<li>補足資料（必要時）</li>
-
-</ul>
-
-
-<h2>納期</h2>
-
-<ul>
-
-<li>申込後7日以内に日程調整</li>
-
-<li>実施後3営業日以内PDF納品</li>
-
-</ul>
-
-
-<h2>返金ポリシー</h2>
-
-<ul>
-
-<li>実施前キャンセル：全額返金</li>
-
-<li>実施後：返金不可</li>
-
-</ul>
-
-<p>
-
-詳細は
-
-<a href="../legal/tokusho/">
-
-特定商取引法に基づく表記
-
-</a>
-
-をご確認ください。
-
-</p>
-
-
-<h2>お申し込み</h2>
-
-<!-- ========================= -->
-<!-- Stripe通過後ここだけ変更 -->
-<!-- ========================= -->
-
-<a
-href="mailto:your@email.com?subject=Breakpoint Consulting 申込"
-class="cta">
-
-申込（決済リンク審査中）
-
-</a>
-
-<p class="notice">
-
-現在Stripe決済リンクは審査中です。
-
-申込後、承認された方へ決済リンクを個別送付します。
-
-</p>
-
-<!-- ========================= -->
-
-
-<h2>本サービスの性質</h2>
-
-<p>
-
-本サービスは成果保証型ではありません。
-
-診断および構造整理を目的とした
-
-コンサルティング役務提供です。
-
-売上・利益等を保証するものではありません。
-
-</p>
-
-</div>
-
-
-<div class="footer">
-
-<a href="../">Home</a> |
-
-<a href="../spec/rulebook/">Rulebook</a> |
-
-<a href="../legal/">Legal</a> |
-
-<a href="../legal/privacy/">Privacy</a> |
-
-<a href="../legal/terms/">Terms</a>
-
-<br><br>
-
-Created by Nobutaka Yamauchi ● MIT License
-
-</div>
-
-</div>
-
+  <div class="wrap">
+
+    <div class="card">
+      <div class="muted">RTS / Services</div>
+      <h1>Breakpoint Consulting（ブレイクポイント・コンサルティング）</h1>
+      <p>
+        固定価格の診断型コンサルティングです。現状の混線点（breakpoint）を特定し、
+        再現可能な状態整理と次の打ち手を納品します。
+      </p>
+
+      <h2>価格</h2>
+      <div class="price">49,500円（税込）</div>
+      <div class="muted">Payment method: credit card</div>
+
+      <div class="btnrow">
+        <!-- TODO: 決済リンクが発行されたら、下の href を差し替えてください -->
+        <!-- 例: href="https://buy.stripe.com/xxxxx" -->
+        <a class="btn" href="__STRIPE_PAYMENT_LINK__">購入（決済へ）</a>
+
+        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
+      </div>
+
+      <div class="note">
+        <b>差し替え箇所:</b> 上の <code>__STRIPE_PAYMENT_LINK__</code> を Stripe の決済リンクに置換してください。
+        （まだリンクが無い状態でも、ページ公開は可能）
+      </div>
+
+      <div class="hr"></div>
+
+      <h2>サービス内容</h2>
+      <p>本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型のコンサルティング役務提供です。</p>
+
+      <h2>納品物</h2>
+      <ul>
+        <li>構造診断レポート（PDF形式）</li>
+        <li>優先順位付きアクションリスト</li>
+        <li>リスク要因の整理ドキュメント</li>
+        <li>次ステップ実行計画</li>
+        <li>納品時オンライン説明（最大90分）</li>
+      </ul>
+
+      <h2>提供形式</h2>
+      <ul>
+        <li>Zoomによるオンラインセッション</li>
+        <li>PDFドキュメント納品</li>
+        <li>必要に応じて補足資料</li>
+      </ul>
+
+      <h2>納期</h2>
+      <ul>
+        <li>お申し込み後7日以内に日程調整</li>
+        <li>セッション実施後3営業日以内にPDF納品</li>
+      </ul>
+
+      <h2>返金ポリシー</h2>
+      <ul>
+        <li>セッション実施前のキャンセル：全額返金</li>
+        <li>セッション実施後：返金不可</li>
+      </ul>
+      <p class="muted">詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。</p>
+
+      <h2>本サービスの性質</h2>
+      <p class="muted">
+        本サービスは成果保証型ではありません。診断および構造整理を目的とするコンサルティング役務提供です。<br>
+        実行結果・売上・利益等を保証するものではありません。<br>
+        本サービスはデジタル成果物（PDF等）を含むコンサルティング役務提供に該当します。
+      </p>
+
+      <div class="hr"></div>
+
+      <h2>関連</h2>
+      <div class="btnrow">
+        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
+        <a class="btn ghost" href="/RTS/">Home</a>
+        <a class="btn ghost" href="/RTS/legal/">Legal</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div style="margin-bottom:10px;">
+        <a href="/RTS/">Home</a> |
+        <a href="/RTS/services/">Services</a> |
+        <a href="/RTS/docs/rulebook/">Rulebook</a> |
+        <a href="/RTS/legal/tokusho/">Tokusho</a> |
+        <a href="/RTS/legal/privacy/">Privacy</a> |
+        <a href="/RTS/legal/terms/">Terms</a>
+      </div>
+      Created by Nobutaka Yamauchi ● MIT License
+    </div>
+
+  </div>
 </body>
-
 </html>
