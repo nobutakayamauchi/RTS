@@ -113,7 +113,18 @@ RTS generates four structural artifacts:
 Git-native.
 No SaaS.
 No telemetry.
+## Architectural Scope
 
+RTS guarantees structural reconstructability of AI execution states.
+
+This guarantee is intentionally narrow.
+
+RTS does not validate ethics, legality, policy correctness, or outcome quality.
+
+RTS ensures that decision state is never structurally lost.
+
+Semantic guarantees require additional layers.
+RTS provides the base layer those systems depend on.
 ---
 
 ## Repository Structure
@@ -223,7 +234,21 @@ RTS is not:
 RTS formalizes execution state.
 
 ---
+## Future Extensions
 
+Because execution state becomes reconstructable and immutable,
+higher-order governance systems become technically possible.
+
+Such layers may include:
+
+- Tamper-evident verification
+- Policy deviation detection
+- Escalation accountability models
+- Organizational responsibility flows
+
+RTS does not provide these today.
+
+It provides the structural condition required to build them.
 ## Vision
 
 AI execution will scale.  
