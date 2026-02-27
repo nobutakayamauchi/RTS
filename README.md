@@ -2,207 +2,158 @@
 
 ## Execution Provenance for AI Systems
 
-AI systems can reproduce output.  
-Can you reproduce the decision state?
+AI systems reproduce output.  
+RTS reproduces decision state.
 
 RTS is a minimal Git-native protocol for making AI-assisted execution structurally auditable.
 
 ---
 
-## How to Read This Document
+## The One Sentence
 
-RTS is layered. You do not need to read everything.
+RTS makes AI execution structurally reconstructable.
 
-### If you are an AI engineer
-
-Read:
-- Why Logging Was Not Enough  
-- State Transition Model  
-- Ledger + Index + Snapshot Architecture  
-
-### If you are a startup founder or product owner
-
-Read:
-- What Problem RTS Solves  
-- Practical Impact  
-- Live Inspection  
-
-### If you are a researcher or governance-focused
-
-Read:
-- Structural Principles  
-- Escalation and Evidence Model  
-
-### If you are implementation-focused
-
-Jump directly to:
-- Ledger + Index + Snapshot Architecture  
-
-### Minimal Reading Path
-
-If you read only three sections, read:
-
-1. Why Logging Was Not Enough  
-2. State Transition Model  
-3. Evidence Snapshot Logic  
-
-That is the core of RTS.
+Not observable.  
+Reconstructable.
 
 ---
 
-## Why RTS Exists
+## The Problem
 
-As AI-assisted execution scales, decision context disappears.
+AI scales execution.  
+It does not scale trust.
 
-Logs show:
-
-- What ran  
-- What output was generated  
+Traditional logs show:
+- What ran
+- What output was generated
 
 They do not show:
-
-- Which assumptions were active  
-- What state transitions occurred  
-- Why escalation logic triggered  
-- How structural mutation accumulated  
+- Which assumptions were active
+- What state transitions occurred
+- Why escalation logic triggered
+- How structural mutation accumulated
 
 When something breaks weeks later, output may be reproducible.
 
 Intent is not.
 
-RTS preserves structural continuity.
-
 ---
 
-## Why Logging Was Not Enough
+## What RTS Changes
 
-Traditional logging answers:
+RTS converts execution into structured provenance blocks.
 
-What happened?
+Each execution records:
+- Context
+- Decision
+- Constraint
+- Assumption
+- Action
+- Outcome
 
-RTS attempts to answer:
-
-What state was active when the decision happened?
-
-This distinction becomes critical when:
-
-- AI agents branch execution paths  
-- Assumptions mutate mid-session  
-- Escalation depends on prior state  
-- Behavioral drift accumulates silently  
-
-Structured logs capture events.
-
-RTS models state transitions.
+Execution becomes state-aware.
 
 The unit is not the log entry.  
-It is the transition.
+It is the state transition.
 
 ---
 
-## What Problem RTS Solves
+## Who This Is For
 
-When AI replaces manual execution, human responsibility does not disappear.
+RTS is for systems that must endure.
 
-You still must:
+You may need RTS if you:
+- Run AI in production
+- Build autonomous AI workflows
+- Require auditability
+- Face regulatory exposure
+- Conduct reproducible AI research
+- Need defensible escalation evidence
 
-- Defend decisions  
-- Explain failures  
-- Audit escalation  
-- Answer stakeholders  
-
-Without structural provenance, this becomes guesswork.
-
-RTS converts execution into a reconstructable ledger.
+If you are building short-lived demos, RTS is unnecessary.
 
 ---
 
-## State Transition Model
+## Architecture (Minimal View)
 
-RTS treats execution as:
+RTS operates using four structural layers:
 
-- Append-only session ledger in JSONL format  
-- Deterministic monthly aggregation  
-- Immutable snapshot sealing  
-- Breakpoint-based mutation detection  
-- Evidence snapshot extraction  
+1. Append-only session ledger (JSONL)
+2. Deterministic monthly index
+3. Immutable snapshot sealing
+4. Breakpoint-triggered evidence snapshots
 
 Execution is modeled as a sequence of state transitions.
 
-Not monitoring.  
-Not orchestration.  
-Not observability.
-
-Execution provenance.
+No SaaS.  
+No telemetry.  
+Git-native.
 
 ---
 
-## Ledger + Index + Snapshot Architecture
+## Ledger + Index + Snapshot
 
 ### Session Ledger
 
 Path:
-
 sessions/YYYY-MM/session_YYYYMMDD.jsonl
 
-Characteristics:
+Properties:
+- Append-only
+- One event per line
+- Deterministic structure
+- Git-tracked
 
-- Append-only  
-- Git-tracked  
-- One event per line  
-- Deterministic structure  
+---
 
 ### Monthly Index
 
 Paths:
-
-sessions/YYYY-MM/index.json  
-sessions/YYYY-MM/index.md  
+sessions/YYYY-MM/index.json
+sessions/YYYY-MM/index.md
 
 Aggregates:
+- Run transitions
+- Dangling runs
+- Mutation indicators
+- Evidence linkage
 
-- Run transitions  
-- Dangling runs  
-- State mutation indicators  
-- Evidence linkage  
+---
 
 ### Snapshot
 
 Path:
-
 sessions/YYYY-MM/index_snapshot.*
 
 Purpose:
+- Seal structural state at a point in time
+- Enable diff and replay
 
-- Seals point-in-time structural state  
-- Enables diff and replay  
+---
 
 ### Evidence Snapshot (ESC)
 
 Path:
+incidents/evidence_snapshots/ESC_<date>_<rule>.md
 
-incidents/evidence_snapshots/ESC_<date>_<rule>.md  
-
-Generated when a structural breakpoint is detected.
+Generated when structural mutation crosses a defined threshold.
 
 Captures:
-
-- Escalation metrics  
-- Mutation score  
-- Transition tail  
-- Ledger reference  
+- Escalation metrics
+- Mutation score
+- Transition tail
+- Ledger reference
 
 ---
 
 ## Escalation and Mutation Logic
 
-RTS detects structural mutation thresholds.
+RTS detects structural mutation.
 
 When mutation crosses a defined boundary:
-
-- Breakpoint is flagged  
-- Evidence snapshot is generated  
-- Structural state is sealed  
+- Breakpoint is flagged
+- Evidence snapshot is generated
+- Structural state is sealed
 
 This enables post-hoc reconstruction without ambiguity.
 
@@ -210,12 +161,12 @@ This enables post-hoc reconstruction without ambiguity.
 
 ## Structural Principles
 
-- Append-only integrity  
-- Git-native provenance  
-- Local-first execution  
-- Deterministic rollup  
-- No external telemetry  
-- Transparent inspection  
+- Append-only integrity
+- Git-native provenance
+- Local-first execution
+- Deterministic rollup
+- No external telemetry
+- Transparent inspection
 
 Provenance belongs to the repository.
 
@@ -223,28 +174,23 @@ Provenance belongs to the repository.
 
 ## Practical Impact
 
-RTS may be relevant if you:
+Without structural provenance:
+- Decisions cannot be defended
+- Failures cannot be reconstructed
+- Escalation becomes guesswork
 
-- Build autonomous AI workflows  
-- Run AI in production systems  
-- Require auditability  
-- Face regulatory uncertainty  
-- Conduct reproducible AI research  
-- Need defensible escalation evidence  
-
-If you are building short-lived demos, RTS is unnecessary.
-
-RTS is for systems that must endure.
+RTS restores structural continuity.
 
 ---
 
 ## Try It
 
-cd starter/python  
-python START_HERE.py  
+cd starter/python
+python START_HERE.py
 
 Execution provenance begins immediately.
 
+No configuration required.  
 No external service required.
 
 ---
@@ -253,13 +199,12 @@ No external service required.
 
 This repository is public.
 
-You may:
-
-- Inspect session ledgers  
-- Verify state transitions  
-- Review evidence snapshots  
-- Audit escalation logic  
-- Clone and replay locally  
+You can:
+- Inspect session ledgers
+- Verify state transitions
+- Review evidence snapshots
+- Audit escalation logic
+- Clone and replay locally
 
 Transparency over opinion.
 
@@ -270,12 +215,11 @@ For walkthrough requests, open an issue.
 ## What RTS Is Not
 
 RTS is not:
-
-- An agent framework  
-- A vector database  
-- A monitoring dashboard  
-- A compliance SaaS  
-- A memory embedding system  
+- An agent framework
+- A vector database
+- A monitoring dashboard
+- A compliance SaaS
+- A memory embedding system
 
 It formalizes execution state.
 
@@ -283,8 +227,7 @@ It formalizes execution state.
 
 ## Vision
 
-AI execution will scale.
-
+AI execution will scale.  
 Trust will not scale automatically.
 
 Governance is not a feature.  
