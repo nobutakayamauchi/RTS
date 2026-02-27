@@ -1,6 +1,6 @@
 # ESC Index — 2026-02
 
-- updated_at_utc: `2026-02-27T01:44:02Z`
+- updated_at_utc: `2026-02-27T01:46:01Z`
 
 ## Latest
 
