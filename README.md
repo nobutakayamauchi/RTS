@@ -6,6 +6,8 @@ AI systems reproduce output.
 
 RTS reproduces decision state — in Git.
 
+RTS is infrastructure for responsibility.
+
 If you cannot reconstruct a decision,
 you cannot defend it.
 If you cannot defend it,
