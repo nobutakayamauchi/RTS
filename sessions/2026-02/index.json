@@ -1,17 +1,17 @@
 {
   "month": "2026-02",
-  "updated_at_utc": "2026-02-27T04:35:22Z",
+  "updated_at_utc": "2026-02-27T04:42:05Z",
   "counts": {
-    "sentinel.run": 54,
-    "sentinel.run.start": 44,
-    "sentinel.run.end": 44
+    "sentinel.run": 55,
+    "sentinel.run.start": 45,
+    "sentinel.run.end": 45
   },
   "ledger_integrity": {
     "status": "OK",
     "issues": [],
-    "parsed_lines": 142,
+    "parsed_lines": 145,
     "invalid_lines": 0,
-    "fingerprint_sha256": "9afeba341efd957fbd379ab67062bca6dafc77c11a666c1bd3d265bbdb834c34"
+    "fingerprint_sha256": "f664816b9dfb942ebca81b229d8aa5e7255286d90974903429f6b9a5c57501ce"
   },
   "sentinel": {
     "end_kinds": [
@@ -23,16 +23,6 @@
     "dangling_runs": 0
   },
   "latest": [
-    {
-      "ts": "2026-02-27T02:24:05Z",
-      "kind": "sentinel.run.end",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": "22470087324",
-      "run_attempt": 1,
-      "status": "success",
-      "commit": "6d0f9ab63a155792bfb620ba580a69798bb64202",
-      "note": "analysis finished"
-    },
     {
       "ts": "2026-02-27T03:27:30Z",
       "kind": "sentinel.run.end",
@@ -101,6 +91,16 @@
       "run_attempt": 1,
       "status": "success",
       "commit": "ba43a7e10a3e1ea4da3958aabe20673a49bca6bd",
+      "note": "analysis finished"
+    },
+    {
+      "ts": "2026-02-27T04:42:05Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "22473078742",
+      "run_attempt": 1,
+      "status": "success",
+      "commit": "c3a19572096b6aab07d7b905fbc2b2e5813a5664",
       "note": "analysis finished"
     }
   ],
