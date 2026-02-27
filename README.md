@@ -25,7 +25,21 @@ Execution speed increases.
 Human oversight shrinks.
 
 When execution scales without structural provenance, fragility becomes systemic.
+## Quick Try (60 seconds)
 
+You can verify RTS immediately.
+
+1. Open any `sessions/YYYY-MM/index.md`
+2. Pick a run
+3. Trace it to its ledger entries
+4. Confirm whether an ESC exists
+
+If decision state is structurally reconstructable,
+RTS is working.
+
+No setup.
+No installation.
+Just inspection.
 RTS addresses that structural gap.
 ---
 
@@ -240,6 +254,22 @@ Because execution state becomes reconstructable and immutable,
 higher-order governance systems become technically possible.
 
 Such layers may include:
+
+- Tamper-evident verification
+- Policy deviation detection
+- Escalation accountability models
+- Organizational responsibility flows
+
+RTS does not provide these today.
+
+It provides the structural condition required to build them.
+
+## Future Extensions
+
+Because execution state becomes reconstructable and immutable,
+higher-order governance systems become technically possible.
+
+These may include:
 
 - Tamper-evident verification
 - Policy deviation detection
