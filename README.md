@@ -9,8 +9,11 @@ RTS reproduces decision state — in Git.
 RTS is infrastructure for responsibility.
 
 If you cannot reconstruct a decision,
+
 you cannot defend it.
+
 If you cannot defend it,
+
 you cannot scale it.
 
 RTS is a minimal, Git-native protocol
