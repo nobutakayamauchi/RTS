@@ -12,7 +12,7 @@ RTS is a minimal, Git-native protocol for structurally auditable AI execution.
 ## The Claim
 
 RTS makes AI execution reconstructable.
-
+Accountability is impossible without reconstructability.
 Not observable.
 Reconstructable.
 
