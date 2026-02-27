@@ -3,9 +3,16 @@
 ## Execution Provenance for AI Systems
 
 AI systems reproduce output.
-RTS reproduces decision state in Git.
 
-RTS is a minimal, Git-native protocol for structurally auditable AI execution.
+RTS reproduces decision state — in Git.
+
+If you cannot reconstruct a decision,
+you cannot defend it.
+If you cannot defend it,
+you cannot scale it.
+
+RTS is a minimal, Git-native protocol
+for structurally auditable AI execution.
 
 ---
 
