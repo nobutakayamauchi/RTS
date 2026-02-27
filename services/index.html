@@ -26,17 +26,11 @@ padding:18px;
 }
 
 .card{
-
 background:white;
 border-radius:18px;
-
-padding:20px;
-
-box-shadow:
-0 14px 34px rgba(0,0,0,.08);
-
+padding:22px;
+box-shadow:0 14px 34px rgba(0,0,0,.08);
 margin-bottom:18px;
-
 }
 
 h1{
@@ -45,7 +39,7 @@ font-size:30px;
 }
 
 h2{
-margin-top:20px;
+margin-top:22px;
 font-size:20px;
 }
 
@@ -60,69 +54,53 @@ line-height:1.7;
 }
 
 .price{
-
 font-size:24px;
-
 font-weight:800;
-
 margin:10px 0;
-
 }
 
-/* CTA button */
+/* CTA */
 
 .cta{
-
 display:inline-block;
-
 padding:14px 18px;
-
 border-radius:14px;
-
 background:#111827;
-
 color:white;
-
 text-decoration:none;
-
 font-weight:700;
-
 margin-top:12px;
-
 }
 
 .notice{
-
 margin-top:10px;
-
 font-size:13px;
-
 color:#6b7280;
-
 line-height:1.6;
+}
 
+.protocol{
+margin-top:12px;
+font-size:14px;
+}
+
+.protocol a{
+color:#2563eb;
+text-decoration:none;
+font-weight:600;
 }
 
 .footer{
-
 text-align:center;
-
 font-size:12px;
-
 color:#6b7280;
-
 margin-top:26px;
-
 }
 
 .footer a{
-
 color:#2563eb;
-
 text-decoration:none;
-
 margin:0 6px;
-
 }
 
 </style>
@@ -145,17 +123,29 @@ Breakpoint Consulting（ブレイクポイント・コンサルティング）
 
 固定価格の診断型コンサルティングです。
 
-現状の混線点（breakpoint）を特定し、
+現状の混線点（Breakpoint）を特定し、
 
 再現可能な状態整理と次の打ち手を納品します。
 
 </p>
 
-<h2>
 
-価格
+<!-- ⭐ Rulebook導線（追加） -->
 
-</h2>
+<div class="protocol">
+
+RTS Protocolについて →
+
+<a href="../spec/rulebook/">
+
+RTS Rulebook
+
+</a>
+
+</div>
+
+
+<h2>価格</h2>
 
 <div class="price">
 
@@ -163,11 +153,8 @@ Breakpoint Consulting（ブレイクポイント・コンサルティング）
 
 </div>
 
-<h2>
 
-サービス内容
-
-</h2>
+<h2>サービス内容</h2>
 
 <p>
 
@@ -177,11 +164,8 @@ AI活用・業務構造・意思決定ログ状態を診断する
 
 </p>
 
-<h2>
 
-納品物
-
-</h2>
+<h2>納品物</h2>
 
 <ul>
 
@@ -197,11 +181,8 @@ AI活用・業務構造・意思決定ログ状態を診断する
 
 </ul>
 
-<h2>
 
-提供形式
-
-</h2>
+<h2>提供形式</h2>
 
 <ul>
 
@@ -213,11 +194,8 @@ AI活用・業務構造・意思決定ログ状態を診断する
 
 </ul>
 
-<h2>
 
-納期
-
-</h2>
+<h2>納期</h2>
 
 <ul>
 
@@ -227,11 +205,8 @@ AI活用・業務構造・意思決定ログ状態を診断する
 
 </ul>
 
-<h2>
 
-返金ポリシー
-
-</h2>
+<h2>返金ポリシー</h2>
 
 <ul>
 
@@ -256,41 +231,15 @@ AI活用・業務構造・意思決定ログ状態を診断する
 </p>
 
 
-<!-- =============================== -->
-<!-- 購入ボタンエリア（ここだけ変更） -->
-<!-- =============================== -->
+<h2>お申し込み</h2>
 
-<h2>
-
-お申し込み
-
-</h2>
-
-<!--
-====================================================
-
-Stripe通過前：
-
-Googleフォームやメール申込にする。
-
-Stripe通過後：
-
-href を buy.stripe.com に変えるだけ。
-
-例：
-
-href="https://buy.stripe.com/XXXXXXXX"
-
-====================================================
--->
+<!-- ========================= -->
+<!-- Stripe通過後ここだけ変更 -->
+<!-- ========================= -->
 
 <a
-
 href="mailto:your@email.com?subject=Breakpoint Consulting 申込"
-
-class="cta"
-
->
+class="cta">
 
 申込（決済リンク審査中）
 
@@ -304,15 +253,10 @@ class="cta"
 
 </p>
 
-<!-- =============================== -->
-<!-- ↑ここだけ後でStripeURLに変更 -->
-<!-- =============================== -->
+<!-- ========================= -->
 
-<h2>
 
-本サービスの性質
-
-</h2>
+<h2>本サービスの性質</h2>
 
 <p>
 
