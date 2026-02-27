@@ -1,446 +1,156 @@
 <!doctype html>
 <html lang="en">
-
 <head>
-
-<meta charset="utf-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-
-<title>
-
-RTS — Execution Logging Protocol
-
-</title>
-
-<style>
-
-body{
-
-margin:0;
-
-font-family:-apple-system,
-system-ui,
-"SF Pro Text";
-
-background:
-
-linear-gradient(
-180deg,
-#bfe9ff,
-#e8f6ff);
-
-color:#0b1220;
-
-}
-
-.wrap{
-
-max-width:860px;
-
-margin:auto;
-
-padding:18px;
-
-}
-
-/* card */
-
-.card{
-
-background:white;
-
-border-radius:22px;
-
-padding:20px;
-
-box-shadow:
-
-0 14px 44px rgba(2,10,26,.18);
-
-margin-bottom:18px;
-
-overflow:hidden;
-
-position:relative;
-
-}
-
-/* headings */
-
-h1{
-
-font-size:clamp(30px,8vw,46px);
-
-line-height:1.05;
-
-margin:8px 0 10px;
-
-}
-
-h2{
-
-margin-top:26px;
-
-margin-bottom:10px;
-
-font-size:22px;
-
-}
-
-p{
-
-color:#4b5563;
-
-line-height:1.65;
-
-}
-
-/* list */
-
-ul{
-
-padding-left:18px;
-
-line-height:1.7;
-
-}
-
-/* white box */
-
-.box{
-
-background:#ffffff;
-
-border-radius:18px;
-
-padding:18px;
-
-margin-top:12px;
-
-box-shadow:
-
-0 10px 28px rgba(2,10,26,.12);
-
-overflow:hidden;
-
-position:relative;
-
-}
-
-/* protocol pills */
-
-.pill{
-
-display:inline-block;
-
-background:#eef3f7;
-
-padding:8px 12px;
-
-border-radius:14px;
-
-margin:6px 6px 0 0;
-
-font-family:monospace;
-
-font-size:13px;
-
-}
-
-/* footer */
-
-.footer{
-
-text-align:center;
-
-font-size:12px;
-
-color:#6b7280;
-
-margin-top:20px;
-
-}
-
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RTS — Execution Logging Protocol</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:-apple-system,system-ui,"SF Pro Text";
+      background:linear-gradient(180deg,#bfe9ff,#e8f6ff);
+      color:#0b1220;
+    }
+    .wrap{max-width:860px;margin:auto;padding:18px;}
+    .card{
+      background:#fff;border-radius:22px;padding:20px;
+      box-shadow:0 14px 44px rgba(2,10,26,.18);
+      margin-bottom:18px;overflow:hidden;position:relative;
+    }
+    h1{font-size:clamp(30px,8vw,46px);line-height:1.05;margin:8px 0 10px;}
+    h2{margin-top:26px;margin-bottom:10px;font-size:22px;}
+    p{color:#4b5563;line-height:1.65;margin:10px 0;}
+    ul{padding-left:18px;line-height:1.7;margin:0;}
+    ol{padding-left:20px;line-height:1.7;margin:0;}
+    .box{
+      background:#fff;border-radius:18px;padding:18px;margin-top:12px;
+      box-shadow:0 10px 28px rgba(2,10,26,.12);
+      overflow:hidden;position:relative;
+    }
+    .pill{
+      display:inline-block;background:#eef3f7;padding:8px 12px;
+      border-radius:14px;margin:6px 6px 0 0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+    }
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      display:inline-block;text-decoration:none;
+      background:#0b1220;color:#fff;
+      padding:10px 14px;border-radius:12px;
+      font-size:14px;font-weight:600;
+    }
+    .btn.ghost{
+      background:#fff;color:#0b1220;border:1px solid rgba(11,18,32,.18);
+    }
+    .footer{
+      text-align:center;font-size:12px;color:#6b7280;margin-top:20px;
+    }
+    .footer a{color:#1f3a8a;text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+  </style>
 </head>
 
 <body>
+  <div class="wrap">
+
+    <div class="card">
+      <h1>RTS</h1>
+      <p><b>Execution Logging Protocol for AI-Assisted Work</b></p>
+      <p>RTS is a structured execution provenance protocol. It preserves decision context in AI-accelerated environments.</p>
+
+      <div class="btnrow">
+        <a class="btn" href="/RTS/services/">Services</a>
+        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
+        <a class="btn ghost" href="/RTS/legal/">Legal</a>
+      </div>
+    </div>
+
+    <h2>What RTS Preserves</h2>
+    <div class="box">
+      <ul>
+        <li>Decision intent</li>
+        <li>Active assumptions</li>
+        <li>Environmental constraints</li>
+        <li>Rejected alternatives</li>
+        <li>Outcome evaluation</li>
+      </ul>
+    </div>
+
+    <h2>Why It Exists</h2>
+    <div class="box">
+      <p>AI increases execution speed.</p>
+      <p>It does not preserve reasoning.</p>
+      <p><b>RTS restores traceability.</b></p>
+    </div>
+
+    <h2>What RTS Is Not</h2>
+    <div class="box">
+      <ul>
+        <li>Not memory embedding</li>
+        <li>Not vector retrieval</li>
+        <li>Not workflow automation</li>
+        <li>Not monitoring software</li>
+      </ul>
+    </div>
+
+    <h2>Protocol Structure</h2>
+    <div class="box">
+      <p>Each block records:</p>
+      <div>
+        <span class="pill">Context</span>
+        <span class="pill">Decision</span>
+        <span class="pill">Constraint</span>
+        <span class="pill">Assumption</span>
+        <span class="pill">Action</span>
+        <span class="pill">Outcome</span>
+      </div>
+    </div>
+
+    <h2>Operational Properties</h2>
+    <div class="box">
+      <ul>
+        <li>Tool-agnostic</li>
+        <li>GitHub-native</li>
+        <li>Local-first</li>
+        <li>No telemetry</li>
+        <li>Open protocol</li>
+      </ul>
+    </div>
+
+    <h2>Governance</h2>
+    <div class="box">
+      <p>RTS is open and public (MIT License).</p>
+      <p>Professional services applying RTS are independent from the core protocol.</p>
+    </div>
+
+    <h2>Quick Start</h2>
+    <div class="box">
+      <ol>
+        <li>Create a block.</li>
+        <li>Log decisions.</li>
+        <li>Commit.</li>
+      </ol>
+    </div>
+
+    <h2>Closing</h2>
+    <div class="box">
+      <p><b>Execution without provenance creates structural fragility.</b></p>
+      <p>RTS introduces continuity.</p>
+    </div>
+
+    <div class="footer">
+      <div style="margin-bottom:10px;">
+        <a href="/RTS/services/">Services</a> |
+        <a href="/RTS/artifacts/breakpoint/">Breakpoint</a> |
+        <a href="/RTS/docs/rulebook/">Rulebook</a> |
+        <a href="/RTS/legal/tokusho/">Tokusho</a> |
+        <a href="/RTS/legal/privacy/">Privacy</a> |
+        <a href="/RTS/legal/terms/">Terms</a>
+      </div>
+      Created by Nobutaka Yamauchi ● MIT License
+    </div>
 
-<div class="wrap">
-
-<!-- HERO -->
-
-<div class="card">
-
-<h1>
-
-RTS
-
-</h1>
-
-<p>
-
-<b>
-
-Execution Logging Protocol for AI-Assisted Work
-
-</b>
-
-</p>
-
-<p>
-
-RTS is a structured execution provenance protocol.
-
-It preserves decision context in AI-accelerated environments.
-
-</p>
-
-</div>
-
-
-<!-- PRESERVES -->
-
-<h2>
-
-What RTS Preserves
-
-</h2>
-
-<div class="box">
-
-<ul>
-
-<li>Decision intent</li>
-
-<li>Active assumptions</li>
-
-<li>Environmental constraints</li>
-
-<li>Rejected alternatives</li>
-
-<li>Outcome evaluation</li>
-
-</ul>
-
-</div>
-
-
-<!-- WHY -->
-
-<h2>
-
-Why It Exists
-
-</h2>
-
-<div class="box">
-
-<p>
-
-AI increases execution speed.
-
-</p>
-
-<p>
-
-It does not preserve reasoning.
-
-</p>
-
-<p>
-
-<b>
-
-RTS restores traceability.
-
-</b>
-
-</p>
-
-</div>
-
-
-<!-- NOT -->
-
-<h2>
-
-What RTS Is Not
-
-</h2>
-
-<div class="box">
-
-<ul>
-
-<li>Not memory embedding</li>
-
-<li>Not vector retrieval</li>
-
-<li>Not workflow automation</li>
-
-<li>Not monitoring software</li>
-
-</ul>
-
-</div>
-
-
-<!-- PROTOCOL -->
-
-<h2>
-
-Protocol Structure
-
-</h2>
-
-<div class="box">
-
-<p>
-
-Each block records:
-
-</p>
-
-<div>
-
-<span class="pill">Context</span>
-
-<span class="pill">Decision</span>
-
-<span class="pill">Constraint</span>
-
-<span class="pill">Assumption</span>
-
-<span class="pill">Action</span>
-
-<span class="pill">Outcome</span>
-
-</div>
-
-</div>
-
-
-<!-- PROPERTIES -->
-
-<h2>
-
-Operational Properties
-
-</h2>
-
-<div class="box">
-
-<ul>
-
-<li>Tool-agnostic</li>
-
-<li>GitHub-native</li>
-
-<li>Local-first</li>
-
-<li>No telemetry</li>
-
-<li>Open protocol</li>
-
-</ul>
-
-</div>
-
-
-<!-- GOVERNANCE -->
-
-<h2>
-
-Governance
-
-</h2>
-
-<div class="box">
-
-<p>
-
-RTS is open and public (MIT License).
-
-</p>
-
-<p>
-
-Professional services applying RTS are independent from the core protocol.
-
-</p>
-
-</div>
-
-
-<!-- QUICK START -->
-
-<h2>
-
-Quick Start
-
-</h2>
-
-<div class="box">
-
-<ol>
-
-<li>Create a block.</li>
-
-<li>Log decisions.</li>
-
-<li>Commit.</li>
-
-</ol>
-
-</div>
-
-
-<!-- CLOSE -->
-
-<h2>
-
-Closing
-
-</h2>
-
-<div class="box">
-
-<p>
-
-<b>
-
-Execution without provenance creates structural fragility.
-
-</b>
-
-</p>
-
-<p>
-
-RTS introduces continuity.
-
-</p>
-
-</div>
-
-
-<div class="footer">
-
-  <div style="margin-bottom:8px;">
-    <a href="./services/" style="font-size:13px;">Services</a> |
-    <a href="./legal/" style="font-size:13px;">Legal</a> | <a href="./legal/tokusho/" style="font-size:13px;">Tokusho</a> | <a href="./legal/privacy/" style="font-size:13px;">Privacy</a> | <a href="./legal/terms/" style="font-size:13px;">Terms</a>
   </div>
-
-  Created by Nobutaka Yamauchi ● MIT License
-
-</div>
-
-</div>
-
 </body>
-
 </html>
