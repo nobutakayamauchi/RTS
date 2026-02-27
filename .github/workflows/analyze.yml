@@ -3,8 +3,12 @@ name: RTS Sentinel Analyze
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "sessions/**/manifest.sha256"
+
   schedule:
-    - cron: "0 3 * * *" # 03:00 UTC
+    - cron: "0 3 * * *"
+
   workflow_dispatch:
 
 permissions:
@@ -21,39 +25,32 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      # -------------------------------
-      # 1) Checkout
-      # -------------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # -------------------------------
-      # 2) Python
-      # -------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies (safe empty)
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
-      # -------------------------------
-      # 3) Session month/day (UTC)
-      # -------------------------------
       - name: Set session month + day (UTC)
         run: |
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
-      # -------------------------------
-      # 4) RUN_START (sentinel.run.start)
-      # -------------------------------
+      ###################################################
+      # RUN START
+      ###################################################
+
       - name: Build RUN_START payload
         if: always()
         env:
@@ -69,27 +66,29 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, datetime
-          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-          run_id = str(os.environ.get("RUN_ID",""))
-          repo = os.environ.get("REPO","")
-          payload = {
-            "ts": ts,
-            "kind": "sentinel.run.start",
-            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
-            "run_id": run_id,
-            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
-            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
-            "status": "started",
-            "commit": os.environ.get("HEAD_SHA",""),
-            "actor": os.environ.get("ACTOR",""),
-            "repo": repo,
-            "ref": os.environ.get("REF_NAME",""),
-            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
-            "note": "run started",
+          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z"
+          run_id=os.environ.get("RUN_ID","")
+          repo=os.environ.get("REPO","")
+
+          payload={
+            "ts":ts,
+            "kind":"sentinel.run.start",
+            "workflow":os.environ.get("WORKFLOW_NAME",""),
+            "run_id":run_id,
+            "run_number":int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt":int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status":"started",
+            "commit":os.environ.get("HEAD_SHA",""),
+            "actor":os.environ.get("ACTOR",""),
+            "repo":repo,
+            "ref":os.environ.get("REF_NAME",""),
+            "run_url":f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
+            "note":"run started"
           }
-          with open("/tmp/session_payload_start.json","w",encoding="utf-8") as f:
-            json.dump(payload,f,ensure_ascii=False,indent=2)
-          print("wrote /tmp/session_payload_start.json")
+
+          open("/tmp/session_payload_start.json","w").write(
+            json.dumps(payload,ensure_ascii=False,indent=2)
+          )
           PY
 
       - name: Append RUN_START
@@ -97,24 +96,24 @@ jobs:
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
-      # -------------------------------
-      # 5) RTS Analysis (your existing engines)
-      # -------------------------------
+      ###################################################
+      # RTS Engines
+      ###################################################
+
       - name: Run RTS Evidence Analysis
-        run: |
-          python scripts/rts_analysis_engine.py
+        run: python scripts/rts_analysis_engine.py
 
       - name: Run RTS Agent Analyze
-        run: |
-          python scripts/rts_agent_analyze.py
+        run: python scripts/rts_agent_analyze.py
 
-      # -------------------------------
-      # 6) RUN_END (sentinel.run.end + legacy marker)
-      # -------------------------------
+      ###################################################
+      # RUN END
+      ###################################################
+
       - name: Build RUN_END payloads
         if: always()
         env:
-          WORKFLOW_NAME: ${{ github.workflow }}
+          JOB_STATUS: ${{ job.status }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
@@ -123,134 +122,99 @@ jobs:
           ACTOR: ${{ github.actor }}
           HEAD_SHA: ${{ github.sha }}
           SERVER_URL: ${{ github.server_url }}
-          JOB_STATUS: ${{ job.status }}
         run: |
           python - <<'PY'
-          import json, os, datetime
-          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-          run_id = str(os.environ.get("RUN_ID",""))
-          repo = os.environ.get("REPO","")
-          status = (os.environ.get("JOB_STATUS","") or "").lower()
-          base = {
-            "ts": ts,
-            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
-            "run_id": run_id,
-            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
-            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
-            "status": status,
-            "commit": os.environ.get("HEAD_SHA",""),
-            "actor": os.environ.get("ACTOR",""),
-            "repo": repo,
-            "ref": os.environ.get("REF_NAME",""),
-            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
-            "note": "analysis finished",
+          import json,os,datetime
+          ts=datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z"
+
+          base={
+            "ts":ts,
+            "workflow":"RTS Sentinel Analyze",
+            "run_id":os.environ.get("RUN_ID",""),
+            "run_number":int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt":int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status":os.environ.get("JOB_STATUS",""),
+            "commit":os.environ.get("HEAD_SHA",""),
+            "actor":os.environ.get("ACTOR",""),
+            "repo":os.environ.get("REPO",""),
+            "ref":os.environ.get("REF_NAME",""),
+            "note":"analysis finished"
           }
 
-          end_payload = dict(base)
-          end_payload["kind"] = "sentinel.run.end"
+          end=dict(base)
+          end["kind"]="sentinel.run.end"
 
-          legacy_payload = dict(base)
-          legacy_payload["kind"] = "sentinel.run"
+          legacy=dict(base)
+          legacy["kind"]="sentinel.run"
 
-          with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
-            json.dump(end_payload,f,ensure_ascii=False,indent=2)
-          with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
-            json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
+          open("/tmp/session_payload_end.json","w").write(
+            json.dumps(end,ensure_ascii=False,indent=2)
+          )
 
-          print("wrote end + legacy payloads")
+          open("/tmp/session_payload_legacy.json","w").write(
+            json.dumps(legacy,ensure_ascii=False,indent=2)
+          )
           PY
 
-      - name: Append RUN_END (sentinel.run.end)
+      - name: Append RUN_END
         if: always()
-        run: |
-          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
+        run: python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
 
-      - name: Append RUN_END marker (sentinel.run legacy)
+      - name: Append RUN legacy
         if: always()
-        run: |
-          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
+        run: python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
-      # -------------------------------
-      # 7) Rollup monthly index (sessions/<month>/index.* + snapshot.*)
-      # -------------------------------
+      ###################################################
+      # Rollups
+      ###################################################
+
       - name: Rollup monthly index
         if: always()
-        run: |
-          python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
+        run: python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
 
-      # -------------------------------
-      # 8) SNAP Index Rebuild + SNAP Cull (safe)
-      # -------------------------------
-      - name: SNAP Index Rebuild (safe)
+      - name: SNAP rebuild
         if: always()
         continue-on-error: true
-        run: |
-          python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
+        run: python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
 
-      - name: SNAP Auto Cull (safe)
+      - name: SNAP auto cull
         if: always()
         continue-on-error: true
-        run: |
-          python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
+        run: python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
-      # -------------------------------
-      # 9) Evidence Index Rebuild (ESC + SNAP, tolerant)  ★これが新規の要
-      #   - scripts/evidence_index_build.py が必要です
-      # -------------------------------
-      - name: Build Evidence + SNAP Index (safe)
+      - name: Evidence index build
         if: always()
         continue-on-error: true
-        run: |
-          python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
+        run: python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
 
-      # -------------------------------
-      # 10) Raw logs -> Artifact (not git)
-      # -------------------------------
-      - name: Pack raw session logs
+      ###################################################
+      # Phase A Manifest ⭐⭐⭐⭐⭐
+      ###################################################
+
+      - name: Generate manifest.sha256
         if: always()
-        continue-on-error: true
-        run: |
-          python scripts/session_artifact_pack.py "${SESSION_MONTH}" || true
+        env:
+          RTS_MONTH: ${{ env.SESSION_MONTH }}
+        run: python scripts/manifest_month.py
 
-      - name: Detect packed artifact
+      - name: Verify manifest.sha256
         if: always()
-        run: |
-          if ls "sessions/${SESSION_MONTH}/raw_session_"*.zip >/dev/null 2>&1; then
-            echo "HAS_SESSION_ARTIFACT=true" >> $GITHUB_ENV
-          else
-            echo "HAS_SESSION_ARTIFACT=false" >> $GITHUB_ENV
-          fi
+        env:
+          RTS_MONTH: ${{ env.SESSION_MONTH }}
+        run: python scripts/verify_manifest.py
 
-      - name: Upload raw session artifact
-        if: always() && env.HAS_SESSION_ARTIFACT == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rts-session-raw-${{ env.SESSION_MONTH }}
-          path: sessions/${{ env.SESSION_MONTH }}/raw_session_*.zip
-          if-no-files-found: ignore
-          retention-days: 14
+      ###################################################
+      # Commit outputs (single push)
+      ###################################################
 
-      # -------------------------------
-      # 11) Evidence Auto Cull (safe)
-      # -------------------------------
-      - name: Evidence Auto Cull (safe)
-        if: always()
-        continue-on-error: true
-        run: |
-          python scripts/evidence_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
-
-      # -------------------------------
-      # 12) Commit outputs (analysis + sessions + incidents indexes)
-      #   - ここでまとめて1回だけ push する
-      # -------------------------------
-      - name: Commit outputs (analysis + sessions + incidents)
+      - name: Commit outputs
         if: always()
         run: |
           set -e
+
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          # stage (存在しない場合でも落ちない)
           git add analysis/ || true
           git add sessions/ || true
           git add incidents/evidence_snapshots/ || true
@@ -268,9 +232,8 @@ jobs:
               echo "push ok"
               exit 0
             fi
-            echo "push failed, retry..."
             sleep 2
           done
 
-          echo "push failed after retries"
+          echo "push failed"
           exit 1
