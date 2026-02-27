@@ -255,21 +255,6 @@ RTS is not:
 RTS formalizes execution state.
 
 ---
-## Future Extensions
-
-Because execution state becomes reconstructable and immutable,
-higher-order governance systems become technically possible.
-
-Such layers may include:
-
-- Tamper-evident verification
-- Policy deviation detection
-- Escalation accountability models
-- Organizational responsibility flows
-
-RTS does not provide these today.
-
-It provides the structural condition required to build them.
 
 ## Future Extensions
 
@@ -286,6 +271,9 @@ These may include:
 RTS does not provide these today.
 
 It provides the structural condition required to build them.
+
+---
+
 ## Vision
 
 AI execution will scale.  
