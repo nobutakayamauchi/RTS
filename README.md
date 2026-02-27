@@ -1,96 +1,248 @@
-# RTS — Execution Provenance Protocol for AI Workflows
+RTS
 
-AI output is reproducible.  
-Decision context is not.
+Execution Provenance for AI Systems
 
-RTS preserves execution provenance for AI-assisted work.
+AI systems can reproduce output.
+Can you reproduce the decision state?
 
-It records decision state so outcomes can be reconstructed, audited, and defended.
+RTS is a minimal Git-native protocol for making AI-assisted execution structurally auditable.
 
----
+⸻
 
-## The Problem
+How to Read This Document
 
-AI systems increase execution speed.
+RTS is layered. You do not need to read everything.
 
-They do not preserve:
+AI engineer
+Read: Why Logging Was Not Enough → State Transition Model → Architecture
 
-- why a decision was made  
-- which assumptions were active  
-- which alternatives were rejected  
-- what constraints influenced the action  
+Startup founder or Product owner
+Read: What Problem RTS Solves → Practical Impact → Live Inspection
 
-When execution scales, traceability collapses.
+Researcher or Governance
+Read: Structural Principles → Escalation and Evidence Model
 
-RTS restores state-level reproducibility.
+Implementation-focused reader
+Jump to: Ledger + Index + Snapshot Architecture
 
----
+If you read only three sections, read:
+	1.	Why Logging Was Not Enough
+	2.	State Transition Model
+	3.	Evidence Snapshot Logic
 
-## What RTS Does
+That is the core of RTS.
 
-RTS converts execution into structured provenance blocks.
+⸻
 
-Each block records:
+Why RTS Exists
 
-- Context  
-- Decision  
-- Constraint  
-- Assumption  
-- Action  
-- Outcome  
+As AI-assisted execution scales, decision context disappears.
 
-This enables reconstruction of the decision environment — not just the output.
+Logs show:
+	•	what ran
+	•	what output was generated
 
-Execution becomes traceable.  
-Incidents become reproducible.
+They do not show:
+	•	which assumptions were active
+	•	what state transitions occurred
+	•	why escalation logic triggered
+	•	how structural mutation accumulated
 
----
+When something breaks weeks later, output may be reproducible.
 
-## What RTS Is Not
+Intent is not.
+
+RTS preserves structural continuity.
+
+⸻
+
+Why Logging Was Not Enough
+
+Traditional logging answers:
+
+What happened?
+
+RTS attempts to answer:
+
+What state was active when the decision happened?
+
+This distinction becomes critical when:
+	•	AI agents branch execution paths
+	•	Assumptions mutate mid-session
+	•	Escalation depends on prior state
+	•	Behavioral drift accumulates silently
+
+Structured logs capture events.
+RTS models state transitions.
+
+The unit is not the log entry.
+It is the transition.
+
+⸻
+
+What Problem RTS Solves
+
+When AI replaces manual execution, human responsibility does not disappear.
+
+You still must:
+	•	Defend decisions
+	•	Explain failures
+	•	Audit escalation
+	•	Answer stakeholders
+
+Without structural provenance, this becomes guesswork.
+
+RTS converts execution into a reconstructable ledger.
+
+⸻
+
+State Transition Model
+
+RTS treats execution as:
+	•	Append-only session ledger in JSONL format
+	•	Deterministic monthly aggregation
+	•	Immutable snapshot sealing
+	•	Breakpoint-based mutation detection
+	•	Evidence snapshot extraction
+
+Execution is modeled as a sequence of state transitions.
+
+Not monitoring.
+Not orchestration.
+Not observability.
+
+Execution provenance.
+
+⸻
+
+Ledger + Index + Snapshot Architecture
+
+Session Ledger
+sessions//session_.jsonl
+Append-only. Git-tracked. One event per line.
+
+Monthly Index
+sessions//index.json
+sessions//index.md
+
+Aggregates:
+	•	Run transitions
+	•	Dangling runs
+	•	State mutation indicators
+	•	Evidence linkage
+
+Snapshot
+sessions//index_snapshot.*
+Seals a point-in-time structural state. Enables diff and replay.
+
+Evidence Snapshot (ESC)
+incidents/evidence_snapshots/ESC__.md
+
+Generated when structural breakpoint is detected.
+
+Captures:
+	•	Escalation metrics
+	•	Mutation score
+	•	Transition tail
+	•	Ledger reference
+
+⸻
+
+Escalation and Mutation Logic
+
+RTS detects structural mutation thresholds.
+
+When mutation crosses a defined boundary:
+	•	Breakpoint is flagged
+	•	Evidence snapshot is generated
+	•	Structural state is sealed
+
+This enables post-hoc reconstruction without ambiguity.
+
+⸻
+
+Structural Principles
+	•	Append-only integrity
+	•	Git-native provenance
+	•	Local-first execution
+	•	Deterministic rollup
+	•	No external telemetry
+	•	Transparent inspection
+
+Provenance belongs to the repository.
+
+⸻
+
+Practical Impact
+
+RTS may be relevant if you:
+	•	Build autonomous AI workflows
+	•	Run AI in production systems
+	•	Require auditability
+	•	Face regulatory uncertainty
+	•	Conduct reproducible AI research
+	•	Need defensible escalation evidence
+
+If you are building short-lived demos, RTS is unnecessary.
+
+RTS is for systems that must endure.
+
+⸻
+
+Try It
+
+cd starter/python
+python START_HERE.py
+
+Execution provenance begins immediately.
+No external service required.
+
+⸻
+
+Live Inspection
+
+This repository is public.
+
+You may:
+	•	Inspect session ledgers
+	•	Verify state transitions
+	•	Review evidence snapshots
+	•	Audit escalation logic
+	•	Clone and replay locally
+
+Transparency over opinion.
+
+For walkthrough requests, open an issue.
+
+⸻
+
+What RTS Is Not
 
 RTS is not:
+	•	An agent framework
+	•	A vector database
+	•	A monitoring dashboard
+	•	A compliance SaaS
+	•	A memory embedding system
 
-- memory embedding  
-- vector retrieval  
-- workflow automation  
-- monitoring software  
+It formalizes execution state.
 
-It does not control agents.  
-It observes and formalizes execution.
+⸻
 
----
+Vision
 
-## Quick Start (60 seconds)
+AI execution will scale.
 
-Run locally:
+Trust will not scale automatically.
 
-    cd starter/python
-    python START_HERE.py
+Governance is not a feature.
+It is a structural property.
 
-Execution memory begins immediately.  
-No configuration required.
+RTS is a minimal protocol for building that property.
 
----
+⸻
 
-## Operational Principles
+License
 
-- Tool-agnostic  
-- GitHub-native  
-- Local-first  
-- No telemetry  
-- Open protocol  
-
-RTS runs locally.  
-You remain the operator.
-
----
-
-Execution without provenance creates structural fragility.  
-RTS introduces structural continuity.
-
----
-
-## License
-
-MIT License  
+MIT License
 Copyright (c) 2026 Nobutaka Yamauchi
