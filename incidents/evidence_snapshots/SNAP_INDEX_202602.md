@@ -1,6 +1,6 @@
 # SNAP Index — 2026-02
 
-- updated_at_utc: `2026-02-27T03:39:46Z`
+- updated_at_utc: `2026-02-27T03:49:33Z`
 - total: `0`
 
 - (none)
