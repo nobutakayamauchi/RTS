@@ -1,4 +1,5 @@
 RTS
+
 Execution Provenance for AI Systems
 
 AI systems reproduce output.
@@ -8,7 +9,7 @@ RTS is a minimal, Git-native protocol for structurally auditable AI execution.
 
 ⸻
 
-THE CLAIM
+The Claim
 
 RTS makes AI execution reconstructable.
 
@@ -17,7 +18,7 @@ Reconstructable.
 
 ⸻
 
-WHY NOW
+Why Now
 
 AI agents are scaling.
 Execution speed increases.
@@ -29,9 +30,9 @@ RTS addresses that structural gap.
 
 ⸻
 
-WHEN YOU ACTUALLY NEED RTS
+When You Actually Need RTS
 
-You likely need RTS if at least one is true:
+You likely need RTS if at least one of these is true:
 	•	You can reproduce output, but cannot explain why it happened.
 	•	Logs show what ran, but not which assumptions were active.
 	•	AI workflows branch or mutate mid-session and context gets lost.
@@ -43,7 +44,7 @@ If one applies, you probably already need it.
 
 ⸻
 
-WHAT RTS CHANGES
+What RTS Changes
 
 Traditional logging answers:
 
@@ -67,7 +68,7 @@ Not the log line.
 
 ⸻
 
-ASC2 — STRUCTURAL BREAKPOINT MODEL
+ASC2 — Structural Breakpoint Model
 
 RTS does not alert on noise.
 It detects structural mutation.
@@ -85,7 +86,7 @@ Structural mutation control.
 
 ⸻
 
-REAL FAILURE SCENARIO
+Real Failure Scenario
 
 Imagine:
 
@@ -96,20 +97,19 @@ Two weeks later, a regulator asks:
 “Why was this allowed?”
 
 You can reproduce the output.
-
 You cannot reproduce the decision state.
 
 RTS makes that state reconstructable.
 
 ⸻
 
-WHAT RTS PRODUCES
+What RTS Produces
 
-Four structural artifacts:
-	1.	Session Ledger (JSONL, append-only)
-	2.	Monthly Index (deterministic aggregation)
-	3.	Snapshot (sealed structural state)
-	4.	Evidence Snapshot (ESC, breakpoint proof)
+RTS generates four structural artifacts:
+	1.	Session Ledger (JSONL) — append-only execution events
+	2.	Monthly Index — deterministic aggregation
+	3.	Snapshot — sealed structural state
+	4.	Evidence Snapshot (ESC) — breakpoint proof
 
 Git-native.
 No SaaS.
@@ -117,23 +117,22 @@ No telemetry.
 
 ⸻
 
-REPOSITORY STRUCTURE
+Repository Structure
 
-Sessions:
+Sessions
+	•	sessions/YYYY-MM/session_YYYYMMDD.jsonl
+	•	sessions/YYYY-MM/index.json
+	•	sessions/YYYY-MM/index.md
+	•	sessions/YYYY-MM/index_snapshot.*
 
-sessions/YYYY-MM/session_YYYYMMDD.jsonl
-sessions/YYYY-MM/index.json
-sessions/YYYY-MM/index.md
-sessions/YYYY-MM/index_snapshot.json
-sessions/YYYY-MM/index_snapshot.md
+Evidence
+	•	incidents/evidence_snapshots/ESC_*.md
 
-Evidence:
-
-incidents/evidence_snapshots/ESC_*.md
-
-If you only inspect two things:
+If you inspect only two places:
 	1.	sessions/
 	2.	incidents/evidence_snapshots/
+
+You will understand RTS.
 
 ⸻
 
@@ -151,9 +150,9 @@ This is permanent structural evidence.
 
 ⸻
 
-HOW TO VERIFY RTS
+How to Verify RTS
 
-Do not trust claims.
+Do not trust claims. Inspect artifacts.
 	1.	Open sessions/YYYY-MM/index.md
 	2.	Trace linked ledger entries
 	3.	Confirm ESC exists when breakpoint occurs
@@ -163,7 +162,7 @@ If it cannot be verified from artifacts, it is not RTS.
 
 ⸻
 
-HOW TO ADOPT RTS
+How to Adopt RTS
 
 Minimum integration:
 	1.	Append run start / run end events to JSONL
@@ -174,7 +173,7 @@ No platform dependency required.
 
 ⸻
 
-WHO NEEDS THIS
+Who Needs This
 
 RTS is for systems that must endure.
 
@@ -189,7 +188,7 @@ Not for short-lived demos.
 
 ⸻
 
-LIVE INSPECTION
+Live Inspection
 
 This repository is public and actively generating structural evidence.
 
@@ -205,7 +204,7 @@ For walkthrough requests, open an Issue.
 
 ⸻
 
-WHAT RTS IS NOT
+What RTS Is Not
 
 RTS is not:
 	•	An agent framework
@@ -217,7 +216,7 @@ RTS formalizes execution state.
 
 ⸻
 
-VISION
+Vision
 
 AI execution will scale.
 Trust will not scale automatically.
@@ -228,7 +227,7 @@ RTS is a minimal protocol for building that structure.
 
 ⸻
 
-LICENSE
+License
 
 MIT License
 Copyright (c) 2026 Nobutaka Yamauchi
