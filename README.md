@@ -57,6 +57,48 @@ Not the log line.
 
 ---
 
+## A Real Example
+
+Consider a workflow that starts failing intermittently.
+
+In RTS, each run produces a ledger event:
+
+Example event:
+
+    {
+      "ts": "2026-02-26T13:55:48Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": 22440128387,
+      "status": "failure",
+      "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6"
+    }
+
+When failure density increases:
+
+- mutation score rises
+- structural threshold is crossed
+- breakpoint is flagged
+- evidence snapshot (ESC) is generated
+- state is sealed
+
+The result is a permanent structural artifact:
+
+incidents/evidence_snapshots/ESC_<date>_<rule>.md
+
+This artifact links:
+
+- transition history
+- escalation metrics
+- mutation score
+- ledger reference
+
+This is not logging.
+
+This is structural mutation detection.
+
+---
+
 ## Who Needs This
 
 RTS is for systems that must endure.
@@ -94,6 +136,7 @@ No telemetry.
 ### Session Ledger
 
 Path:
+
 sessions/YYYY-MM/session_YYYYMMDD.jsonl
 
 Properties:
@@ -103,23 +146,12 @@ Properties:
 - Deterministic
 - Git-tracked
 
-Example event structure:
-
-ts → ISO8601 timestamp  
-kind → sentinel.run.start / sentinel.run.end  
-workflow → workflow name  
-run_id → numeric identifier  
-status → success / failure / cancelled  
-commit → commit SHA  
-
 ---
 
 ### Monthly Index
 
-Paths:
-
 sessions/YYYY-MM/index.json  
-sessions/YYYY-MM/index.md  
+sessions/YYYY-MM/index.md
 
 Aggregates:
 
