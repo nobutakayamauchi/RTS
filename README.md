@@ -23,8 +23,8 @@ Reconstructable.
 
 AI agents are scaling.
 
-Execution speed is increasing.  
-Human oversight is shrinking.
+Execution speed increases.  
+Human oversight shrinks.
 
 When execution scales without structural provenance, fragility becomes systemic.
 
@@ -75,7 +75,7 @@ Not for short-lived demos.
 
 ## Architecture (High Level)
 
-RTS uses four structural layers:
+RTS consists of four structural layers:
 
 1. Append-only session ledger (JSONL)
 2. Deterministic monthly index
@@ -94,8 +94,7 @@ No telemetry.
 ### Session Ledger
 
 Path:
-
-    sessions/YYYY-MM/session_YYYYMMDD.jsonl
+sessions/YYYY-MM/session_YYYYMMDD.jsonl
 
 Properties:
 
@@ -104,16 +103,14 @@ Properties:
 - Deterministic
 - Git-tracked
 
-Example event:
+Example event structure:
 
-    {
-      "ts": "2026-02-26T13:55:48Z",
-      "kind": "sentinel.run.end",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": 22440128387,
-      "status": "success",
-      "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6"
-    }
+ts → ISO8601 timestamp  
+kind → sentinel.run.start / sentinel.run.end  
+workflow → workflow name  
+run_id → numeric identifier  
+status → success / failure / cancelled  
+commit → commit SHA  
 
 ---
 
@@ -121,8 +118,8 @@ Example event:
 
 Paths:
 
-    sessions/YYYY-MM/index.json
-    sessions/YYYY-MM/index.md
+sessions/YYYY-MM/index.json  
+sessions/YYYY-MM/index.md  
 
 Aggregates:
 
@@ -135,23 +132,18 @@ Aggregates:
 
 ### Snapshot
 
-Path:
+sessions/YYYY-MM/index_snapshot.*
 
-    sessions/YYYY-MM/index_snapshot.*
-
-Seals structural state at a point in time.
-
+Seals structural state at a point in time.  
 Enables diff and replay.
 
 ---
 
 ### Evidence Snapshot (ESC)
 
-Path:
+incidents/evidence_snapshots/ESC_<date>_<rule>.md
 
-    incidents/evidence_snapshots/ESC_<date>_<rule>.md
-
-Generated when structural mutation crosses a defined threshold.
+Generated when mutation crosses a defined threshold.
 
 Captures:
 
@@ -170,7 +162,7 @@ When mutation crosses a boundary:
 
 - Breakpoint is flagged
 - Evidence snapshot is generated
-- State is sealed
+- Structural state is sealed
 
 This enables unambiguous reconstruction.
 
@@ -189,7 +181,7 @@ You can:
 
 Transparency over opinion.
 
-If you want an online walkthrough, open an Issue.
+If you want a live walkthrough, open an Issue.
 
 ---
 
@@ -202,7 +194,7 @@ RTS is not:
 - A monitoring tool
 - A compliance SaaS
 
-It formalizes execution state.
+RTS formalizes execution state.
 
 ---
 
