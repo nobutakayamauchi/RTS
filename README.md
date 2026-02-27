@@ -1,38 +1,49 @@
-# RTS
-
-## Execution Provenance for AI Systems
+RTS
+Execution Provenance for AI Systems
 
 AI systems reproduce output.
-
 RTS reproduces decision state — in Git.
 
 RTS is a minimal, Git-native protocol for structurally auditable AI execution.
 
----
+⸻
 
-## The Claim
+THE CLAIM
 
 RTS makes AI execution reconstructable.
 
-Not observable.  
+Not observable.
 Reconstructable.
 
----
+⸻
 
-## Why Now
+WHY NOW
 
 AI agents are scaling.
-
-Execution speed increases.  
+Execution speed increases.
 Human oversight shrinks.
 
 When execution scales without structural provenance, fragility becomes systemic.
 
 RTS addresses that structural gap.
 
----
+⸻
 
-## What RTS Changes
+WHEN YOU ACTUALLY NEED RTS
+
+You likely need RTS if at least one is true:
+	•	You can reproduce output, but cannot explain why it happened.
+	•	Logs show what ran, but not which assumptions were active.
+	•	AI workflows branch or mutate mid-session and context gets lost.
+	•	Weeks later, you cannot reconstruct the original decision environment.
+	•	Stakeholders require justification, not just results.
+
+If none apply, RTS is unnecessary.
+If one applies, you probably already need it.
+
+⸻
+
+WHAT RTS CHANGES
 
 Traditional logging answers:
 
@@ -45,202 +56,179 @@ What state was active when the decision happened?
 RTS models execution as state transitions.
 
 Each execution captures:
+	•	Context
+	•	Decision
+	•	Assumptions
+	•	Constraints
+	•	Outcome
 
-- Context
-- Decision
-- Assumptions
-- Constraints
-- Outcome
-
-The unit is the transition.  
+The unit is the transition.
 Not the log line.
 
----
+⸻
 
-## A Real Example
+ASC2 — STRUCTURAL BREAKPOINT MODEL
 
-Consider a workflow that starts failing intermittently.
+RTS does not alert on noise.
+It detects structural mutation.
 
-In RTS, each run produces a ledger event:
+When mutation density crosses a defined boundary:
+	1.	Breakpoint is flagged
+	2.	Structural state is sealed
+	3.	Evidence snapshot (ESC) is generated
+	4.	Ledger + metrics become immutable reference
 
-Example event:
+This converts instability into inspectable structure.
 
-    {
-      "ts": "2026-02-26T13:55:48Z",
-      "kind": "sentinel.run.end",
-      "workflow": "RTS Sentinel Analyze",
-      "run_id": 22440128387,
-      "status": "failure",
-      "commit": "9d2447c4303587c2c6d473943f2fd1072e5a21c6"
-    }
+Not monitoring.
+Structural mutation control.
 
-When failure density increases:
+⸻
 
-- mutation score rises
-- structural threshold is crossed
-- breakpoint is flagged
-- evidence snapshot (ESC) is generated
-- state is sealed
+REAL FAILURE SCENARIO
 
-The result is a permanent structural artifact:
+Imagine:
 
-incidents/evidence_snapshots/ESC_<date>_<rule>.md
+An AI system approves an escalation in production.
 
-This artifact links:
+Two weeks later, a regulator asks:
 
-- transition history
-- escalation metrics
-- mutation score
-- ledger reference
+“Why was this allowed?”
 
-This is not logging.
+You can reproduce the output.
 
-This is structural mutation detection.
+You cannot reproduce the decision state.
 
----
+RTS makes that state reconstructable.
 
-## Who Needs This
+⸻
+
+WHAT RTS PRODUCES
+
+Four structural artifacts:
+	1.	Session Ledger (JSONL, append-only)
+	2.	Monthly Index (deterministic aggregation)
+	3.	Snapshot (sealed structural state)
+	4.	Evidence Snapshot (ESC, breakpoint proof)
+
+Git-native.
+No SaaS.
+No telemetry.
+
+⸻
+
+REPOSITORY STRUCTURE
+
+Sessions:
+
+sessions/YYYY-MM/session_YYYYMMDD.jsonl
+sessions/YYYY-MM/index.json
+sessions/YYYY-MM/index.md
+sessions/YYYY-MM/index_snapshot.json
+sessions/YYYY-MM/index_snapshot.md
+
+Evidence:
+
+incidents/evidence_snapshots/ESC_*.md
+
+If you only inspect two things:
+	1.	sessions/
+	2.	incidents/evidence_snapshots/
+
+⸻
+
+ESC (Evidence Snapshot)
+
+Generated only when structural mutation crosses threshold.
+
+Each ESC contains:
+	•	Escalation metrics
+	•	Mutation score
+	•	Transition tail
+	•	Ledger reference
+
+This is permanent structural evidence.
+
+⸻
+
+HOW TO VERIFY RTS
+
+Do not trust claims.
+	1.	Open sessions/YYYY-MM/index.md
+	2.	Trace linked ledger entries
+	3.	Confirm ESC exists when breakpoint occurs
+	4.	Diff snapshot states
+
+If it cannot be verified from artifacts, it is not RTS.
+
+⸻
+
+HOW TO ADOPT RTS
+
+Minimum integration:
+	1.	Append run start / run end events to JSONL
+	2.	Roll up deterministic monthly index
+	3.	Generate ESC only when breakpoint is crossed
+
+No platform dependency required.
+
+⸻
+
+WHO NEEDS THIS
 
 RTS is for systems that must endure.
 
-You may need RTS if you:
-
-- Run AI in production
-- Require auditability
-- Face regulatory exposure
-- Need defensible escalation evidence
-- Build long-lived AI systems
+You likely need it if you:
+	•	Run AI in production
+	•	Require auditability
+	•	Face regulatory exposure
+	•	Need defensible escalation evidence
+	•	Build long-lived AI systems
 
 Not for short-lived demos.
 
----
+⸻
 
-## Architecture (High Level)
-
-RTS consists of four structural layers:
-
-1. Append-only session ledger (JSONL)
-2. Deterministic monthly index
-3. Immutable snapshot sealing
-4. Breakpoint-triggered evidence snapshots
-
-Git-native.
-
-No SaaS.  
-No telemetry.
-
----
-
-## Ledger Structure
-
-### Session Ledger
-
-Path:
-
-sessions/YYYY-MM/session_YYYYMMDD.jsonl
-
-Properties:
-
-- Append-only
-- One event per line
-- Deterministic
-- Git-tracked
-
----
-
-### Monthly Index
-
-sessions/YYYY-MM/index.json  
-sessions/YYYY-MM/index.md
-
-Aggregates:
-
-- Run transitions
-- Dangling runs
-- Mutation indicators
-- Evidence linkage
-
----
-
-### Snapshot
-
-sessions/YYYY-MM/index_snapshot.*
-
-Seals structural state at a point in time.  
-Enables diff and replay.
-
----
-
-### Evidence Snapshot (ESC)
-
-incidents/evidence_snapshots/ESC_<date>_<rule>.md
-
-Generated when mutation crosses a defined threshold.
-
-Captures:
-
-- Escalation metrics
-- Mutation score
-- Transition tail
-- Ledger reference
-
----
-
-## Escalation Logic
-
-RTS detects structural mutation.
-
-When mutation crosses a boundary:
-
-- Breakpoint is flagged
-- Evidence snapshot is generated
-- Structural state is sealed
-
-This enables unambiguous reconstruction.
-
----
-
-## Live Inspection
+LIVE INSPECTION
 
 This repository is public and actively generating structural evidence.
 
 You can:
-
-- Inspect session ledgers
-- Verify transitions
-- Review evidence snapshots
-- Clone and replay locally
+	•	Inspect ledgers
+	•	Verify transitions
+	•	Review ESC files
+	•	Clone and replay locally
 
 Transparency over opinion.
 
-If you want a live walkthrough, open an Issue.
+For walkthrough requests, open an Issue.
 
----
+⸻
 
-## What RTS Is Not
+WHAT RTS IS NOT
 
 RTS is not:
-
-- An agent framework
-- A vector database
-- A monitoring tool
-- A compliance SaaS
+	•	An agent framework
+	•	A vector database
+	•	A monitoring tool
+	•	A compliance SaaS
 
 RTS formalizes execution state.
 
----
+⸻
 
-## Vision
+VISION
 
 AI execution will scale.
+Trust will not scale automatically.
 
-Trust must become structural.
+Governance must become structural.
 
 RTS is a minimal protocol for building that structure.
 
----
+⸻
 
-## License
+LICENSE
 
-MIT License  
+MIT License
 Copyright (c) 2026 Nobutaka Yamauchi
