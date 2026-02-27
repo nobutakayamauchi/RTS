@@ -1,49 +1,43 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Services | RTS</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:0; color:#111;}
-    .wrap{max-width:920px; margin:0 auto; padding:48px 20px;}
-    h1{margin:0 0 8px; font-size:34px;}
-    .sub{color:#444; margin:0 0 22px; max-width:70ch;}
-    .cards{display:grid; grid-template-columns:1fr; gap:14px;}
-    @media(min-width:860px){.cards{grid-template-columns:1fr 1fr;}}
-    .card{border:1px solid #e6e6e6; border-radius:14px; padding:18px;}
-    .btn{display:inline-block; margin-top:10px; background:#1a73e8; color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:650;}
-    .link{color:#1a73e8; text-decoration:none;}
-    .muted{color:#666; font-size:13px; line-height:1.6;}
-    .foot{margin-top:26px; display:flex; flex-wrap:wrap; gap:14px; font-size:13px;}
-    .foot a{color:#1a73e8; text-decoration:none;}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Services | RTS</title>
+<style>
+body{font-family:system-ui;margin:0;padding:40px;max-width:900px;margin:auto;}
+.card{border:1px solid #eee;padding:20px;border-radius:12px;margin-bottom:20px;}
+.btn{display:inline-block;background:#1a73e8;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;}
+.muted{color:#666;font-size:14px;}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Services</h1>
-    <p class="sub">Select a service. Credit-card checkout is available for fixed-price services.</p>
 
-    <div class="cards">
-      <div class="card">
-        <h2 style="margin:0 0 6px;">Breakpoint Console</h2>
-        <div class="muted">Fixed-price diagnostic session (Zoom) + written PDF report.</div>
-        <a class="btn" href="/breakpoint/">View details</a>
-      </div>
+<h1>Services</h1>
 
-      <div class="card">
-        <h2 style="margin:0 0 6px;">RTS Method</h2>
-        <div class="muted">Background, philosophy, and why decision trails matter.</div>
-        <a class="link" href="/method/">Read</a>
-      </div>
-    </div>
+<div class="card">
+<h2>Breakpoint Console</h2>
+<p class="muted">
+Fixed-price structural diagnostic service. Includes asynchronous analysis and written PDF report.
+</p>
+<a href="/breakpoint/" class="btn">View Details</a>
+</div>
 
-    <div class="foot">
-      <a href="/">Home</a>
-      <a href="/legal/">Legal Notice</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/terms/">Terms</a>
-    </div>
-  </div>
+<div class="card">
+<h2>RTS Method</h2>
+<p class="muted">
+Structural governance principles and decision continuity framework.
+</p>
+<a href="/method/">Read</a>
+</div>
+
+<hr>
+
+<div class="muted">
+<a href="/legal/">Legal Notice</a> |
+<a href="/privacy/">Privacy</a> |
+<a href="/terms/">Terms</a>
+</div>
+
 </body>
 </html>
