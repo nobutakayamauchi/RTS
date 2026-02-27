@@ -106,7 +106,7 @@ jobs:
 
       - name: Run RTS Agent Analyze
         run: |
-      python scripts/rts_agent_analyze_DOES_NOT_EXIST.py
+          python scripts/rts_agent_analyze.py
 
       # -------------------------------
       # 6) RUN_END (sentinel.run.end + legacy marker)
