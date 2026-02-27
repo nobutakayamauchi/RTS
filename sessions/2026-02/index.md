@@ -1,18 +1,18 @@
 # RTS Sessions — 2026-02
 
-- updated_at_utc: `2026-02-26T22:43:31Z`
+- updated_at_utc: `2026-02-27T01:23:20Z`
 
 ## Ledger Integrity
 
 - status: **OK**
-- parsed_lines: `88`
+- parsed_lines: `91`
 - invalid_lines: `0`
 
 ## Counts
 
-- `sentinel.run`: 36
-- `sentinel.run.end`: 26
-- `sentinel.run.start`: 26
+- `sentinel.run`: 37
+- `sentinel.run.end`: 27
+- `sentinel.run.start`: 27
 
 ## Metrics (latest)
 
@@ -45,7 +45,6 @@
 
 ## Latest (tail)
 
-- `2026-02-26T14:40:42Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22446879098 attempt=1 status=success commit=9c18c83c5685bdf44d66acae7db954474f884b1b — analysis finished
 - `2026-02-26T21:53:08Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22462808291 attempt=1 status=success commit=a3b7c6ec68eefc1a57347354c67257130f8819c0 — analysis finished
 - `2026-02-26T21:57:27Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22462951432 attempt=1 status=success commit=5f9ca3daf89817c87c8a355f79beb81c8f51647c — analysis finished
 - `2026-02-26T21:58:46Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22462992740 attempt=1 status=success commit=6a4aa48f059e4f818f2465a4ae1aee53a86cba14 — analysis finished
@@ -53,6 +52,7 @@
 - `2026-02-26T22:29:08Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22463964746 attempt=1 status=success commit=1ffe067f70646fcc7b970164e1208dfdf4fc170a — analysis finished
 - `2026-02-26T22:41:11Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22464338119 attempt=1 status=success commit=d11260d560e0bfe0d179b68a60cd5344979e47d6 — analysis finished
 - `2026-02-26T22:43:30Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22464410128 attempt=1 status=success commit=dc161d00f030aec7f865202aa3141a9077633199 — analysis finished
+- `2026-02-27T01:23:20Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22468686279 attempt=1 status=success commit=6598e1b39c86aff5fad794f08616316605597aaf — analysis finished
 
 ## Transitions (latest)
 
@@ -61,4 +61,5 @@
 ## Raw ledgers
 
 - `session_20260226.jsonl`
+- `session_20260227.jsonl`
 
