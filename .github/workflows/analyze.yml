@@ -5,15 +5,14 @@ on:
     branches: [main]
     paths-ignore:
       - "sessions/**/manifest.sha256"
-
   schedule:
-    - cron: "0 3 * * *"
-
+    - cron: "0 3 * * *" # 03:00 UTC
   workflow_dispatch:
 
 permissions:
   contents: write
   actions: read
+  pull-requests: write
 
 concurrency:
   group: rts-sentinel-analyze-main
@@ -25,12 +24,17 @@ jobs:
     timeout-minutes: 10
 
     steps:
-
+      # -------------------------------
+      # 1) Checkout
+      # -------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -------------------------------
+      # 2) Python
+      # -------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -42,15 +46,17 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
+      # -------------------------------
+      # 3) Session month/day (UTC)
+      # -------------------------------
       - name: Set session month + day (UTC)
         run: |
           echo "SESSION_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
           echo "SESSION_DAY=$(date -u +%Y%m%d)" >> $GITHUB_ENV
 
-      ###################################################
-      # RUN START
-      ###################################################
-
+      # -------------------------------
+      # 4) RUN_START payload + append
+      # -------------------------------
       - name: Build RUN_START payload
         if: always()
         env:
@@ -66,29 +72,27 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, datetime
-          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z"
-          run_id=os.environ.get("RUN_ID","")
-          repo=os.environ.get("REPO","")
-
-          payload={
-            "ts":ts,
-            "kind":"sentinel.run.start",
-            "workflow":os.environ.get("WORKFLOW_NAME",""),
-            "run_id":run_id,
-            "run_number":int(os.environ.get("RUN_NUMBER","0") or 0),
-            "run_attempt":int(os.environ.get("RUN_ATTEMPT","1") or 1),
-            "status":"started",
-            "commit":os.environ.get("HEAD_SHA",""),
-            "actor":os.environ.get("ACTOR",""),
-            "repo":repo,
-            "ref":os.environ.get("REF_NAME",""),
-            "run_url":f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
-            "note":"run started"
+          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+          run_id = str(os.environ.get("RUN_ID",""))
+          repo = os.environ.get("REPO","")
+          payload = {
+            "ts": ts,
+            "kind": "sentinel.run.start",
+            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
+            "run_id": run_id,
+            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status": "started",
+            "commit": os.environ.get("HEAD_SHA",""),
+            "actor": os.environ.get("ACTOR",""),
+            "repo": repo,
+            "ref": os.environ.get("REF_NAME",""),
+            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
+            "note": "run started",
           }
-
-          open("/tmp/session_payload_start.json","w").write(
-            json.dumps(payload,ensure_ascii=False,indent=2)
-          )
+          with open("/tmp/session_payload_start.json","w",encoding="utf-8") as f:
+            json.dump(payload,f,ensure_ascii=False,indent=2)
+          print("wrote /tmp/session_payload_start.json")
           PY
 
       - name: Append RUN_START
@@ -96,24 +100,24 @@ jobs:
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_start.json"
 
-      ###################################################
-      # RTS Engines
-      ###################################################
-
+      # -------------------------------
+      # 5) RTS Engines
+      # -------------------------------
       - name: Run RTS Evidence Analysis
-        run: python scripts/rts_analysis_engine.py
+        run: |
+          python scripts/rts_analysis_engine.py
 
       - name: Run RTS Agent Analyze
-        run: python scripts/rts_agent_analyze.py
+        run: |
+          python scripts/rts_agent_analyze.py
 
-      ###################################################
-      # RUN END
-      ###################################################
-
+      # -------------------------------
+      # 6) RUN_END payloads + append
+      # -------------------------------
       - name: Build RUN_END payloads
         if: always()
         env:
-          JOB_STATUS: ${{ job.status }}
+          WORKFLOW_NAME: ${{ github.workflow }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
@@ -122,96 +126,105 @@ jobs:
           ACTOR: ${{ github.actor }}
           HEAD_SHA: ${{ github.sha }}
           SERVER_URL: ${{ github.server_url }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           python - <<'PY'
-          import json,os,datetime
-          ts=datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z"
+          import json, os, datetime
+          ts = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+          run_id = str(os.environ.get("RUN_ID",""))
+          repo = os.environ.get("REPO","")
+          status = (os.environ.get("JOB_STATUS","") or "").lower()
 
-          base={
-            "ts":ts,
-            "workflow":"RTS Sentinel Analyze",
-            "run_id":os.environ.get("RUN_ID",""),
-            "run_number":int(os.environ.get("RUN_NUMBER","0") or 0),
-            "run_attempt":int(os.environ.get("RUN_ATTEMPT","1") or 1),
-            "status":os.environ.get("JOB_STATUS",""),
-            "commit":os.environ.get("HEAD_SHA",""),
-            "actor":os.environ.get("ACTOR",""),
-            "repo":os.environ.get("REPO",""),
-            "ref":os.environ.get("REF_NAME",""),
-            "note":"analysis finished"
+          base = {
+            "ts": ts,
+            "workflow": os.environ.get("WORKFLOW_NAME","RTS Sentinel Analyze"),
+            "run_id": run_id,
+            "run_number": int(os.environ.get("RUN_NUMBER","0") or 0),
+            "run_attempt": int(os.environ.get("RUN_ATTEMPT","1") or 1),
+            "status": status,
+            "commit": os.environ.get("HEAD_SHA",""),
+            "actor": os.environ.get("ACTOR",""),
+            "repo": repo,
+            "ref": os.environ.get("REF_NAME",""),
+            "run_url": f'{os.environ.get("SERVER_URL","https://github.com")}/{repo}/actions/runs/{run_id}',
+            "note": "analysis finished",
           }
 
-          end=dict(base)
-          end["kind"]="sentinel.run.end"
+          end_payload = dict(base)
+          end_payload["kind"] = "sentinel.run.end"
 
-          legacy=dict(base)
-          legacy["kind"]="sentinel.run"
+          legacy_payload = dict(base)
+          legacy_payload["kind"] = "sentinel.run"
 
-          open("/tmp/session_payload_end.json","w").write(
-            json.dumps(end,ensure_ascii=False,indent=2)
-          )
+          with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
+            json.dump(end_payload,f,ensure_ascii=False,indent=2)
 
-          open("/tmp/session_payload_legacy.json","w").write(
-            json.dumps(legacy,ensure_ascii=False,indent=2)
-          )
+          with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
+            json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
+
+          print("wrote end + legacy payloads")
           PY
 
-      - name: Append RUN_END
+      - name: Append RUN_END (sentinel.run.end)
         if: always()
-        run: python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
+        run: |
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
 
-      - name: Append RUN legacy
+      - name: Append RUN_END marker (sentinel.run legacy)
         if: always()
-        run: python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
+        run: |
+          python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
-      ###################################################
-      # Rollups
-      ###################################################
-
+      # -------------------------------
+      # 7) Rollup + indexes
+      # -------------------------------
       - name: Rollup monthly index
         if: always()
-        run: python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
+        run: |
+          python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
 
-      - name: SNAP rebuild
+      - name: SNAP Index Rebuild (safe)
         if: always()
         continue-on-error: true
-        run: python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
+        run: |
+          python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
 
-      - name: SNAP auto cull
+      - name: SNAP Auto Cull (safe)
         if: always()
         continue-on-error: true
-        run: python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
+        run: |
+          python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
-      - name: Evidence index build
+      - name: Build Evidence + SNAP Index (safe)
         if: always()
         continue-on-error: true
-        run: python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
+        run: |
+          python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
 
-      ###################################################
-      # Phase A Manifest ⭐⭐⭐⭐⭐
-      ###################################################
-
+      # -------------------------------
+      # 8) Phase A manifest + verify
+      # -------------------------------
       - name: Generate manifest.sha256
         if: always()
         env:
           RTS_MONTH: ${{ env.SESSION_MONTH }}
-        run: python scripts/manifest_month.py
+        run: |
+          python scripts/manifest_month.py
 
       - name: Verify manifest.sha256
         if: always()
         env:
           RTS_MONTH: ${{ env.SESSION_MONTH }}
-        run: python scripts/verify_manifest.py
+        run: |
+          python scripts/verify_manifest.py
 
-      ###################################################
-      # Commit outputs (single push)
-      ###################################################
-
-      - name: Commit outputs
+      # -------------------------------
+      # 9) Commit outputs (NO push to main; PR instead)
+      # -------------------------------
+      - name: Commit outputs to branch (safe)
         if: always()
         run: |
           set -e
-
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
@@ -224,16 +237,18 @@ jobs:
             exit 0
           fi
 
-          git commit -m "RTS: outputs update (${SESSION_MONTH})" || true
+          git commit -m "RTS: outputs update (${SESSION_MONTH})" || exit 0
 
-          for i in 1 2 3; do
-            git pull --rebase origin main || true
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            sleep 2
-          done
-
-          echo "push failed"
-          exit 1
+      - name: Create or update PR (analyze outputs)
+        if: always()
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: rts-bot/analyze
+          delete-branch: true
+          title: "RTS: outputs update (${SESSION_MONTH})"
+          body: |
+            Automated outputs update from RTS Sentinel Analyze.
+            main is protected, so this workflow opens/updates a PR instead of pushing directly.
+          commit-message: "RTS: outputs update (${SESSION_MONTH})"
+          labels: rts-bot, automated
