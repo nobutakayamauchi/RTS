@@ -69,7 +69,7 @@
       <div class="muted">Payment method: credit card / Apple Pay</div>
 
       <div class="btnrow">
-        <!-- Stripe Payment Link（完全URL / …なし） -->
+        <!-- Stripe Payment Link (FULL URL) -->
         <a class="btn"
            href="https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01"
            target="_blank"
@@ -77,12 +77,13 @@
           今すぐ購入する（49,500円）
         </a>
 
+        <!-- GitHub Pages: /RTS/ 配下前提 -->
         <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
       </div>
 
       <div class="note">
-        <b>注意:</b> Stripeリンクが <code>...</code>（省略）付きで貼られると <b>AccessDenied</b> になります。<br>
-        必ず Stripe の「コピー」ボタンから取得した <b>完全URL</b> を貼ってください。
+        <b>確認ポイント:</b> 購入ボタンのリンクは <code>https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01</code> を直接指定しています。
+        もし <code>AccessDenied</code> が出る場合は、リンクが途中で欠けているか、Stripe側で無効化されている可能性があります。
       </div>
 
       <div class="hr"></div>
@@ -99,7 +100,7 @@
         <li>優先順位付きアクションリスト</li>
         <li>リスク要因の整理ドキュメント</li>
         <li>次ステップ実行計画</li>
-        <li>納品時の補足説明（テキスト/音声含む）</li>
+        <li>納品時の補足説明（テキスト/音声を含む）</li>
       </ul>
 
       <h2>提供形式</h2>
