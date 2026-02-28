@@ -44,6 +44,10 @@
       color:#334155;font-size:13px;line-height:1.6;
       margin-top:12px;
     }
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      background:#eef3f7;padding:2px 6px;border-radius:8px;
+    }
   </style>
 </head>
 
@@ -65,15 +69,20 @@
       <div class="muted">Payment method: credit card / Apple Pay</div>
 
       <div class="btnrow">
-        <!-- Stripe Payment Link -->
+        <!-- Stripe Payment Link（完全URL / …なし） -->
         <a class="btn"
            href="https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01"
            target="_blank"
            rel="noopener noreferrer">
-           今すぐ購入する（49,500円）
+          今すぐ購入する（49,500円）
         </a>
 
-        <a class="btn ghost" href="../legal/tokusho/">特定商取引法に基づく表記</a>
+        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
+      </div>
+
+      <div class="note">
+        <b>注意:</b> Stripeリンクが <code>...</code>（省略）付きで貼られると <b>AccessDenied</b> になります。<br>
+        必ず Stripe の「コピー」ボタンから取得した <b>完全URL</b> を貼ってください。
       </div>
 
       <div class="hr"></div>
@@ -113,7 +122,7 @@
       </ul>
 
       <p class="muted">
-        詳細は <a href="../legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。
+        詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。
       </p>
 
       <h2>本サービスの性質</h2>
@@ -126,21 +135,21 @@
 
       <h2>関連</h2>
       <div class="btnrow">
-        <a class="btn ghost" href="../docs/rulebook/">Rulebook</a>
-        <a class="btn ghost" href="../">Home</a>
-        <a class="btn ghost" href="../legal/">Legal</a>
+        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
+        <a class="btn ghost" href="/RTS/">Home</a>
+        <a class="btn ghost" href="/RTS/legal/">Legal</a>
       </div>
     </div>
 
     <!-- ===== Footer ===== -->
     <div class="footer">
       <div style="margin-bottom:10px;">
-        <a href="../">Home</a> |
-        <a href="./">Services</a> |
-        <a href="../docs/rulebook/">Rulebook</a> |
-        <a href="../legal/tokusho/">Tokusho</a> |
-        <a href="../legal/privacy/">Privacy</a> |
-        <a href="../legal/terms/">Terms</a>
+        <a href="/RTS/">Home</a> |
+        <a href="/RTS/services/">Services</a> |
+        <a href="/RTS/docs/rulebook/">Rulebook</a> |
+        <a href="/RTS/legal/tokusho/">Tokusho</a> |
+        <a href="/RTS/legal/privacy/">Privacy</a> |
+        <a href="/RTS/legal/terms/">Terms</a>
       </div>
       Created by Nobutaka Yamauchi ● MIT License
     </div>
