@@ -12,8 +12,8 @@ on:
 permissions:
   contents: write
   actions: read
+  pull-requests: write
 
-# 競合（push rejected）を抑える
 concurrency:
   group: rts-escalation-recorder-main
   cancel-in-progress: true
@@ -58,7 +58,7 @@ jobs:
         run: |
           python scripts/rts_escalation.py
 
-      - name: Commit evidence (safe push)
+      - name: Commit evidence to branch (safe)
         run: |
           set -e
           git config user.name "rts-bot"
@@ -67,20 +67,22 @@ jobs:
           git add incidents/evidence_packs incidents/evidence_snapshots || true
 
           # 変更がないなら終了
-          git diff --cached --quiet && exit 0
+          if git diff --cached --quiet; then
+            echo "[ok] no changes"
+            exit 0
+          fi
 
           git commit -m "RTS: escalation evidence pack (snapshot freeze)" || exit 0
 
-          # リモート更新があると push rejected になるので rebase して再試行
-          for i in 1 2 3; do
-            git pull --rebase origin main || true
-            if git push origin main; then
-              echo "push ok"
-              exit 0
-            fi
-            echo "push failed, retry $i..."
-            sleep 2
-          done
-
-          echo "push failed after retries"
-          exit 1
+      - name: Create or update PR (escalation evidence)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: rts-bot/escalation
+          delete-branch: true
+          title: "RTS: escalation evidence pack (snapshot freeze)"
+          body: |
+            Automated escalation evidence update.
+            main is protected, so this workflow opens/updates a PR instead of pushing directly.
+          commit-message: "RTS: escalation evidence pack (snapshot freeze)"
+          labels: rts-bot, automated
