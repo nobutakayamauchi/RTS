@@ -22,9 +22,7 @@
     h2{font-size:18px;margin:18px 0 10px;}
     p{color:#4b5563;line-height:1.7;margin:10px 0;}
     ul{padding-left:18px;line-height:1.8;margin:0;}
-    .price{
-      font-size:26px;font-weight:800;margin:6px 0 0;
-    }
+    .price{font-size:26px;font-weight:800;margin:6px 0 0;}
     .muted{color:#6b7280;font-size:13px;line-height:1.6;}
     .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .btn{
@@ -46,19 +44,17 @@
       color:#334155;font-size:13px;line-height:1.6;
       margin-top:12px;
     }
-    code{
-      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-      background:#eef3f7;padding:2px 6px;border-radius:8px;
-    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
 
+    <!-- ===== Service Card ===== -->
     <div class="card">
       <div class="muted">RTS / Services</div>
       <h1>Breakpoint Consulting（ブレイクポイント・コンサルティング）</h1>
+
       <p>
         固定価格の診断型コンサルティングです。現状の混線点（breakpoint）を特定し、
         再現可能な状態整理と次の打ち手を納品します。
@@ -66,25 +62,27 @@
 
       <h2>価格</h2>
       <div class="price">49,500円（税込）</div>
-      <div class="muted">Payment method: credit card</div>
+      <div class="muted">Payment method: credit card / Apple Pay</div>
 
       <div class="btnrow">
-        <!-- TODO: 決済リンクが発行されたら、下の href を差し替えてください -->
-        <!-- 例: href="https://buy.stripe.com/xxxxx" -->
-        <a class="btn" href="__STRIPE_PAYMENT_LINK__">購入（決済へ）</a>
+        <!-- Stripe Payment Link -->
+        <a class="btn"
+           href="https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01"
+           target="_blank"
+           rel="noopener noreferrer">
+           今すぐ購入する（49,500円）
+        </a>
 
-        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
-      </div>
-
-      <div class="note">
-        <b>差し替え箇所:</b> 上の <code>__STRIPE_PAYMENT_LINK__</code> を Stripe の決済リンクに置換してください。
-        （まだリンクが無い状態でも、ページ公開は可能）
+        <a class="btn ghost" href="../legal/tokusho/">特定商取引法に基づく表記</a>
       </div>
 
       <div class="hr"></div>
 
       <h2>サービス内容</h2>
-      <p>本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型のコンサルティング役務提供です。</p>
+      <p>
+        本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型の
+        コンサルティング役務提供です。
+      </p>
 
       <h2>納品物</h2>
       <ul>
@@ -92,55 +90,57 @@
         <li>優先順位付きアクションリスト</li>
         <li>リスク要因の整理ドキュメント</li>
         <li>次ステップ実行計画</li>
-        <li>納品時オンライン説明（最大90分）</li>
+        <li>納品時の補足説明（テキスト/音声含む）</li>
       </ul>
 
       <h2>提供形式</h2>
       <ul>
-        <li>Zoomによるオンラインセッション</li>
+        <li>オンライン（テキスト / 音声通話）</li>
         <li>PDFドキュメント納品</li>
-        <li>必要に応じて補足資料</li>
+        <li>必要に応じて追加資料</li>
       </ul>
 
       <h2>納期</h2>
       <ul>
-        <li>お申し込み後7日以内に日程調整</li>
-        <li>セッション実施後3営業日以内にPDF納品</li>
+        <li>お申し込み後7日以内にヒアリング開始</li>
+        <li>ヒアリング完了後3営業日以内にPDF納品</li>
       </ul>
 
       <h2>返金ポリシー</h2>
       <ul>
-        <li>セッション実施前のキャンセル：全額返金</li>
-        <li>セッション実施後：返金不可</li>
+        <li>着手前のキャンセル：全額返金</li>
+        <li>着手後のキャンセル：返金不可</li>
       </ul>
-      <p class="muted">詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。</p>
+
+      <p class="muted">
+        詳細は <a href="../legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。
+      </p>
 
       <h2>本サービスの性質</h2>
       <p class="muted">
-        本サービスは成果保証型ではありません。診断および構造整理を目的とするコンサルティング役務提供です。<br>
-        実行結果・売上・利益等を保証するものではありません。<br>
-        本サービスはデジタル成果物（PDF等）を含むコンサルティング役務提供に該当します。
+        本サービスは成果保証型ではありません。診断および構造整理を目的とする
+        コンサルティング役務提供であり、実行結果・売上・利益等を保証するものではありません。
       </p>
 
       <div class="hr"></div>
 
       <h2>関連</h2>
       <div class="btnrow">
-        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
-        <a class="btn ghost" href="/RTS/">Home</a>
-        <a class="btn ghost" href="/RTS/legal/">Legal</a>
+        <a class="btn ghost" href="../docs/rulebook/">Rulebook</a>
+        <a class="btn ghost" href="../">Home</a>
+        <a class="btn ghost" href="../legal/">Legal</a>
       </div>
-
     </div>
 
+    <!-- ===== Footer ===== -->
     <div class="footer">
       <div style="margin-bottom:10px;">
-        <a href="/RTS/">Home</a> |
-        <a href="/RTS/services/">Services</a> |
-        <a href="/RTS/docs/rulebook/">Rulebook</a> |
-        <a href="/RTS/legal/tokusho/">Tokusho</a> |
-        <a href="/RTS/legal/privacy/">Privacy</a> |
-        <a href="/RTS/legal/terms/">Terms</a>
+        <a href="../">Home</a> |
+        <a href="./">Services</a> |
+        <a href="../docs/rulebook/">Rulebook</a> |
+        <a href="../legal/tokusho/">Tokusho</a> |
+        <a href="../legal/privacy/">Privacy</a> |
+        <a href="../legal/terms/">Terms</a>
       </div>
       Created by Nobutaka Yamauchi ● MIT License
     </div>
