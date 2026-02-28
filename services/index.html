@@ -30,12 +30,12 @@
       background:#0b1220;color:#fff;
       padding:12px 16px;border-radius:12px;
       font-size:14px;font-weight:700;
-      transition:opacity .2s ease;
     }
-    .btn:hover{opacity:.85;}
     .btn.ghost{background:#fff;color:#0b1220;border:1px solid rgba(11,18,32,.18);}
     .hr{height:1px;background:rgba(11,18,32,.08);margin:18px 0;}
-    .footer{text-align:center;font-size:12px;color:#6b7280;margin-top:20px;}
+    .footer{
+      text-align:center;font-size:12px;color:#6b7280;margin-top:20px;
+    }
     .footer a{color:#1f3a8a;text-decoration:none}
     .footer a:hover{text-decoration:underline}
     .note{
@@ -50,9 +50,11 @@
 <body>
   <div class="wrap">
 
+    <!-- ===== Service Card ===== -->
     <div class="card">
       <div class="muted">RTS / Services</div>
       <h1>Breakpoint Consulting（ブレイクポイント・コンサルティング）</h1>
+
       <p>
         固定価格の診断型コンサルティングです。現状の混線点（breakpoint）を特定し、
         再現可能な状態整理と次の打ち手を納品します。
@@ -63,19 +65,24 @@
       <div class="muted">Payment method: credit card / Apple Pay</div>
 
       <div class="btnrow">
+        <!-- Stripe Payment Link -->
         <a class="btn"
-           href="https://buy.stripe.com/aFa6oJgqcdgTgK..."
+           href="https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01"
            target="_blank"
            rel="noopener noreferrer">
            今すぐ購入する（49,500円）
         </a>
-        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
+
+        <a class="btn ghost" href="../legal/tokusho/">特定商取引法に基づく表記</a>
       </div>
 
       <div class="hr"></div>
 
       <h2>サービス内容</h2>
-      <p>本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型のコンサルティング役務提供です。</p>
+      <p>
+        本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型の
+        コンサルティング役務提供です。
+      </p>
 
       <h2>納品物</h2>
       <ul>
@@ -83,22 +90,14 @@
         <li>優先順位付きアクションリスト</li>
         <li>リスク要因の整理ドキュメント</li>
         <li>次ステップ実行計画</li>
-        <li>納品内容の補足説明（テキスト/音声）</li>
+        <li>納品時の補足説明（テキスト/音声含む）</li>
       </ul>
 
       <h2>提供形式</h2>
       <ul>
-        <li>非同期（テキスト/音声メッセージ）でのヒアリング・整理</li>
+        <li>オンライン（テキスト / 音声通話）</li>
         <li>PDFドキュメント納品</li>
-        <li>必要に応じて追加の補足資料</li>
-        <li>（任意）短時間の通話／音声での確認（希望がある場合のみ）</li>
-      </ul>
-
-      <h2>進め方（流れ）</h2>
-      <ul>
-        <li>購入後：フォーム or メールでヒアリング項目を送付</li>
-        <li>ヒアリング回答を受領後：整理・分析を開始</li>
-        <li>PDF納品 → 補足説明（テキスト/音声）を送付</li>
+        <li>必要に応じて追加資料</li>
       </ul>
 
       <h2>納期</h2>
@@ -110,36 +109,38 @@
       <h2>返金ポリシー</h2>
       <ul>
         <li>着手前のキャンセル：全額返金</li>
-        <li>着手後：返金不可</li>
+        <li>着手後のキャンセル：返金不可</li>
       </ul>
-      <p class="muted">詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。</p>
+
+      <p class="muted">
+        詳細は <a href="../legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。
+      </p>
 
       <h2>本サービスの性質</h2>
       <p class="muted">
-        本サービスは成果保証型ではありません。診断および構造整理を目的とするコンサルティング役務提供です。<br>
-        実行結果・売上・利益等を保証するものではありません。<br>
-        本サービスはデジタル成果物（PDF等）を含むコンサルティング役務提供に該当します。
+        本サービスは成果保証型ではありません。診断および構造整理を目的とする
+        コンサルティング役務提供であり、実行結果・売上・利益等を保証するものではありません。
       </p>
 
       <div class="hr"></div>
 
       <h2>関連</h2>
       <div class="btnrow">
-        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
-        <a class="btn ghost" href="/RTS/">Home</a>
-        <a class="btn ghost" href="/RTS/legal/">Legal</a>
+        <a class="btn ghost" href="../docs/rulebook/">Rulebook</a>
+        <a class="btn ghost" href="../">Home</a>
+        <a class="btn ghost" href="../legal/">Legal</a>
       </div>
-
     </div>
 
+    <!-- ===== Footer ===== -->
     <div class="footer">
       <div style="margin-bottom:10px;">
-        <a href="/RTS/">Home</a> |
-        <a href="/RTS/services/">Services</a> |
-        <a href="/RTS/docs/rulebook/">Rulebook</a> |
-        <a href="/RTS/legal/tokusho/">Tokusho</a> |
-        <a href="/RTS/legal/privacy/">Privacy</a> |
-        <a href="/RTS/legal/terms/">Terms</a>
+        <a href="../">Home</a> |
+        <a href="./">Services</a> |
+        <a href="../docs/rulebook/">Rulebook</a> |
+        <a href="../legal/tokusho/">Tokusho</a> |
+        <a href="../legal/privacy/">Privacy</a> |
+        <a href="../legal/terms/">Terms</a>
       </div>
       Created by Nobutaka Yamauchi ● MIT License
     </div>
