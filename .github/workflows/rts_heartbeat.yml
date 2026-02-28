@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: rts-heartbeat-main
@@ -23,25 +24,35 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Append heartbeat line (always)
+      - name: Append heartbeat line
         run: |
           mkdir -p logs
           echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ") heartbeat" >> logs/heartbeat.log
 
-      - name: Commit heartbeat (safe)
+      - name: Commit to branch
         run: |
+          set -e
           git config user.name "rts-bot"
           git config user.email "rts-bot@users.noreply.github.com"
 
+          BRANCH="rts/heartbeat"
+
+          git checkout -B $BRANCH
+
           git add logs/heartbeat.log || true
 
-          if git diff --cached --quiet; then
-            echo "[ok] no changes"
-            exit 0
-          fi
+          git diff --cached --quiet && exit 0
 
-          git commit -m "RTS: heartbeat" || exit 0
+          git commit -m "RTS: heartbeat"
 
-          # fetch-first問題の根治
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin $BRANCH --force
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: rts/heartbeat
+          base: main
+          title: "RTS: Heartbeat update"
+          body: "Automated heartbeat log update."
+          commit-message: "RTS: heartbeat"
+          delete-branch: false
