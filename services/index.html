@@ -22,9 +22,7 @@
     h2{font-size:18px;margin:18px 0 10px;}
     p{color:#4b5563;line-height:1.7;margin:10px 0;}
     ul{padding-left:18px;line-height:1.8;margin:0;}
-    .price{
-      font-size:26px;font-weight:800;margin:6px 0 0;
-    }
+    .price{font-size:26px;font-weight:800;margin:6px 0 0;}
     .muted{color:#6b7280;font-size:13px;line-height:1.6;}
     .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .btn{
@@ -32,12 +30,12 @@
       background:#0b1220;color:#fff;
       padding:12px 16px;border-radius:12px;
       font-size:14px;font-weight:700;
+      transition:opacity .2s ease;
     }
+    .btn:hover{opacity:.85;}
     .btn.ghost{background:#fff;color:#0b1220;border:1px solid rgba(11,18,32,.18);}
     .hr{height:1px;background:rgba(11,18,32,.08);margin:18px 0;}
-    .footer{
-      text-align:center;font-size:12px;color:#6b7280;margin-top:20px;
-    }
+    .footer{text-align:center;font-size:12px;color:#6b7280;margin-top:20px;}
     .footer a{color:#1f3a8a;text-decoration:none}
     .footer a:hover{text-decoration:underline}
     .note{
@@ -45,10 +43,6 @@
       padding:12px 14px;border-radius:14px;
       color:#334155;font-size:13px;line-height:1.6;
       margin-top:12px;
-    }
-    code{
-      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-      background:#eef3f7;padding:2px 6px;border-radius:8px;
     }
   </style>
 </head>
@@ -66,19 +60,16 @@
 
       <h2>価格</h2>
       <div class="price">49,500円（税込）</div>
-      <div class="muted">Payment method: credit card</div>
+      <div class="muted">Payment method: credit card / Apple Pay</div>
 
       <div class="btnrow">
-        <!-- TODO: 決済リンクが発行されたら、下の href を差し替えてください -->
-        <!-- 例: href="https://buy.stripe.com/xxxxx" -->
-        <a class="btn" href="__STRIPE_PAYMENT_LINK__">購入（決済へ）</a>
-
+        <a class="btn"
+           href="https://buy.stripe.com/aFa6oJgqcdgTgK..."
+           target="_blank"
+           rel="noopener noreferrer">
+           今すぐ購入する（49,500円）
+        </a>
         <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
-      </div>
-
-      <div class="note">
-        <b>差し替え箇所:</b> 上の <code>__STRIPE_PAYMENT_LINK__</code> を Stripe の決済リンクに置換してください。
-        （まだリンクが無い状態でも、ページ公開は可能）
       </div>
 
       <div class="hr"></div>
@@ -92,26 +83,34 @@
         <li>優先順位付きアクションリスト</li>
         <li>リスク要因の整理ドキュメント</li>
         <li>次ステップ実行計画</li>
-        <li>納品時オンライン説明（最大90分）</li>
+        <li>納品内容の補足説明（テキスト/音声）</li>
       </ul>
 
       <h2>提供形式</h2>
       <ul>
-        <li>Zoomによるオンラインセッション</li>
+        <li>非同期（テキスト/音声メッセージ）でのヒアリング・整理</li>
         <li>PDFドキュメント納品</li>
-        <li>必要に応じて補足資料</li>
+        <li>必要に応じて追加の補足資料</li>
+        <li>（任意）短時間の通話／音声での確認（希望がある場合のみ）</li>
+      </ul>
+
+      <h2>進め方（流れ）</h2>
+      <ul>
+        <li>購入後：フォーム or メールでヒアリング項目を送付</li>
+        <li>ヒアリング回答を受領後：整理・分析を開始</li>
+        <li>PDF納品 → 補足説明（テキスト/音声）を送付</li>
       </ul>
 
       <h2>納期</h2>
       <ul>
-        <li>お申し込み後7日以内に日程調整</li>
-        <li>セッション実施後3営業日以内にPDF納品</li>
+        <li>お申し込み後7日以内にヒアリング開始</li>
+        <li>ヒアリング完了後3営業日以内にPDF納品</li>
       </ul>
 
       <h2>返金ポリシー</h2>
       <ul>
-        <li>セッション実施前のキャンセル：全額返金</li>
-        <li>セッション実施後：返金不可</li>
+        <li>着手前のキャンセル：全額返金</li>
+        <li>着手後：返金不可</li>
       </ul>
       <p class="muted">詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。</p>
 
