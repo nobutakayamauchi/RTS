@@ -7,8 +7,6 @@ If this repository helped you think differently about AI accountability, conside
 
 ## Execution Provenance for AI Systems
 
-## Execution Provenance for AI Systems
-
 AI systems execute faster than humans can reason.
 
 RTS preserves why decisions were made.
