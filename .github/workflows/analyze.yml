@@ -43,7 +43,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
 
-      - name: Set session month + day (UTC)
+      - name: Set session month and day UTC
         shell: bash
         run: |
           set -e
@@ -142,30 +142,33 @@ jobs:
             "note": "analysis finished",
           }
 
-          end_payload = dict(base); end_payload["kind"] = "sentinel.run.end"
-          legacy_payload = dict(base); legacy_payload["kind"] = "sentinel.run"
+          end_payload = dict(base)
+          end_payload["kind"] = "sentinel.run.end"
+
+          legacy_payload = dict(base)
+          legacy_payload["kind"] = "sentinel.run"
 
           with open("/tmp/session_payload_end.json","w",encoding="utf-8") as f:
             json.dump(end_payload,f,ensure_ascii=False,indent=2)
           with open("/tmp/session_payload_legacy.json","w",encoding="utf-8") as f:
             json.dump(legacy_payload,f,ensure_ascii=False,indent=2)
 
-          print("wrote end + legacy payloads")
+          print("wrote end and legacy payloads")
           PY
 
-      - name: Append RUN_END (sentinel.run.end)
+      - name: Append RUN_END sentinel.run.end
         if: always()
         shell: bash
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_end.json"
 
-      - name: Append RUN_END marker (sentinel.run legacy)
+      - name: Append RUN_END legacy sentinel.run
         if: always()
         shell: bash
         run: |
           python scripts/session_append.py "${SESSION_MONTH}" "/tmp/session_payload_legacy.json"
 
-      - name: Rollup monthly index (chain-safe: allow DEGRADED=3)
+      - name: Rollup monthly index chain safe
         if: always()
         shell: bash
         run: |
@@ -179,42 +182,42 @@ jobs:
           rc=$?
           set -e
 
-          echo "[info] session_rollup exit code: ${rc}"
+          echo "[info] session_rollup exit code ${rc}"
 
           if [ "${rc}" -eq 3 ]; then
-            echo "[warn] Ledger integrity DEGRADED (exit 3). Continuing pipeline."
+            echo "[warn] Ledger integrity DEGRADED exit 3 continuing"
             exit 0
           fi
 
           if [ "${rc}" -ne 0 ]; then
-            echo "[error] session_rollup failed with exit code ${rc}"
+            echo "[error] session_rollup failed exit ${rc}"
             exit "${rc}"
           fi
 
-          echo "[info] session_rollup completed successfully."
+          echo "[info] session_rollup completed"
 
-      - name: SNAP Index Rebuild (safe)
+      - name: SNAP Index Rebuild safe
         if: always()
         continue-on-error: true
         shell: bash
         run: |
           python scripts/snap_index_rebuild.py "${SESSION_MONTH}" || true
 
-      - name: SNAP Auto Cull (safe)
+      - name: SNAP Auto Cull safe
         if: always()
         continue-on-error: true
         shell: bash
         run: |
           python scripts/snap_auto_cull.py "${SESSION_MONTH}" --keep-per-day 3 --keep-per-month 30 || true
 
-      - name: Build Evidence + SNAP Index (safe)
+      - name: Build Evidence and SNAP Index safe
         if: always()
         continue-on-error: true
         shell: bash
         run: |
           python scripts/evidence_index_build.py "${SESSION_MONTH}" || true
 
-      - name: Generate manifest.sha256
+      - name: Generate manifest sha256
         if: always()
         env:
           RTS_MONTH: ${{ env.SESSION_MONTH }}
@@ -222,7 +225,7 @@ jobs:
         run: |
           python scripts/manifest_month.py
 
-      - name: Verify manifest.sha256
+      - name: Verify manifest sha256
         if: always()
         env:
           RTS_MONTH: ${{ env.SESSION_MONTH }}
@@ -230,7 +233,7 @@ jobs:
         run: |
           python scripts/verify_manifest.py
 
-      - name: Commit outputs (safe; PR only)
+      - name: Commit outputs safe PR only
         if: always()
         shell: bash
         run: |
@@ -244,25 +247,24 @@ jobs:
           git add incidents/evidence_snapshots/ || true
 
           if git diff --cached --quiet; then
-            echo "No outputs changed."
+            echo "No outputs changed"
             exit 0
           fi
 
           git commit -m "RTS: outputs update (${SESSION_MONTH})" || exit 0
 
-      - name: Create or update PR (analyze outputs)
+      - name: Create or update PR analyze outputs
         if: always()
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: rts-bot/analyze
           delete-branch: true
-          title: RTS: outputs update (${{ env.SESSION_MONTH }})
+          title: RTS outputs update ${{ env.SESSION_MONTH }}
           body: |
             Automated outputs update from RTS Sentinel Analyze.
-            main is protected, so this workflow opens/updates a PR instead of pushing directly.
             Month: ${{ env.SESSION_MONTH }}
-          commit-message: RTS: outputs update (${{ env.SESSION_MONTH }})
+          commit-message: RTS outputs update ${{ env.SESSION_MONTH }}
           labels: |
             rts-bot
             automated
