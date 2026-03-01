@@ -1,0 +1,31 @@
+PROVISIONAL SEAL NOTE
+Month: 2026-02
+
+This month is provisionally sealed.
+
+Background:
+The system was implemented while the specification was still evolving.
+During trial-and-error (mistakes, retries, structural adjustments),
+log files proliferated.
+
+A consolidation step (“cutter”) has since been introduced,
+and the operational structure is now stabilized.
+
+Current Decision:
+Reorganization is technically possible on an iPhone,
+but operationally inefficient.
+After obtaining a PC environment,
+the files for this month will be normalized into a canonical form
+and re-sealed.
+
+Commitment:
+- No files will be deleted for concealment.
+- Re-sealing will document:
+  (1) what changed
+  (2) why the seal was reopened
+- The purpose of this note is to preserve explainability.
+- No other intent.
+
+Status:
+PROVISIONAL_SEAL
+Re-seal planned.
