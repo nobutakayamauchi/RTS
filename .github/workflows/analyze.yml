@@ -178,10 +178,34 @@ jobs:
       # -------------------------------
       # 7) Rollup + indexes
       # -------------------------------
-      - name: Rollup monthly index
+      - name: Rollup monthly index (chain-safe: allow DEGRADED=3)
         if: always()
+        shell: bash
         run: |
+          set -o pipefail
+          echo "[info] Running session_rollup.py month=${SESSION_MONTH} day=${SESSION_DAY}"
+
+          # capture exit code (do not fail step immediately)
+          set +e
           python scripts/session_rollup.py "${SESSION_MONTH}" "${SESSION_DAY}"
+          rc=$?
+          set -e
+
+          echo "[info] session_rollup exit code: ${rc}"
+
+          # B policy: 3 = DEGRADED -> continue chain (success)
+          if [ "${rc}" -eq 3 ]; then
+            echo "[warn] Ledger integrity DEGRADED (exit 3). Continuing pipeline."
+            exit 0
+          fi
+
+          # other non-zero = real failure
+          if [ "${rc}" -ne 0 ]; then
+            echo "[error] session_rollup failed with exit code ${rc}"
+            exit "${rc}"
+          fi
+
+          echo "[info] session_rollup completed successfully."
 
       - name: SNAP Index Rebuild (safe)
         if: always()
@@ -223,8 +247,10 @@ jobs:
       # -------------------------------
       - name: Commit outputs to branch (safe)
         if: always()
+        shell: bash
         run: |
           set -e
+
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
@@ -237,6 +263,7 @@ jobs:
             exit 0
           fi
 
+          # NOTE: Here we are in bash, so ${SESSION_MONTH} is OK.
           git commit -m "RTS: outputs update (${SESSION_MONTH})" || exit 0
 
       - name: Create or update PR (analyze outputs)
@@ -246,9 +273,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: rts-bot/analyze
           delete-branch: true
-          title: "RTS: outputs update (${SESSION_MONTH})"
+          # NOTE: This is YAML context, so use ${{ env.SESSION_MONTH }} (NOT ${SESSION_MONTH})
+          title: "RTS: outputs update (${{ env.SESSION_MONTH }})"
           body: |
             Automated outputs update from RTS Sentinel Analyze.
             main is protected, so this workflow opens/updates a PR instead of pushing directly.
-          commit-message: "RTS: outputs update (${SESSION_MONTH})"
+
+            Month: ${{ env.SESSION_MONTH }}
+          commit-message: "RTS: outputs update (${{ env.SESSION_MONTH }})"
           labels: rts-bot, automated
