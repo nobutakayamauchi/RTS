@@ -2,18 +2,19 @@
 
 ## Execution Provenance for AI Systems
 
-AI systems reproduce output.
+AI systems execute faster than humans can reason.
 
-RTS reproduces decision state — in Git.
+RTS preserves why decisions were made.
+
+Not the output.  
+The execution itself.
 
 RTS is infrastructure for responsibility.
 
 If you cannot reconstruct a decision,
-
 you cannot defend it.
 
 If you cannot defend it,
-
 you cannot scale it.
 
 RTS is a minimal, Git-native protocol
@@ -24,8 +25,10 @@ for structurally auditable AI execution.
 ## The Claim
 
 RTS makes AI execution reconstructable.
+
 Accountability is impossible without reconstructability.
-Not observable.
+
+Not observable.  
 Reconstructable.
 
 ---
@@ -33,40 +36,76 @@ Reconstructable.
 ## Why Now
 
 AI agents are scaling.
-Execution speed increases.
+
+Execution speed increases.  
 Human oversight shrinks.
 
-When execution scales without structural provenance, fragility becomes systemic.
+When execution scales without structural provenance,
+fragility becomes systemic.
+
+---
+
+## What RTS Is Not
+
+RTS is not:
+
+- Monitoring software
+- Observability tooling
+- Workflow automation
+- Vector retrieval
+- Agent framework
+- Compliance SaaS
+
+RTS does not judge outcomes.
+
+RTS preserves execution structure.
+
+---
+
+## The Chain
+
+Every run becomes part of a verifiable chain.
+
+Each commit becomes evidence.
+
+Each execution can be reconstructed.
+
+The shift is the transition.
+
+---
+
 ## Quick Try (60 seconds)
 
 You can verify RTS immediately.
 
 1. Open any `sessions/YYYY-MM/index.md`
 2. Pick a run
-3. Trace it to its ledger entries
+3. Trace it to ledger entries
 4. Confirm whether an ESC exists
 
 If decision state is structurally reconstructable,
 RTS is working.
 
-No setup.
-No installation.
+No setup.  
+No installation.  
 Just inspection.
-RTS addresses that structural gap.
+
 ---
 
 ## When You Actually Need RTS
 
-You likely need RTS if at least one of these is true:
+You likely need RTS if at least one is true:
 
 - You can reproduce output but cannot explain why it happened.
-- Logs show what ran but not which assumptions were active.
-- AI workflows branch or mutate mid-session and context gets lost.
-- Weeks later you cannot reconstruct the original decision environment.
+- Logs show execution but not active assumptions.
+- AI workflows branch or mutate mid-session.
+- Weeks later the decision environment cannot be reconstructed.
 - Stakeholders require justification, not just results.
 
 If none apply, RTS is unnecessary.
-If one applies, you probably already need it.
+
+If one applies,
+you probably already need it.
 
 ---
 
@@ -91,24 +130,26 @@ Each execution captures:
 - Outcome
 
 The unit is the transition.
+
 Not the log line.
+
 ---
 
-## ASC2 - Structural Breakpoint Model
+## ASC2 — Structural Breakpoint Model
 
 RTS does not alert on noise.
+
 It detects structural mutation.
 
 When mutation density crosses a defined boundary:
 
 - Breakpoint is flagged
 - Structural state is sealed
-- Evidence snapshot (ESC) is generated
-- Ledger and metrics become immutable reference
-
-This converts instability into inspectable structure.
+- Evidence Snapshot (ESC) is generated
+- Ledger becomes immutable reference
 
 Not monitoring.
+
 Structural mutation control.
 
 ---
@@ -117,19 +158,21 @@ Structural mutation control.
 
 An AI system approves an escalation in production.
 
-Two weeks later, a regulator asks:
+Two weeks later a regulator asks:
 
 "Why was this allowed?"
 
 You can reproduce the output.
+
 You cannot reproduce the decision state.
 
 RTS makes that state reconstructable.
+
 ---
 
 ## What RTS Produces
 
-RTS generates four structural artifacts:
+RTS generates structural artifacts:
 
 1. Session Ledger (JSONL)
 2. Monthly Index
@@ -137,20 +180,30 @@ RTS generates four structural artifacts:
 4. Evidence Snapshot (ESC)
 
 Git-native.
-No SaaS.
+
+No SaaS.  
 No telemetry.
+
+---
+
 ## Architectural Scope
 
-RTS guarantees structural reconstructability of AI execution states.
+RTS guarantees structural reconstructability
+of AI execution states.
 
 This guarantee is intentionally narrow.
 
-RTS does not validate ethics, legality, policy correctness, or outcome quality.
+RTS does not validate:
 
-RTS ensures that decision state is never structurally lost.
+- Ethics
+- Legality
+- Policy correctness
+- Output quality
 
-Semantic guarantees require additional layers.
-RTS provides the base layer those systems depend on.
+Semantic guarantees require additional systems.
+
+RTS provides the structural base layer.
+
 ---
 
 ## Repository Structure
@@ -167,7 +220,7 @@ RTS provides the base layer those systems depend on.
 
 - incidents/evidence_snapshots/ESC_*.md
 
-If you inspect only two directories:
+Inspect:
 
 - sessions/
 - incidents/evidence_snapshots/
@@ -187,19 +240,23 @@ Each ESC includes:
 - Transition tail
 - Ledger reference
 
-This is permanent structural evidence.
+Permanent structural evidence.
+
 ---
 
 ## How To Verify RTS
 
-Do not trust claims. Inspect artifacts.
+Do not trust claims.
+
+Inspect artifacts.
 
 1. Open `sessions/YYYY-MM/index.md`
-2. Trace linked ledger entries
+2. Trace ledger entries
 3. Confirm ESC exists when breakpoint occurs
 4. Diff snapshot states
 
-If it cannot be verified from artifacts, it is not RTS.
+If it cannot be verified from artifacts,
+it is not RTS.
 
 ---
 
@@ -209,7 +266,7 @@ Minimum integration:
 
 1. Append run start / run end events to JSONL
 2. Roll up deterministic monthly index
-3. Generate ESC only when breakpoint is crossed
+3. Generate ESC when breakpoint occurs
 
 No platform dependency required.
 
@@ -233,7 +290,7 @@ Not for short-lived demos.
 
 ## Live Inspection
 
-This repository is public and actively generating structural evidence.
+This repository actively generates structural evidence.
 
 You can:
 
@@ -244,44 +301,28 @@ You can:
 
 Transparency over opinion.
 
-For walkthrough requests, open an Issue.
-
----
-
-## What RTS Is Not
-
-RTS is not:
-
-- An agent framework
-- A vector database
-- A monitoring tool
-- A compliance SaaS
-
-RTS formalizes execution state.
+Open an Issue for walkthrough requests.
 
 ---
 
 ## Future Extensions
 
-Because execution state becomes reconstructable and immutable,
-higher-order governance systems become technically possible.
-
-These may include:
+Structural reconstructability enables:
 
 - Tamper-evident verification
 - Policy deviation detection
-- Escalation accountability models
-- Organizational responsibility flows
+- Organizational accountability flows
 
 RTS does not provide these today.
 
-It provides the structural condition required to build them.
+It provides the condition required to build them.
 
 ---
 
 ## Vision
 
-AI execution will scale.  
+AI execution will scale.
+
 Trust will not scale automatically.
 
 Governance must become structural.
