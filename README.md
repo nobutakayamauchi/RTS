@@ -1,7 +1,11 @@
 # RTS
 
-> Experimental research protocol.  
+> Experimental research protocol.
 > Structural execution provenance for AI systems.
+
+If this repository helped you think differently about AI accountability, consider starring it.
+
+## Execution Provenance for AI Systems
 
 ## Execution Provenance for AI Systems
 
