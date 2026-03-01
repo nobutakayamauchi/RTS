@@ -1,5 +1,8 @@
 # RTS
 
+> Experimental research protocol.  
+> Structural execution provenance for AI systems.
+
 ## Execution Provenance for AI Systems
 
 AI systems execute faster than humans can reason.
