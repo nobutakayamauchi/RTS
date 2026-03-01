@@ -329,6 +329,28 @@ Governance must become structural.
 
 RTS is a minimal protocol for building that structure.
 
+## Open Structural Critique
+
+RTS is publicly testable.
+
+If you believe this model is flawed, incomplete, naive, or unnecessary —  
+please attempt to break it.
+
+Active critique thread:
+- Discussions → "RTS — Break the Execution Ledger (Serious critique invited)"
+
+Structural inspection starts here:
+
+1. Open `sessions/YYYY-MM/index.md`
+2. Trace ledger transitions
+3. Verify ESC snapshots
+4. Attempt to find irreconstructable decision states
+
+If you succeed, document the failure.
+If you fail, explain why.
+
+Serious technical critique is welcome.
+
 ---
 
 ## License
