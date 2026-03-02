@@ -1,0 +1,43 @@
+name: RTS Decision Boundary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  decision:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Append decision boundary
+        env:
+          RTS_MONTH: ${{ github.run_id }}
+          DECISION_ID: manual-test
+          ACTOR: ${{ github.actor }}
+          ACTOR_ROLE: operator
+          SCOPE: repo
+          JUSTIFICATION: manual decision test
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          python scripts/decision_boundary_append.py
+
+      - name: Commit
+        run: |
+          git config user.name "rts-bot"
+          git config user.email "rts-bot@users.noreply.github.com"
+
+          git add sessions/
+
+          git commit -m "RTS: decision boundary append" || exit 0
+          git push
