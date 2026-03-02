@@ -2,42 +2,87 @@ name: RTS Decision Boundary
 
 on:
   workflow_dispatch:
+    inputs:
+      decision_id:
+        description: "Decision ID"
+        required: true
+      scope:
+        description: "Scope of responsibility"
+        required: true
+      justification:
+        description: "Why this decision is made"
+        required: false
 
 permissions:
   contents: write
+  pull-requests: write
+
+concurrency:
+  group: rts-decision-boundary
+  cancel-in-progress: true
 
 jobs:
   decision:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
-
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Set month (UTC)
+        run: echo "RTS_MONTH=$(date -u +%Y-%m)" >> $GITHUB_ENV
+
       - name: Append decision boundary
         env:
-          RTS_MONTH: ${{ github.run_id }}
-          DECISION_ID: manual-test
+          RTS_MONTH: ${{ env.RTS_MONTH }}
+          DECISION_ID: ${{ github.event.inputs.decision_id }}
+          SCOPE: ${{ github.event.inputs.scope }}
+          JUSTIFICATION: ${{ github.event.inputs.justification }}
           ACTOR: ${{ github.actor }}
-          ACTOR_ROLE: operator
-          SCOPE: repo
-          JUSTIFICATION: manual decision test
+          ACTOR_ROLE: "approver"
           HEAD_SHA: ${{ github.sha }}
         run: |
           python scripts/decision_boundary_append.py
 
-      - name: Commit
+      - name: Commit outputs to branch (safe)
         run: |
+          set -e
           git config user.name "rts-bot"
           git config user.email "rts-bot@users.noreply.github.com"
 
-          git add sessions/
+          BRANCH="rts/decision-boundary"
+          git checkout -B "${BRANCH}"
 
-          git commit -m "RTS: decision boundary append" || exit 0
-          git push
+          git add sessions/ || true
+
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git commit -m "RTS: decision boundary append"
+          git push origin "${BRANCH}" --force
+
+      - name: Create or update PR (decision boundary)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: rts/decision-boundary
+          base: main
+          title: "RTS: Decision Boundary"
+          body: |
+            Automated decision boundary append.
+
+            Inputs:
+            - decision_id: ${{ github.event.inputs.decision_id }}
+            - scope: ${{ github.event.inputs.scope }}
+            - justification: ${{ github.event.inputs.justification }}
+          delete-branch: false
