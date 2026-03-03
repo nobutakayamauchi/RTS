@@ -4,7 +4,9 @@ Decision Reconstructability Protocol for AI-Accelerated Systems.
 
 RTS guarantees reconstructability — not correctness.
 
-It records decision states so structural drift and discontinuities can be located, audited, and reduced over time.
+Acceleration without reconstructability leads to structural collapse.
+
+RTS preserves decision states so structural drift and discontinuities can be located and reduced over time.
 
 ---
 
@@ -18,79 +20,108 @@ When systems fail, the same question appears:
 
 **Who approved this — and under what assumptions?**
 
-Most AI workflows cannot reconstruct the decision state after the fact.
+Most AI workflows optimize execution.
+They do not preserve decision state.
+
 RTS exists to preserve that state.
 
 ---
 
 ## What RTS Is
 
-RTS is a **Git-native structural ledger** for decisions and execution.
+RTS is a Git-native structural ledger for decision systems.
 
 It preserves:
 
-- decision authority (who approved what)
-- execution structure (what happened, in what order)
-- state transitions (what changed and when)
+- decision authority  
+- execution structure  
+- state transitions  
 
-RTS logs **structure**, not semantics.
+RTS logs structure — not semantics.
+
 It is designed for auditability, continuity, and post-failure reconstruction.
 
 ---
 
-## How RTS Works
+# Core Mechanism
 
-RTS introduces a structural decision layer built on Git.
+The RTS core consists of three structural guarantees.
 
-### 1) Decision State Snapshot
+## 1) Decision State Snapshot
 
 Each block records:
 
-- Context
-- Decision
-- Constraints
-- Assumptions
-- Action
-- Outcome
+- Context  
+- Decision  
+- Constraints  
+- Assumptions  
+- Action  
+- Outcome  
 
-This forms a reconstructable decision snapshot.
+This forms a reconstructable decision state.
 
-### 2) State Transition Tracking
+---
 
-RTS tracks state transitions so you can identify:
+## 2) State Transition Tracking
 
-- where the structure changed
-- where assumptions shifted
-- where discontinuities appeared
+RTS tracks transitions between decision states to identify:
 
-### 3) Append-Only Ledger
+- where structural drift began  
+- where assumptions shifted  
+- where discontinuities appeared  
+- which decision altered the trajectory  
+
+This enables precise reconstruction after failure.
+
+---
+
+## 3) Append-Only Ledger
 
 RTS is deterministic and Git-native.
 
-- commits act as immutable timestamps
-- history becomes operational evidence
-- reconstruction remains possible even when memory is lost
+- commits act as immutable timestamps  
+- history becomes operational evidence  
+- reconstruction remains possible even when memory is lost  
 
-### 4) Decision Boundary Layer (Optional)
+The system guarantees reconstructability of structure.
 
-RTS can record a boundary event that captures:
+---
 
-- approver / authority holder
-- scope of responsibility
-- justification at the time of approval
-- commit hash (state at approval time)
+# Extensions (Optional Layers)
+
+The following components extend the core.
+
+## Decision Boundary Layer
+
+RTS can record a boundary event capturing:
+
+- approver / authority holder  
+- scope of responsibility  
+- justification at approval time  
+- commit hash (state at approval time)  
 
 This is **not blame**.
 It is an authority trace.
 
 ---
 
+Additional extensions may include:
+
+- drift analysis
+- governance history
+- failure freeze snapshots (ESC)
+- identity modeling
+
+All extensions depend on the core reconstructability model.
+
+---
+
 ## Minimal Flow
 
-1. Create a decision block
-2. Commit the state
-3. Record a boundary (optional)
-4. Reconstruct anytime
+1. Create decision block  
+2. Commit  
+3. (Optional) Record boundary  
+4. Reconstruct anytime  
 
 ---
 
@@ -98,21 +129,21 @@ It is an authority trace.
 
 RTS is not:
 
-- workflow automation
-- monitoring software
-- compliance software
-- memory embedding / vector retrieval
+- workflow automation  
+- monitoring software  
+- compliance software  
+- memory embedding / vector retrieval  
 
-RTS is a **structural ledger**.
+RTS is a structural ledger.
 
 ---
 
 ## Documentation
 
-- Manifesto → `docs/manifesto.md`
-- Technical Overview → `docs/technical_overview.md`
-- Genesis / History → `docs/genesis/`
-- Rulebook → `docs/rulebook/`
+- Manifesto → `docs/manifesto.md`  
+- Technical Overview → `docs/technical_overview.md`  
+- Genesis / History → `docs/genesis/`  
+- Rulebook → `docs/rulebook/`  
 
 ---
 
