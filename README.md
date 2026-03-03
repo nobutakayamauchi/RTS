@@ -1,60 +1,96 @@
 # RTS
 
-Structural Decision & Execution Ledger for AI Systems.
-
-RTS records who approved what — and under which assumptions.
-
-RTS is a Git-native protocol that preserves:
-
-- decision authority  
-- execution structure  
-- state transitions  
+Decision Reconstructability Protocol for AI-Accelerated Systems.
 
 RTS guarantees reconstructability — not correctness.
 
----
-
-## Decision Boundary
-
-RTS introduces a structural decision boundary layer.
-
-A decision boundary records:
-
-- who approved a structural change  
-- the scope of responsibility  
-- the justification at the time of approval  
-- the commit state (hash)  
-
-This is not a blame system.
-
-It is an authority trace.
-
-RTS separates:
-
-- human decision ownership  
-from  
-- system behavioral outcome  
-
-This prevents post-failure confusion about:
-
-- who decided  
-- what was approved  
-- under which assumptions  
+It records decision states so structural drift and discontinuities can be located, audited, and reduced over time.
 
 ---
 
-## What RTS Preserves
+## The Problem
+
+AI accelerates execution.
+
+But decision authority is rarely recorded.
+
+When systems fail, the same question appears:
+
+**Who approved this — and under what assumptions?**
+
+Most AI workflows cannot reconstruct the decision state after the fact.
+RTS exists to preserve that state.
+
+---
+
+## What RTS Is
+
+RTS is a **Git-native structural ledger** for decisions and execution.
+
+It preserves:
+
+- decision authority (who approved what)
+- execution structure (what happened, in what order)
+- state transitions (what changed and when)
+
+RTS logs **structure**, not semantics.
+It is designed for auditability, continuity, and post-failure reconstruction.
+
+---
+
+## How RTS Works
+
+RTS introduces a structural decision layer built on Git.
+
+### 1) Decision State Snapshot
 
 Each block records:
 
-- Context  
-- Decision  
-- Constraint  
-- Assumption  
-- Action  
-- Outcome  
+- Context
+- Decision
+- Constraints
+- Assumptions
+- Action
+- Outcome
 
-RTS logs structure, not semantics.
+This forms a reconstructable decision snapshot.
+
+### 2) State Transition Tracking
+
+RTS tracks state transitions so you can identify:
+
+- where the structure changed
+- where assumptions shifted
+- where discontinuities appeared
+
+### 3) Append-Only Ledger
+
+RTS is deterministic and Git-native.
+
+- commits act as immutable timestamps
+- history becomes operational evidence
+- reconstruction remains possible even when memory is lost
+
+### 4) Decision Boundary Layer (Optional)
+
+RTS can record a boundary event that captures:
+
+- approver / authority holder
+- scope of responsibility
+- justification at the time of approval
+- commit hash (state at approval time)
+
+This is **not blame**.
+It is an authority trace.
+
+---
+
+## Minimal Flow
+
+1. Create a decision block
+2. Commit the state
+3. Record a boundary (optional)
+4. Reconstruct anytime
 
 ---
 
@@ -62,46 +98,21 @@ RTS logs structure, not semantics.
 
 RTS is not:
 
-- memory embedding  
-- vector retrieval  
-- workflow automation  
-- monitoring software  
-- compliance software  
+- workflow automation
+- monitoring software
+- compliance software
+- memory embedding / vector retrieval
 
-It is a structural ledger.
-
----
-
-## Minimal Flow
-
-1. Create block  
-2. Log decision  
-3. Commit  
-4. (Optional) Record decision boundary  
-5. Reconstruct state later  
-
----
-
-## Why RTS
-
-AI accelerates execution.
-
-But authority is rarely recorded.
-
-When systems fail, the same question appears:
-
-**Who approved this?**
-
-RTS anchors that answer — structurally, not socially.
+RTS is a **structural ledger**.
 
 ---
 
 ## Documentation
 
-- Manifesto → docs/manifesto.md  
-- Technical Overview → docs/technical_overview.md  
-- Genesis / History → docs/genesis/  
-- Rulebook → docs/rulebook/  
+- Manifesto → `docs/manifesto.md`
+- Technical Overview → `docs/technical_overview.md`
+- Genesis / History → `docs/genesis/`
+- Rulebook → `docs/rulebook/`
 
 ---
 
