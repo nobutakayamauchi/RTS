@@ -1,4 +1,4 @@
-# RTS CORE MANIFEST
+# RTS Charter
 
 (Real-Time Trust System)
 
