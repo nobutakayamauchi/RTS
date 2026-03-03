@@ -2,6 +2,8 @@
 
 Structural Decision & Execution Ledger for AI Systems.
 
+RTS records who approved what — and under which assumptions.
+
 RTS is a Git-native protocol that preserves:
 
 - decision authority  
@@ -34,6 +36,7 @@ from
 - system behavioral outcome  
 
 This prevents post-failure confusion about:
+
 - who decided  
 - what was approved  
 - under which assumptions  
@@ -89,7 +92,7 @@ When systems fail, the same question appears:
 
 **Who approved this?**
 
-RTS anchors that answer.
+RTS anchors that answer — structurally, not socially.
 
 ---
 
