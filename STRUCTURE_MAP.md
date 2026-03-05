@@ -1,51 +1,73 @@
 # RTS Repository Structure Map
 
-This file defines the structural intent of the repository.
+This document defines the structural intent of the repository.
 
-RTS preserves execution structure.
+RTS preserves execution structure.  
 The repository itself follows the same principle.
 
 ---
 
-## Root Layer (Operational Surface)
+## 1️⃣ Root Layer (Operational + Public Interface)
 
-Files and directories required for system operation:
+The root directory serves two purposes:
 
-- README.md
-- LICENSE
-- .github/
-- scripts/
-- sessions/
-- analysis/
-- incidents/
-- docs/
+- System operation
+- Public documentation entry points
 
-Nothing else should remain at root.
+Core operational directories:
+
+- `.github/`
+- `sessions/`
+- `analysis/`
+- `incidents/`
+- `docs/`
+
+Core system files:
+
+- `README.md`
+- `LICENSE`
+
+Public interface files (allowed at root):
+
+- `START.md`
+- `_LATEST.md`
+- `SECURITY.md`
+- `SENTINEL_CHARTER.md`
+- `USE_CASES.md`
+- `STRUCTURE_MAP.md`
+
+Root may also contain:
+
+- Static site files (`index.md`, `index.html`, `search.html`)
+- Generated artifacts required for Pages
+
+Nothing unrelated to system operation or public interface should remain at root.
 
 ---
 
-## Documentation Layer (Human Readable)
+## 2️⃣ Documentation Layer (`/docs/`)
 
-Located under `/docs/`
+Human-readable extended documentation lives under `/docs/`.
 
-- manifesto.md → Core declaration
-- technical_overview.md → System explanation
-- genesis/ → Historical origin and evolution
-- rulebook/ → Operational doctrine
-- research/ → Experimental evolution documents
-- archive/ → Deprecated but preserved history
+- `manifest.md` → Core declaration
+- `technical_overview.md` → System explanation
+- `genesis/` → Historical origin
+- `rulebook/` → Operational doctrine
+- `research/` → Experimental evolution
+- `archive/` → Deprecated but preserved history
 
 ---
 
-## Principle
+## 3️⃣ Operational Rule
 
 When in doubt:
 
 1. If it runs the system → keep at root.
-2. If it explains the system → move to docs/.
-3. If it is historical or experimental → move to docs/research or docs/archive.
-4. Never delete history. Move instead.
+2. If it is public entry documentation → keep at root.
+3. If it explains or expands → move to `/docs/`.
+4. If historical or experimental → move to `/docs/research` or `/docs/archive`.
+5. Never delete history. Move instead.
 
 ---
 
-RTS applies its own structural doctrine to itself.
+RTS applies its structural doctrine to itself.
