@@ -2,7 +2,7 @@
 
 Real Time Trust System (RTS)
 
-Execution becomes memory.\
+Execution becomes memory.
 Memory becomes identity.
 
 ------------------------------------------------------------------------
