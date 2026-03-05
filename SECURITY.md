@@ -1,32 +1,58 @@
-# SECURITY (RTS Sentinel)
+# Security Policy
 
-RTS is an evidence-first operational logging framework.
+## Overview
+
+RTS (Real-Time Trust System) is an evidence-first operational logging framework.
 It records execution history and links to repository artifacts.
 
-## Safety Principles
-- **No inference beyond evidence.**
-- **Humans provide judgment.**
-- **Do not publish secrets or personal data.**
-- **When uncertain, stop and ask for review.**
+RTS is not a security product.
+It is a structural integrity and traceability system.
 
-## What MUST NOT be posted publicly
-- API keys / tokens / passwords
+---
+
+## Core Safety Principles
+
+- No inference beyond evidence.
+- Humans provide final judgment.
+- Do not publish secrets or personal data.
+- When uncertain, stop and request review.
+
+---
+
+## Prohibited Content (Do NOT Publish)
+
+The following must never be committed publicly:
+
+- API keys, tokens, passwords
 - Private URLs, invoices, personal identifiers
-- Private chat logs or transcripts containing sensitive info
-- Any data you do not have the right to disclose
+- Private chat logs containing sensitive information
+- Data without explicit disclosure rights
+- Internal infrastructure credentials
+- Personal data (GDPR-protected or similar)
 
-## Reporting a Security or Safety Issue
-If you believe RTS content may expose sensitive information:
+---
+
+## Reporting a Security Issue
+
+If you believe RTS content exposes sensitive information:
+
 1. **Do not open a public Issue.**
-2. Remove or redact the sensitive artifact if you control it.
-3. Contact the maintainer privately (preferred).
+2. Redact or remove the sensitive artifact if possible.
+3. Contact the maintainer privately.
 
-## Operational Guardrails (Public Use)
-- Public Issues/PRs must use templates and include **evidence links only**.
-- High-impact changes must go through PR review (see CONTRIBUTING).
-- The maintainer may remove content that violates these rules.
+High-impact issues should not be discussed in public threads.
+
+---
+
+## Operational Guardrails
+
+- Public Issues and PRs must reference evidence links only.
+- High-impact structural changes require Pull Request review.
+- Maintainers may remove violating content without notice.
+
+---
 
 ## Disclaimer
-RTS is not a security product.
-It does not guarantee correctness, privacy, or safety.
+
+RTS does not guarantee correctness, privacy, or safety.
 Use at your own risk and validate outputs independently.
