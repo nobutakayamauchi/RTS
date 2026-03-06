@@ -1,155 +1,122 @@
-RTS DECLARATION — Operator Execution Doctrine
+# RTS Declaration — Operator Execution Doctrine
 
-Real Time Trust System (RTS)
+## Real Time Trust System (RTS)
 
-Execution becomes memory.
+Execution becomes memory.  
 Memory becomes identity.
 
-⸻
+---
 
-Declaration Statement
+## 1. Declaration Statement
 
 This document establishes the operational declaration of the Real Time Trust System (RTS).
 
-RTS is not introduced as a software product or automation tool.
+RTS is not introduced as software or automation.
 
-It is declared as an execution memory doctrine developed through direct operational experience inside AI collaboration environments.
+RTS is declared as:
 
-The purpose of RTS is to preserve human reasoning continuity across iterative AI-assisted workflows.
+- An execution memory coordination layer
+- A structural response to AI-collaboration discontinuities
+- An operational infrastructure for preserving reasoning continuity
 
-⸻
+RTS preserves thinking continuity beyond individual sessions.
 
-Origin Context
+Human judgment remains final authority.  
+AI functions strictly as an execution assistant.
 
-Repeated public operator reports revealed a recurring condition across independent platforms and tools:
+---
 
-AI collaboration produced valuable reasoning during active sessions.
+## 2. Origin Context
 
-However, reasoning continuity repeatedly disappeared when sessions ended or workflows were interrupted.
+Repeated public operator records revealed a recurring condition:
 
-The observed failure was not model intelligence.
+- AI collaboration produced valuable reasoning
+- Reasoning continuity collapsed when sessions reset
+- Failure was not logical — it was structural
+- Execution memory lacked preservation infrastructure
 
-It was operational memory loss.
+RTS emerged as a structural response to execution-memory loss.
 
-Execution history lacked preservation infrastructure.
+---
 
-RTS emerged as a response to this condition.
+## 3. Core Assertion
 
-⸻
+RTS guarantees reconstructability — not correctness.
 
-Core Assertion
+It ensures:
 
-Human judgment remains the final authority.
-
-AI functions as an execution assistant.
-
-RTS does not replace thinking.
-
-RTS preserves thinking.
-
-Execution decisions must survive beyond individual sessions.
-
-Operational memory must exist independently of conversational state.
-
-⸻
-
-Operational Doctrine
-
-RTS operates under the following principles:
-
-Continuity over convenience.
-
-Execution evidence over assumption.
-
-Iteration over perfection.
-
-Public timestamped history over private recollection.
+- Decision memory survives
+- Execution history persists
+- Operational state remains auditable
+- Public timestamps replace private recollection
 
 Operational truth emerges through recorded execution.
 
-⸻
+---
 
-Execution Method
+## 4. Operational Doctrine
 
-RTS development followed adaptive execution discipline:
+RTS operates under the following principles:
 
-Smartphone-only deployment environment.
+1. Continuity over convenience  
+2. Execution evidence over assumption  
+3. Inclusive improvement over perfection  
+4. Public structural memory over private memory  
 
-AI-assisted development collaboration.
+---
 
-Browser-based GitHub operational editing.
+## 5. Execution Method
 
-Iterative rebuild strategy when critical errors accumulated.
+RTS development follows adaptive execution discipline:
 
-File-based output workflows used to stabilize markdown and execution records.
+- Smartphone-native deployment
+- AI-assisted collaboration
+- Browser-based GitHub operations
+- Iterative rebuild strategy after structural stress
+- Log-based workflow stabilization
+- External prompt cross-validation
 
-Each operational step required screenshot verification and AI cross-validation.
+Execution proceeds through rapid iteration cycles.
 
-Execution proceeded through rapid trial-and-error iteration cycles.
+---
 
-⸻
+## 6. System Function
 
-System Function
+RTS establishes operational memory via:
 
-RTS establishes operational memory through:
-
-decision logging
-
-execution history preservation
-
-incident signal collection
-
-structured evolution records
-
-public repository timestamp evidence
+- Decision logging
+- Execution history preservation
+- Incident signal collection
+- Structured evolution records
+- Public repository timestamp evidence
 
 Execution history itself becomes infrastructure.
 
-⸻
+---
 
-Declaration of Intent
+## 7. Declaration of Intent
 
 RTS exists to prevent loss of thinking continuity.
 
-Ideas must survive execution.
-
-History must survive iteration.
-
+Ideas must survive execution.  
+History must survive iteration.  
 Trust must survive collaboration.
 
 RTS declares execution memory as operational infrastructure for AI-era operators.
 
-⸻
+---
 
-Status
+## 8. Status
 
-DECLARED
+**STATUS:** DECLARED  
+**INTEGRITY:** VERIFIED (via public GitHub history)  
+**OPERATIONAL STATE:** ACTIVE  
 
-Operational execution ongoing.
+Operator: Nobutaka Yamauchi  
+AI System: ChatGPT  
+Environment: Smartphone-first (iPhone 15 Pro)  
+Initial Declaration Year: 2026  
 
-Integrity established through public GitHub repository history.
+---
 
-⸻
-
-Operator
-
-Nobutaka Yamauchi
-
-AI System
-
-ChatGPT 5.2
-AI-assisted execution collaboration
-
-Environment
-
-Smartphone-only deployment
-iPhone 15 Pro
-Mobile GitHub interface
-
-⸻
-
-Initial Declaration
-
-2026
-
-END OF DECLARATION
+END OF RTS DECLARATION
