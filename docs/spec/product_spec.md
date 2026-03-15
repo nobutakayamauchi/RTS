@@ -1,7 +1,8 @@
 # RTS Product Specification
-Real-Time Trust System (RTS)
-Version: 0.1
-Author: Nobutaka Yamauchi
+
+Real-Time Trust System (RTS)  
+Version: 0.1  
+Author: Nobutaka Yamauchi  
 
 ---
 
@@ -27,10 +28,10 @@ RTS does not enforce decisions. It records them, verifies them, and governs stru
 
 ### 3.1 Execution Layer
 
-File:
+File  
 logs/EXECUTION_LOG.md
 
-Records:
+Records
 
 - Execution cycle start
 - Execution cycle completion
@@ -41,10 +42,10 @@ Records:
 
 ### 3.2 Proposal Layer
 
-File:
+File  
 evolution/ACTIVE_PROPOSALS.md
 
-Records:
+Records
 
 - Pending proposals
 - Approved proposals
@@ -54,10 +55,10 @@ Records:
 
 ### 3.3 Governance Layer
 
-File:
+File  
 evolution/PROPOSALS.md
 
-Records:
+Records
 
 - All proposals historically
 - Approval authority
@@ -67,10 +68,10 @@ Records:
 
 ### 3.4 Core Manifest
 
-File:
+File  
 CORE_MANIFEST.md
 
-Defines:
+Defines
 
 - System identity
 - Structural integrity
@@ -78,9 +79,41 @@ Defines:
 
 ---
 
+### 3.5 Agent Evaluation Layer
+
+File  
+spec/rts_agent_evaluation_v0.1.md
+
+Defines the evaluation framework for AI agents operating within the RTS environment.
+
+Purpose
+
+- Detect boundary violations
+- Evaluate agent operational reliability
+- Provide traceable agent behavior assessment
+- Support governance of autonomous agents
+
+Evaluation follows a two-stage process
+
+1. AI Pre-Evaluation
+2. Human Final Evaluation
+
+The evaluation model checks four boundary conditions
+
+- AUTHORITY
+- FABRICATION
+- SOURCE
+- NETWORK
+
+Detailed specification
+
+See `spec/rts_agent_evaluation_v0.1.md`
+
+---
+
 ## 4. Execution Model
 
-Each execution cycle:
+Each execution cycle
 
 1. System starts
 2. System evaluates state
@@ -92,7 +125,7 @@ Each execution cycle:
 
 ## 5. Trust Model
 
-Trust is derived from:
+Trust is derived from
 
 - Immutable logs
 - Explicit approvals
@@ -105,7 +138,7 @@ Trust is not assumed. It is proven.
 
 ## 6. Product Definition
 
-RTS is a framework that enables:
+RTS is a framework that enables
 
 - Autonomous system auditability
 - AI decision traceability
@@ -116,7 +149,7 @@ RTS is a framework that enables:
 
 ## 7. Commercial Applications
 
-RTS can be used for:
+RTS can be used for
 
 - AI governance systems
 - Autonomous agent audit trails
@@ -128,10 +161,10 @@ RTS can be used for:
 
 ## 8. Ownership
 
-Originator:
+Originator  
 Nobutaka Yamauchi
 
-Authority:
+Authority  
 Structural approval authority remains with the originator.
 
 ---
@@ -140,4 +173,4 @@ Structural approval authority remains with the originator.
 
 RTS is ACTIVE.
 
-Integrity: VERIFIED.
+Integrity VERIFIED.
