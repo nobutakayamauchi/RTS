@@ -1,7 +1,7 @@
 # RTS Agent Analyze ZERO — Index
 
-- generated_at_utc: 2026-03-02T15:28:58+00:00
-- runs_count: 1
+- generated_at_utc: 2026-03-15T05:05:17+00:00
+- runs_count: 2
 
 RTS observes agent execution structure only. No semantics. No judging.
 
@@ -9,12 +9,13 @@ RTS observes agent execution structure only. No semantics. No judging.
 - FAIL: 0
 - DRIFT: 0
 - SPAGHETTI: 0
-- OK: 0
+- OK: 1
 - VERIFIED: 1
 
 ## Runs
 | Run | Class | Spans | fail | drift | warn | miss_status | spaghetti_reason_codes |
 |---|---:|---:|---:|---:|---:|---:|---|
+| [RUN_TEMPLATE.md](../runs/RUN_TEMPLATE.md) | OK | 0 | 0 | 0 | 0 | 0.0 |  |
 | [RUN_VERIFIED_GOLD.md](../runs/RUN_VERIFIED_GOLD.md) | VERIFIED | 2 | 0 | 0 | 0 | 0.0 |  |
 
 ## Operator Notes
