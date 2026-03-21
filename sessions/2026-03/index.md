@@ -1,11 +1,11 @@
 # RTS Sessions - 2026-03
 
-- updated_at_utc: `2026-03-02T15:28:58Z`
+- updated_at_utc: `2026-03-21T04:26:07Z`
 
 ## Ledger Integrity
 
 - status: **DEGRADED** (errors=2, warnings=0)
-- parsed_lines: `8`
+- parsed_lines: `11`
 - invalid_lines: `0`
 
 ### Issues (latest)
@@ -15,9 +15,9 @@
 
 ## Counts
 
-- `sentinel.run`: 2
-- `sentinel.run.end`: 2
-- `sentinel.run.start`: 2
+- `sentinel.run`: 3
+- `sentinel.run.end`: 3
+- `sentinel.run.start`: 3
 
 ## Metrics (latest)
 
@@ -39,6 +39,7 @@
 
 - `2026-03-01T12:32:13Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22543480213 attempt=1 status=success commit=a3641dfc4c2398e3b54356d3e52390958c431f70 - analysis finished
 - `2026-03-02T15:28:58Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=22582863444 attempt=1 status=success commit=94ed64f9d1db3b07895e9dcf716e63b0f3a59db7 - analysis finished
+- `2026-03-21T04:26:07Z` `sentinel.run.end` workflow=RTS Sentinel Analyze run=23371962443 attempt=1 status=success commit=7cd7ac902ef101db975978db46fa4d67e680cd0a - analysis finished
 
 ## Transitions (latest)
 
@@ -48,4 +49,5 @@
 
 - `session_20260301.jsonl`
 - `session_20260302.jsonl`
+- `session_20260321.jsonl`
 
