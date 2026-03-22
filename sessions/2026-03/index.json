@@ -1,10 +1,10 @@
 {
   "month": "2026-03",
-  "updated_at_utc": "2026-03-02T15:28:58Z",
+  "updated_at_utc": "2026-03-22T04:52:02Z",
   "counts": {
-    "sentinel.run.start": 2,
-    "sentinel.run.end": 2,
-    "sentinel.run": 2
+    "sentinel.run.start": 3,
+    "sentinel.run.end": 3,
+    "sentinel.run": 3
   },
   "ledger_integrity": {
     "status": "DEGRADED",
@@ -22,9 +22,9 @@
         "message": "missing key: kind"
       }
     ],
-    "parsed_lines": 8,
+    "parsed_lines": 11,
     "invalid_lines": 0,
-    "fingerprint_sha256": "3bfb431edbe180bc4c9c5c5c6727a2ebd3f211221ba7c2213b4ac28c55e198c7"
+    "fingerprint_sha256": "b3638803108c0c35e355c4b754bf813199e97e3303340583b32dfc6a2eb4bdac"
   },
   "sentinel": {
     "end_kinds": [
@@ -55,12 +55,23 @@
       "status": "success",
       "commit": "94ed64f9d1db3b07895e9dcf716e63b0f3a59db7",
       "note": "analysis finished"
+    },
+    {
+      "ts": "2026-03-22T04:52:02Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "23395979631",
+      "run_attempt": 1,
+      "status": "success",
+      "commit": "7cd7ac902ef101db975978db46fa4d67e680cd0a",
+      "note": "analysis finished"
     }
   ],
   "transitions": [],
   "raw_ledgers": [
     "session_20260301.jsonl",
-    "session_20260302.jsonl"
+    "session_20260302.jsonl",
+    "session_20260322.jsonl"
   ],
   "metrics_latest": {
     "window_n": 20,

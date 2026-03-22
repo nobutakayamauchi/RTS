@@ -1,10 +1,27 @@
 {
-  "generated_at_utc": "2026-03-02T15:28:58+00:00",
-  "runs_count": 1,
+  "generated_at_utc": "2026-03-22T04:52:02+00:00",
+  "runs_count": 2,
   "counts": {
+    "OK": 1,
     "VERIFIED": 1
   },
   "items": [
+    {
+      "name": "RUN_TEMPLATE.md",
+      "relpath": "runs/RUN_TEMPLATE.md",
+      "run_id": null,
+      "mode": null,
+      "success_flag": null,
+      "config_fingerprint": null,
+      "span_count": 0,
+      "fail_count": 0,
+      "drift_count": 0,
+      "warn_count": 0,
+      "missing_status_rate": 0.0,
+      "classification": "OK",
+      "spaghetti_reason_codes": [],
+      "conflict_keys": []
+    },
     {
       "name": "RUN_VERIFIED_GOLD.md",
       "relpath": "runs/RUN_VERIFIED_GOLD.md",
