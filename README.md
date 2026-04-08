@@ -1,6 +1,6 @@
 # RTS
 
-Decision Reconstructability Protocol for AI-Accelerated Systems.
+Decision Reconstructability Protocol for AI-accelerated systems.
 
 Acceleration without reconstructability leads to structural collapse.
 
