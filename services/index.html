@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>RTS Services — Breakpoint Consulting</title>
+  <title>RTS Service Line</title>
 
   <style>
     body{
@@ -20,6 +20,7 @@
     }
     h1{font-size:28px;line-height:1.15;margin:0 0 8px;}
     h2{font-size:18px;margin:18px 0 10px;}
+    h3{font-size:16px;margin:16px 0 8px;}
     p{color:#4b5563;line-height:1.7;margin:10px 0;}
     ul{padding-left:18px;line-height:1.8;margin:0;}
     .price{font-size:26px;font-weight:800;margin:6px 0 0;}
@@ -44,6 +45,23 @@
       color:#334155;font-size:13px;line-height:1.6;
       margin-top:12px;
     }
+    .tag{
+      display:inline-block;
+      background:#eef3f7;
+      color:#334155;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin:0 8px 8px 0;
+    }
+    .plan{
+      border:1px solid rgba(11,18,32,.10);
+      border-radius:16px;
+      padding:14px;
+      margin:12px 0;
+      background:#fcfdff;
+    }
     code{
       font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
       background:#eef3f7;padding:2px 6px;border-radius:8px;
@@ -54,100 +72,199 @@
 <body>
   <div class="wrap">
 
-    <!-- ===== Service Card ===== -->
     <div class="card">
-      <div class="muted">RTS / Services</div>
-      <h1>Breakpoint Consulting（ブレイクポイント・コンサルティング）</h1>
+      <div class="muted">RTS / Service Line</div>
+      <h1>RTS Service Line</h1>
 
       <p>
-        固定価格の診断型コンサルティングです。現状の混線点（breakpoint）を特定し、
-        再現可能な状態整理と次の打ち手を納品します。
+        散らかった状態を整理して、次の一手を決めるためのサービス群です。
+        AI活用、副業立ち上げ、事業整理、外注前準備などで止まりやすい部分を、
+        状況に応じて整理・設計します。
       </p>
-
-      <h2>価格</h2>
-      <div class="price">49,500円（税込）</div>
-      <div class="muted">Payment method: credit card / Apple Pay</div>
-
-      <div class="btnrow">
-        <!-- Stripe Payment Link (FULL URL) -->
-        <a class="btn"
-           href="https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01"
-           target="_blank"
-           rel="noopener noreferrer">
-          今すぐ購入する（49,500円）
-        </a>
-
-        <!-- GitHub Pages: /RTS/ 配下前提 -->
-        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
-      </div>
 
       <div class="note">
-        <b>確認ポイント:</b> 購入ボタンのリンクは <code>https://buy.stripe.com/aFa6oJgqcgdTgKGeIj3Nm01</code> を直接指定しています。
-        もし <code>AccessDenied</code> が出る場合は、リンクが途中で欠けているか、Stripe側で無効化されている可能性があります。
+        <b>見方:</b><br>
+        商品名 = 何をするか<br>
+        <code>Point</code> = 一点整理 / <code>Core</code> = 中心整理 / <code>Full</code> = 全体整理
       </div>
 
-      <div class="hr"></div>
-
-      <h2>サービス内容</h2>
-      <p>
-        本サービスは、AI活用・業務構造・意思決定ログの状態を診断する固定価格型の
-        コンサルティング役務提供です。
-      </p>
-
-      <h2>納品物</h2>
-      <ul>
-        <li>構造診断レポート（PDF形式）</li>
-        <li>優先順位付きアクションリスト</li>
-        <li>リスク要因の整理ドキュメント</li>
-        <li>次ステップ実行計画</li>
-        <li>納品時の補足説明（テキスト/音声を含む）</li>
-      </ul>
-
-      <h2>提供形式</h2>
-      <ul>
-        <li>オンライン（テキスト / 音声通話）</li>
-        <li>PDFドキュメント納品</li>
-        <li>必要に応じて追加資料</li>
-      </ul>
-
-      <h2>納期</h2>
-      <ul>
-        <li>お申し込み後7日以内にヒアリング開始</li>
-        <li>ヒアリング完了後3営業日以内にPDF納品</li>
-      </ul>
-
-      <h2>返金ポリシー</h2>
-      <ul>
-        <li>着手前のキャンセル：全額返金</li>
-        <li>着手後のキャンセル：返金不可</li>
-      </ul>
-
-      <p class="muted">
-        詳細は <a href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a> をご確認ください。
-      </p>
-
-      <h2>本サービスの性質</h2>
-      <p class="muted">
-        本サービスは成果保証型ではありません。診断および構造整理を目的とする
-        コンサルティング役務提供であり、実行結果・売上・利益等を保証するものではありません。
-      </p>
-
-      <div class="hr"></div>
-
-      <h2>関連</h2>
-      <div class="btnrow">
-        <a class="btn ghost" href="/RTS/docs/rulebook/">Rulebook</a>
-        <a class="btn ghost" href="/RTS/">Home</a>
-        <a class="btn ghost" href="/RTS/legal/">Legal</a>
+      <div style="margin-top:14px;">
+        <span class="tag">Scout / 方向確認、初期整理</span>
+        <span class="tag">Pitch / 説明整理、見せ方整理</span>
+        <span class="tag">Guard / 失敗防止、危険診断</span>
+        <span class="tag">Scope / 範囲整理、仕様整理</span>
       </div>
     </div>
 
-    <!-- ===== Footer ===== -->
+    <div class="card" id="scout">
+      <div class="muted">Scout（スカウト）</div>
+      <h2>方向確認、初期整理</h2>
+      <p>
+        やりたいことはあるけれど、何から始めればいいかわからない時に使う整理サービスです。
+        副業、AI活用、事業立ち上げ、商品作りなどの入口を整えます。
+      </p>
+      <div class="plan">
+        <h3>Scout Point</h3>
+        <p>何から始めるべきかを整理する一点整理プランです。</p>
+        <div class="price">10,000円</div>
+        <div class="muted">
+          現状を整理し、見えた範囲の結果をお伝えします。
+          必要に応じて差額で Core / Full へ移行できます。
+        </div>
+      </div>
+      <div class="btnrow">
+        <a class="btn" href="https://buy.stripe.com/aFabJ3ei4e5LeCy8jV3Nm04" target="_blank" rel="noopener noreferrer">Scout Point を申し込む</a>
+      </div>
+    </div>
+
+    <div class="card" id="pitch">
+      <div class="muted">Pitch（ピッチ）</div>
+      <h2>説明整理、見せ方整理</h2>
+      <p>
+        何をしているか、誰向けか、何を売るかを整えるサービスです。
+        自己紹介やサービス説明、見せ方の入口を整理します。
+      </p>
+      <div class="plan">
+        <h3>Pitch Point</h3>
+        <p>何をしているか、誰向けか、何を売るかを整える一点整理プランです。</p>
+        <div class="price">10,000円</div>
+        <div class="muted">
+          現状を整理し、見えた範囲の結果をお伝えします。
+          必要に応じて差額で Core / Full へ移行できます。
+        </div>
+      </div>
+      <div class="btnrow">
+        <a class="btn" href="https://buy.stripe.com/28E7sNc9W4vbcuqcAb3Nm05" target="_blank" rel="noopener noreferrer">Pitch Point を申し込む</a>
+      </div>
+    </div>
+
+    <div class="card" id="guard">
+      <div class="muted">Guard（ガード）</div>
+      <h2>失敗防止、危険診断</h2>
+      <p>
+        失敗しやすい点や危険ポイントを先に洗い出し、
+        危ない進め方を避けるための整理を行います。
+      </p>
+      <div class="plan">
+        <h3>Guard Point</h3>
+        <p>失敗しやすい点や危険ポイントを先に洗い出す一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">
+          現状を整理し、見えた範囲の結果をお伝えします。
+          必要に応じて差額で Core / Full へ移行できます。
+        </div>
+      </div>
+      <div class="btnrow">
+        <a class="btn" href="https://buy.stripe.com/cNi28tc9W2n31PMcAb3Nm06" target="_blank" rel="noopener noreferrer">Guard Point を申し込む</a>
+      </div>
+    </div>
+
+    <div class="card" id="scope">
+      <div class="muted">Scope（スコープ）</div>
+      <h2>範囲整理、仕様整理</h2>
+      <p>
+        やることとやらないこと、どこまで進めるかを整理するサービスです。
+        外注前、開発前、導入前の範囲確認に向いています。
+      </p>
+      <div class="plan">
+        <h3>Scope Point</h3>
+        <p>やることとやらないこと、どこまで進めるかを整理する一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">
+          現状を整理し、見えた範囲の結果をお伝えします。
+          必要に応じて差額で Core / Full へ移行できます。
+        </div>
+      </div>
+      <div class="btnrow">
+        <a class="btn" href="https://buy.stripe.com/fZu9AVc9W4vbgKG1Vx3Nm07" target="_blank" rel="noopener noreferrer">Scope Point を申し込む</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="muted">Extended Lines</div>
+      <h2>個別相談で対応するライン</h2>
+      <p>必要に応じて以下の Point ラインもご案内できます。</p>
+
+      <div class="plan">
+        <h3>Draft Point</h3>
+        <p>たたき台や初期案を作るための一点整理プランです。</p>
+        <div class="price">10,000円</div>
+        <div class="muted">必要な要素を絞り、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/9B628t6PCe5Lcuq9nZ3Nm08" target="_blank" rel="noopener noreferrer">Draft Point</a>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h3>Flow Point</h3>
+        <p>導線や業務の流れの詰まりを整理する一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">現状を確認し、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/00w00l7TG8Lrcuq0Rt3Nm09" target="_blank" rel="noopener noreferrer">Flow Point</a>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h3>Relay Point</h3>
+        <p>外注前や受け渡し前に必要な橋渡し部分を整理する一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">現状を整理し、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/00wfZjei49Pv9ie9nZ3Nm0a" target="_blank" rel="noopener noreferrer">Relay Point</a>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h3>Signal Point</h3>
+        <p>本質や優先順位の見極めを行う一点整理プランです。</p>
+        <div class="price">10,000円</div>
+        <div class="muted">情報を絞り、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/bJe5kFc9W9Pv3XU0Rt3Nm0b" target="_blank" rel="noopener noreferrer">Signal Point</a>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h3>Frame Point</h3>
+        <p>構造や枠組みの整理を行う一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">現状を整理し、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/dRm7sNei4bXDfGC43F3Nm0c" target="_blank" rel="noopener noreferrer">Frame Point</a>
+        </div>
+      </div>
+
+      <div class="plan">
+        <h3>Shift Point</h3>
+        <p>AI導入、移行、切り替えの入口を整理する一点整理プランです。</p>
+        <div class="price">15,000円</div>
+        <div class="muted">現状を整理し、見えた範囲の結果をお伝えします。必要に応じて差額で Core / Full へ移行できます。</div>
+        <div class="btnrow">
+          <a class="btn ghost" href="https://buy.stripe.com/bJefZj2zm5zf7a6dEf3Nm0d" target="_blank" rel="noopener noreferrer">Shift Point</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="muted">Contact</div>
+      <h2>どの商品を選べばいいかわからない場合は相談可</h2>
+      <p>
+        まずは Point で現状を整理し、その結果をもとに、
+        このまま継続可能か、より広い整理が必要かをご案内します。
+        必要に応じて Core / Full へ差額で移行できます。
+      </p>
+
+      <div class="btnrow">
+        <a class="btn ghost" href="/RTS/legal/tokusho/">特定商取引法に基づく表記</a>
+        <a class="btn ghost" href="/RTS/">Home</a>
+      </div>
+    </div>
+
     <div class="footer">
       <div style="margin-bottom:10px;">
         <a href="/RTS/">Home</a> |
         <a href="/RTS/services/">Services</a> |
-        <a href="/RTS/docs/rulebook/">Rulebook</a> |
         <a href="/RTS/legal/tokusho/">Tokusho</a> |
         <a href="/RTS/legal/privacy/">Privacy</a> |
         <a href="/RTS/legal/terms/">Terms</a>
