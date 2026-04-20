@@ -7,3 +7,4 @@ required_fields:
   - trigger
   - result
   - timestamp
+record_scope: cross_repo_skill_execution
