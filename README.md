@@ -6,6 +6,8 @@ Acceleration without reconstructability leads to structural collapse.
 
 RTS preserves decision states so structural drift and discontinuities can be located and reduced over time.
 
+Repository position: see [docs/overview/POSITION.md](docs/overview/POSITION.md).
+
 ---
 
 ## The Problem
