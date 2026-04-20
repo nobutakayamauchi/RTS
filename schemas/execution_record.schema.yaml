@@ -2,6 +2,7 @@ record_type: execution_record
 purpose: store minimal execution results in reconstructable form
 required_fields:
   - skill_id
+  - drive_id
   - trigger
   - result
   - timestamp
