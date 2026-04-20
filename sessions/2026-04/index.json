@@ -1,0 +1,75 @@
+{
+  "month": "2026-04",
+  "updated_at_utc": "2026-04-20T15:05:35Z",
+  "counts": {
+    "sentinel.run.start": 1,
+    "sentinel.run.end": 1,
+    "sentinel.run": 1
+  },
+  "ledger_integrity": {
+    "status": "OK",
+    "issues": [],
+    "parsed_lines": 3,
+    "invalid_lines": 0,
+    "fingerprint_sha256": "de88b4ac92a4ca9e6c887921ff5641820ee3eecd6654da24cb2b19b2415b3bff"
+  },
+  "sentinel": {
+    "end_kinds": [
+      "sentinel.run.end",
+      "sentinel.run"
+    ],
+    "start_kind": "sentinel.run.start",
+    "dangling_run_ids": [],
+    "dangling_runs": 0
+  },
+  "latest": [
+    {
+      "ts": "2026-04-20T15:05:35Z",
+      "kind": "sentinel.run.end",
+      "workflow": "RTS Sentinel Analyze",
+      "run_id": "24674008239",
+      "run_attempt": 1,
+      "status": "success",
+      "commit": "d7551f15dc096ec8f3014941d22eb6a700ddb5db",
+      "note": "analysis finished"
+    }
+  ],
+  "transitions": [],
+  "raw_ledgers": [
+    "session_20260420.jsonl"
+  ],
+  "metrics_latest": {
+    "window_n": 20,
+    "fail_count_last_n": 0,
+    "fail_density": 0.0,
+    "burst_window_k": 5,
+    "burst_threshold_b": 3,
+    "burst_fail": false,
+    "recovery_speed_runs": null,
+    "flip_frequency_last_n": 0.0,
+    "flips_in_last_n": 0,
+    "dangling_runs": 0
+  },
+  "mutation_latest": {
+    "rule_version": "2026-04",
+    "weights": {
+      "w1_fail_density_delta": 0.35,
+      "w2_streak_length": 0.25,
+      "w3_burst_spike": 0.15,
+      "w4_flip_frequency": 0.1,
+      "w5_dangling_runs": 0.15
+    },
+    "components": {
+      "fail_density_delta": 0.0,
+      "streak_length": 0.0,
+      "burst_spike": 0.0,
+      "flip_frequency": 0.0,
+      "dangling_runs": 0.0
+    },
+    "mutation_score": 0.0,
+    "breakpoint": false,
+    "breakpoint_reasons": []
+  },
+  "evidence_latest": null,
+  "evidence_index": []
+}
