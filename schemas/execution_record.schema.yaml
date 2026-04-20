@@ -3,6 +3,7 @@ purpose: store minimal execution results in reconstructable form
 required_fields:
   - skill_id
   - drive_id
+  - pack_id
   - trigger
   - result
   - timestamp
