@@ -1,0 +1,8 @@
+record_type: evidence_ref
+purpose: store minimal references to evidence used in reconstructable execution flows
+required_fields:
+  - evidence_id
+  - source_type
+  - source_ref
+  - retrieved_at
+record_scope: cross_repo_evidence_reference
