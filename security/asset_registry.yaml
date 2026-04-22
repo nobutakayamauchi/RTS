@@ -1,0 +1,49 @@
+assets:
+  - asset_id: ASSET-EMAIL-PRIMARY
+    category: email
+    criticality: high
+    owner: security_owner_placeholder
+    notes: Primary operational inbox used for account recovery and security notifications.
+    zone: daily
+
+  - asset_id: ASSET-GITHUB-CONTROL
+    category: github
+    criticality: critical
+    owner: engineering_owner_placeholder
+    notes: GitHub account and repository control path for source integrity and automation trust.
+    zone: development
+
+  - asset_id: ASSET-CLOUD-EXECUTION
+    category: cloud
+    criticality: critical
+    owner: infrastructure_owner_placeholder
+    notes: Cloud execution environment hosting RTS workloads and runtime control surfaces.
+    zone: admin
+
+  - asset_id: ASSET-DOMAIN-DNS-CONTROL
+    category: domain
+    criticality: critical
+    owner: operations_owner_placeholder
+    notes: Domain and DNS authority that determines public routing and service reachability.
+    zone: admin
+
+  - asset_id: ASSET-BILLING-CONTROL
+    category: billing
+    criticality: high
+    owner: finance_owner_placeholder
+    notes: Billing and payment control for continuity of cloud and external services.
+    zone: admin
+
+  - asset_id: ASSET-AI-PROVIDER-ACCESS
+    category: ai_api
+    criticality: medium
+    owner: platform_owner_placeholder
+    notes: External AI provider access used for model calls and scoped integration tasks.
+    zone: external_ai
+
+  - asset_id: ASSET-LOCAL-PRIMARY-DEVICE
+    category: local_device
+    criticality: medium
+    owner: operator_owner_placeholder
+    notes: Primary local device used for daily and development entry points.
+    zone: daily
