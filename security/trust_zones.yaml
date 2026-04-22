@@ -1,0 +1,50 @@
+zones:
+  - zone_id: daily
+    description: Daily-use user environment for routine communication and lightweight work.
+    allowed_assets:
+      - email
+      - local_device
+    forbidden_crossings:
+      - direct_admin_credential_management
+      - unrestricted_cloud_control
+    notes: Keep day-to-day activities separate from privileged operations.
+
+  - zone_id: development
+    description: Development and source-control execution surface.
+    allowed_assets:
+      - github
+      - local_device
+    forbidden_crossings:
+      - direct_billing_operations
+      - registrar_level_domain_control
+    notes: Code operations should not imply finance or registrar authority.
+
+  - zone_id: admin
+    description: Privileged administration surface for cloud, billing, and domain governance.
+    allowed_assets:
+      - cloud
+      - domain
+      - billing
+    forbidden_crossings:
+      - routine_daily_browsing_context
+      - unrestricted_external_ai_submission
+    notes: Highest-risk zone; requires tighter credential scope and review.
+
+  - zone_id: external_ai
+    description: External AI provider interaction boundary.
+    allowed_assets:
+      - ai_api
+    forbidden_crossings:
+      - raw_admin_secret_exposure
+      - direct_billing_authority_reuse
+    notes: Treat as controlled egress boundary for prompts and outputs.
+
+  - zone_id: public_surface
+    description: Public-facing published surface such as websites, docs, or open artifacts.
+    allowed_assets:
+      - domain
+      - github
+    forbidden_crossings:
+      - privileged_secret_storage
+      - internal_admin_console_access
+    notes: Public exposure must not imply private control-plane reachability.
