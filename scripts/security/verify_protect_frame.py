@@ -50,6 +50,10 @@ REQUIRED_ENTRY_KEYS = {
     },
 }
 
+ALLOWED_CRITICALITY = {"critical", "high", "medium"}
+ALLOWED_BLAST_RADIUS = {"high", "medium", "low"}
+ALLOWED_STATUS = {"active", "review_required", "disabled"}
+
 
 def _parse_scalar(value: str):
     lowered = value.lower()
@@ -132,9 +136,18 @@ def _load_yaml(file_path: Path):
     return _simple_yaml_load(text)
 
 
+def _is_non_empty(value: object) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    return True
+
+
 def main() -> int:
     repo_root = Path(__file__).resolve().parents[2]
     errors: list[str] = []
+    loaded_data: dict[str, dict] = {}
 
     for relative_path in REQUIRED_FILES:
         file_path = repo_root / relative_path
@@ -171,6 +184,7 @@ def main() -> int:
             errors.append(f"{relative_path}:{top_key} must be a list")
             continue
 
+        loaded_data[relative_path] = data
         required_keys = REQUIRED_ENTRY_KEYS[relative_path]
         for index, entry in enumerate(entries):
             if not isinstance(entry, dict):
@@ -185,13 +199,80 @@ def main() -> int:
                     f"{relative_path}:{top_key}[{index}] missing keys: {', '.join(missing)}"
                 )
 
+    zones_file = "security/trust_zones.yaml"
+    zone_entries = loaded_data.get(zones_file, {}).get("zones", [])
+    zone_ids = {
+        entry.get("zone_id")
+        for entry in zone_entries
+        if isinstance(entry, dict) and isinstance(entry.get("zone_id"), str)
+    }
+
+    for index, entry in enumerate(zone_entries):
+        if not isinstance(entry, dict):
+            continue
+
+        for list_key in ("allowed_assets", "forbidden_crossings"):
+            value = entry.get(list_key)
+            if not isinstance(value, list):
+                errors.append(
+                    f"{zones_file}:zones[{index}].{list_key} must be a list"
+                )
+
+    assets_file = "security/asset_registry.yaml"
+    asset_entries = loaded_data.get(assets_file, {}).get("assets", [])
+    for index, entry in enumerate(asset_entries):
+        if not isinstance(entry, dict):
+            continue
+
+        criticality = entry.get("criticality")
+        if criticality not in ALLOWED_CRITICALITY:
+            errors.append(
+                f"{assets_file}:assets[{index}].criticality must be one of "
+                f"{sorted(ALLOWED_CRITICALITY)}"
+            )
+
+        zone = entry.get("zone")
+        if zone not in zone_ids:
+            errors.append(
+                f"{assets_file}:assets[{index}].zone '{zone}' is not defined in {zones_file}"
+            )
+
+    secrets_file = "security/secret_scope_registry.yaml"
+    secret_entries = loaded_data.get(secrets_file, {}).get("secrets", [])
+    for index, entry in enumerate(secret_entries):
+        if not isinstance(entry, dict):
+            continue
+
+        zone = entry.get("zone")
+        if zone not in zone_ids:
+            errors.append(
+                f"{secrets_file}:secrets[{index}].zone '{zone}' is not defined in {zones_file}"
+            )
+
+        blast_radius = entry.get("blast_radius")
+        if blast_radius not in ALLOWED_BLAST_RADIUS:
+            errors.append(
+                f"{secrets_file}:secrets[{index}].blast_radius must be one of "
+                f"{sorted(ALLOWED_BLAST_RADIUS)}"
+            )
+
+        status = entry.get("status")
+        if status not in ALLOWED_STATUS:
+            errors.append(
+                f"{secrets_file}:secrets[{index}].status must be one of "
+                f"{sorted(ALLOWED_STATUS)}"
+            )
+
+        if not _is_non_empty(entry.get("max_lifetime")):
+            errors.append(f"{secrets_file}:secrets[{index}].max_lifetime must be non-empty")
+
     if errors:
         print("[FAIL] Protect Frame verification failed:")
         for err in errors:
             print(f" - {err}")
         return 1
 
-    print("[OK] Protect Frame v0.1 verification succeeded.")
+    print("[OK] Protect Frame verification passed.")
     return 0
 
 

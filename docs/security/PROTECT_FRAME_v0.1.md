@@ -59,6 +59,12 @@ Design rules in v0.1:
 
 The script is non-mutating and returns non-zero on any violation.
 
+## Operational Notes
+- Initial registries are scaffolded for real use with practical baseline entries.
+- Secrets are represented as metadata only and never stored as secret values.
+- Verification currently checks structural consistency and policy-value alignment only.
+- CI and incident linkage are intentionally deferred in this version.
+
 ## Incident Reconstruction Intent
 Protect Frame v0.1 is designed for post-event reconstruction support.
 By preserving explicit boundary and scope metadata, reviewers can reconstruct

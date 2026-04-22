@@ -1,50 +1,50 @@
 zones:
   - zone_id: daily
-    description: Daily-use user environment for routine communication and lightweight work.
+    description: Daily user environment for communication and routine operational tasks.
     allowed_assets:
       - email
       - local_device
     forbidden_crossings:
-      - direct_admin_credential_management
-      - unrestricted_cloud_control
-    notes: Keep day-to-day activities separate from privileged operations.
+      - direct_admin_credentials_use
+      - direct_admin_console_access
+    notes: Keep daily activity separate from privileged administration paths.
 
   - zone_id: development
-    description: Development and source-control execution surface.
+    description: Source-control and build surface used for implementation and repo workflows.
     allowed_assets:
       - github
       - local_device
     forbidden_crossings:
-      - direct_billing_operations
-      - registrar_level_domain_control
-    notes: Code operations should not imply finance or registrar authority.
+      - direct_billing_management
+      - registrar_level_domain_changes_without_admin_handoff
+    notes: Development can manage code but should not directly hold broad admin authority.
 
   - zone_id: admin
-    description: Privileged administration surface for cloud, billing, and domain governance.
+    description: Highest-trust control plane for cloud, domain, and billing administration.
     allowed_assets:
       - cloud
       - domain
       - billing
     forbidden_crossings:
-      - routine_daily_browsing_context
-      - unrestricted_external_ai_submission
-    notes: Highest-risk zone; requires tighter credential scope and review.
+      - mixed_daily_session_operations
+      - broad_secret_export_to_external_ai
+    notes: Most critical boundary; maintain strong separation from daily and external contexts.
 
   - zone_id: external_ai
-    description: External AI provider interaction boundary.
+    description: External AI interaction boundary for inference and model service usage.
     allowed_assets:
       - ai_api
     forbidden_crossings:
-      - raw_admin_secret_exposure
-      - direct_billing_authority_reuse
-    notes: Treat as controlled egress boundary for prompts and outputs.
+      - admin_privilege_delegation
+      - cross_zone_secret_reuse
+    notes: Do not provide management-level credentials or wide-scope secrets to this zone.
 
   - zone_id: public_surface
-    description: Public-facing published surface such as websites, docs, or open artifacts.
+    description: Public-facing publication surface for domains and open repository artifacts.
     allowed_assets:
       - domain
       - github
     forbidden_crossings:
+      - internal_admin_interface_exposure
       - privileged_secret_storage
-      - internal_admin_console_access
-    notes: Public exposure must not imply private control-plane reachability.
+    notes: Public surface stays isolated from internal control and privileged administration.

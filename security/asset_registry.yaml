@@ -1,49 +1,49 @@
 assets:
-  - asset_id: ASSET-EMAIL-001
+  - asset_id: ASSET-EMAIL-PRIMARY
     category: email
-    criticality: high
-    owner: team_owner
-    notes: Primary communication account template entry.
+    criticality: critical
+    owner: operations_owner
+    notes: Primary email identity used for account recovery and security notifications.
     zone: daily
 
-  - asset_id: ASSET-GITHUB-001
+  - asset_id: ASSET-GITHUB-CONTROL
     category: github
-    criticality: high
-    owner: team_owner
-    notes: Source control organization or repository access template entry.
+    criticality: critical
+    owner: repository_admin
+    notes: GitHub account and repository control path for code, settings, and access grants.
     zone: development
 
-  - asset_id: ASSET-CLOUD-001
+  - asset_id: ASSET-CLOUD-EXECUTION
     category: cloud
-    criticality: high
+    criticality: critical
     owner: infra_owner
-    notes: Cloud project or account access template entry.
+    notes: Cloud execution environment hosting runtime resources and deployment surface.
     zone: admin
 
-  - asset_id: ASSET-DOMAIN-001
+  - asset_id: ASSET-DOMAIN-DNS-CONTROL
     category: domain
-    criticality: medium
-    owner: ops_owner
-    notes: Domain registrar and DNS management template entry.
-    zone: admin
-
-  - asset_id: ASSET-BILLING-001
-    category: billing
     criticality: high
-    owner: finance_owner
-    notes: Billing portal and payment profile template entry.
+    owner: ops_owner
+    notes: Domain and DNS control that determines routing and service reachability.
     zone: admin
 
-  - asset_id: ASSET-AIAPI-001
+  - asset_id: ASSET-BILLING-PAYMENT
+    category: billing
+    criticality: critical
+    owner: finance_owner
+    notes: Billing and payment control for service continuity and spend governance.
+    zone: admin
+
+  - asset_id: ASSET-AI-PROVIDER-ACCESS
     category: ai_api
-    criticality: medium
+    criticality: high
     owner: platform_owner
-    notes: External AI provider account or project template entry.
+    notes: AI provider account access controlling API usage and project boundaries.
     zone: external_ai
 
-  - asset_id: ASSET-LOCAL-001
+  - asset_id: ASSET-LOCAL-DEVICE-PRIMARY
     category: local_device
     criticality: medium
     owner: individual_owner
-    notes: Local workstation or endpoint template entry.
+    notes: Primary local device used for daily operations and development entry.
     zone: daily
