@@ -1,0 +1,49 @@
+assets:
+  - asset_id: ASSET-EMAIL-001
+    category: email
+    criticality: high
+    owner: team_owner
+    notes: Primary communication account template entry.
+    zone: daily
+
+  - asset_id: ASSET-GITHUB-001
+    category: github
+    criticality: high
+    owner: team_owner
+    notes: Source control organization or repository access template entry.
+    zone: development
+
+  - asset_id: ASSET-CLOUD-001
+    category: cloud
+    criticality: high
+    owner: infra_owner
+    notes: Cloud project or account access template entry.
+    zone: admin
+
+  - asset_id: ASSET-DOMAIN-001
+    category: domain
+    criticality: medium
+    owner: ops_owner
+    notes: Domain registrar and DNS management template entry.
+    zone: admin
+
+  - asset_id: ASSET-BILLING-001
+    category: billing
+    criticality: high
+    owner: finance_owner
+    notes: Billing portal and payment profile template entry.
+    zone: admin
+
+  - asset_id: ASSET-AIAPI-001
+    category: ai_api
+    criticality: medium
+    owner: platform_owner
+    notes: External AI provider account or project template entry.
+    zone: external_ai
+
+  - asset_id: ASSET-LOCAL-001
+    category: local_device
+    criticality: medium
+    owner: individual_owner
+    notes: Local workstation or endpoint template entry.
+    zone: daily
