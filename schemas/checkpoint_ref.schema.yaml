@@ -1,0 +1,8 @@
+record_type: checkpoint_ref
+purpose: store minimal references to resumable checkpoints in reconstructable execution flows
+required_fields:
+  - checkpoint_id
+  - skill_id
+  - checkpoint_ref
+  - recorded_at
+record_scope: cross_repo_checkpoint_reference
