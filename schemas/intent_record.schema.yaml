@@ -1,0 +1,8 @@
+record_type: intent_record
+purpose: store minimal intent records for reconstructable execution flows
+required_fields:
+  - intent_id
+  - skill_id
+  - requested_by
+  - requested_at
+record_scope: cross_repo_execution_intent
