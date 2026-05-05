@@ -1,0 +1,18 @@
+# Template only. Do not store live registry records in this repo.
+record_type: talent_adoption_record
+version: 0.1
+status: draft
+metadata:
+  created_at: "YYYY-MM-DDTHH:MM:SSZ"
+  created_by: ""
+  source_system: "external"
+subject:
+  talent_id: ""
+  role: ""
+adoption:
+  decision_ref: ""
+  rationale: ""
+  effective_date: "YYYY-MM-DD"
+links:
+  external_registry_ref: ""
+  evidence_ref: ""

@@ -1,0 +1,19 @@
+# Template only. Do not store live signal feed records in this repo.
+record_type: signal_record
+version: 0.1
+status: draft
+metadata:
+  created_at: "YYYY-MM-DDTHH:MM:SSZ"
+  created_by: ""
+  source_system: "external"
+signal:
+  signal_id: ""
+  category: ""
+  severity: "low|medium|high"
+  observed_at: "YYYY-MM-DDTHH:MM:SSZ"
+assessment:
+  structural_impact: ""
+  reconstruction_relevance: ""
+links:
+  external_feed_ref: ""
+  evidence_ref: ""
