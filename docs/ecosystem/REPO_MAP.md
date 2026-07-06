@@ -119,6 +119,25 @@ Boundary:
 - not RTS core
 - not RTS-AGE
 
+## Public Profile Surface
+
+### nobutakayamauchi
+
+Role: Public profile and RTS positioning surface.
+
+Status: ACTIVE / PROFILE.
+
+Purpose:
+
+- present the operator identity and RTS positioning
+- point readers toward the canonical RTS repository and ecosystem direction
+
+Boundary:
+
+- not RTS core
+- not a runtime or delivery workflow
+- should stay aligned with the current RTS ecosystem position
+
 ## Parts / Extension Shelves
 
 ### RTS-Skills
@@ -225,4 +244,5 @@ Status: ARCHIVE / DELETE CANDIDATE.
 - RTS-minicompany operates the money-line workflow.
 - rts01-offer sells the audit/reset offer.
 - seminar-compass is an independent product candidate.
+- nobutakayamauchi is the public profile and positioning surface.
 - skills, packs, drive, design, talent, and signal repositories are extension shelves until promoted.
