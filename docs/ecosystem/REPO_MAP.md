@@ -140,7 +140,7 @@ Boundary:
 
 ## Parts / Extension Shelves
 
-### RTS-Skills
+### RTS-Skills-
 
 Role: Reusable operational skills.
 
@@ -149,6 +149,12 @@ Status: PARTS / SKILLS.
 Purpose:
 
 - hold reusable AI-agnostic operational skills and wrappers
+
+Boundary:
+
+- not RTS core
+- not a live runtime
+- inventory-first unless pulled into a concrete task
 
 ### RTS-MCP-Packs
 
@@ -160,6 +166,12 @@ Purpose:
 
 - hold reusable MCP connector pack definitions for future operator environments
 
+Boundary:
+
+- not RTS core
+- not a credentials store
+- not an active connector runtime by default
+
 ### RTS-Hermes-Drive
 
 Role: Orchestration bridge.
@@ -169,6 +181,12 @@ Status: PARTS / ORCHESTRATION.
 Purpose:
 
 - bridge RTS skills and pack concepts into Hermes-style drive/orchestration structures
+
+Boundary:
+
+- not RTS core
+- not an always-on orchestrator by default
+- inventory-first unless pulled into a concrete task
 
 ### RTS-Design-Research
 
@@ -180,6 +198,12 @@ Purpose:
 
 - convert design references and UI research into RTS-compatible design decision material
 
+Boundary:
+
+- not RTS core
+- not a product implementation by default
+- preserve observations and decision material before implementation
+
 ### rts-dev-protocol
 
 Role: Development doctrine notes.
@@ -190,51 +214,99 @@ Purpose:
 
 - preserve structure-first development protocol notes and architecture vocabulary
 
-## Freeze / Later Review
+Boundary:
+
+- not RTS core
+- not a product runtime
+- use as development guidance, not source-of-truth protocol
+
+## Frozen / Review-Only Shelves
 
 ### RTS-Talent-Registry
 
-Role: AI talent governance registry.
+Role: Governance registry concept.
 
-Status: FREEZE / GOVERNANCE-PARTS.
+Status: FREEZE / GOVERNANCE-REGISTRY / REVIEW BEFORE USE.
+
+Boundary:
+
+- not active recruiting infrastructure
+- not a personal-data registry
+- not runtime infrastructure
 
 ### RTS-Signal-Feeds
 
-Role: Signal intelligence layer.
+Role: Non-executable signal skeleton.
 
-Status: FREEZE / SIGNAL-PARTS.
+Status: FREEZE / SIGNAL-SKELETON / REVIEW BEFORE USE.
+
+Boundary:
+
+- not live collection infrastructure
+- not publishing infrastructure
+- not automatic routing infrastructure
 
 ### rts-video-flow
 
-Role: Video workflow scaffold.
+Role: Local video workflow prototype.
 
-Status: FREEZE / MEDIA-PARTS.
+Status: FREEZE / VIDEO-WORKFLOW / REVIEW BEFORE USE.
+
+Boundary:
+
+- not a production publishing pipeline
+- not platform automation
+- not a default home for media assets
 
 ### AIX
 
-Role: Execution-aware arbitrage research scaffold.
+Role: Private research scaffold.
 
-Status: FREEZE / RESEARCH.
+Status: FREEZE / TRADING-LAB / DO NOT ACTIVATE.
 
-## Archive / Delete Candidates
+Boundary:
+
+- not RTS core
+- not RTS business or product infrastructure
+- not public offer material
+
+## Inactive / Minimal Repositories
 
 ### codex-connector-test
 
-Role: Connector test repository.
+Role: Connector test sandbox.
 
-Status: ARCHIVE CANDIDATE.
+Status: ARCHIVE / TEST-FIXTURE / REVIEW ONLY.
+
+Boundary:
+
+- not production RTS work
+- not a component shelf
+- not an active product repository
 
 ### ryoushuushotesutoyou
 
-Role: Receipt image/output test.
+Role: Private one-off test repository.
 
-Status: DELETE CANDIDATE.
+Status: PRIVATE TEST / REVIEW ONLY.
+
+Boundary:
+
+- not active RTS ecosystem work
+- not a product repository
+- not a component shelf
 
 ### rts-lite
 
-Role: Empty or obsolete lightweight RTS placeholder.
+Role: Empty lightweight placeholder.
 
-Status: ARCHIVE / DELETE CANDIDATE.
+Status: INACTIVE / EMPTY PLACEHOLDER / REVIEW ONLY.
+
+Boundary:
+
+- not the minimal RTS reference
+- not active RTS work
+- use RTS-Minimal-Runtime instead for minimal RTS reference behavior
 
 ## Rule of Thumb
 
@@ -245,4 +317,6 @@ Status: ARCHIVE / DELETE CANDIDATE.
 - rts01-offer sells the audit/reset offer.
 - seminar-compass is an independent product candidate.
 - nobutakayamauchi is the public profile and positioning surface.
-- skills, packs, drive, design, talent, and signal repositories are extension shelves until promoted.
+- skills, packs, drive, design, and doctrine repositories are component shelves until pulled into concrete work.
+- talent, signal, video, and AIX repositories are frozen unless a review task revives them.
+- test and placeholder repositories should stay minimal unless a specific purpose appears.
