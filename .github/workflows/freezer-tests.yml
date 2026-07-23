@@ -25,9 +25,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Show committed FREEZER hashes
+      - name: Build committed FREEZER hash snapshot
         run: |
-          python - <<'PY'
+          python - <<'PY' > /tmp/freezer-committed-manifest.sha256
           import hashlib
           from pathlib import Path
           root = Path('.')
@@ -43,6 +43,13 @@ jobs:
                   continue
               print(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {relative}")
           PY
+      - name: Upload committed hash snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: freezer-committed-manifest
+          path: /tmp/freezer-committed-manifest.sha256
+          if-no-files-found: error
+          retention-days: 1
       - name: Rebuild derived indexes and manifest
         run: python -m freezer.cli reindex
       - name: Run FREEZER tests
