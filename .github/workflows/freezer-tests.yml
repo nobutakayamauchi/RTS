@@ -25,34 +25,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Build committed FREEZER hash snapshot
-        run: |
-          python - <<'PY' > /tmp/freezer-committed-manifest.sha256
-          import hashlib
-          from pathlib import Path
-          root = Path('.')
-          for path in sorted((root / 'freezer').rglob('*')):
-              if not path.is_file():
-                  continue
-              relative = path.relative_to(root).as_posix()
-              if '__pycache__' in path.parts or path.suffix == '.pyc':
-                  continue
-              if relative == 'freezer/manifests/manifest.sha256':
-                  continue
-              if relative.startswith('freezer/recall/'):
-                  continue
-              print(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {relative}")
-          PY
-      - name: Upload committed hash snapshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: freezer-committed-manifest
-          path: /tmp/freezer-committed-manifest.sha256
-          if-no-files-found: error
-          retention-days: 1
-      - name: Rebuild derived indexes and manifest
-        run: python -m freezer.cli reindex
+      - name: Verify committed FREEZER snapshot
+        run: python -m freezer.cli verify
       - name: Run FREEZER tests
         run: python -B -m unittest discover -s tests -v
-      - name: Verify FREEZER records
+      - name: Rebuild derived indexes and manifest
+        run: python -m freezer.cli reindex
+      - name: Verify rebuilt FREEZER records
         run: python -m freezer.cli verify
