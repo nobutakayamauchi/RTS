@@ -55,6 +55,19 @@ class FreezerTests(unittest.TestCase):
         with self.assertRaises(FreezerError):
             validate_item(invalid, self.config)
 
+    def test_invalid_enum_values_are_rejected(self):
+        for field, value in (
+            ("status", "DONE"),
+            ("type", "idea"),
+            ("build_authority", "MAYBE"),
+            ("recall_mode", "AUTO"),
+        ):
+            invalid = json.loads(json.dumps(self.item))
+            invalid[field] = value
+            with self.subTest(field=field):
+                with self.assertRaises(FreezerError):
+                    validate_item(invalid, self.config)
+
     def test_rebuild_and_verify_in_isolated_copy(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = self.isolated_root(temp_dir)
