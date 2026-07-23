@@ -1,4 +1,5 @@
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -47,10 +48,13 @@ class FreezerTests(unittest.TestCase):
         with self.assertRaises(FreezerError):
             validate_item(invalid, self.config)
 
-    def test_rebuild_and_verify(self):
-        rows = rebuild(self.repo_root)
-        self.assertEqual(rows[0]["item_id"], "RTS-FRZ-000001")
-        self.assertEqual(verify(self.repo_root), [])
+    def test_rebuild_and_verify_in_isolated_copy(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = Path(temp_dir)
+            shutil.copytree(self.repo_root / "freezer", temp_root / "freezer")
+            rows = rebuild(temp_root)
+            self.assertEqual(rows[0]["item_id"], "RTS-FRZ-000001")
+            self.assertEqual(verify(temp_root), [])
 
 
 if __name__ == "__main__":
