@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nobutakayamauchi/RTS/freezer/schemas/preflight.schema.json",
+  "title": "RTS FREEZER Implementation Preflight",
+  "type": "object",
+  "required": [
+    "preflight_id",
+    "item_id",
+    "preflight_version",
+    "item_version_snapshot",
+    "item_fingerprint",
+    "outcome",
+    "assessor",
+    "rationale",
+    "affected_boundaries",
+    "existing_assumptions",
+    "data_migration",
+    "external_interfaces",
+    "approval_changes",
+    "public_documents",
+    "regression_tests",
+    "hidden_dependencies",
+    "rollback_boundary",
+    "completion_conditions",
+    "decomposition",
+    "risks",
+    "created_at"
+  ],
+  "properties": {
+    "preflight_id": {
+      "type": "string",
+      "pattern": "^RTS-PF-[0-9]{6}-[0-9]{3}$"
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^RTS-FRZ-[0-9]{6}$"
+    },
+    "preflight_version": {"type": "integer", "minimum": 1},
+    "item_version_snapshot": {"type": "integer", "minimum": 1},
+    "item_fingerprint": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "outcome": {
+      "enum": ["PASS", "DECOMPOSE_REQUIRED", "BLOCKED", "RESEARCH_REQUIRED"]
+    },
+    "assessor": {"type": "string", "minLength": 1},
+    "rationale": {"type": "string", "minLength": 1},
+    "affected_boundaries": {"$ref": "#/$defs/stringList"},
+    "existing_assumptions": {"$ref": "#/$defs/stringList"},
+    "data_migration": {
+      "type": "object",
+      "required": ["required", "notes"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "external_interfaces": {"$ref": "#/$defs/stringList"},
+    "approval_changes": {"$ref": "#/$defs/stringList"},
+    "public_documents": {"$ref": "#/$defs/stringList"},
+    "regression_tests": {"$ref": "#/$defs/stringList"},
+    "hidden_dependencies": {"$ref": "#/$defs/stringList"},
+    "rollback_boundary": {"type": "string", "minLength": 1},
+    "completion_conditions": {"$ref": "#/$defs/stringList"},
+    "decomposition": {
+      "type": "object",
+      "required": ["required", "child_candidates"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "child_candidates": {"$ref": "#/$defs/stringList"}
+      },
+      "additionalProperties": false
+    },
+    "risks": {"$ref": "#/$defs/stringList"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "additionalProperties": false
+}
