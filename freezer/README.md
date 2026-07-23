@@ -91,7 +91,7 @@ The preflight outcome is one of:
 - `BLOCKED`: a known condition prevents implementation.
 - `RESEARCH_REQUIRED`: important unknowns must be resolved first.
 
-A preflight stores a fingerprint of the substantive candidate plan. Status, approval, and timestamps may change without invalidating it. Any substantive revision makes the preflight `STALE`, and selection is blocked until the ground survey is run again.
+A preflight stores a fingerprint of the substantive implementation plan. Status, approval, timestamps, priority scores, effort estimates, tags, and recall metadata may change without invalidating it, so the queue can be re-ranked normally. Changes to scope, preserved value, safety exclusions, dependencies, sources, or intended destination make the preflight `STALE`, and selection is blocked until the ground survey is run again.
 
 ## Commands
 
