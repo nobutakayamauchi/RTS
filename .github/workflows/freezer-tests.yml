@@ -27,9 +27,37 @@ jobs:
           python-version: "3.11"
       - name: Verify committed FREEZER snapshot
         run: python -m freezer.cli verify
+      - name: Fail on stale committed indexes
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          paths = [
+              Path("freezer/index/items.json"),
+              Path("freezer/index/priority.json"),
+          ]
+
+          def semantic(path):
+              data = json.loads(path.read_text(encoding="utf-8"))
+              data.pop("generated_at", None)
+              return data
+
+          committed = {path: semantic(path) for path in paths}
+          subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
+          rebuilt = {path: semantic(path) for path in paths}
+
+          stale = [str(path) for path in paths if committed[path] != rebuilt[path]]
+          if stale:
+              print("Committed FREEZER indexes are stale:")
+              for path in stale:
+                  print(f"- {path}")
+              print("Run: python -m freezer.cli reindex")
+              raise SystemExit(1)
+          PY
       - name: Run FREEZER tests
         run: python -B -m unittest discover -s tests -v
-      - name: Rebuild derived indexes and manifest
-        run: python -m freezer.cli reindex
       - name: Verify rebuilt FREEZER records
         run: python -m freezer.cli verify
