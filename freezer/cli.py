@@ -41,6 +41,18 @@ def write_json(path: Path, value: Any) -> None:
     )
 
 
+def deep_merge(base: dict[str, Any], changes: dict[str, Any]) -> dict[str, Any]:
+    """Recursively merge revision fields without discarding nested score data."""
+
+    merged = dict(base)
+    for key, value in changes.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
 def config_path(root: Path) -> Path:
     return root / "freezer" / "config.json"
 
@@ -181,9 +193,31 @@ def prepare_input_item(
     return item
 
 
+def validate_runtime_constraints(root: Path, item: dict[str, Any], config: dict[str, Any]) -> None:
+    status = item["status"]
+    if status in {"SELECTED", "IN_PROGRESS"} and item["build_authority"] != "APPROVED":
+        raise FreezerError(
+            f"{item['item_id']}: {status} requires build_authority=APPROVED"
+        )
+
+    if status == "IN_PROGRESS":
+        active = [
+            existing["item_id"]
+            for existing in iter_current_items(root)
+            if existing["item_id"] != item["item_id"]
+            and existing["status"] == "IN_PROGRESS"
+        ]
+        if len(active) >= int(config["work_in_progress_limit"]):
+            raise FreezerError(
+                f"work-in-progress limit reached; active={active}, "
+                f"limit={config['work_in_progress_limit']}"
+            )
+
+
 def save_new_version(root: Path, item: dict[str, Any]) -> Path:
     config = load_config(root)
     validate_item(item, config)
+    validate_runtime_constraints(root, item, config)
     destination = version_path(root, item["item_id"], item["version"])
     if destination.exists():
         raise FreezerError(f"refusing to overwrite immutable version: {destination}")
@@ -219,8 +253,7 @@ def revise_item(root: Path, item_id: str, source: Path) -> dict[str, Any]:
     touched = sorted(forbidden & changes.keys())
     if touched:
         raise FreezerError(f"revision cannot replace immutable fields: {', '.join(touched)}")
-    revised = dict(current)
-    revised.update(changes)
+    revised = deep_merge(current, changes)
     revised = prepare_input_item(
         revised,
         item_id=item_id,
@@ -283,8 +316,9 @@ def rebuild(root: Path) -> list[dict[str, Any]]:
         entries.append(index_entry(item, config))
 
     by_id = sorted(entries, key=lambda row: row["item_id"])
+    rankable_statuses = set(config["rankable_statuses"])
     by_priority = sorted(
-        entries,
+        (row for row in entries if row["status"] in rankable_statuses),
         key=lambda row: (-row["priority_score"], row["item_id"]),
     )
     index_dir = root / "freezer" / "index"
