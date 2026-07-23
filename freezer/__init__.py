@@ -1,0 +1,1 @@
+"""RTS FREEZER package."""

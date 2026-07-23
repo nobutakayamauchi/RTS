@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-07-23T23:04:26Z",
+  "count": 1,
+  "policy": {
+    "work_in_progress_limit": 1,
+    "human_approval_required": true,
+    "auto_start": false
+  },
+  "items": [
+    {
+      "item_id": "RTS-FRZ-000001",
+      "version": 1,
+      "title": "Governed Adaptive Memory Layer",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 65.25,
+      "estimated_hours": {
+        "minimum": 20,
+        "maximum": 70
+      },
+      "tags": [
+        "memory",
+        "self-evolution",
+        "governance",
+        "evidence",
+        "rollback",
+        "personal-ai"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "updated_at": "2026-07-24T00:00:00Z"
+    }
+  ]
+}

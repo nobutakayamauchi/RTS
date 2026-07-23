@@ -1,0 +1,79 @@
+{
+  "item_id": "RTS-FRZ-000001",
+  "version": 1,
+  "title": "Governed Adaptive Memory Layer",
+  "type": "feature",
+  "status": "FROZEN",
+  "summary": "RTSへ、証拠付き記憶、改善提案、人間承認、Skill追加、回帰検証、ロールバックを一つの再構成可能な流れとして追加する次世代機能候補。",
+  "original_problem": "RTSは判断・実行・証拠の構造を保持できるが、利用者ごとの経験から必要な能力を獲得し、その進化理由と安全性を後から再構成する記憶層はまだ未実装である。",
+  "why_it_matters": "RTSが利用者ごとに異なる進化を遂げ、単なる共通ツールではなく唯一無二の相棒へ育つための中核候補になる。同時に、AIの変更を人間承認と証拠で統治できる。",
+  "reason_frozen": "有料案件と実運用データを先に獲得する。現時点で本実装すると、実際の利用上の痛みではなく想像に基づく過剰設計になり、営業・納品の本線を止める危険がある。",
+  "preserved_value": [
+    "証拠と出典を伴う長期記憶",
+    "記憶・実行記録・判断状態の連結",
+    "RTS自身による改善案の生成",
+    "人間承認後のみSkillまたは能力層を追加",
+    "変更前後の回帰試験",
+    "問題発生時のロールバック",
+    "進化理由・承認者・結果の再構成",
+    "利用者ごとに異なる進化経路"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 2,
+    "strategic_fit": 5,
+    "readiness": 2,
+    "revenue_value": 2,
+    "dependency_value": 4,
+    "risk_reduction": 4,
+    "confidence": 4,
+    "effort": 4,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "有料案件を1件以上完了している",
+    "過去情報の再利用、過去判断の参照、Skill改善の必要が合計3回以上発生している",
+    "20〜30時間の最小実装枠を確保できる",
+    "execution_recordとevidence_refの完全連結方針が安定している"
+  ],
+  "negative_triggers": [
+    "営業導線または初回案件の運用が未確立",
+    "現行RTS Coreへ破壊的変更が必要",
+    "進化処理に人間承認とロールバックを入れられない",
+    "顧客データの分離・削除方針が未確立"
+  ],
+  "dependencies": [
+    "execution_recordとevidence_refの完全連結",
+    "checkpointとmanifestの運用規則",
+    "Skill変更時の回帰試験",
+    "顧客・プロジェクト単位のデータ境界"
+  ],
+  "source_refs": [
+    "https://arxiv.org/abs/2607.18975",
+    "RTS README: Decision State Snapshot / State Transition Tracking / Append-Only Ledger",
+    "docs/overview/CURRENT_MINIMAL_CORE.md",
+    "docs/overview/EXECUTION_AND_EVIDENCE.md"
+  ],
+  "possible_destinations": [
+    "RTS Core optional memory layer",
+    "RTS-AGE evolution engine",
+    "Hermes Drive governed adaptation extension"
+  ],
+  "estimated_hours": {
+    "minimum": 20,
+    "maximum": 70
+  },
+  "tags": [
+    "memory",
+    "self-evolution",
+    "governance",
+    "evidence",
+    "rollback",
+    "personal-ai"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL",
+  "supersedes": null,
+  "created_at": "2026-07-24T00:00:00Z",
+  "updated_at": "2026-07-24T00:00:00Z"
+}

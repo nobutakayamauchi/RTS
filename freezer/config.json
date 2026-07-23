@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "work_in_progress_limit": 1,
+  "score_scale": {
+    "minimum": 0,
+    "maximum": 5
+  },
+  "score_weights": {
+    "impact": 1.8,
+    "urgency": 1.4,
+    "strategic_fit": 1.6,
+    "readiness": 1.2,
+    "revenue_value": 1.3,
+    "dependency_value": 1.2,
+    "risk_reduction": 1.1,
+    "confidence": 0.8,
+    "effort": 1.0,
+    "uncertainty": 0.8
+  },
+  "benefit_fields": [
+    "impact",
+    "urgency",
+    "strategic_fit",
+    "readiness",
+    "revenue_value",
+    "dependency_value",
+    "risk_reduction",
+    "confidence"
+  ],
+  "cost_fields": [
+    "effort",
+    "uncertainty"
+  ],
+  "rankable_statuses": [
+    "FROZEN",
+    "READY",
+    "RESEARCH_REQUIRED",
+    "BLOCKED"
+  ],
+  "selection_policy": {
+    "candidate_count": 3,
+    "human_approval_required": true,
+    "auto_start": false
+  }
+}
