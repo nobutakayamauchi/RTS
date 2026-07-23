@@ -2,7 +2,8 @@
 """Implementation preflight gate for RTS FREEZER candidates.
 
 A candidate must have a current PASS preflight whose fingerprint still matches
-its substantive plan before it may move to SELECTED or IN_PROGRESS.
+its substantive implementation plan before it may move to SELECTED or
+IN_PROGRESS.
 """
 
 from __future__ import annotations
@@ -19,14 +20,24 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_ROOT = PACKAGE_DIR.parent
 ITEM_ID_PREFIX = "RTS-FRZ-"
 OUTCOMES = {"PASS", "DECOMPOSE_REQUIRED", "BLOCKED", "RESEARCH_REQUIRED"}
-VOLATILE_ITEM_FIELDS = {
-    "version",
-    "status",
-    "build_authority",
-    "created_at",
-    "updated_at",
-    "supersedes",
-}
+
+# Ranking and lifecycle metadata are intentionally excluded. Re-scoring a
+# candidate must not invalidate a completed ground survey. Changes to scope,
+# dependencies, sources, safety exclusions, or destination do invalidate it.
+IMPLEMENTATION_PLAN_FIELDS = (
+    "item_id",
+    "title",
+    "type",
+    "summary",
+    "original_problem",
+    "why_it_matters",
+    "preserved_value",
+    "negative_triggers",
+    "dependencies",
+    "source_refs",
+    "possible_destinations",
+)
+
 REQUIRED_ASSESSMENT_FIELDS = {
     "affected_boundaries",
     "existing_assumptions",
@@ -41,6 +52,21 @@ REQUIRED_ASSESSMENT_FIELDS = {
     "decomposition",
     "risks",
 }
+GENERATED_FIELDS = {
+    "preflight_id",
+    "item_id",
+    "preflight_version",
+    "item_version_snapshot",
+    "item_fingerprint",
+    "created_at",
+}
+INPUT_FIELDS = {
+    "outcome",
+    "assessor",
+    "rationale",
+    *REQUIRED_ASSESSMENT_FIELDS,
+}
+RECORD_FIELDS = GENERATED_FIELDS | INPUT_FIELDS
 
 
 class PreflightError(RuntimeError):
@@ -68,8 +94,23 @@ def write_json(path: Path, value: Any) -> None:
     )
 
 
+def items_root(root: Path) -> Path:
+    return root / "freezer" / "items"
+
+
+def all_item_ids(root: Path) -> list[str]:
+    base = items_root(root)
+    if not base.exists():
+        return []
+    return sorted(
+        path.name
+        for path in base.iterdir()
+        if path.is_dir() and path.name.startswith(ITEM_ID_PREFIX)
+    )
+
+
 def item_current_path(root: Path, item_id: str) -> Path:
-    return root / "freezer" / "items" / item_id / "current.json"
+    return items_root(root) / item_id / "current.json"
 
 
 def load_current_item(root: Path, item_id: str) -> dict[str, Any]:
@@ -77,17 +118,21 @@ def load_current_item(root: Path, item_id: str) -> dict[str, Any]:
     version = pointer.get("current_version")
     if pointer.get("item_id") != item_id or not isinstance(version, int):
         raise PreflightError(f"{item_id}: invalid item current pointer")
-    return load_json(root / "freezer" / "items" / item_id / f"v{version:03d}.json")
+    item = load_json(items_root(root) / item_id / f"v{version:03d}.json")
+    if item.get("item_id") != item_id or item.get("version") != version:
+        raise PreflightError(f"{item_id}: item pointer/version mismatch")
+    return item
 
 
 def canonical_plan(item: dict[str, Any]) -> dict[str, Any]:
-    """Return the substantive plan used to invalidate stale preflights."""
+    """Return only fields that define the implementation ground."""
 
-    return {
-        key: value
-        for key, value in item.items()
-        if key not in VOLATILE_ITEM_FIELDS
-    }
+    missing = [field for field in IMPLEMENTATION_PLAN_FIELDS if field not in item]
+    if missing:
+        raise PreflightError(
+            f"{item.get('item_id', '<unknown>')}: missing plan fields: {', '.join(missing)}"
+        )
+    return {field: item[field] for field in IMPLEMENTATION_PLAN_FIELDS}
 
 
 def item_fingerprint(item: dict[str, Any]) -> str:
@@ -128,50 +173,81 @@ def load_current_preflight(root: Path, item_id: str) -> dict[str, Any]:
     version = pointer.get("current_preflight_version")
     if pointer.get("item_id") != item_id or not isinstance(version, int):
         raise PreflightError(f"{item_id}: invalid preflight current pointer")
-    return load_json(preflight_path(root, item_id, version))
+    record = load_json(preflight_path(root, item_id, version))
+    if record.get("item_id") != item_id or record.get("preflight_version") != version:
+        raise PreflightError(f"{item_id}: preflight pointer/version mismatch")
+    if pointer.get("path") != preflight_path(root, item_id, version).relative_to(root).as_posix():
+        raise PreflightError(f"{item_id}: preflight pointer path mismatch")
+    if pointer.get("outcome") != record.get("outcome"):
+        raise PreflightError(f"{item_id}: preflight pointer outcome mismatch")
+    if pointer.get("item_fingerprint") != record.get("item_fingerprint"):
+        raise PreflightError(f"{item_id}: preflight pointer fingerprint mismatch")
+    return record
 
 
 def validate_string_list(record: dict[str, Any], field: str) -> None:
     value = record[field]
     if not isinstance(value, list) or any(not isinstance(entry, str) for entry in value):
-        raise PreflightError(f"{record.get('item_id', '<unknown>')}: {field} must be a string list")
+        raise PreflightError(
+            f"{record.get('item_id', '<unknown>')}: {field} must be a string list"
+        )
+
+
+def validate_timestamp(value: Any, *, item_id: str) -> None:
+    if not isinstance(value, str) or not value:
+        raise PreflightError(f"{item_id}: created_at must be a date-time string")
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise PreflightError(f"{item_id}: invalid created_at={value!r}") from exc
 
 
 def validate_preflight(record: dict[str, Any]) -> None:
-    required = {
-        "preflight_id",
-        "item_id",
-        "preflight_version",
-        "item_version_snapshot",
-        "item_fingerprint",
-        "outcome",
-        "assessor",
-        "rationale",
-        "created_at",
-        *REQUIRED_ASSESSMENT_FIELDS,
-    }
-    missing = sorted(required - record.keys())
+    missing = sorted(RECORD_FIELDS - record.keys())
+    extra = sorted(record.keys() - RECORD_FIELDS)
     if missing:
         raise PreflightError(
             f"{record.get('item_id', '<unknown>')}: missing preflight fields: {', '.join(missing)}"
+        )
+    if extra:
+        raise PreflightError(
+            f"{record.get('item_id', '<unknown>')}: unknown preflight fields: {', '.join(extra)}"
         )
 
     item_id = record["item_id"]
     if not isinstance(item_id, str) or not item_id.startswith(ITEM_ID_PREFIX):
         raise PreflightError(f"invalid preflight item_id: {item_id!r}")
+    suffix = item_id.removeprefix(ITEM_ID_PREFIX)
+    if len(suffix) != 6 or not suffix.isdigit():
+        raise PreflightError(f"invalid preflight item_id: {item_id!r}")
+
+    version = record["preflight_version"]
+    if not isinstance(version, int) or version < 1:
+        raise PreflightError(f"{item_id}: invalid preflight_version")
+    expected_id = f"RTS-PF-{suffix}-{version:03d}"
+    if record["preflight_id"] != expected_id:
+        raise PreflightError(
+            f"{item_id}: preflight_id mismatch; expected={expected_id!r}"
+        )
+
     if record["outcome"] not in OUTCOMES:
         raise PreflightError(f"{item_id}: invalid preflight outcome={record['outcome']!r}")
-    if not isinstance(record["preflight_version"], int) or record["preflight_version"] < 1:
-        raise PreflightError(f"{item_id}: invalid preflight_version")
     if not isinstance(record["item_version_snapshot"], int) or record["item_version_snapshot"] < 1:
         raise PreflightError(f"{item_id}: invalid item_version_snapshot")
+
     fingerprint = record["item_fingerprint"]
-    if not isinstance(fingerprint, str) or len(fingerprint) != 64:
+    if (
+        not isinstance(fingerprint, str)
+        or len(fingerprint) != 64
+        or any(char not in "0123456789abcdef" for char in fingerprint)
+    ):
         raise PreflightError(f"{item_id}: invalid item_fingerprint")
+
     if not isinstance(record["assessor"], str) or not record["assessor"].strip():
         raise PreflightError(f"{item_id}: assessor is required")
     if not isinstance(record["rationale"], str) or not record["rationale"].strip():
         raise PreflightError(f"{item_id}: rationale is required")
+    validate_timestamp(record["created_at"], item_id=item_id)
 
     for field in (
         "affected_boundaries",
@@ -187,19 +263,34 @@ def validate_preflight(record: dict[str, Any]) -> None:
         validate_string_list(record, field)
 
     migration = record["data_migration"]
-    if not isinstance(migration, dict) or not isinstance(migration.get("required"), bool):
-        raise PreflightError(f"{item_id}: data_migration requires boolean required")
-    if not isinstance(migration.get("notes", ""), str):
-        raise PreflightError(f"{item_id}: data_migration notes must be a string")
+    if not isinstance(migration, dict) or set(migration) != {"required", "notes"}:
+        raise PreflightError(
+            f"{item_id}: data_migration requires only required and notes"
+        )
+    if not isinstance(migration["required"], bool):
+        raise PreflightError(f"{item_id}: data_migration.required must be boolean")
+    if not isinstance(migration["notes"], str):
+        raise PreflightError(f"{item_id}: data_migration.notes must be a string")
 
     decomposition = record["decomposition"]
-    if not isinstance(decomposition, dict) or not isinstance(decomposition.get("required"), bool):
-        raise PreflightError(f"{item_id}: decomposition requires boolean required")
-    children = decomposition.get("child_candidates", [])
+    if not isinstance(decomposition, dict) or set(decomposition) != {
+        "required",
+        "child_candidates",
+    }:
+        raise PreflightError(
+            f"{item_id}: decomposition requires only required and child_candidates"
+        )
+    if not isinstance(decomposition["required"], bool):
+        raise PreflightError(f"{item_id}: decomposition.required must be boolean")
+    children = decomposition["child_candidates"]
     if not isinstance(children, list) or any(not isinstance(entry, str) for entry in children):
-        raise PreflightError(f"{item_id}: decomposition child_candidates must be a string list")
+        raise PreflightError(
+            f"{item_id}: decomposition.child_candidates must be a string list"
+        )
     if decomposition["required"] and not children:
-        raise PreflightError(f"{item_id}: required decomposition must name child candidates")
+        raise PreflightError(
+            f"{item_id}: required decomposition must name child candidates"
+        )
 
     if not isinstance(record["rollback_boundary"], str) or not record["rollback_boundary"].strip():
         raise PreflightError(f"{item_id}: rollback_boundary is required")
@@ -214,16 +305,32 @@ def validate_preflight(record: dict[str, Any]) -> None:
         if not record["completion_conditions"]:
             raise PreflightError(f"{item_id}: PASS requires completion_conditions")
     elif record["outcome"] == "DECOMPOSE_REQUIRED" and not decomposition["required"]:
-        raise PreflightError(f"{item_id}: DECOMPOSE_REQUIRED requires decomposition.required=true")
+        raise PreflightError(
+            f"{item_id}: DECOMPOSE_REQUIRED requires decomposition.required=true"
+        )
 
 
 def create_preflight(root: Path, item_id: str, source: Path) -> dict[str, Any]:
     item = load_current_item(root, item_id)
     raw = load_json(source)
+    missing = sorted(INPUT_FIELDS - raw.keys())
+    extra = sorted(raw.keys() - INPUT_FIELDS)
+    if missing:
+        raise PreflightError(
+            f"{item_id}: missing preflight input fields: {', '.join(missing)}"
+        )
+    if extra:
+        raise PreflightError(
+            f"{item_id}: unknown preflight input fields: {', '.join(extra)}"
+        )
+
     pointer_path = preflight_current_path(root, item_id)
     if pointer_path.exists():
-        current = load_json(pointer_path)
-        version = int(current["current_preflight_version"]) + 1
+        current_pointer = load_json(pointer_path)
+        current_version = current_pointer.get("current_preflight_version")
+        if not isinstance(current_version, int) or current_version < 1:
+            raise PreflightError(f"{item_id}: invalid current preflight pointer")
+        version = current_version + 1
     else:
         version = 1
 
@@ -281,9 +388,10 @@ def require_passing_preflight(root: Path, item: dict[str, Any]) -> dict[str, Any
 
 def verify_preflights(root: Path) -> list[str]:
     errors: list[str] = []
+
     for item_id in all_preflight_item_ids(root):
         try:
-            item = load_current_item(root, item_id)
+            load_current_item(root, item_id)
             pointer = load_json(preflight_current_path(root, item_id))
             current = load_current_preflight(root, item_id)
             validate_preflight(current)
@@ -294,13 +402,25 @@ def verify_preflights(root: Path) -> list[str]:
             expected = list(range(1, current["preflight_version"] + 1))
             if actual != expected:
                 errors.append(
-                    f"{item_id}: non-contiguous preflight history; expected={expected}, actual={actual}"
+                    f"{item_id}: non-contiguous preflight history; "
+                    f"expected={expected}, actual={actual}"
                 )
-            if item["status"] in {"SELECTED", "IN_PROGRESS"}:
+            for path in versions:
+                validate_preflight(load_json(path))
+        except PreflightError as exc:
+            errors.append(str(exc))
+
+    # This second pass is essential: a selected item with no preflight directory
+    # must still fail standalone preflight verification.
+    for item_id in all_item_ids(root):
+        try:
+            item = load_current_item(root, item_id)
+            if item.get("status") in {"SELECTED", "IN_PROGRESS"}:
                 require_passing_preflight(root, item)
         except PreflightError as exc:
             errors.append(str(exc))
-    return errors
+
+    return list(dict.fromkeys(errors))
 
 
 def command_show(root: Path, item_id: str) -> None:
@@ -313,6 +433,7 @@ def command_history(root: Path, item_id: str) -> None:
         raise PreflightError(f"{item_id}: no preflight history")
     for path in sorted(directory.glob("pf*.json")):
         record = load_json(path)
+        validate_preflight(record)
         print(
             f"{path.stem}\t{record['created_at']}\t{record['outcome']}\t"
             f"item-v{record['item_version_snapshot']:03d}"
@@ -351,7 +472,7 @@ def build_parser() -> argparse.ArgumentParser:
     status = sub.add_parser("status", help="show whether the current item plan may be selected")
     status.add_argument("item_id")
 
-    sub.add_parser("verify", help="validate all preflight records")
+    sub.add_parser("verify", help="validate all preflight records and active-item gates")
     return parser
 
 
