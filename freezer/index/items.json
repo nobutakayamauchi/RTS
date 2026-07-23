@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T23:04:26Z",
+  "generated_at": "2026-07-24T00:00:00Z",
   "count": 1,
   "items": [
     {
@@ -22,6 +22,7 @@
         "personal-ai"
       ],
       "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
       "updated_at": "2026-07-24T00:00:00Z"
     }
   ]
