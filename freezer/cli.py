@@ -14,6 +14,13 @@ from typing import Any, Iterable
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_ROOT = PACKAGE_DIR.parent
 ITEM_ID_PREFIX = "RTS-FRZ-"
+ITEM_TYPES = {"feature", "research", "product", "architecture", "process", "risk"}
+ITEM_STATUSES = {
+    "CAPTURED", "NORMALIZED", "SCORED", "READY", "SELECTED", "IN_PROGRESS",
+    "VERIFIED", "COMPLETED", "BLOCKED", "FROZEN", "RESEARCH_REQUIRED", "REJECTED",
+}
+BUILD_AUTHORITIES = {"NOT_APPROVED", "APPROVED"}
+RECALL_MODES = {"MANUAL", "CONDITION_WATCH"}
 
 
 class FreezerError(RuntimeError):
@@ -87,6 +94,18 @@ def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
 
     if not isinstance(item["version"], int) or item["version"] < 1:
         raise FreezerError(f"{item_id}: version must be a positive integer")
+
+    enum_checks = {
+        "type": ITEM_TYPES,
+        "status": ITEM_STATUSES,
+        "build_authority": BUILD_AUTHORITIES,
+        "recall_mode": RECALL_MODES,
+    }
+    for field, allowed in enum_checks.items():
+        if item[field] not in allowed:
+            raise FreezerError(
+                f"{item_id}: invalid {field}={item[field]!r}; allowed={sorted(allowed)}"
+            )
 
     priority = item["priority"]
     score_min = config["score_scale"]["minimum"]
