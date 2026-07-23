@@ -19,6 +19,7 @@ from freezer.preflight import (
     create_preflight,
     preflight_state,
     validate_preflight,
+    verify_preflights,
 )
 
 
@@ -180,13 +181,27 @@ class FreezerTests(unittest.TestCase):
             revised = revise_item(temp_root, "RTS-FRZ-000001", authority)
             self.assertEqual(preflight_state(temp_root, revised)["state"], "PASS")
 
+    def test_priority_reranking_does_not_stale_preflight(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            rerank = self.write_json(
+                temp_root / "rerank.json",
+                {
+                    "priority": {"urgency": 5, "revenue_value": 4},
+                    "estimated_hours": {"minimum": 25, "maximum": 60},
+                },
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", rerank)
+            self.assertEqual(preflight_state(temp_root, revised)["state"], "PASS")
+
     def test_substantive_revision_makes_preflight_stale(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = self.isolated_root(temp_dir)
             self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
             plan_change = self.write_json(
                 temp_root / "plan-change.json",
-                {"priority": {"urgency": 5}},
+                {"summary": "The implementation scope has materially changed."},
             )
             revised = revise_item(temp_root, "RTS-FRZ-000001", plan_change)
             self.assertEqual(preflight_state(temp_root, revised)["state"], "STALE")
@@ -231,6 +246,35 @@ class FreezerTests(unittest.TestCase):
         record["regression_tests"] = []
         with self.assertRaises(PreflightError):
             validate_preflight(record)
+
+    def test_unknown_preflight_input_field_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            payload = self.preflight_payload()
+            payload["surprise"] = "not part of the schema"
+            source = self.write_json(temp_root / "preflight.json", payload)
+            with self.assertRaisesRegex(PreflightError, "unknown preflight input fields"):
+                create_preflight(temp_root, "RTS-FRZ-000001", source)
+
+    def test_standalone_preflight_verify_catches_selected_item_without_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            item_path = (
+                temp_root
+                / "freezer"
+                / "items"
+                / "RTS-FRZ-000001"
+                / "v001.json"
+            )
+            item = json.loads(item_path.read_text(encoding="utf-8"))
+            item["status"] = "SELECTED"
+            item["build_authority"] = "APPROVED"
+            item_path.write_text(
+                json.dumps(item, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            errors = verify_preflights(temp_root)
+            self.assertTrue(any("PASS preflight" in error for error in errors))
 
     def test_completed_items_leave_priority_queue(self):
         with tempfile.TemporaryDirectory() as temp_dir:
