@@ -1,0 +1,33 @@
+name: FREEZER Tests
+
+on:
+  pull_request:
+    paths:
+      - "freezer/**"
+      - "tests/test_freezer.py"
+      - ".github/workflows/freezer-tests.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "freezer/**"
+      - "tests/test_freezer.py"
+      - ".github/workflows/freezer-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  freezer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Rebuild derived indexes and manifest
+        run: python -m freezer.cli reindex
+      - name: Run FREEZER tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Verify FREEZER records
+        run: python -m freezer.cli verify
