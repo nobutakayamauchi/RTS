@@ -1,0 +1,48 @@
+{
+  "outcome": "PASS",
+  "assessor": "human-and-ai-review",
+  "rationale": "The candidate is bounded, dependencies are known, and rollback is defined.",
+  "affected_boundaries": [
+    "core_logic",
+    "schemas",
+    "tests",
+    "documentation",
+    "operations",
+    "approval_boundaries",
+    "external_interfaces",
+    "existing_records"
+  ],
+  "existing_assumptions": [
+    "List every assumption that the implementation depends on."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "Explain migration or why none is required."
+  },
+  "external_interfaces": [
+    "List APIs, repositories, services, file formats, and human handoffs."
+  ],
+  "approval_changes": [
+    "List any authority or approval boundary that changes."
+  ],
+  "public_documents": [
+    "List public claims, product pages, contracts, or documentation affected."
+  ],
+  "regression_tests": [
+    "Name the checks that prove existing behavior still works."
+  ],
+  "hidden_dependencies": [
+    "Record discovered coupling, old records, implicit behavior, and operational constraints."
+  ],
+  "rollback_boundary": "Define the last known-good commit, data state, and safe rollback action.",
+  "completion_conditions": [
+    "Define one bounded completion condition per independently verifiable result."
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "Record the largest failure modes and how they will be detected."
+  ]
+}

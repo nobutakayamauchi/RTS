@@ -11,13 +11,30 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from freezer.preflight import (
+    PreflightError,
+    preflight_state,
+    require_passing_preflight,
+    verify_preflights,
+)
+
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_ROOT = PACKAGE_DIR.parent
 ITEM_ID_PREFIX = "RTS-FRZ-"
 ITEM_TYPES = {"feature", "research", "product", "architecture", "process", "risk"}
 ITEM_STATUSES = {
-    "CAPTURED", "NORMALIZED", "SCORED", "READY", "SELECTED", "IN_PROGRESS",
-    "VERIFIED", "COMPLETED", "BLOCKED", "FROZEN", "RESEARCH_REQUIRED", "REJECTED",
+    "CAPTURED",
+    "NORMALIZED",
+    "SCORED",
+    "READY",
+    "SELECTED",
+    "IN_PROGRESS",
+    "VERIFIED",
+    "COMPLETED",
+    "BLOCKED",
+    "FROZEN",
+    "RESEARCH_REQUIRED",
+    "REJECTED",
 }
 BUILD_AUTHORITIES = {"NOT_APPROVED", "APPROVED"}
 RECALL_MODES = {"MANUAL", "CONDITION_WATCH"}
@@ -74,16 +91,34 @@ def load_config(root: Path) -> dict[str, Any]:
 
 def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
     required = {
-        "item_id", "version", "title", "type", "status", "summary",
-        "original_problem", "why_it_matters", "reason_frozen",
-        "preserved_value", "priority", "trigger_conditions",
-        "negative_triggers", "dependencies", "source_refs",
-        "possible_destinations", "estimated_hours", "tags",
-        "build_authority", "recall_mode", "created_at", "updated_at",
+        "item_id",
+        "version",
+        "title",
+        "type",
+        "status",
+        "summary",
+        "original_problem",
+        "why_it_matters",
+        "reason_frozen",
+        "preserved_value",
+        "priority",
+        "trigger_conditions",
+        "negative_triggers",
+        "dependencies",
+        "source_refs",
+        "possible_destinations",
+        "estimated_hours",
+        "tags",
+        "build_authority",
+        "recall_mode",
+        "created_at",
+        "updated_at",
     }
     missing = sorted(required - item.keys())
     if missing:
-        raise FreezerError(f"{item.get('item_id', '<unknown>')}: missing fields: {', '.join(missing)}")
+        raise FreezerError(
+            f"{item.get('item_id', '<unknown>')}: missing fields: {', '.join(missing)}"
+        )
 
     item_id = item["item_id"]
     if not isinstance(item_id, str) or not item_id.startswith(ITEM_ID_PREFIX):
@@ -91,7 +126,6 @@ def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
     suffix = item_id.removeprefix(ITEM_ID_PREFIX)
     if len(suffix) != 6 or not suffix.isdigit():
         raise FreezerError(f"invalid item_id: {item_id!r}")
-
     if not isinstance(item["version"], int) or item["version"] < 1:
         raise FreezerError(f"{item_id}: version must be a positive integer")
 
@@ -108,6 +142,8 @@ def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
             )
 
     priority = item["priority"]
+    if not isinstance(priority, dict):
+        raise FreezerError(f"{item_id}: priority must be an object")
     score_min = config["score_scale"]["minimum"]
     score_max = config["score_scale"]["maximum"]
     expected = set(config["score_weights"])
@@ -122,17 +158,14 @@ def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
             raise FreezerError(f"{item_id}: {name} must be between {score_min} and {score_max}")
 
     hours = item["estimated_hours"]
+    if not isinstance(hours, dict) or "minimum" not in hours or "maximum" not in hours:
+        raise FreezerError(f"{item_id}: estimated_hours requires minimum and maximum")
     if hours["minimum"] < 0 or hours["maximum"] < hours["minimum"]:
         raise FreezerError(f"{item_id}: invalid estimated_hours range")
 
 
 def compute_score(item: dict[str, Any], config: dict[str, Any]) -> float:
-    """Return a deterministic 0-100 priority score.
-
-    Benefit fields use their value directly. Cost fields are inverted so that
-    lower effort/uncertainty improves the score. Raw dimensions remain stored,
-    allowing later weight changes without rewriting history.
-    """
+    """Return a deterministic 0-100 priority score."""
 
     max_value = config["score_scale"]["maximum"]
     weights = config["score_weights"]
@@ -140,7 +173,6 @@ def compute_score(item: dict[str, Any], config: dict[str, Any]) -> float:
     costs = set(config["cost_fields"])
     numerator = 0.0
     denominator = 0.0
-
     for name, weight in weights.items():
         raw = float(item["priority"][name])
         if name in benefits:
@@ -151,7 +183,6 @@ def compute_score(item: dict[str, Any], config: dict[str, Any]) -> float:
             raise FreezerError(f"unclassified score field: {name}")
         numerator += contribution * float(weight)
         denominator += max_value * float(weight)
-
     return round((numerator / denominator) * 100.0, 2) if denominator else 0.0
 
 
@@ -168,7 +199,8 @@ def all_item_ids(root: Path) -> list[str]:
     if not base.exists():
         return []
     return sorted(
-        path.name for path in base.iterdir()
+        path.name
+        for path in base.iterdir()
         if path.is_dir() and path.name.startswith(ITEM_ID_PREFIX)
     )
 
@@ -214,10 +246,15 @@ def prepare_input_item(
 
 def validate_runtime_constraints(root: Path, item: dict[str, Any], config: dict[str, Any]) -> None:
     status = item["status"]
-    if status in {"SELECTED", "IN_PROGRESS"} and item["build_authority"] != "APPROVED":
-        raise FreezerError(
-            f"{item['item_id']}: {status} requires build_authority=APPROVED"
-        )
+    if status in {"SELECTED", "IN_PROGRESS"}:
+        if item["build_authority"] != "APPROVED":
+            raise FreezerError(
+                f"{item['item_id']}: {status} requires build_authority=APPROVED"
+            )
+        try:
+            require_passing_preflight(root, item)
+        except PreflightError as exc:
+            raise FreezerError(str(exc)) from exc
 
     if status == "IN_PROGRESS":
         active = [
@@ -246,7 +283,7 @@ def save_new_version(root: Path, item: dict[str, Any]) -> Path:
         {
             "item_id": item["item_id"],
             "current_version": item["version"],
-            "path": str(destination.relative_to(root)).replace("\\", "/"),
+            "path": destination.relative_to(root).as_posix(),
             "updated_at": item["updated_at"],
         },
     )
@@ -285,7 +322,11 @@ def revise_item(root: Path, item_id: str, source: Path) -> dict[str, Any]:
     return revised
 
 
-def index_entry(item: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+def index_entry(root: Path, item: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+    try:
+        gate = preflight_state(root, item)["state"]
+    except PreflightError:
+        gate = "INVALID"
     return {
         "item_id": item["item_id"],
         "version": item["version"],
@@ -296,6 +337,7 @@ def index_entry(item: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
         "estimated_hours": item["estimated_hours"],
         "tags": item["tags"],
         "build_authority": item["build_authority"],
+        "preflight_state": gate,
         "updated_at": item["updated_at"],
     }
 
@@ -332,7 +374,7 @@ def rebuild(root: Path) -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
     for item in iter_current_items(root):
         validate_item(item, config)
-        entries.append(index_entry(item, config))
+        entries.append(index_entry(root, item, config))
 
     by_id = sorted(entries, key=lambda row: row["item_id"])
     rankable_statuses = set(config["rankable_statuses"])
@@ -353,6 +395,7 @@ def rebuild(root: Path) -> list[dict[str, Any]]:
             "policy": {
                 "work_in_progress_limit": config["work_in_progress_limit"],
                 "human_approval_required": config["selection_policy"]["human_approval_required"],
+                "implementation_preflight_required": True,
                 "auto_start": config["selection_policy"]["auto_start"],
             },
             "items": by_priority,
@@ -382,7 +425,6 @@ def verify_manifest(root: Path) -> list[str]:
             errors.append(f"manifest missing paths: {missing}")
         if stale:
             errors.append(f"manifest has stale paths: {stale}")
-
     for relative, path in current_paths.items():
         actual = hashlib.sha256(path.read_bytes()).hexdigest()
         if expected.get(relative) != actual:
@@ -398,6 +440,7 @@ def verify(root: Path) -> list[str]:
             pointer = load_json(current_path(root, item_id))
             item = load_current(root, item_id)
             validate_item(item, config)
+            validate_runtime_constraints(root, item, config)
             if item["version"] != pointer["current_version"]:
                 errors.append(f"{item_id}: pointer/version mismatch")
             versions = sorted((items_root(root) / item_id).glob("v*.json"))
@@ -405,16 +448,17 @@ def verify(root: Path) -> list[str]:
             actual_versions = [int(path.stem[1:]) for path in versions]
             if actual_versions != expected_versions:
                 errors.append(
-                    f"{item_id}: non-contiguous history; expected={expected_versions}, actual={actual_versions}"
+                    f"{item_id}: non-contiguous history; "
+                    f"expected={expected_versions}, actual={actual_versions}"
                 )
         except FreezerError as exc:
             errors.append(str(exc))
-
+    errors.extend(verify_preflights(root))
     errors.extend(verify_manifest(root))
     return errors
 
 
-def recall_markdown(item: dict[str, Any], config: dict[str, Any]) -> str:
+def recall_markdown(item: dict[str, Any], config: dict[str, Any], gate: str) -> str:
     score = compute_score(item, config)
     bullets = lambda values: "\n".join(f"- {value}" for value in values) or "- none"
     return f"""# FREEZER Recall Packet — {item['item_id']}
@@ -425,6 +469,7 @@ def recall_markdown(item: dict[str, Any], config: dict[str, Any]) -> str:
 - Status: {item['status']}
 - Priority score: {score:.2f}
 - Build authority: {item['build_authority']}
+- Implementation preflight: {gate}
 - Recall mode: {item['recall_mode']}
 - Estimated effort: {item['estimated_hours']['minimum']}–{item['estimated_hours']['maximum']} hours
 
@@ -458,9 +503,10 @@ def recall_markdown(item: dict[str, Any], config: dict[str, Any]) -> str:
 ## Sources
 {bullets(item['source_refs'])}
 
-## Human gate
+## Human and ground-survey gates
 This packet does not authorize implementation. Re-score all candidates, review the top candidates,
-and obtain explicit human approval before changing this item to SELECTED or IN_PROGRESS.
+complete a current PASS implementation preflight, and obtain explicit human approval before changing
+this item to SELECTED or IN_PROGRESS.
 """
 
 
@@ -472,12 +518,13 @@ def command_list(root: Path, args: argparse.Namespace) -> None:
     if args.tag:
         rows = [row for row in rows if args.tag in row["tags"]]
     rows = rows[: args.limit]
-    print("RANK\tSCORE\tSTATUS\tITEM_ID\tTITLE\tHOURS")
+    print("RANK\tSCORE\tSTATUS\tPREFLIGHT\tITEM_ID\tTITLE\tHOURS")
     for rank, row in enumerate(rows, start=1):
         hours = row["estimated_hours"]
         print(
             f"{rank}\t{row['priority_score']:.2f}\t{row['status']}\t"
-            f"{row['item_id']}\t{row['title']}\t{hours['minimum']}-{hours['maximum']}"
+            f"{row.get('preflight_state', 'MISSING')}\t{row['item_id']}\t"
+            f"{row['title']}\t{hours['minimum']}-{hours['maximum']}"
         )
 
 
@@ -496,7 +543,11 @@ def command_history(root: Path, item_id: str) -> None:
 
 def command_recall(root: Path, item_id: str, output: str | None) -> None:
     item = load_current(root, item_id)
-    text = recall_markdown(item, load_config(root))
+    try:
+        gate = preflight_state(root, item)["state"]
+    except PreflightError:
+        gate = "INVALID"
+    text = recall_markdown(item, load_config(root), gate)
     if output:
         path = Path(output)
         if not path.is_absolute():
@@ -541,7 +592,7 @@ def build_parser() -> argparse.ArgumentParser:
     recall.add_argument("--output")
 
     sub.add_parser("reindex", help="recalculate priorities and rebuild indexes")
-    sub.add_parser("verify", help="validate items, version history, and manifest")
+    sub.add_parser("verify", help="validate items, preflights, version history, and manifest")
     return parser
 
 
