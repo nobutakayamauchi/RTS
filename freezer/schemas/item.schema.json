@@ -103,58 +103,128 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "impact": {"type": "number", "minimum": 0, "maximum": 5},
-        "urgency": {"type": "number", "minimum": 0, "maximum": 5},
-        "strategic_fit": {"type": "number", "minimum": 0, "maximum": 5},
-        "readiness": {"type": "number", "minimum": 0, "maximum": 5},
-        "revenue_value": {"type": "number", "minimum": 0, "maximum": 5},
-        "dependency_value": {"type": "number", "minimum": 0, "maximum": 5},
-        "risk_reduction": {"type": "number", "minimum": 0, "maximum": 5},
-        "confidence": {"type": "number", "minimum": 0, "maximum": 5},
-        "effort": {"type": "number", "minimum": 0, "maximum": 5},
-        "uncertainty": {"type": "number", "minimum": 0, "maximum": 5}
+        "impact": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "urgency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "strategic_fit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "readiness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "revenue_value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "dependency_value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "risk_reduction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "effort": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "uncertainty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
       }
     },
     "trigger_conditions": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "negative_triggers": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "dependencies": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "source_refs": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "possible_destinations": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "estimated_hours": {
       "type": "object",
-      "required": ["minimum", "maximum"],
+      "required": [
+        "minimum",
+        "maximum"
+      ],
       "properties": {
-        "minimum": {"type": "number", "minimum": 0},
-        "maximum": {"type": "number", "minimum": 0}
+        "minimum": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximum": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     },
     "tags": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "build_authority": {
-      "enum": ["NOT_APPROVED", "APPROVED"]
+      "enum": [
+        "NOT_APPROVED",
+        "APPROVED"
+      ]
     },
     "recall_mode": {
-      "enum": ["MANUAL", "CONDITION_WATCH"]
+      "enum": [
+        "MANUAL",
+        "CONDITION_WATCH"
+      ]
     },
     "supersedes": {
-      "type": ["string", "null"]
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "created_at": {
       "type": "string",
