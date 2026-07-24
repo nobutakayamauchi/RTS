@@ -101,7 +101,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "create":
             record = create_assessment(root, args.item_id, args.input.resolve())
-            rebuild_index(root)
+            from freezer.cli import rebuild
+            rebuild(root)
             print(record["assessment_id"])
         elif args.command == "show":
             command_show(root, args.item_id)
@@ -114,7 +115,10 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "list":
             command_list(root, args.limit)
         elif args.command == "reindex":
-            print(f"indexed {len(rebuild_index(root))} build candidate(s)")
+            from freezer.cli import rebuild
+            rebuild(root)
+            rows = load_json(root / "freezer" / "index" / "build_priority.json")["items"]
+            print(f"indexed {len(rows)} build candidate(s)")
         elif args.command == "verify":
             errors = verify_assessments(root)
             if errors:
