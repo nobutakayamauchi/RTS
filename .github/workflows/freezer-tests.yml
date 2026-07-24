@@ -8,9 +8,7 @@ on:
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
-      - "integration_bundle.part*"
       - ".github/workflows/freezer-tests.yml"
-      - ".github/workflows/apply-pr228-integration.yml"
   push:
     branches:
       - main
@@ -23,56 +21,10 @@ on:
       - ".github/workflows/freezer-tests.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply-bundle:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Apply integration bundle with diagnostics
-        run: |
-          set +e
-          status=0
-          {
-            set -x
-            shopt -s nullglob
-            parts=(integration_bundle.part*)
-            echo "parts=${#parts[@]}"
-            if [ ${#parts[@]} -eq 0 ]; then
-              echo "No integration bundle to apply."
-            else
-              cat "${parts[@]}" | base64 --decode > /tmp/pr228-integration.tar.gz || status=$?
-              if [ "$status" -eq 0 ]; then tar -tzf /tmp/pr228-integration.tar.gz; status=$?; fi
-              if [ "$status" -eq 0 ]; then tar -xzf /tmp/pr228-integration.tar.gz -C .; status=$?; fi
-              if [ "$status" -eq 0 ]; then
-                rm -f integration_bundle.part* integration_bundle.b64
-                rm -f .github/workflows/apply-pr228-integration.yml
-                git config user.name github-actions[bot]
-                git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-                git add -A
-                git status --short
-                git commit -m "Register governed loop decomposition and complete asset manifest child" || status=$?
-              fi
-              if [ "$status" -eq 0 ]; then git push origin HEAD:${{ github.event.pull_request.head.ref }} || status=$?; fi
-            fi
-            echo "final_status=$status"
-          } > apply-diagnostic.txt 2>&1
-          exit 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr228-apply-diagnostic
-          path: apply-diagnostic.txt
-
   freezer:
-    needs: apply-bundle
-    if: always() && needs.apply-bundle.result == 'success'
-    permissions:
-      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -84,5 +36,57 @@ jobs:
           python -m freezer.cli verify
           python -m freezer.build_assessment verify
           python -m asset_manifest.cli verify
+      - name: Fail on stale committed indexes
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          freezer_paths = [
+              Path("freezer/index/items.json"),
+              Path("freezer/index/priority.json"),
+              Path("freezer/index/build_priority.json"),
+          ]
+          asset_paths = [
+              Path("asset_manifest/index/repositories.json"),
+              Path("asset_manifest/index/assets.json"),
+              Path("asset_manifest/index/ownership.json"),
+          ]
+
+          def semantic(path):
+              data = json.loads(path.read_text(encoding="utf-8"))
+              data.pop("generated_at", None)
+              return data
+
+          committed_freezer = {path: semantic(path) for path in freezer_paths}
+          committed_assets = {path: semantic(path) for path in asset_paths}
+
+          subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
+          subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
+
+          rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
+          rebuilt_assets = {path: semantic(path) for path in asset_paths}
+          stale = [
+              str(path)
+              for path in freezer_paths
+              if committed_freezer[path] != rebuilt_freezer[path]
+          ] + [
+              str(path)
+              for path in asset_paths
+              if committed_assets[path] != rebuilt_assets[path]
+          ]
+          if stale:
+              print("Committed derived indexes are stale:")
+              for path in stale:
+                  print(f"- {path}")
+              raise SystemExit(1)
+          PY
       - name: Run governed-record tests
         run: python -B -m unittest discover -s tests -v
+      - name: Verify rebuilt governed records
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m asset_manifest.cli verify
