@@ -102,6 +102,8 @@ def validate_event(event: Any, previous: dict[str, Any] | None) -> dict[str, Any
     expected_previous = GENESIS_HASH if previous is None else previous["event_hash"]
     if event["previous_event_hash"] != expected_previous:
         raise ControllerError("event previous hash mismatch")
+    if previous is not None and event["state_before"] != previous["state_after"]:
+        raise ControllerError("event state continuity mismatch")
     expect_digest(event["event_hash"], "event.event_hash")
     expect_digest(event["event_id"], "event.event_id")
     if event["state_before"] == event["state_after"]:
