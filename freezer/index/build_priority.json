@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T14:09:00Z",
+  "generated_at": "2026-07-24T20:12:21Z",
   "count": 3,
   "policy": {
     "priority_weight": 0.35,
@@ -10,6 +10,21 @@
     "human_approval_required": true
   },
   "items": [
+    {
+      "item_id": "RTS-FRZ-000007",
+      "version": 2,
+      "title": "Outcome Learning and Skill Promotion",
+      "status": "FROZEN",
+      "priority_score": 63.28,
+      "assessment_state": "CURRENT",
+      "build_score": 60.09,
+      "ranking_score": 61.21,
+      "recommendation": "RESEARCH_REQUIRED",
+      "net_hours": 42.0,
+      "reuse_hours_saved": 18.0,
+      "implementation_efficiency": 0.95,
+      "build_authority": "NOT_APPROVED"
+    },
     {
       "item_id": "RTS-FRZ-000003",
       "version": 2,
@@ -34,21 +49,6 @@
       "assessment_state": "MISSING",
       "build_score": null,
       "ranking_score": 22.84,
-      "recommendation": "ASSESSMENT_REQUIRED",
-      "net_hours": null,
-      "reuse_hours_saved": null,
-      "implementation_efficiency": null,
-      "build_authority": "NOT_APPROVED"
-    },
-    {
-      "item_id": "RTS-FRZ-000007",
-      "version": 2,
-      "title": "Outcome Learning and Skill Promotion",
-      "status": "FROZEN",
-      "priority_score": 63.28,
-      "assessment_state": "MISSING",
-      "build_score": null,
-      "ranking_score": 22.15,
       "recommendation": "ASSESSMENT_REQUIRED",
       "net_hours": null,
       "reuse_hours_saved": null,
