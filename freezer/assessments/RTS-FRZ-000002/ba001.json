@@ -1,0 +1,128 @@
+{
+  "assessor": "ChatGPT 5.6 Thinking with GitHub connector",
+  "rationale": "FREEZERの次候補選定に毎回使える横断工程であり、既存の版管理・Preflight・Repo Map・CIを再利用できる。実装コストに対して繰り返し効果と事故防止効果が大きいため、今作る価値が高い。",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4.5
+  },
+  "implementation": {
+    "from_scratch_hours": 16,
+    "integration_hours": 2,
+    "validation_hours": 1.5,
+    "unknown_buffer_hours": 0.5
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "nobutakayamauchi/RTS-AGE",
+      "nobutakayamauchi/RTS-minicompany",
+      "nobutakayamauchi/RTS-Minimal-Runtime",
+      "nobutakayamauchi/RTS-Skills-",
+      "nobutakayamauchi/RTS-Hermes-Drive",
+      "nobutakayamauchi/RTS-MCP-Packs",
+      "nobutakayamauchi/rts-dev-protocol"
+    ],
+    "queries": [
+      "repo inventory",
+      "reuse estimate score repository inventory dependency impact",
+      "proposal",
+      "inventory"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/preflight.py",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Immutable record, pointer, fingerprint, stale-state and verification patterns are reusable."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/cli.py",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Existing priority calculation, item loading, rankable status and manifest conventions shorten integration."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "docs/ecosystem/REPO_MAP.md",
+        "ref": "main",
+        "kind": "data",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1.5,
+        "notes": "Provides a canonical first-pass repository inventory and boundaries."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "docs/ecosystem/PROJECT_REGISTRY.md",
+        "ref": "main",
+        "kind": "data",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Provides active, parts, frozen and inactive classifications for scan scope."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "tests/test_freezer.py",
+        "ref": "main",
+        "kind": "test",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1.5,
+        "notes": "Existing isolated-root and append-only tests supply a reusable test strategy."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": ".github/workflows/freezer-tests.yml",
+        "ref": "main",
+        "kind": "workflow",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Existing CI can add assessment verification and semantic index freshness checks."
+      }
+    ],
+    "gaps": [
+      "GitHub code search coverage is not guaranteed for every private or unindexed repository.",
+      "Similarity does not prove runtime compatibility or safe licensing.",
+      "Time savings are coarse estimates and must be revised after implementation evidence."
+    ]
+  },
+  "risks": [
+    "Scoring can create false precision if evidence confidence is overstated.",
+    "Repository search may miss useful assets because of naming differences.",
+    "Reuse can increase integration cost when boundaries differ.",
+    "A high score must not bypass Preflight or human approval."
+  ],
+  "assessment_id": "RTS-BA-000002-001",
+  "item_id": "RTS-FRZ-000002",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "aa92f6596a01f8c050b2e3a9e2c1e5dbf31e8e86a451215243ad7441e1b3192f",
+  "derived": {
+    "benefit_score": 95.75,
+    "cost_score": 44.44,
+    "reuse_score": 62.5,
+    "decision_score": 75.37,
+    "reuse_hours_saved": 10.0,
+    "net_hours": 10.0,
+    "time_saved_ratio": 0.625,
+    "implementation_efficiency": 1.6,
+    "cost_effectiveness": 9.57,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-07-24T00:10:22Z"
+}
