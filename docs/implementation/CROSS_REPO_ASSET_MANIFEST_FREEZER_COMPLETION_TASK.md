@@ -79,15 +79,17 @@ Also run the existing semantic stale-index check or an equivalent temporary-copy
 
 ## Completion evidence
 
-The append-only current records now bind completion to the already-merged implementation:
+The append-only current records now bind completion to the already-merged implementation and conform to the published string-list item contract:
 
-- item: `freezer/items/RTS-FRZ-000004/v005.json`
-- Build Assessment: `freezer/assessments/RTS-FRZ-000004/ba002.json`
-- Implementation Preflight: `freezer/preflights/RTS-FRZ-000004/pf002.json`
+- parent item: `freezer/items/RTS-FRZ-000003/v002.json`
+- completed child item: `freezer/items/RTS-FRZ-000004/v006.json`
+- Build Assessment: `freezer/assessments/RTS-FRZ-000004/ba003.json`
+- parent Implementation Preflight: `freezer/preflights/RTS-FRZ-000003/pf002.json`
+- completed child Implementation Preflight: `freezer/preflights/RTS-FRZ-000004/pf003.json`
 - implementation PR: `#228`
 - implementation merge commit: `9bafaa74ff56e5765060408c133ac106337a4574`
 
-Earlier item, assessment, and Preflight versions remain immutable. The current pointers select the evidence-complete versions.
+The current records for 000003–000007 use arrays of strings for `preserved_value` and the other published list fields. Runtime validation and focused tests now reject scalar strings. Earlier item, assessment, and Preflight versions remain immutable; current pointers select the schema-compliant evidence-complete versions.
 
 ## Completion condition
 
