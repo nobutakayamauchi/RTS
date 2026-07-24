@@ -8,7 +8,7 @@ on:
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
-      - "integration_bundle.b64"
+      - "integration_bundle.part*"
       - ".github/workflows/freezer-tests.yml"
       - ".github/workflows/apply-pr228-integration.yml"
   push:
@@ -36,13 +36,15 @@ jobs:
           fetch-depth: 0
       - name: Apply integration bundle when present
         run: |
-          if [ ! -f integration_bundle.b64 ]; then
+          shopt -s nullglob
+          parts=(integration_bundle.part*)
+          if [ ${#parts[@]} -eq 0 ]; then
             echo "No integration bundle to apply."
             exit 0
           fi
-          base64 --decode integration_bundle.b64 > /tmp/pr228-integration.tar.gz
+          cat "${parts[@]}" | base64 --decode > /tmp/pr228-integration.tar.gz
           tar -xzf /tmp/pr228-integration.tar.gz -C .
-          rm integration_bundle.b64
+          rm -f integration_bundle.part* integration_bundle.b64
           rm -f .github/workflows/apply-pr228-integration.yml
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
