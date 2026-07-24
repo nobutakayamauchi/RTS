@@ -85,7 +85,22 @@ jobs:
               raise SystemExit(1)
           PY
       - name: Run FREEZER tests
-        run: python -B -m unittest discover -s tests -v
+        id: freezer_tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python -B -m unittest discover -s tests -v 2>&1 | tee /tmp/freezer-tests.log
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freezer-test-diagnostics
+          path: /tmp/freezer-tests.log
+          if-no-files-found: error
+          retention-days: 1
+      - name: Stop after test failure
+        if: steps.freezer_tests.outcome == 'failure'
+        run: exit 1
       - name: Verify rebuilt FREEZER records
         run: |
           python -m freezer.cli verify
