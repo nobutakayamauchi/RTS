@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-24T00:00:00Z",
-  "count": 1,
+  "generated_at": "2026-07-24T01:33:11Z",
+  "count": 2,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -24,6 +24,30 @@
       "build_authority": "NOT_APPROVED",
       "preflight_state": "MISSING",
       "updated_at": "2026-07-24T00:00:00Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000002",
+      "version": 1,
+      "title": "GitHub Reuse and Build Value Assessment",
+      "type": "process",
+      "status": "COMPLETED",
+      "priority_score": 93.28,
+      "estimated_hours": {
+        "minimum": 6,
+        "maximum": 12
+      },
+      "tags": [
+        "github",
+        "reuse",
+        "roi",
+        "estimation",
+        "priority",
+        "development-efficiency",
+        "governance"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-07-24T01:00:00Z"
     }
   ]
 }

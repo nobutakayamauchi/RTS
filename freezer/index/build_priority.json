@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-07-24T01:33:11Z",
+  "count": 1,
+  "policy": {
+    "priority_weight": 0.35,
+    "build_assessment_weight": 0.65,
+    "active_recommendation_required": "BUILD_NOW",
+    "github_scan_required": true,
+    "implementation_preflight_follows_assessment": true,
+    "human_approval_required": true
+  },
+  "items": [
+    {
+      "item_id": "RTS-FRZ-000001",
+      "version": 1,
+      "title": "Governed Adaptive Memory Layer",
+      "status": "FROZEN",
+      "priority_score": 65.25,
+      "assessment_state": "MISSING",
+      "build_score": null,
+      "ranking_score": 22.84,
+      "recommendation": "ASSESSMENT_REQUIRED",
+      "net_hours": null,
+      "reuse_hours_saved": null,
+      "implementation_efficiency": null,
+      "build_authority": "NOT_APPROVED"
+    }
+  ]
+}

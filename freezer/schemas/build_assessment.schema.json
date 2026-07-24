@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rts/freezer/build-assessment.schema.json",
+  "title": "RTS FREEZER Build Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assessment_id",
+    "item_id",
+    "assessment_version",
+    "item_version_snapshot",
+    "item_fingerprint",
+    "assessor",
+    "rationale",
+    "expected_effect",
+    "implementation",
+    "github_scan",
+    "risks",
+    "derived",
+    "created_at"
+  ],
+  "properties": {
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^RTS-BA-[0-9]{6}-[0-9]{3}$"
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^RTS-FRZ-[0-9]{6}$"
+    },
+    "assessment_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "item_version_snapshot": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "item_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "assessor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "impact",
+        "strategic_fit",
+        "revenue_leverage",
+        "risk_reduction",
+        "recurrence",
+        "confidence"
+      ],
+      "properties": {
+        "impact": {"type": "number", "minimum": 0, "maximum": 5},
+        "strategic_fit": {"type": "number", "minimum": 0, "maximum": 5},
+        "revenue_leverage": {"type": "number", "minimum": 0, "maximum": 5},
+        "risk_reduction": {"type": "number", "minimum": 0, "maximum": 5},
+        "recurrence": {"type": "number", "minimum": 0, "maximum": 5},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 5}
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_scratch_hours",
+        "integration_hours",
+        "validation_hours",
+        "unknown_buffer_hours"
+      ],
+      "properties": {
+        "from_scratch_hours": {"type": "number", "exclusiveMinimum": 0},
+        "integration_hours": {"type": "number", "minimum": 0},
+        "validation_hours": {"type": "number", "minimum": 0},
+        "unknown_buffer_hours": {"type": "number", "minimum": 0}
+      }
+    },
+    "github_scan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "repositories", "queries", "assets", "gaps"],
+      "properties": {
+        "performed": {"type": "boolean"},
+        "repositories": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "queries": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "repository",
+              "path",
+              "ref",
+              "kind",
+              "reuse_mode",
+              "license_status",
+              "estimated_hours_saved",
+              "notes"
+            ],
+            "properties": {
+              "repository": {"type": "string"},
+              "path": {"type": "string"},
+              "ref": {"type": "string"},
+              "kind": {
+                "enum": ["code", "schema", "test", "workflow", "documentation", "data", "design"]
+              },
+              "reuse_mode": {
+                "enum": ["DIRECT", "ADAPT", "REFERENCE", "NONE"]
+              },
+              "license_status": {
+                "enum": ["OWNED", "COMPATIBLE", "REVIEW_REQUIRED", "UNKNOWN"]
+              },
+              "estimated_hours_saved": {"type": "number", "minimum": 0},
+              "notes": {"type": "string"}
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benefit_score",
+        "cost_score",
+        "reuse_score",
+        "decision_score",
+        "reuse_hours_saved",
+        "net_hours",
+        "time_saved_ratio",
+        "implementation_efficiency",
+        "cost_effectiveness",
+        "recommendation"
+      ],
+      "properties": {
+        "benefit_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "cost_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "reuse_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "decision_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "reuse_hours_saved": {"type": "number", "minimum": 0},
+        "net_hours": {"type": "number", "minimum": 0},
+        "time_saved_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "implementation_efficiency": {"type": "number", "minimum": 0},
+        "cost_effectiveness": {"type": "number", "minimum": 0},
+        "recommendation": {
+          "enum": ["BUILD_NOW", "BUILD_NEXT", "DEFER", "RESEARCH_REQUIRED", "REJECT"]
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from freezer.assessment_core import BuildAssessmentError
+from freezer.assessment_store import require_build_now_assessment
 from freezer.preflight import (
     PreflightError,
     preflight_state,
@@ -252,6 +254,10 @@ def validate_runtime_constraints(root: Path, item: dict[str, Any], config: dict[
                 f"{item['item_id']}: {status} requires build_authority=APPROVED"
             )
         try:
+            require_build_now_assessment(root, item)
+        except BuildAssessmentError as exc:
+            raise FreezerError(str(exc)) from exc
+        try:
             require_passing_preflight(root, item)
         except PreflightError as exc:
             raise FreezerError(str(exc)) from exc
@@ -395,12 +401,15 @@ def rebuild(root: Path) -> list[dict[str, Any]]:
             "policy": {
                 "work_in_progress_limit": config["work_in_progress_limit"],
                 "human_approval_required": config["selection_policy"]["human_approval_required"],
+                "build_assessment_required": True,
                 "implementation_preflight_required": True,
                 "auto_start": config["selection_policy"]["auto_start"],
             },
             "items": by_priority,
         },
     )
+    from freezer.assessment_rank import rebuild_index
+    rebuild_index(root)
     rebuild_manifest(root)
     return by_priority
 

@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-07-24T00:00:00Z",
+  "generated_at": "2026-07-24T01:33:11Z",
   "count": 1,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
+    "build_assessment_required": true,
     "implementation_preflight_required": true,
     "auto_start": false
   },

@@ -1,0 +1,83 @@
+{
+  "item_id": "RTS-FRZ-000002",
+  "version": 1,
+  "title": "GitHub Reuse and Build Value Assessment",
+  "type": "process",
+  "status": "COMPLETED",
+  "summary": "実装候補ごとにGitHub上の既存コード・スキーマ・テスト・文書・データを調査し、再利用による短縮時間、実装時間、効果、費用対効果を同じ形式で算出してから次の開発対象を決める工程。",
+  "original_problem": "優先度だけで開発対象を選ぶと、既存資産で大幅に短縮できる候補や、効果は大きいが今は費用対効果が低い候補を正しく比較できない。また、既にGitHubにある材料を見落とすと同じものを作り直す。",
+  "why_it_matters": "着工前に再利用可能な材料と粗い実装コストを可視化することで、開発速度を上げつつ、短時間で効果が出る一件を選びやすくなる。FREEZERの再計算を実装価値と実装効率に接続する。",
+  "reason_frozen": "凍結せず即時実装。FREEZER運用の入口に必要であり、以後の全候補の選定コストと重複実装を減らすため。",
+  "preserved_value": [
+    "GitHubリポジトリ横断の再利用候補記録",
+    "新規実装時間と再利用短縮時間の分離",
+    "期待効果と費用対効果の決定論的スコア",
+    "BUILD_NOW・BUILD_NEXT・DEFER・RESEARCH_REQUIRED・REJECT判定",
+    "評価履歴の追記保存と仕様変更時のSTALE判定",
+    "既存優先度と実装価値を合成した最終ランキング",
+    "実装前Preflightと人間承認への接続"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 4,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 5,
+    "effort": 2,
+    "uncertainty": 1
+  },
+  "trigger_conditions": [
+    "新しいFREEZER候補を次の実装対象として比較する",
+    "既存GitHub資産で短縮できる可能性がある",
+    "実装時間または効果の見積もりが前回評価から変化した"
+  ],
+  "negative_triggers": [
+    "GitHub上の類似物をライセンス・品質・適合性の確認なしに直接流用する",
+    "スコアだけで人間承認を省略する",
+    "顧客データまたは秘密情報を公開リポジトリ調査へ混ぜる",
+    "評価後に仕様が変わったのに古い評価を使い続ける"
+  ],
+  "dependencies": [
+    "RTS FREEZER v1",
+    "実装前Preflight",
+    "GitHub Connectorまたは同等のリポジトリ閲覧手段",
+    "RTS Ecosystem Repository Map",
+    "SHA-256 ManifestとCI検証"
+  ],
+  "source_refs": [
+    "nobutakayamauchi/RTS:freezer/cli.py",
+    "nobutakayamauchi/RTS:freezer/preflight.py",
+    "nobutakayamauchi/RTS:tests/test_freezer.py",
+    "nobutakayamauchi/RTS:.github/workflows/freezer-tests.yml",
+    "nobutakayamauchi/RTS:docs/ecosystem/REPO_MAP.md",
+    "nobutakayamauchi/RTS:docs/ecosystem/PROJECT_REGISTRY.md"
+  ],
+  "possible_destinations": [
+    "freezer/build_assessment.py",
+    "freezer/assessments/",
+    "freezer/index/build_priority.json",
+    "freezer/schemas/build_assessment.schema.json",
+    "freezer/templates/build_assessment_input.json"
+  ],
+  "estimated_hours": {
+    "minimum": 6,
+    "maximum": 12
+  },
+  "tags": [
+    "github",
+    "reuse",
+    "roi",
+    "estimation",
+    "priority",
+    "development-efficiency",
+    "governance"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "supersedes": null,
+  "created_at": "2026-07-24T01:00:00Z",
+  "updated_at": "2026-07-24T01:00:00Z"
+}
