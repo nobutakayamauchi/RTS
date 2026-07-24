@@ -1,0 +1,25 @@
+{
+  "$id": "https://example.invalid/rts/skill_snapshot.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "content_path": {"type": "string"},
+    "content_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "contract": {"type": "object"},
+    "external_mutation_performed": {"const": false},
+    "promotion_eligibility": {"const": "NOT_ELIGIBLE"},
+    "role": {"enum": ["BASELINE", "CANDIDATE"]},
+    "schema_version": {"const": "RTS-SKILL-SNAPSHOT-V1"},
+    "skill_id": {"type": "string"},
+    "snapshot_fingerprint": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "snapshot_id": {"pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", "type": "string"},
+    "source": {"type": "object"}
+  },
+  "required": [
+    "content_path", "content_sha256", "contract", "external_mutation_performed",
+    "promotion_eligibility", "role", "schema_version", "skill_id",
+    "snapshot_fingerprint", "snapshot_id", "source"
+  ],
+  "title": "RTS Skill Snapshot v1",
+  "type": "object"
+}

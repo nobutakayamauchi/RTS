@@ -1,0 +1,43 @@
+{
+  "$id": "https://example.invalid/rts/skill_regression_dataset.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "baseline_snapshot_id": {"type": "string"},
+    "candidate_snapshot_id": {"type": "string"},
+    "dataset_fingerprint": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "dataset_id": {"type": "string"},
+    "execution_scope": {"const": "LOCAL_STATIC_EVALUATION_ONLY"},
+    "external_execution_performed": {"const": false},
+    "fixture_set": {"minItems": 4, "type": "array"},
+    "outcome_bundle_ids": {"const": ["RTS-OUTCOME-000001", "RTS-OUTCOME-000002", "RTS-OUTCOME-000003"]},
+    "promotion_eligibility": {"const": "NOT_ELIGIBLE"},
+    "rollback_id": {"type": "string"},
+    "schema_version": {"const": "RTS-SKILL-REGRESSION-DATASET-V1"},
+    "skill_id": {"type": "string"},
+    "thresholds": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum_regressions": {"const": 0},
+        "maximum_safety_failures": {"const": 0},
+        "minimum_candidate_pass_rate": {"const": 1.0},
+        "minimum_improvements": {"const": 2},
+        "rollback_snapshot_required": {"const": true}
+      },
+      "required": [
+        "maximum_regressions", "maximum_safety_failures",
+        "minimum_candidate_pass_rate", "minimum_improvements",
+        "rollback_snapshot_required"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "baseline_snapshot_id", "candidate_snapshot_id", "dataset_fingerprint",
+    "dataset_id", "execution_scope", "external_execution_performed",
+    "fixture_set", "outcome_bundle_ids", "promotion_eligibility",
+    "rollback_id", "schema_version", "skill_id", "thresholds"
+  ],
+  "title": "RTS Skill Regression Dataset v1",
+  "type": "object"
+}
