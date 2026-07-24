@@ -34,13 +34,13 @@ python -m outcome_evidence.cli show RTS-OUTCOME-000001
 
 `verify` is read-only. It checks exact schemas, canonical fingerprints, evidence-file hashes, cross-record agreement, required scenario variation, privacy-sensitive keys, path containment, no external-execution claims, and the permanent `NOT_ELIGIBLE` promotion boundary.
 
-## What this unlocks
+## Companion prerequisite
 
-This satisfies only the evidence-corpus research prerequisite. It does not create:
+The governed baseline/candidate comparison, immutable thresholds, deterministic fixtures, and rollback snapshot now live in `skill_regression/`.
 
-- a baseline/candidate Skill regression dataset
-- acceptance or rejection thresholds
-- an immutable rollback snapshot
+Together, the two packages provide research evidence for a future FREEZER reassessment. They still do not create:
+
 - a promotion proposal or human decision record
 - an Implementation Preflight for `RTS-FRZ-000007`
 - build authority or a lifecycle transition
+- automatic Skill promotion, publication, retirement, or adjacent-repository mutation

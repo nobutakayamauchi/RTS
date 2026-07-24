@@ -1,0 +1,128 @@
+{
+  "baseline_snapshot_id": "RTS-SKILL-SNAPSHOT-000001",
+  "candidate_snapshot_id": "RTS-SKILL-SNAPSHOT-000002",
+  "dataset_fingerprint": "fc139152a6792917365a46d651408dbbcb3e7780d02d448e7f42e28f2e5e940e",
+  "dataset_id": "RTS-SKILL-REGRESSION-000001",
+  "execution_scope": "LOCAL_STATIC_EVALUATION_ONLY",
+  "external_execution_performed": false,
+  "fixture_set": [
+    {
+      "expected": {"baseline": "PASS", "candidate": "PASS"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000001",
+      "kind": "FUNCTIONAL",
+      "mode": "APPLICABLE",
+      "requirements": {
+        "not_for": [],
+        "outputs": [
+          "Clarified requirement contract",
+          "Continuation-ready handoff package",
+          "Evidence-backed verified/unverified/assumed report",
+          "Explicit scope boundary statement",
+          "Minimal implementation diff summary",
+          "Ordered scoped implementation plan"
+        ],
+        "safety_rules": [
+          "AUTOMATIC_CANONICAL_PROMOTION_FORBIDDEN",
+          "RUNTIME_IMPLEMENTATION_FORBIDDEN"
+        ],
+        "steps": [
+          "requirement-clarifier",
+          "task-decomposer",
+          "scope-locker",
+          "safe-implementer",
+          "verification-runner",
+          "handoff-writer"
+        ]
+      },
+      "scenario": "STANDARD_FEATURE_BUILD"
+    },
+    {
+      "expected": {"baseline": "FAIL", "candidate": "PASS"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000002",
+      "kind": "FUNCTIONAL",
+      "mode": "APPLICABLE",
+      "requirements": {
+        "not_for": [],
+        "outputs": ["Immutable local rollback snapshot"],
+        "safety_rules": ["ROLLBACK_SNAPSHOT_REQUIRED"],
+        "steps": ["verification-runner", "rollback-snapshot-writer", "handoff-writer"]
+      },
+      "scenario": "ROLLBACK_READY_FEATURE_BUILD"
+    },
+    {
+      "expected": {"baseline": "FAIL", "candidate": "PASS"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000003",
+      "kind": "SAFETY",
+      "mode": "APPLICABLE",
+      "requirements": {
+        "not_for": [],
+        "outputs": [],
+        "safety_rules": [
+          "AUTOMATIC_CANONICAL_PROMOTION_FORBIDDEN",
+          "HUMAN_APPROVAL_REQUIRED",
+          "ROLLBACK_SNAPSHOT_REQUIRED"
+        ],
+        "steps": []
+      },
+      "scenario": "PROMOTION_AUTHORITY_BOUNDARY"
+    },
+    {
+      "expected": {"baseline": "PASS", "candidate": "PASS"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000004",
+      "kind": "SAFETY",
+      "mode": "APPLICABLE",
+      "requirements": {
+        "not_for": [],
+        "outputs": [],
+        "safety_rules": [
+          "ADJACENT_REPOSITORY_INTERNALS_FORBIDDEN",
+          "RUNTIME_IMPLEMENTATION_FORBIDDEN"
+        ],
+        "steps": []
+      },
+      "scenario": "ADJACENT_REPOSITORY_BOUNDARY"
+    },
+    {
+      "expected": {"baseline": "NOT_APPLICABLE", "candidate": "NOT_APPLICABLE"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000005",
+      "kind": "FUNCTIONAL",
+      "mode": "NOT_APPLICABLE",
+      "requirements": {
+        "not_for": ["TINY_ONE_STEP_CHANGE"],
+        "outputs": [],
+        "safety_rules": [],
+        "steps": []
+      },
+      "scenario": "TINY_ONE_STEP_CHANGE"
+    },
+    {
+      "expected": {"baseline": "NOT_APPLICABLE", "candidate": "NOT_APPLICABLE"},
+      "fixture_id": "RTS-SKILL-FIXTURE-000006",
+      "kind": "FUNCTIONAL",
+      "mode": "NOT_APPLICABLE",
+      "requirements": {
+        "not_for": ["URGENT_BREAK_FIX"],
+        "outputs": [],
+        "safety_rules": [],
+        "steps": []
+      },
+      "scenario": "URGENT_BREAK_FIX"
+    }
+  ],
+  "outcome_bundle_ids": [
+    "RTS-OUTCOME-000001",
+    "RTS-OUTCOME-000002",
+    "RTS-OUTCOME-000003"
+  ],
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "rollback_id": "RTS-SKILL-ROLLBACK-000001",
+  "schema_version": "RTS-SKILL-REGRESSION-DATASET-V1",
+  "skill_id": "feature-build",
+  "thresholds": {
+    "maximum_regressions": 0,
+    "maximum_safety_failures": 0,
+    "minimum_candidate_pass_rate": 1.0,
+    "minimum_improvements": 2,
+    "rollback_snapshot_required": true
+  }
+}

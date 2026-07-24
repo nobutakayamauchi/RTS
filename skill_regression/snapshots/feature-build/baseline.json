@@ -1,0 +1,47 @@
+{
+  "content_path": "skill_regression/snapshots/feature-build/baseline.md",
+  "content_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+  "contract": {
+    "expected_outputs": [
+      "Clarified requirement contract",
+      "Continuation-ready handoff package",
+      "Evidence-backed verified/unverified/assumed report",
+      "Explicit scope boundary statement",
+      "Minimal implementation diff summary",
+      "Ordered scoped implementation plan"
+    ],
+    "not_for": [
+      "TINY_ONE_STEP_CHANGE",
+      "URGENT_BREAK_FIX"
+    ],
+    "ordered_steps": [
+      "requirement-clarifier",
+      "task-decomposer",
+      "scope-locker",
+      "safe-implementer",
+      "verification-runner",
+      "handoff-writer"
+    ],
+    "safety_rules": [
+      "ADJACENT_REPOSITORY_INTERNALS_FORBIDDEN",
+      "AUTOMATIC_CANONICAL_PROMOTION_FORBIDDEN",
+      "FACT_ASSUMPTION_UNVERIFIED_SEPARATION_REQUIRED",
+      "RUNTIME_IMPLEMENTATION_FORBIDDEN"
+    ]
+  },
+  "external_mutation_performed": false,
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "role": "BASELINE",
+  "schema_version": "RTS-SKILL-SNAPSHOT-V1",
+  "skill_id": "feature-build",
+  "snapshot_fingerprint": "321f7e927ecd9ad83135111d3995abcdbb144b80d4aeccd8fa8815e82b78dcf2",
+  "snapshot_id": "RTS-SKILL-SNAPSHOT-000001",
+  "source": {
+    "derived_from_snapshot_id": null,
+    "path": "rts-skills/bundles/feature-build.md",
+    "reference_commit_sha": "66991529519795e62d61874d6a6197ae14e01967",
+    "repository": "nobutakayamauchi/RTS-Skills-",
+    "source_content_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+    "source_type": "PINNED_PUBLIC_SOURCE"
+  }
+}

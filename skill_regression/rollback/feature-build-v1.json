@@ -1,0 +1,20 @@
+{
+  "adjacent_repository_write_authorized": false,
+  "baseline_snapshot_fingerprint": "321f7e927ecd9ad83135111d3995abcdbb144b80d4aeccd8fa8815e82b78dcf2",
+  "baseline_snapshot_id": "RTS-SKILL-SNAPSHOT-000001",
+  "candidate_snapshot_id": "RTS-SKILL-SNAPSHOT-000002",
+  "human_approval_required": true,
+  "mutation_authorized": false,
+  "restore_content_path": "skill_regression/snapshots/feature-build/baseline.md",
+  "restore_content_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+  "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd",
+  "rollback_id": "RTS-SKILL-ROLLBACK-000001",
+  "schema_version": "RTS-SKILL-ROLLBACK-SNAPSHOT-V1",
+  "skill_id": "feature-build",
+  "trigger_conditions": [
+    "candidate introduces any regression",
+    "candidate result fingerprint cannot be reconstructed",
+    "candidate violates a safety fixture",
+    "human reviewer rejects the candidate"
+  ]
+}
