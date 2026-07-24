@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T14:09:00Z",
+  "generated_at": "2026-07-24T23:27:00Z",
   "count": 7,
   "items": [
     {
@@ -159,7 +159,7 @@
         "rollback"
       ],
       "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
+      "preflight_state": "PASS",
       "updated_at": "2026-07-24T05:20:26Z"
     }
   ]
