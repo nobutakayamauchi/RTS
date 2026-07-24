@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-24T01:33:11Z",
-  "count": 2,
+  "generated_at": "2026-07-24T04:58:25Z",
+  "count": 7,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -48,6 +48,119 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-07-24T01:00:00Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000003",
+      "version": 1,
+      "title": "Governed Execution and Learning Loop",
+      "type": "architecture",
+      "status": "FROZEN",
+      "priority_score": 72.46,
+      "estimated_hours": {
+        "minimum": 56,
+        "maximum": 96
+      },
+      "tags": [
+        "loop",
+        "harness",
+        "learning",
+        "governance",
+        "cross-repo",
+        "parent"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "DECOMPOSE_REQUIRED",
+      "updated_at": "2026-07-24T03:47:32Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000004",
+      "version": 4,
+      "title": "Cross-Repo Asset Manifest v1",
+      "type": "architecture",
+      "status": "COMPLETED",
+      "priority_score": 85.9,
+      "estimated_hours": {
+        "minimum": 12,
+        "maximum": 24
+      },
+      "tags": [
+        "asset-manifest",
+        "cross-repo",
+        "provenance",
+        "privacy",
+        "reuse",
+        "build-now"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-07-24T03:50:07Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000005",
+      "version": 1,
+      "title": "Read-Only Loop Core",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 75.41,
+      "estimated_hours": {
+        "minimum": 16,
+        "maximum": 32
+      },
+      "tags": [
+        "read-only",
+        "loop",
+        "evaluation",
+        "recommendation",
+        "checkpoint"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-07-24T03:47:33Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000006",
+      "version": 1,
+      "title": "Governed Execution Controller",
+      "type": "architecture",
+      "status": "FROZEN",
+      "priority_score": 67.05,
+      "estimated_hours": {
+        "minimum": 24,
+        "maximum": 48
+      },
+      "tags": [
+        "controller",
+        "execution",
+        "agent",
+        "budget",
+        "rollback",
+        "human-gate"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-07-24T03:47:33Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000007",
+      "version": 1,
+      "title": "Outcome Learning and Skill Promotion",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 63.28,
+      "estimated_hours": {
+        "minimum": 24,
+        "maximum": 48
+      },
+      "tags": [
+        "learning",
+        "outcome",
+        "skill-promotion",
+        "regression",
+        "rollback"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-07-24T03:47:34Z"
     }
   ]
 }

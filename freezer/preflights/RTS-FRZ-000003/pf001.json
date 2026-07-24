@@ -1,0 +1,78 @@
+{
+  "outcome": "DECOMPOSE_REQUIRED",
+  "assessor": "human-and-ai-ground-survey",
+  "rationale": "The parent crosses four independently testable boundaries: inventory/provenance, read-only evaluation, execution authority, and learning promotion. Direct implementation would recreate hidden-coupling risk.",
+  "affected_boundaries": [
+    "RTS canonical records",
+    "cross-repository ownership",
+    "agent evaluation",
+    "execution authority",
+    "skill lifecycle",
+    "private metadata handling"
+  ],
+  "existing_assumptions": [
+    "RTS remains canonical structural ledger",
+    "Hermes Drive remains thin orchestration layer",
+    "RTS-AGE remains proposal/dry-run implementation lab",
+    "Skills and Packs keep separate canonical responsibilities"
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No parent migration is authorized; each child defines its own append-only artifacts."
+  },
+  "external_interfaces": [
+    "GitHub repositories",
+    "RTS-Hermes-Drive",
+    "RTS-AGE",
+    "RTS-Skills-",
+    "RTS-MCP-Packs"
+  ],
+  "approval_changes": [
+    "No parent implementation approval is granted",
+    "Each child requires its own BUILD_NOW assessment, PASS preflight, and explicit approval"
+  ],
+  "public_documents": [
+    "docs/implementation/CROSS_REPO_ASSET_MANIFEST_V1_TASK.md",
+    "docs/ecosystem/REPO_MAP.md",
+    "docs/ecosystem/PROJECT_REGISTRY.md"
+  ],
+  "regression_tests": [
+    "FREEZER validation",
+    "Build Assessment validation",
+    "Preflight validation",
+    "Per-child tests and manifests"
+  ],
+  "hidden_dependencies": [
+    "execution_record/evidence_ref linkage is currently minimal",
+    "legacy kernel interfaces have drift",
+    "private repositories cannot be copied into public RTS",
+    "provider adapters are not canonical records"
+  ],
+  "rollback_boundary": "Keep the parent FROZEN and NOT_APPROVED; remove no existing assets. Each child is independently revertible by its merge commit.",
+  "completion_conditions": [
+    "000004 completes deterministic asset inventory",
+    "000005 proves read-only loop",
+    "000006 proves bounded governed execution",
+    "000007 proves evidence-backed skill promotion"
+  ],
+  "decomposition": {
+    "required": true,
+    "child_candidates": [
+      "RTS-FRZ-000004",
+      "RTS-FRZ-000005",
+      "RTS-FRZ-000006",
+      "RTS-FRZ-000007"
+    ]
+  },
+  "risks": [
+    "One giant PR would mix repository governance and runtime authority",
+    "Premature execution authority could mutate systems without valid evidence",
+    "Private data could leak during naive integration"
+  ],
+  "preflight_id": "RTS-PF-000003-001",
+  "item_id": "RTS-FRZ-000003",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "0f945f86dc1d12582b960dc42f698227946191003dc7ca6098d786287f1365dc",
+  "created_at": "2026-07-24T03:49:45Z"
+}

@@ -241,3 +241,8 @@ python -m freezer.preflight history RTS-FRZ-000001
 
 - `RTS-FRZ-000001` preserves the Governed Adaptive Memory Layer. It remains `FROZEN`, `NOT_APPROVED`, and unassessed until its trigger conditions are met.
 - `RTS-FRZ-000002` records the GitHub Reuse and Build Value Assessment implemented in July 2026. Its assessment found a `75.37` decision score, `10.0` estimated net hours from a `16.0` hour from-scratch baseline, `10.0` reusable hours, and a `BUILD_NOW` recommendation. Its implementation preflight passed and the item is recorded as `COMPLETED`.
+- `RTS-FRZ-000003` preserves the parent Governed Execution and Learning Loop. Its Preflight outcome is `DECOMPOSE_REQUIRED`; it remains `FROZEN` and `NOT_APPROVED` while the four children are handled independently.
+- `RTS-FRZ-000004` records Cross-Repo Asset Manifest v1. Its assessment recommendation is `BUILD_NOW` with a `73.35` decision score, its implementation Preflight passed, and the verified child is recorded as `COMPLETED`.
+- `RTS-FRZ-000005` preserves the Read-Only Loop Core as `FROZEN` and `NOT_APPROVED`, dependent on item 004.
+- `RTS-FRZ-000006` preserves the Governed Execution Controller as `FROZEN` and `NOT_APPROVED`, dependent on items 004 and 005.
+- `RTS-FRZ-000007` preserves Outcome Learning and Skill Promotion as `FROZEN` and `NOT_APPROVED`, dependent on items 004 through 006.

@@ -8,8 +8,10 @@ from freezer.assessment_store import create_assessment
 from freezer.cli import (
     FreezerError,
     add_item,
+    all_item_ids,
     compute_score,
     load_config,
+    next_item_id,
     rebuild,
     revise_item,
     validate_item,
@@ -169,8 +171,9 @@ class FreezerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = self.isolated_root(temp_dir)
             rows = rebuild(temp_root)
-            self.assertEqual(rows[0]["item_id"], "RTS-FRZ-000001")
-            self.assertEqual(rows[0]["preflight_state"], "MISSING")
+            by_id = {row["item_id"]: row for row in rows}
+            self.assertIn("RTS-FRZ-000001", by_id)
+            self.assertEqual(by_id["RTS-FRZ-000001"]["preflight_state"], "MISSING")
             self.assertEqual(verify(temp_root), [])
 
     def test_partial_priority_revision_preserves_other_dimensions(self):
@@ -357,30 +360,31 @@ class FreezerTests(unittest.TestCase):
                 encoding="utf-8",
             )
             rows = rebuild(temp_root)
-            self.assertEqual(rows, [])
+            self.assertNotIn("RTS-FRZ-000001", {row["item_id"] for row in rows})
             all_items = json.loads(
                 (temp_root / "freezer" / "index" / "items.json").read_text(encoding="utf-8")
             )
-            self.assertEqual(all_items["count"], 2)
+            self.assertEqual(all_items["count"], len(all_item_ids(temp_root)))
 
     def test_work_in_progress_limit_is_enforced(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = self.isolated_root(temp_dir)
             second = json.loads(json.dumps(self.item))
-            second["item_id"] = "RTS-FRZ-000003"
+            second_id = next_item_id(temp_root)
+            second["item_id"] = second_id
             second["title"] = "Second active item"
             second["status"] = "FROZEN"
             second["build_authority"] = "NOT_APPROVED"
             source = self.write_json(temp_root / "second.json", second)
             add_item(temp_root, source)
 
-            self.create_build_now_assessment(temp_root, "RTS-FRZ-000003")
-            self.create_pass_preflight(temp_root, "RTS-FRZ-000003")
+            self.create_build_now_assessment(temp_root, second_id)
+            self.create_pass_preflight(temp_root, second_id)
             activate_second = self.write_json(
                 temp_root / "activate-second.json",
                 {"status": "IN_PROGRESS", "build_authority": "APPROVED"},
             )
-            revise_item(temp_root, "RTS-FRZ-000003", activate_second)
+            revise_item(temp_root, second_id, activate_second)
 
             self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
             self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
