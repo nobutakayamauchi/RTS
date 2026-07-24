@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/freezer-build-assessment-v1
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -24,7 +27,6 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import json
 
           def replace_once(text: str, old: str, new: str, label: str) -> str:
               if text.count(old) != 1:
