@@ -1,0 +1,118 @@
+name: Refresh FREEZER Evidence
+
+on:
+  push:
+    branches:
+      - fix/complete-cross-repo-asset-manifest-freezer-v1
+    paths:
+      - ".github/workflows/refresh-freezer-evidence.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/complete-cross-repo-asset-manifest-freezer-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Append merge evidence and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import tempfile
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          from freezer.assessment_core import INPUT_FIELDS as ASSESSMENT_INPUT_FIELDS
+          from freezer.assessment_store import create_assessment
+          from freezer.preflight import INPUT_FIELDS as PREFLIGHT_INPUT_FIELDS, create_preflight
+
+          root = Path('.').resolve()
+          item_id = 'RTS-FRZ-000004'
+          evidence = 'PR #228; merge commit 9bafaa74ff56e5765060408c133ac106337a4574'
+          refs = [
+              'PR #228',
+              'merge commit 9bafaa74ff56e5765060408c133ac106337a4574',
+          ]
+
+          current_path = root / 'freezer' / 'items' / item_id / 'current.json'
+          current = json.loads(current_path.read_text(encoding='utf-8'))
+          assert current['current_version'] == 4, current
+          source_path = root / current['path']
+          item = json.loads(source_path.read_text(encoding='utf-8'))
+
+          item_refs = list(item['source_refs'])
+          for ref in refs:
+              if ref not in item_refs:
+                  item_refs.append(ref)
+          now = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+          revised = dict(item)
+          revised.update({
+              'version': 5,
+              'source_refs': item_refs,
+              'updated_at': now,
+              'supersedes': 'v004',
+          })
+          destination = root / 'freezer' / 'items' / item_id / 'v005.json'
+          assert not destination.exists()
+          destination.write_text(json.dumps(revised, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          current_path.write_text(json.dumps({
+              'item_id': item_id,
+              'current_version': 5,
+              'path': 'freezer/items/RTS-FRZ-000004/v005.json',
+              'updated_at': now,
+          }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          ba001 = json.loads((root / 'freezer/assessments/RTS-FRZ-000004/ba001.json').read_text(encoding='utf-8'))
+          assessment_input = {field: ba001[field] for field in ASSESSMENT_INPUT_FIELDS}
+          assessment_input['rationale'] = assessment_input['rationale'].rstrip() + ' Reconstructable completion evidence: ' + evidence + '.'
+          for value in refs:
+              if value not in assessment_input['github_scan']['queries']:
+                  assessment_input['github_scan']['queries'].append(value)
+
+          pf001 = json.loads((root / 'freezer/preflights/RTS-FRZ-000004/pf001.json').read_text(encoding='utf-8'))
+          preflight_input = {field: pf001[field] for field in PREFLIGHT_INPUT_FIELDS}
+          preflight_input['rationale'] = preflight_input['rationale'].rstrip() + ' Reconstructable completion evidence: ' + evidence + '.'
+          for field in ('public_documents', 'completion_conditions'):
+              values = list(preflight_input[field])
+              if evidence not in values:
+                  values.append(evidence)
+              preflight_input[field] = values
+
+          with tempfile.TemporaryDirectory() as directory:
+              directory = Path(directory)
+              assessment_source = directory / 'assessment.json'
+              preflight_source = directory / 'preflight.json'
+              assessment_source.write_text(json.dumps(assessment_input, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+              preflight_source.write_text(json.dumps(preflight_input, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+              assessment = create_assessment(root, item_id, assessment_source)
+              preflight = create_preflight(root, item_id, preflight_source)
+              assert assessment['assessment_version'] == 2
+              assert assessment['derived']['recommendation'] == 'BUILD_NOW'
+              assert preflight['preflight_version'] == 2
+              assert preflight['outcome'] == 'PASS'
+          PY
+
+          python -m freezer.cli reindex
+          python -m asset_manifest.cli verify
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -B -m unittest discover -s tests -v
+
+          rm -f .github/workflows/refresh-freezer-evidence.yml
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type f -name '*.pyc' -delete
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Append PR 228 evidence to governed records"
+          git push origin HEAD:fix/complete-cross-repo-asset-manifest-freezer-v1
