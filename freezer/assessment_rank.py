@@ -132,15 +132,27 @@ def gate_payload(root: Path, item_id: str) -> dict[str, Any]:
             preflight = preflight_state(root, item)["state"]
         except PreflightError as exc:
             preflight = f"INVALID: {exc}"
+    config = load_config(root)
+    active_in_progress = [
+        existing["item_id"]
+        for existing in iter_current_items(root)
+        if existing["item_id"] != item_id and existing.get("status") == "IN_PROGRESS"
+    ]
+    wip_limit = int(config["work_in_progress_limit"])
+    wip_capacity_available = len(active_in_progress) < wip_limit
     ready = (
         state["state"] == "CURRENT" and recommendation == "BUILD_NOW" and preflight == "PASS"
         and item.get("build_authority") == "APPROVED"
         and item.get("status") in {"READY", "SELECTED", "IN_PROGRESS"}
+        and wip_capacity_available
     )
     return {
         "item_id": item_id, "item_version": item["version"], "status": item["status"],
         "assessment_state": state["state"], "recommendation": recommendation,
         "decision_score": record["derived"]["decision_score"] if record else None,
         "preflight_state": preflight, "build_authority": item.get("build_authority"),
+        "work_in_progress_limit": wip_limit,
+        "active_in_progress": active_in_progress,
+        "wip_capacity_available": wip_capacity_available,
         "selection_ready": ready,
     }

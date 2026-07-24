@@ -305,5 +305,20 @@ class BuildAssessmentTests(unittest.TestCase):
             self.assertTrue(payload["selection_ready"])
 
 
+    def test_full_gate_is_false_when_wip_capacity_is_full(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = self.isolated_root(temp_dir)
+            self.mutate_current_item(root, "RTS-FRZ-000002", {"status": "READY"})
+            self.mutate_current_item(
+                root,
+                "RTS-FRZ-000001",
+                {"status": "IN_PROGRESS", "build_authority": "APPROVED"},
+            )
+            payload = gate_payload(root, "RTS-FRZ-000002")
+            self.assertEqual(payload["active_in_progress"], ["RTS-FRZ-000001"])
+            self.assertEqual(payload["work_in_progress_limit"], 1)
+            self.assertFalse(payload["wip_capacity_available"])
+            self.assertFalse(payload["selection_ready"])
+
 if __name__ == "__main__":
     unittest.main()
