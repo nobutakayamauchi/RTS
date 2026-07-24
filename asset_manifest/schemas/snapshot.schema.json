@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nobutakayamauchi/RTS/asset_manifest/schemas/snapshot.schema.json",
+  "title": "RTS Cross-Repo Asset Manifest Snapshot",
+  "type": "object",
+  "required": [
+    "schema_version", "snapshot_version", "generated_at", "source_refs",
+    "repositories", "assets", "known_gaps", "assumptions", "privacy_statement"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "RTS-ASSET-MANIFEST-V1"},
+    "snapshot_version": {"type": "integer", "minimum": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_refs": {"type": "array", "items": {"type": "string"}},
+    "known_gaps": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "privacy_statement": {"type": "string", "minLength": 1},
+    "repositories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repository", "visibility", "default_branch", "observed_ref", "role",
+          "lifecycle_status", "canonical_responsibility", "allowed_reuse_boundary",
+          "safe_metadata_only", "evidence_refs"
+        ],
+        "properties": {
+          "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+          "visibility": {"enum": ["public", "private", "unknown"]},
+          "default_branch": {"type": "string", "minLength": 1},
+          "observed_ref": {"type": "string", "pattern": "^[A-Za-z0-9_./-]{1,128}$"},
+          "role": {"type": "string", "minLength": 1},
+          "lifecycle_status": {"type": "string", "minLength": 1},
+          "canonical_responsibility": {"type": "string", "minLength": 1},
+          "allowed_reuse_boundary": {"type": "string", "minLength": 1},
+          "safe_metadata_only": {"type": "boolean"},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "asset_id", "repository", "locator", "kind", "capability", "source_ref",
+          "canonicality", "reuse_mode", "license_status", "sensitivity",
+          "consumer_candidates", "notes", "risks", "evidence_refs"
+        ],
+        "properties": {
+          "asset_id": {"type": "string", "pattern": "^RTS-AM-A[0-9]{4}$"},
+          "repository": {"type": "string"},
+          "locator": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["code", "schema", "test", "workflow", "documentation", "data", "design", "runtime", "process"]},
+          "capability": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "pattern": "^[A-Za-z0-9_./-]{1,128}$"},
+          "canonicality": {"enum": ["CANONICAL", "REFERENCE", "REUSABLE", "EXPERIMENTAL", "FROZEN", "SUPERSEDED"]},
+          "reuse_mode": {"enum": ["DIRECT", "ADAPT", "REFERENCE_ONLY", "NO_REUSE"]},
+          "license_status": {"enum": ["COMPATIBLE", "REVIEW_REQUIRED", "INCOMPATIBLE", "NOT_APPLICABLE", "UNKNOWN"]},
+          "sensitivity": {"enum": ["PUBLIC", "PRIVATE_METADATA_ONLY", "RESTRICTED"]},
+          "consumer_candidates": {"type": "array", "items": {"type": "string"}},
+          "notes": {"type": "string"},
+          "risks": {"type": "array", "items": {"type": "string"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}
