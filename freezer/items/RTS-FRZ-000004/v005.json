@@ -1,0 +1,72 @@
+{
+  "item_id": "RTS-FRZ-000004",
+  "title": "Cross-Repo Asset Manifest v1",
+  "type": "architecture",
+  "status": "COMPLETED",
+  "summary": "Create an immutable metadata inventory of repository roles, reusable assets, exact references, ownership, reuse mode, licensing, sensitivity, and known gaps across the RTS ecosystem.",
+  "original_problem": "Past assets are distributed across 19 repositories, so new work can duplicate code, miss useful history, violate repository boundaries, or accidentally expose private material.",
+  "why_it_matters": "A deterministic asset map is the prerequisite for every later loop stage and materially reduces research, integration, privacy, licensing, and hidden-dependency risk.",
+  "reason_frozen": "Held until GitHub survey, build-value assessment, and implementation ground survey were completed.",
+  "preserved_value": "Append-only snapshots, deterministic repository/asset/ownership indexes, hard privacy/license/ownership checks, exact evidence references, and reusable CLI operations.",
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 5,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "All owned repositories are classified",
+    "Private repositories can be represented as safe metadata only",
+    "Deterministic validation and rollback are available"
+  ],
+  "negative_triggers": [
+    "Repository bodies must be copied into RTS",
+    "Secrets/customer data/private prompts would enter public history",
+    "Canonical ownership conflicts cannot be detected",
+    "Implementation requires mutating adjacent repositories"
+  ],
+  "dependencies": [
+    "RTS FREEZER v1",
+    "Mandatory implementation Preflight",
+    "GitHub reuse and build-value assessment",
+    "docs/ecosystem/REPO_MAP.md",
+    "docs/ecosystem/PROJECT_REGISTRY.md"
+  ],
+  "source_refs": [
+    "docs/implementation/CROSS_REPO_ASSET_MANIFEST_V1_TASK.md",
+    "docs/ecosystem/REPO_MAP.md",
+    "docs/ecosystem/PROJECT_REGISTRY.md",
+    "freezer/README.md",
+    "PR #228",
+    "merge commit 9bafaa74ff56e5765060408c133ac106337a4574"
+  ],
+  "possible_destinations": [
+    "asset_manifest/",
+    "RTS-Hermes-Drive read-only consumer",
+    "RTS-AGE proposal inputs"
+  ],
+  "estimated_hours": {
+    "minimum": 12,
+    "maximum": 24
+  },
+  "tags": [
+    "asset-manifest",
+    "cross-repo",
+    "provenance",
+    "privacy",
+    "reuse",
+    "build-now"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 5,
+  "created_at": "2026-07-24T03:47:32Z",
+  "updated_at": "2026-07-24T05:09:54Z",
+  "supersedes": "v004"
+}

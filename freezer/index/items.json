@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T04:58:25Z",
+  "generated_at": "2026-07-24T05:09:54Z",
   "count": 7,
   "items": [
     {
@@ -74,7 +74,7 @@
     },
     {
       "item_id": "RTS-FRZ-000004",
-      "version": 4,
+      "version": 5,
       "title": "Cross-Repo Asset Manifest v1",
       "type": "architecture",
       "status": "COMPLETED",
@@ -93,7 +93,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-07-24T03:50:07Z"
+      "updated_at": "2026-07-24T05:09:54Z"
     },
     {
       "item_id": "RTS-FRZ-000005",

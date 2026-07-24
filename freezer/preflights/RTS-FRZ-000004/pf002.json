@@ -1,0 +1,72 @@
+{
+  "public_documents": [
+    "asset_manifest/README.md",
+    "docs/implementation/CROSS_REPO_ASSET_MANIFEST_V1_TASK.md",
+    "PR #228; merge commit 9bafaa74ff56e5765060408c133ac106337a4574"
+  ],
+  "risks": [
+    "Stale repository refs",
+    "Overstating review completeness",
+    "Canonical capability naming collisions",
+    "Accidental private path disclosure"
+  ],
+  "outcome": "PASS",
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "rationale": "The work is isolated to metadata, schemas, deterministic indexes, tests, and manifests in RTS. Adjacent repositories are read-only evidence sources and rollback is a single PR revert. Reconstructable completion evidence: PR #228; merge commit 9bafaa74ff56e5765060408c133ac106337a4574.",
+  "existing_assumptions": [
+    "RTS repo remains public",
+    "Private repository names and high-level roles are safe approved metadata",
+    "No adjacent repository mutation is required",
+    "JSON and Python standard library are sufficient"
+  ],
+  "completion_conditions": [
+    "All 19 repositories represented",
+    "24 initial reusable/reference assets classified",
+    "Immutable snapshot and three deterministic indexes verified",
+    "Privacy, license, ownership, pointer and hash rules tested",
+    "Parent/child FREEZER records preserve scope boundaries",
+    "PR #228; merge commit 9bafaa74ff56e5765060408c133ac106337a4574"
+  ],
+  "assessor": "human-and-ai-ground-survey",
+  "external_interfaces": [
+    "GitHub repository metadata and file refs as read-only evidence",
+    "No runtime API or credential connection"
+  ],
+  "approval_changes": [
+    "Only RTS-FRZ-000004 receives APPROVED authority for this PR",
+    "000003 and 000005-000007 remain NOT_APPROVED"
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "New append-only v001 snapshot only; no existing record is rewritten."
+  },
+  "affected_boundaries": [
+    "asset_manifest package",
+    "FREEZER records and indexes",
+    "CI governed-record checks",
+    "public/private repository metadata boundary"
+  ],
+  "regression_tests": [
+    "python -m asset_manifest.cli verify",
+    "python -B -m unittest discover -s tests -v",
+    "python -m freezer.cli verify",
+    "python -m freezer.build_assessment verify",
+    "semantic index rebuild in CI",
+    "Unicode Guard"
+  ],
+  "hidden_dependencies": [
+    "FREEZER tests previously assumed a small fixed seed set and may need non-brittle updates",
+    "Manifest hashes must be regenerated after any tracked file change",
+    "Private repository locators must stay logical and metadata-only"
+  ],
+  "rollback_boundary": "Revert the Cross-Repo Asset Manifest PR; no adjacent repository or external state is mutated.",
+  "preflight_id": "RTS-PF-000004-002",
+  "item_id": "RTS-FRZ-000004",
+  "preflight_version": 2,
+  "item_version_snapshot": 5,
+  "item_fingerprint": "adcbbe123e0c997f7075ce235b46186c773fc7b7fb69924539c6d42ad9da8ad4",
+  "created_at": "2026-07-24T05:09:54Z"
+}
