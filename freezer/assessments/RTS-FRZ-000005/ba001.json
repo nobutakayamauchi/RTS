@@ -1,0 +1,156 @@
+{
+  "risks": [
+    "False precision in estimated hours",
+    "Optional execution/evidence inputs have shape validation but no full linkage contract",
+    "Legacy state detection patterns require adaptation rather than direct promotion",
+    "Governed indexes must remain semantically fresh after lifecycle completion"
+  ],
+  "rationale": "The canonical FREEZER gates, Asset Manifest, execution/evidence contracts, minimal runtime flow, verification-runner boundary, and read-only observer patterns materially shorten implementation. The resulting evaluator is local, deterministic, advisory-only, and provides evidence before any controller receives write authority.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "nobutakayamauchi/RTS-Minimal-Runtime",
+      "nobutakayamauchi/RTS-Skills-",
+      "nobutakayamauchi/RTS-AGE",
+      "nobutakayamauchi/RTS-MCP-Packs"
+    ],
+    "queries": [
+      "FREEZER governance build assessment Preflight WIP",
+      "execution record evidence reference contract",
+      "minimal reconstructable runtime flow",
+      "verification runner verified unverified assumed",
+      "read-only observer report permission separation"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/",
+        "ref": "795e388a1c60437663ab954c3ad123164dc53874",
+        "kind": "code",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "RTS-AM-A0001: immutable lifecycle, Build Assessment, Preflight, indexes, manifest and WIP=1 governance."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "schemas/execution_record.schema.yaml",
+        "ref": "795e388a1c60437663ab954c3ad123164dc53874",
+        "kind": "schema",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "RTS-AM-A0002: canonical execution-record required fields."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "schemas/evidence_ref.schema.yaml",
+        "ref": "795e388a1c60437663ab954c3ad123164dc53874",
+        "kind": "schema",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "RTS-AM-A0003: canonical evidence-reference required fields."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "rts_kernel/state_engine.py",
+        "ref": "795e388a1c60437663ab954c3ad123164dc53874",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "RTS-AM-A0004: legacy repository-state concepts adapted only; no promotion of drifted APIs."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-Minimal-Runtime",
+        "path": "README.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "DIRECT",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 2,
+        "notes": "RTS-AM-A0009: intent-to-reconstruction flow reference."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-Skills-",
+        "path": "rts-skills/core/verification-runner/skill.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 2,
+        "notes": "RTS-AM-A0011: verified, unverified and assumed evidence-state boundary."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-AGE",
+        "path": "core/observer_gate/log_reader.py",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "RTS-AM-A0014: privacy-conscious read-only input pattern."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-AGE",
+        "path": "core/observer_gate/report.py",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "RTS-AM-A0015: aggregate advisory report pattern without prompt exposure."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-MCP-Packs",
+        "path": "docs/overview/POSITION.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "RTS-AM-A0017: explicit read/write permission separation."
+      }
+    ],
+    "gaps": [
+      "The current RTS core does not define full execution_record-to-evidence_ref linkage",
+      "Adjacent repository branch refs are not immutable commit pins",
+      "No live runtime outcome feed is included in v1"
+    ]
+  },
+  "assessor": "human-and-ai-ground-survey",
+  "implementation": {
+    "from_scratch_hours": 24,
+    "integration_hours": 3,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 2
+  },
+  "assessment_id": "RTS-BA-000005-001",
+  "item_id": "RTS-FRZ-000005",
+  "assessment_version": 1,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "cee37f8121330039629e94c5f6c0ff8926ebe4db51e60dbd7ad9f2ae3adc6991",
+  "derived": {
+    "benefit_score": 97.0,
+    "cost_score": 33.33,
+    "reuse_score": 66.67,
+    "decision_score": 73.35,
+    "reuse_hours_saved": 16,
+    "net_hours": 16,
+    "time_saved_ratio": 0.6667,
+    "implementation_efficiency": 1.5,
+    "cost_effectiveness": 6.06,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-07-24T07:55:00Z"
+}
