@@ -1,0 +1,38 @@
+{
+  "schema_version": "RTS-LOOP-EVALUATION-V1",
+  "evaluation_id": "1cf9a3fc327d13454bacf1472de1bf524d9b1a6b9cb5e239cc650fb0df11f1df",
+  "as_of": "2026-07-24T00:00:00Z",
+  "authority": "ADVISORY_ONLY",
+  "implementation_authority_granted": false,
+  "inputs": [
+    {
+      "path": "freezer/index/items.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "wip": {
+    "count": 0,
+    "active_item_ids": []
+  },
+  "state": "STALL",
+  "audit_level": "NORMAL",
+  "evidence": {
+    "verified": [
+      "example only"
+    ],
+    "unverified": [],
+    "assumed": [
+      "no runtime feed supplied"
+    ]
+  },
+  "recommendation": {
+    "action": "CAPTURE_NEW_CANDIDATE",
+    "item_id": null,
+    "why": "The example contains no active work.",
+    "success_condition": "A governed candidate is captured or the queue remains intentionally empty.",
+    "fallback": "Verify the committed indexes.",
+    "stop_conditions": [
+      "governed inputs are stale"
+    ]
+  }
+}

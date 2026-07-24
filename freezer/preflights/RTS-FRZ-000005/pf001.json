@@ -1,0 +1,75 @@
+{
+  "data_migration": {
+    "required": false,
+    "notes": "No migration; the evaluator reads existing committed indexes and optional caller-supplied local records."
+  },
+  "risks": [
+    "Governed indexes may become stale if regeneration is skipped",
+    "Optional execution/evidence inputs have no full linkage contract",
+    "Advisory recommendations could be mistaken for implementation authority",
+    "Legacy state concepts must not be promoted as controller behavior"
+  ],
+  "external_interfaces": [
+    "None; repository-local files only",
+    "No network, provider, credential, subprocess, deployment, scheduling, publication, messaging, or tool connection"
+  ],
+  "regression_tests": [
+    "python -m asset_manifest.cli verify",
+    "python -m freezer.cli verify",
+    "python -m freezer.build_assessment verify",
+    "python -m loop_core.cli verify",
+    "python -B -m unittest discover -s tests -v",
+    "semantic generated-output freshness verification",
+    "Unicode Guard"
+  ],
+  "assessor": "human-and-ai-ground-survey",
+  "approval_changes": [
+    "RTS-FRZ-000005 alone receives APPROVED build authority and a human-approved selection lifecycle",
+    "RTS-FRZ-000006 and RTS-FRZ-000007 remain NOT_APPROVED and unimplemented"
+  ],
+  "existing_assumptions": [
+    "Committed FREEZER and Asset Manifest indexes are the governed default inputs",
+    "The minimal execution_record and evidence_ref contracts remain structural only",
+    "Python standard library is sufficient",
+    "Normal evaluation writes only canonical JSON to stdout"
+  ],
+  "public_documents": [
+    "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md",
+    "loop_core/README.md",
+    "docs/overview/EXECUTION_AND_EVIDENCE.md",
+    "asset_manifest/index/assets.json"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "rationale": "The implementation is bounded to a deterministic local evaluator, schema, example, tests and CI. It cannot mutate governed inputs or adjacent repositories, has no external interfaces or credentials, and grants no controller or write authority.",
+  "affected_boundaries": [
+    "loop_core advisory evaluator and CLI",
+    "FREEZER item, assessment, Preflight, indexes and manifest",
+    "governed CI path filters and validation",
+    "execution/evidence shape-validation boundary"
+  ],
+  "rollback_boundary": "Revert PR #230; no adjacent repository, external service, credential, deployment, publication or customer state is mutated.",
+  "hidden_dependencies": [
+    "FREEZER item and Build Assessment fingerprints must remain current across status-only lifecycle revisions",
+    "Manifest hashes must be regenerated after every tracked FREEZER file change",
+    "loop_core defaults depend on semantically fresh items and build-priority indexes"
+  ],
+  "completion_conditions": [
+    "Read-only evaluation is deterministic for identical inputs and arguments",
+    "Governed input hashes remain unchanged after evaluation",
+    "Output validates against the committed schema and authority is ADVISORY_ONLY",
+    "RTS-FRZ-000005 has current BUILD_NOW assessment and PASS Preflight",
+    "Lifecycle records show SELECTED, IN_PROGRESS, VERIFIED and COMPLETED",
+    "RTS-FRZ-000006 and RTS-FRZ-000007 remain NOT_APPROVED and FROZEN",
+    "All required validation and Unicode Guard pass"
+  ],
+  "outcome": "PASS",
+  "preflight_id": "RTS-PF-000005-001",
+  "item_id": "RTS-FRZ-000005",
+  "preflight_version": 1,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "a051082e24a6f093a24e9ffe3ecd25c616c7f5a1b1c9bdfd96680d19daea22db",
+  "created_at": "2026-07-24T07:55:00Z"
+}

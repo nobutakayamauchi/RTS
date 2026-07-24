@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-24T05:20:26Z",
-  "count": 5,
+  "generated_at": "2026-07-24T07:59:00Z",
+  "count": 4,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -9,28 +9,6 @@
     "auto_start": false
   },
   "items": [
-    {
-      "item_id": "RTS-FRZ-000005",
-      "version": 2,
-      "title": "Read-Only Loop Core",
-      "type": "feature",
-      "status": "FROZEN",
-      "priority_score": 75.41,
-      "estimated_hours": {
-        "minimum": 16,
-        "maximum": 32
-      },
-      "tags": [
-        "read-only",
-        "loop",
-        "evaluation",
-        "recommendation",
-        "checkpoint"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T05:20:26Z"
-    },
     {
       "item_id": "RTS-FRZ-000003",
       "version": 2,

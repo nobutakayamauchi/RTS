@@ -5,9 +5,12 @@ on:
     paths:
       - "freezer/**"
       - "asset_manifest/**"
+      - "loop_core/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
+      - "tests/test_loop_core.py"
+      - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
   push:
     branches:
@@ -15,9 +18,12 @@ on:
     paths:
       - "freezer/**"
       - "asset_manifest/**"
+      - "loop_core/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
+      - "tests/test_loop_core.py"
+      - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
 
 permissions:
@@ -36,6 +42,7 @@ jobs:
           python -m freezer.cli verify
           python -m freezer.build_assessment verify
           python -m asset_manifest.cli verify
+          python -m loop_core.cli verify
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
@@ -90,3 +97,4 @@ jobs:
           python -m freezer.cli verify
           python -m freezer.build_assessment verify
           python -m asset_manifest.cli verify
+          python -m loop_core.cli verify
