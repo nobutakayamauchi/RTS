@@ -236,6 +236,15 @@ python -m loop_core.cli verify
 python -B -m unittest discover -s tests -v
 ```
 
+The workflow `push.paths` and `pull_request.paths` filters must explicitly include at least:
+
+- `loop_core/**`
+- `tests/test_loop_core.py`
+- `docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md`
+- the workflow file itself
+
+A change limited to `loop_core/**` or its focused tests must trigger the governed validation workflow without relying on an unrelated FREEZER or Asset Manifest change.
+
 Retain the existing semantic stale-index check and Unicode Guard behavior.
 
 ## Required validation
