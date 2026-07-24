@@ -1,0 +1,21 @@
+{
+  "authorization_fingerprint": "c18c5ba44ed4f068eecddab12b600716c43b2ed3b0a1cdb66fdfe34b8a4c16a4",
+  "authorization_id": "RTS-AUTH-OUTCOME-002",
+  "evidence_id": "RTS-EVIDENCE-OUTCOME-000002",
+  "external_execution_performed": false,
+  "plan_fingerprint": "a241d820c72a8fecdba0d7e1abb25387d6c6a77b80b911e1a01caa9ca197d0f2",
+  "plan_id": "a241d820c72a8fecdba0d7e1abb25387d6c6a77b80b911e1a01caa9ca197d0f2",
+  "scenario": "ESCALATION",
+  "schema_version": "RTS-OUTCOME-EVIDENCE-SOURCE-V1",
+  "summary": "Projected event usage triggered bounded escalation before an illegal transition.",
+  "terminal_state": "ESCALATED",
+  "timestamp": "2026-07-24T20:30:02Z",
+  "usage": {
+    "attempts": 2,
+    "changed_bytes": 0,
+    "changed_files": 0,
+    "elapsed_seconds": 2,
+    "events": 5
+  },
+  "verification": "SIMULATED_ONLY"
+}

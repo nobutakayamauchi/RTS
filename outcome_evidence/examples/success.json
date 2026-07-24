@@ -1,0 +1,63 @@
+{
+  "bundle_fingerprint": "47a00d31aa03a0a64c93ddc784bceaec0fabbf611873ae97c48399ac761b2571",
+  "bundle_id": "RTS-OUTCOME-000001",
+  "classification_rationale": "The deterministic local path is reconstructed, but no real-world success was observed.",
+  "controller": {
+    "authorization_fingerprint": "d365631618b882fa167cfbbab5e1581d9da55c36e5c47232463fabaaede88d89",
+    "budget_usage": {
+      "attempts": 1,
+      "changed_bytes": 0,
+      "changed_files": 0,
+      "elapsed_seconds": 2,
+      "events": 5
+    },
+    "external_execution_performed": false,
+    "plan_fingerprint": "f50db0eb556e63bace2cf455029069e7fd5828c4028b15f2c98043767a164ae1",
+    "terminal_state": "SUCCEEDED"
+  },
+  "criteria": {
+    "failure": [
+      "no external result was observed"
+    ],
+    "observed": [
+      "checkpoint-compatible simulated completion"
+    ],
+    "success": [
+      "controller evidence reconstructs the local path",
+      "terminal state equals SUCCEEDED"
+    ]
+  },
+  "evidence_integrity": {
+    "RTS-EVIDENCE-OUTCOME-000001": "3ba5ec9128769c751391ffc32566c988b0608ff9ee6d24eda23274b3ec5788d7"
+  },
+  "evidence_refs": [
+    {
+      "evidence_id": "RTS-EVIDENCE-OUTCOME-000001",
+      "retrieved_at": "2026-07-24T20:30:01Z",
+      "source_ref": "outcome_evidence/evidence/success-controller-result.json",
+      "source_type": "local_controller_fixture"
+    }
+  ],
+  "execution_record": {
+    "drive_id": "local-dry-run-drive",
+    "pack_id": "no-external-tools",
+    "result": {
+      "scenario": "SUCCESS",
+      "summary": "Deterministic local dry-run completed the expected path.",
+      "verification": "SIMULATED_ONLY"
+    },
+    "skill_id": "fixture-skill-v1",
+    "timestamp": "2026-07-24T20:30:01Z",
+    "trigger": "governed-outcome-success-fixture"
+  },
+  "execution_scope": "SIMULATED_ONLY",
+  "outcome_classification": "UNVERIFIED",
+  "promotion_blockers": [
+    "baseline and candidate Skill comparison is absent",
+    "external outcome remains unverified",
+    "immutable rollback snapshot is absent"
+  ],
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "scenario": "SUCCESS",
+  "schema_version": "RTS-OUTCOME-BUNDLE-V1"
+}

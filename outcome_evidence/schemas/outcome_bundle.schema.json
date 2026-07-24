@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rts/outcome_bundle.schema.json",
+  "title": "RTS Governed Outcome Bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "scenario",
+    "execution_scope",
+    "outcome_classification",
+    "classification_rationale",
+    "execution_record",
+    "evidence_refs",
+    "evidence_integrity",
+    "controller",
+    "criteria",
+    "promotion_eligibility",
+    "promotion_blockers",
+    "bundle_fingerprint"
+  ],
+  "properties": {
+    "schema_version": {"const": "RTS-OUTCOME-BUNDLE-V1"},
+    "bundle_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "scenario": {"enum": ["SUCCESS", "ESCALATION", "RECOVERY"]},
+    "execution_scope": {"const": "SIMULATED_ONLY"},
+    "outcome_classification": {"enum": ["VERIFIED", "UNVERIFIED", "ASSUMED"]},
+    "classification_rationale": {"type": "string", "minLength": 1, "maxLength": 512},
+    "execution_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_id", "drive_id", "pack_id", "trigger", "result", "timestamp"],
+      "properties": {
+        "skill_id": {"type": "string", "minLength": 1},
+        "drive_id": {"type": "string", "minLength": 1},
+        "pack_id": {"type": "string", "minLength": 1},
+        "trigger": {"type": "string", "minLength": 1},
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scenario", "summary", "verification"],
+          "properties": {
+            "scenario": {"enum": ["SUCCESS", "ESCALATION", "RECOVERY"]},
+            "summary": {"type": "string", "minLength": 1, "maxLength": 512},
+            "verification": {"const": "SIMULATED_ONLY"}
+          }
+        },
+        "timestamp": {"type": "string", "format": "date-time"}
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "source_type", "source_ref", "retrieved_at"],
+        "properties": {
+          "evidence_id": {"type": "string", "minLength": 1},
+          "source_type": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "pattern": "^outcome_evidence/evidence/"},
+          "retrieved_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "evidence_integrity": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_fingerprint", "authorization_fingerprint", "terminal_state", "budget_usage", "external_execution_performed"],
+      "properties": {
+        "plan_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "authorization_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "terminal_state": {"enum": ["SUCCEEDED", "FAILED", "STOPPED", "ESCALATED"]},
+        "budget_usage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["attempts", "elapsed_seconds", "changed_files", "changed_bytes", "events"],
+          "properties": {
+            "attempts": {"type": "integer", "minimum": 0},
+            "elapsed_seconds": {"type": "integer", "minimum": 0},
+            "changed_files": {"type": "integer", "minimum": 0},
+            "changed_bytes": {"type": "integer", "minimum": 0},
+            "events": {"type": "integer", "minimum": 0}
+          }
+        },
+        "external_execution_performed": {"const": false}
+      }
+    },
+    "criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["success", "failure", "observed"],
+      "properties": {
+        "success": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "failure": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "observed": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "promotion_eligibility": {"const": "NOT_ELIGIBLE"},
+    "promotion_blockers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "bundle_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

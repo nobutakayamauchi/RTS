@@ -1,0 +1,62 @@
+{
+  "bundle_fingerprint": "0084528328cece383d24aebd71fd8c154203aa2e026da780bada69434059b91b",
+  "bundle_id": "RTS-OUTCOME-000003",
+  "classification_rationale": "Recovery relevance is inferred from a preserved checkpoint; no Skill mutation or rollback was executed.",
+  "controller": {
+    "authorization_fingerprint": "64520b5da0655a7841057bf4586925084a2ae221fc306545f7165a09bd5efde0",
+    "budget_usage": {
+      "attempts": 1,
+      "changed_bytes": 0,
+      "changed_files": 0,
+      "elapsed_seconds": 1,
+      "events": 5
+    },
+    "external_execution_performed": false,
+    "plan_fingerprint": "961feff72e61d0b5dfc8685cf8d6f3f19cb5eac48dadc3ed470062303098f12e",
+    "terminal_state": "STOPPED"
+  },
+  "criteria": {
+    "failure": [
+      "Skill rollback restoration was not exercised"
+    ],
+    "observed": [
+      "terminal STOPPED state retained bounded local evidence"
+    ],
+    "success": [
+      "prior events and checkpoint remain reconstructable after stop"
+    ]
+  },
+  "evidence_integrity": {
+    "RTS-EVIDENCE-OUTCOME-000003": "0d3a95f275fbd9ee346fda7b8d1159305d6f5602ea8a18cae6af941675a5b69d"
+  },
+  "evidence_refs": [
+    {
+      "evidence_id": "RTS-EVIDENCE-OUTCOME-000003",
+      "retrieved_at": "2026-07-24T20:30:03Z",
+      "source_ref": "outcome_evidence/evidence/recovery-controller-result.json",
+      "source_type": "local_controller_fixture"
+    }
+  ],
+  "execution_record": {
+    "drive_id": "local-dry-run-drive",
+    "pack_id": "no-external-tools",
+    "result": {
+      "scenario": "RECOVERY",
+      "summary": "Explicit stop preserved reconstructable local state for a future rollback decision.",
+      "verification": "SIMULATED_ONLY"
+    },
+    "skill_id": "fixture-skill-v1",
+    "timestamp": "2026-07-24T20:30:03Z",
+    "trigger": "governed-outcome-recovery-fixture"
+  },
+  "execution_scope": "SIMULATED_ONLY",
+  "outcome_classification": "ASSUMED",
+  "promotion_blockers": [
+    "candidate Skill mutation did not occur",
+    "real recovery outcome is unavailable",
+    "rollback restoration remains untested"
+  ],
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "scenario": "RECOVERY",
+  "schema_version": "RTS-OUTCOME-BUNDLE-V1"
+}
