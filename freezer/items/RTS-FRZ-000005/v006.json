@@ -1,0 +1,65 @@
+{
+  "item_id": "RTS-FRZ-000005",
+  "title": "Read-Only Loop Core",
+  "type": "feature",
+  "status": "COMPLETED",
+  "summary": "Build a read-only loop that consumes governed records and asset metadata, evaluates state/outcomes, and produces recommendations without implementation authority.",
+  "original_problem": "Existing operation-loop and state/evolution specifications are mostly documents or legacy code and are not joined to current FREEZER evidence as a bounded executable evaluator.",
+  "why_it_matters": "Read-only operation provides real data and validates contracts before any controller receives write or execution authority.",
+  "reason_frozen": "Depends on the completed Cross-Repo Asset Manifest and requires a separate assessment using its actual inventory.",
+  "preserved_value": [
+    "State capture, evidence-grounded evaluation, recommendation output, stop conditions, checkpointing, and reconstruction without mutation."
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 3,
+    "strategic_fit": 5,
+    "readiness": 3,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 4,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000004 is completed",
+    "Asset manifest verification remains stable",
+    "execution_record/evidence_ref linkage boundary is explicitly scoped"
+  ],
+  "negative_triggers": [
+    "Requires write authority",
+    "Cannot separate verified/unverified/assumed outputs",
+    "Must redefine RTS core"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000004"
+  ],
+  "source_refs": [
+    "docs/core/operation_loop.md",
+    "rts_kernel/state_engine.py",
+    "rts_kernel/indexing/memory_index_engine.py",
+    "RTS-Skills- verification-runner asset via asset manifest"
+  ],
+  "possible_destinations": [
+    "RTS-Hermes-Drive",
+    "RTS-AGE dry-run adapter"
+  ],
+  "estimated_hours": {
+    "minimum": 16,
+    "maximum": 32
+  },
+  "tags": [
+    "read-only",
+    "loop",
+    "evaluation",
+    "recommendation",
+    "checkpoint"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 6,
+  "created_at": "2026-07-24T03:47:33Z",
+  "updated_at": "2026-07-24T07:59:00Z",
+  "supersedes": "v005"
+}
