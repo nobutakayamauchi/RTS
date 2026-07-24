@@ -10,7 +10,9 @@ from pathlib import Path
 from freezer.assessment_core import (
     BuildAssessmentError, DEFAULT_ROOT, derive, load_current_item, load_json, validate_record,
 )
-from freezer.assessment_rank import build_index_rows, gate_payload, rebuild_index, verify_assessments
+from freezer.assessment_rank import (
+    build_index_rows, gate_payload, rebuild_index, verify_assessments,
+)
 from freezer.assessment_store import (
     assessment_root, assessment_state, create_assessment, load_current_assessment,
 )
