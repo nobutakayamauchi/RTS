@@ -212,6 +212,78 @@ class ExecutionControllerTests(unittest.TestCase):
         self.assertEqual(second["state"], "ESCALATED")
         self.assertEqual(second["usage"]["events"], 5)
 
+    def test_retry_reserves_event_capacity_for_terminal_escalation(self) -> None:
+        self.set_budget("max_events", 5)
+        retry = {
+            "kind": "failure",
+            "summary": "retryable fixture failure",
+            "retryable": True,
+            "usage": {"elapsed_seconds": 1, "changed_files": 0, "changed_bytes": 0},
+            "result": {"reason": "fixture"},
+            "timestamp": "2026-07-24T00:00:01Z",
+        }
+        self.write_json(self.script, retry)
+        first = run_execution(self.root, self.auth, self.state, self.script)
+        self.assertEqual(first["state"], "RUNNING")
+        retry["timestamp"] = "2026-07-24T00:00:02Z"
+        self.write_json(self.script, retry)
+        second = resume_execution(self.root, self.auth, self.state, self.script)
+        self.assertEqual(second["state"], "ESCALATED")
+        self.assertEqual(second["usage"]["events"], 5)
+
+    def test_emergency_stop_survives_gate_drift(self) -> None:
+        retry = {
+            "kind": "failure",
+            "summary": "pause before gate drift",
+            "retryable": True,
+            "usage": {"elapsed_seconds": 1, "changed_files": 0, "changed_bytes": 0},
+            "result": {"reason": "fixture"},
+            "timestamp": "2026-07-24T00:00:01Z",
+        }
+        self.write_json(self.script, retry)
+        first = run_execution(self.root, self.auth, self.state, self.script)
+        build_path = self.root / "freezer/index/build_priority.json"
+        build = self.read_json(build_path)
+        build["items"][0]["assessment_state"] = "STALE"
+        self.write_json(build_path, build)
+
+        stopped = stop_execution(
+            self.root, self.auth, self.state, "2026-07-24T00:00:02Z"
+        )
+        self.assertEqual(stopped["state"], "STOPPED")
+        events, checkpoint = verify_checkpoint(self.state, first["plan_id"])
+        self.assertEqual(events[-1]["event_type"], "HUMAN_EMERGENCY_STOP")
+        self.assertEqual(checkpoint["state"], "STOPPED")
+
+    def test_inspect_survives_gate_drift(self) -> None:
+        retry = {
+            "kind": "failure",
+            "summary": "pause before inspection",
+            "retryable": True,
+            "usage": {"elapsed_seconds": 1, "changed_files": 0, "changed_bytes": 0},
+            "result": {"reason": "fixture"},
+            "timestamp": "2026-07-24T00:00:01Z",
+        }
+        self.write_json(self.script, retry)
+        first = run_execution(self.root, self.auth, self.state, self.script)
+        build_path = self.root / "freezer/index/build_priority.json"
+        build = self.read_json(build_path)
+        build["items"][0]["assessment_state"] = "STALE"
+        self.write_json(build_path, build)
+        inspected = inspect_run(self.root, self.auth, self.state)
+        self.assertEqual(inspected["plan"]["plan_id"], first["plan_id"])
+        self.assertEqual(inspected["checkpoint"]["state"], "RUNNING")
+
+    def test_stop_before_dispatch_records_planned_to_stopped(self) -> None:
+        stopped = stop_execution(
+            self.root, self.auth, self.state, "2026-07-24T00:00:00Z"
+        )
+        self.assertEqual(stopped["state"], "STOPPED")
+        events, _ = verify_checkpoint(self.state, stopped["plan_id"])
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["state_before"], "PLANNED")
+        self.assertEqual(events[0]["state_after"], "STOPPED")
+
     def test_checkpoint_disagreement_is_detected(self) -> None:
         result = run_execution(self.root, self.auth, self.state, self.script)
         path = self.state / result["plan_id"] / "checkpoint.json"
@@ -288,6 +360,21 @@ class ExecutionControllerTests(unittest.TestCase):
                 if path.is_file()
             )
             self.assertNotIn("secret", persisted)
+
+    def test_nested_private_script_fields_are_rejected(self) -> None:
+        script = self.read_json(self.script)
+        script["result"] = {"metadata": [{"provider-raw-payload": "secret"}]}
+        self.write_json(self.script, script)
+        with self.assertRaisesRegex(ControllerError, "forbidden private field"):
+            run_execution(self.root, self.auth, self.state, self.script)
+
+    def test_unsafe_summary_is_rejected_before_state_write(self) -> None:
+        script = self.read_json(self.script)
+        script["summary"] = "credential: must not be persisted"
+        self.write_json(self.script, script)
+        with self.assertRaisesRegex(ControllerError, "forbidden private marker"):
+            run_execution(self.root, self.auth, self.state, self.script)
+        self.assertFalse(self.state.exists())
 
     def test_inspect_verifies_checkpoint_and_events(self) -> None:
         result = run_execution(self.root, self.auth, self.state, self.script)
