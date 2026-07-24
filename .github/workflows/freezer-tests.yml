@@ -28,9 +28,25 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify committed FREEZER snapshot
+        id: committed_verify
+        continue-on-error: true
         run: |
-          python -m freezer.cli verify
-          python -m freezer.build_assessment verify
+          set -o pipefail
+          {
+            python -m freezer.cli verify
+            python -m freezer.build_assessment verify
+          } 2>&1 | tee /tmp/freezer-verify.log
+      - name: Upload verification diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freezer-verification-diagnostics
+          path: /tmp/freezer-verify.log
+          if-no-files-found: error
+          retention-days: 1
+      - name: Stop after committed verification failure
+        if: steps.committed_verify.outcome == 'failure'
+        run: exit 1
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
