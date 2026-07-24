@@ -3,6 +3,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from freezer.assessment_core import (
+    BuildAssessmentError,
+    item_fingerprint as assessment_item_fingerprint,
+)
+from freezer.preflight import (
+    PreflightError,
+    item_fingerprint as preflight_item_fingerprint,
+)
+
 from .models import ControllerError, load_json
 
 DEFAULT_INDEX_PATHS = (
@@ -10,6 +19,7 @@ DEFAULT_INDEX_PATHS = (
     "freezer/index/build_priority.json",
     "freezer/index/items.json",
 )
+
 
 def _relative_or_absolute(path: Path, root: Path) -> str:
     try:
@@ -120,6 +130,12 @@ def _governed_state(root: Path, authorization: dict[str, Any]) -> tuple[dict[str
         raise ControllerError("assessment pointer ID mismatch")
     if assessment_pointer.get("item_fingerprint") != assessment_record.get("item_fingerprint"):
         raise ControllerError("assessment pointer fingerprint mismatch")
+    try:
+        current_assessment_fingerprint = assessment_item_fingerprint(item_record)
+    except BuildAssessmentError as exc:
+        raise ControllerError(f"cannot fingerprint current item for Assessment: {exc}") from exc
+    if assessment_record.get("item_fingerprint") != current_assessment_fingerprint:
+        raise ControllerError("Build Assessment fingerprint is stale for current item")
 
     preflight_pointer_path = root / "freezer" / "preflights" / item_id / "current.json"
     preflight_pointer, preflight_record_path, preflight_record = _load_pointer_target(root, preflight_pointer_path)
@@ -129,6 +145,12 @@ def _governed_state(root: Path, authorization: dict[str, Any]) -> tuple[dict[str
         raise ControllerError("Preflight record is not current PASS")
     if preflight_pointer.get("item_fingerprint") != preflight_record.get("item_fingerprint"):
         raise ControllerError("Preflight pointer fingerprint mismatch")
+    try:
+        current_preflight_fingerprint = preflight_item_fingerprint(item_record)
+    except PreflightError as exc:
+        raise ControllerError(f"cannot fingerprint current item for Preflight: {exc}") from exc
+    if preflight_record.get("item_fingerprint") != current_preflight_fingerprint:
+        raise ControllerError("Preflight fingerprint is stale for current item")
 
     paths = [
         assets_path,

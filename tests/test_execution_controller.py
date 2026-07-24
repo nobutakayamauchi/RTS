@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from freezer.assessment_core import item_fingerprint as assessment_item_fingerprint
+
 from execution_controller.cli import _verification_fixture
 from execution_controller.controller import (
     ControllerError,
@@ -90,6 +92,33 @@ class ExecutionControllerTests(unittest.TestCase):
         build["items"][0]["assessment_state"] = "STALE"
         self.write_json(build_path, build)
         with self.assertRaisesRegex(ControllerError, "missing or stale"):
+            plan_execution(self.root, self.auth)
+
+    def test_assessment_fingerprint_is_recomputed_from_current_item(self) -> None:
+        item_path = self.root / "freezer/items/RTS-FRZ-999999/v001.json"
+        item = self.read_json(item_path)
+        item["summary"] = "Changed after assessment."
+        self.write_json(item_path, item)
+        with self.assertRaisesRegex(ControllerError, "Assessment fingerprint is stale"):
+            plan_execution(self.root, self.auth)
+
+    def test_preflight_fingerprint_is_recomputed_from_current_item(self) -> None:
+        item_path = self.root / "freezer/items/RTS-FRZ-999999/v001.json"
+        item = self.read_json(item_path)
+        item["summary"] = "Changed after preflight."
+        self.write_json(item_path, item)
+
+        fresh_assessment = assessment_item_fingerprint(item)
+        assessment_path = self.root / "freezer/assessments/RTS-FRZ-999999/ba001.json"
+        assessment = self.read_json(assessment_path)
+        assessment["item_fingerprint"] = fresh_assessment
+        self.write_json(assessment_path, assessment)
+        pointer_path = self.root / "freezer/assessments/RTS-FRZ-999999/current.json"
+        pointer = self.read_json(pointer_path)
+        pointer["item_fingerprint"] = fresh_assessment
+        self.write_json(pointer_path, pointer)
+
+        with self.assertRaisesRegex(ControllerError, "Preflight fingerprint is stale"):
             plan_execution(self.root, self.auth)
 
     def test_legal_and_illegal_state_transitions(self) -> None:

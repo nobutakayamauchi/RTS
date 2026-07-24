@@ -6,6 +6,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+from freezer.assessment_core import item_fingerprint as assessment_item_fingerprint
+from freezer.preflight import item_fingerprint as preflight_item_fingerprint
+
 from .controller import (
     ControllerError,
     inspect_run,
@@ -110,7 +113,7 @@ def _verification_fixture(root: Path) -> tuple[Path, Path]:
         "item_id": item_id,
         "assessment_version": 1,
         "item_version_snapshot": 1,
-        "item_fingerprint": "a" * 64,
+        "item_fingerprint": assessment_item_fingerprint(item),
         "derived": {"recommendation": "BUILD_NOW"},
     }
     _write_json(root / assessment_path, assessment)
@@ -133,7 +136,7 @@ def _verification_fixture(root: Path) -> tuple[Path, Path]:
         "item_id": item_id,
         "preflight_version": 1,
         "item_version_snapshot": 1,
-        "item_fingerprint": "b" * 64,
+        "item_fingerprint": preflight_item_fingerprint(item),
         "outcome": "PASS",
     }
     _write_json(root / preflight_path, preflight)
