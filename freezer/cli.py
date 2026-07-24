@@ -165,6 +165,20 @@ def validate_item(item: dict[str, Any], config: dict[str, Any]) -> None:
     if hours["minimum"] < 0 or hours["maximum"] < hours["minimum"]:
         raise FreezerError(f"{item_id}: invalid estimated_hours range")
 
+    string_list_fields = {
+        "preserved_value",
+        "trigger_conditions",
+        "negative_triggers",
+        "dependencies",
+        "source_refs",
+        "possible_destinations",
+        "tags",
+    }
+    for field in sorted(string_list_fields):
+        values = item[field]
+        if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+            raise FreezerError(f"{item_id}: {field} must be an array of strings")
+
 
 def compute_score(item: dict[str, Any], config: dict[str, Any]) -> float:
     """Return a deterministic 0-100 priority score."""

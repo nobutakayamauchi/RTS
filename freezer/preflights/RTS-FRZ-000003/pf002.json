@@ -1,0 +1,78 @@
+{
+  "data_migration": {
+    "required": false,
+    "notes": "No parent migration is authorized; each child defines its own append-only artifacts."
+  },
+  "risks": [
+    "One giant PR would mix repository governance and runtime authority",
+    "Premature execution authority could mutate systems without valid evidence",
+    "Private data could leak during naive integration"
+  ],
+  "external_interfaces": [
+    "GitHub repositories",
+    "RTS-Hermes-Drive",
+    "RTS-AGE",
+    "RTS-Skills-",
+    "RTS-MCP-Packs"
+  ],
+  "regression_tests": [
+    "FREEZER validation",
+    "Build Assessment validation",
+    "Preflight validation",
+    "Per-child tests and manifests"
+  ],
+  "assessor": "human-and-ai-ground-survey",
+  "approval_changes": [
+    "No parent implementation approval is granted",
+    "Each child requires its own BUILD_NOW assessment, PASS preflight, and explicit approval"
+  ],
+  "existing_assumptions": [
+    "RTS remains canonical structural ledger",
+    "Hermes Drive remains thin orchestration layer",
+    "RTS-AGE remains proposal/dry-run implementation lab",
+    "Skills and Packs keep separate canonical responsibilities"
+  ],
+  "public_documents": [
+    "docs/implementation/CROSS_REPO_ASSET_MANIFEST_V1_TASK.md",
+    "docs/ecosystem/REPO_MAP.md",
+    "docs/ecosystem/PROJECT_REGISTRY.md"
+  ],
+  "decomposition": {
+    "required": true,
+    "child_candidates": [
+      "RTS-FRZ-000004",
+      "RTS-FRZ-000005",
+      "RTS-FRZ-000006",
+      "RTS-FRZ-000007"
+    ]
+  },
+  "rationale": "The parent crosses four independently testable boundaries: inventory/provenance, read-only evaluation, execution authority, and learning promotion. Direct implementation would recreate hidden-coupling risk.",
+  "affected_boundaries": [
+    "RTS canonical records",
+    "cross-repository ownership",
+    "agent evaluation",
+    "execution authority",
+    "skill lifecycle",
+    "private metadata handling"
+  ],
+  "rollback_boundary": "Keep the parent FROZEN and NOT_APPROVED; remove no existing assets. Each child is independently revertible by its merge commit.",
+  "hidden_dependencies": [
+    "execution_record/evidence_ref linkage is currently minimal",
+    "legacy kernel interfaces have drift",
+    "private repositories cannot be copied into public RTS",
+    "provider adapters are not canonical records"
+  ],
+  "completion_conditions": [
+    "000004 completes deterministic asset inventory",
+    "000005 proves read-only loop",
+    "000006 proves bounded governed execution",
+    "000007 proves evidence-backed skill promotion"
+  ],
+  "outcome": "DECOMPOSE_REQUIRED",
+  "preflight_id": "RTS-PF-000003-002",
+  "item_id": "RTS-FRZ-000003",
+  "preflight_version": 2,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "19192a86d34e5b0d772e0859f9c334388a2b1b4b856d653154c981a80474180a",
+  "created_at": "2026-07-24T05:20:26Z"
+}

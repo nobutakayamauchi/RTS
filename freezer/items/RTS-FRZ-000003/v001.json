@@ -1,0 +1,73 @@
+{
+  "item_id": "RTS-FRZ-000003",
+  "title": "Governed Execution and Learning Loop",
+  "type": "architecture",
+  "status": "FROZEN",
+  "summary": "Parent initiative for a governed AI execution loop that selects work, runs bounded implementation, evaluates outcomes, extracts reusable learning, and promotes changes only after evidence and human approval.",
+  "original_problem": "RTS has valuable loop, audit, memory, skill, provider, and success-replication assets distributed across repositories, but no single governed end-to-end operational loop joins them safely.",
+  "why_it_matters": "A complete loop can shorten repeated development while preventing autonomous scope expansion, lost context, unverified learning, and PR #91-style hidden-coupling failures.",
+  "reason_frozen": "The feasibility survey found four independently verifiable construction boundaries. Building the parent directly would combine asset discovery, read-only evaluation, execution control, and skill promotion into one unsafe integration.",
+  "preserved_value": "The complete two-loop architecture: execute safely, evaluate evidence, propose improvements, compare versions, require human approval, and preserve rollback/reconstruction.",
+  "priority": {
+    "impact": 4,
+    "urgency": 3,
+    "strategic_fit": 5,
+    "readiness": 3,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 4,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "All four children have current evidence-backed assessments",
+    "Cross-repo ownership contracts remain stable",
+    "Read-only loop data demonstrates value before execution authority expands"
+  ],
+  "negative_triggers": [
+    "Any attempt to flatten all repository bodies into RTS core",
+    "Missing rollback or human approval boundary",
+    "Private repository content would be exposed",
+    "Children cannot be independently verified"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000004",
+    "RTS-FRZ-000005",
+    "RTS-FRZ-000006",
+    "RTS-FRZ-000007"
+  ],
+  "source_refs": [
+    "docs/implementation/CROSS_REPO_ASSET_MANIFEST_V1_TASK.md",
+    "docs/ecosystem/REPO_MAP.md",
+    "docs/ecosystem/PROJECT_REGISTRY.md",
+    "docs/core/operation_loop.md",
+    "evolution/RTS_EVOLUTION_ENGINE.md",
+    "evolution/RTS_SUCCESS_REPLICATION_ENGINE.md"
+  ],
+  "possible_destinations": [
+    "RTS",
+    "RTS-Hermes-Drive",
+    "RTS-AGE",
+    "RTS-Skills-",
+    "RTS-MCP-Packs"
+  ],
+  "estimated_hours": {
+    "minimum": 56,
+    "maximum": 96
+  },
+  "tags": [
+    "loop",
+    "harness",
+    "learning",
+    "governance",
+    "cross-repo",
+    "parent"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 1,
+  "created_at": "2026-07-24T03:47:32Z",
+  "updated_at": "2026-07-24T03:47:32Z",
+  "supersedes": null
+}

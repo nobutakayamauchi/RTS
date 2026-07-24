@@ -1,0 +1,69 @@
+{
+  "item_id": "RTS-FRZ-000007",
+  "title": "Outcome Learning and Skill Promotion",
+  "type": "feature",
+  "status": "FROZEN",
+  "summary": "Evaluate completed runs, classify success/failure, extract learning proposals, compare old/new behavior, and promote or roll back skills only after evidence and human approval.",
+  "original_problem": "RTS records outcomes and contains legacy evolution/success specifications, but current execution results do not yet flow into governed, tested, versioned skill improvement.",
+  "why_it_matters": "Without this child the system can execute but cannot reliably improve its methods or prevent repeated mistakes.",
+  "reason_frozen": "Requires completed asset, read-only, and execution-controller children plus real run evidence for evaluation design.",
+  "preserved_value": [
+    "Outcome records, learning proposals, regression comparison, skill lifecycle, approval, rollback, retirement, and reconstruction."
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 2,
+    "strategic_fit": 5,
+    "readiness": 2,
+    "revenue_value": 4,
+    "dependency_value": 3,
+    "risk_reduction": 4,
+    "confidence": 3,
+    "effort": 5,
+    "uncertainty": 4
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000004 through 000006 completed",
+    "At least three governed run outcomes exist",
+    "Skill promotion and rollback datasets are defined"
+  ],
+  "negative_triggers": [
+    "AI can self-promote changes",
+    "Success is accepted without linked evidence",
+    "Regression comparison is absent",
+    "Core rules can be silently rewritten"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000004",
+    "RTS-FRZ-000005",
+    "RTS-FRZ-000006"
+  ],
+  "source_refs": [
+    "evolution/RTS_EVOLUTION_ENGINE.md",
+    "evolution/RTS_SUCCESS_REPLICATION_ENGINE.md",
+    "docs/core/self_audit_engine.md",
+    "RTS-Talent-Registry promotion asset via asset manifest"
+  ],
+  "possible_destinations": [
+    "RTS-Skills-",
+    "RTS-Hermes-Drive",
+    "RTS governance proposal records"
+  ],
+  "estimated_hours": {
+    "minimum": 24,
+    "maximum": 48
+  },
+  "tags": [
+    "learning",
+    "outcome",
+    "skill-promotion",
+    "regression",
+    "rollback"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 2,
+  "created_at": "2026-07-24T03:47:34Z",
+  "updated_at": "2026-07-24T05:20:26Z",
+  "supersedes": "v001"
+}

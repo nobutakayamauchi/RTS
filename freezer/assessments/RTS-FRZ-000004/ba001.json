@@ -1,0 +1,161 @@
+{
+  "assessor": "cross-repo-feasibility-review",
+  "rationale": "The current RTS ecosystem map, existing FREEZER gates, legacy inventory/index concepts, Skills verification method, and repository position documents materially shorten the implementation. The result is a prerequisite for all later loop children and can be bounded to metadata-only records.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 24,
+    "integration_hours": 3,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 2
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "nobutakayamauchi/RTS-Minimal-Runtime",
+      "nobutakayamauchi/RTS-AGE",
+      "nobutakayamauchi/RTS-Skills-",
+      "nobutakayamauchi/RTS-Hermes-Drive",
+      "nobutakayamauchi/RTS-MCP-Packs",
+      "nobutakayamauchi/RTS-minicompany",
+      "nobutakayamauchi/RTS-Design-Research",
+      "nobutakayamauchi/rts-dev-protocol",
+      "nobutakayamauchi/RTS-Talent-Registry",
+      "nobutakayamauchi/RTS-Signal-Feeds",
+      "nobutakayamauchi/rts-video-flow",
+      "nobutakayamauchi/AIX",
+      "nobutakayamauchi/rts01-offer",
+      "nobutakayamauchi/seminar-compass",
+      "nobutakayamauchi/nobutakayamauchi",
+      "nobutakayamauchi/codex-connector-test",
+      "nobutakayamauchi/ryoushuushotesutoyou",
+      "nobutakayamauchi/rts-lite"
+    ],
+    "queries": [
+      "repository role canonical responsibility lifecycle status",
+      "FREEZER preflight build assessment manifest deterministic index",
+      "legacy state engine memory index self audit",
+      "Skills feature build verification runner",
+      "provider adapter dry run decision log report",
+      "private repository metadata boundary"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "docs/ecosystem/REPO_MAP.md",
+        "ref": "e4976a6bbe1f9b15d075401de26d8f56ef509874",
+        "kind": "documentation",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Current canonical ecosystem role map."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "docs/ecosystem/PROJECT_REGISTRY.md",
+        "ref": "e4976a6bbe1f9b15d075401de26d8f56ef509874",
+        "kind": "data",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Current repository lifecycle classification."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/",
+        "ref": "e4976a6bbe1f9b15d075401de26d8f56ef509874",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Immutable versions, deterministic indexes and SHA manifest patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "rts_kernel/indexing/memory_index_engine.py",
+        "ref": "e4976a6bbe1f9b15d075401de26d8f56ef509874",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Legacy deterministic indexing patterns; repair-required, not copied as runtime."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-Skills-",
+        "path": "rts-skills/core/verification-runner/skill.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "Verified/unverified/assumed reporting boundary."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-AGE",
+        "path": "core/observer_gate/log_reader.py",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "Privacy-conscious metadata reader pattern."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-Talent-Registry",
+        "path": "docs/governance/PROMOTION_RULES.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "Evidence-state and retirement vocabulary."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS-Design-Research",
+        "path": "docs/contracts/provenance_model.md",
+        "ref": "main",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "Provenance and reference boundary concepts."
+      }
+    ],
+    "gaps": [
+      "Not every historical commit or binary object was inspected",
+      "Most adjacent repository refs are branch refs and should be pinned in future snapshots",
+      "Private repository content was intentionally not read into the public inventory"
+    ]
+  },
+  "risks": [
+    "False precision in estimated hours",
+    "Stale branch refs",
+    "Private metadata leakage if logical locator rules are weakened",
+    "Conflicting ownership claims if capabilities are named inconsistently"
+  ],
+  "assessment_id": "RTS-BA-000004-001",
+  "item_id": "RTS-FRZ-000004",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "85f04e0bf516e16f49a1a143fd82bf3b2553f7cb96eb4a9bf829aa6228c4d8dd",
+  "derived": {
+    "benefit_score": 97.0,
+    "cost_score": 33.33,
+    "reuse_score": 66.67,
+    "decision_score": 73.35,
+    "reuse_hours_saved": 16.0,
+    "net_hours": 16.0,
+    "time_saved_ratio": 0.6667,
+    "implementation_efficiency": 1.5,
+    "cost_effectiveness": 6.06,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-07-24T03:49:45Z"
+}
