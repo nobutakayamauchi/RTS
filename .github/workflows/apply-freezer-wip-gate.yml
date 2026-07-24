@@ -1,0 +1,73 @@
+name: Apply FREEZER WIP Gate Fix
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/freezer-build-assessment-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Include WIP capacity in the full gate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected one match, found {count}")
+              return text.replace(old, new, 1)
+
+          rank_path = Path('freezer/assessment_rank.py')
+          rank = rank_path.read_text(encoding='utf-8')
+          rank = replace_once(
+              rank,
+              '''    ready = (\n        state["state"] == "CURRENT" and recommendation == "BUILD_NOW" and preflight == "PASS"\n        and item.get("build_authority") == "APPROVED"\n        and item.get("status") in {"READY", "SELECTED", "IN_PROGRESS"}\n    )\n    return {\n''',
+              '''    config = load_config(root)\n    active_in_progress = [\n        existing["item_id"]\n        for existing in iter_current_items(root)\n        if existing["item_id"] != item_id and existing.get("status") == "IN_PROGRESS"\n    ]\n    wip_limit = int(config["work_in_progress_limit"])\n    wip_capacity_available = len(active_in_progress) < wip_limit\n    ready = (\n        state["state"] == "CURRENT" and recommendation == "BUILD_NOW" and preflight == "PASS"\n        and item.get("build_authority") == "APPROVED"\n        and item.get("status") in {"READY", "SELECTED", "IN_PROGRESS"}\n        and wip_capacity_available\n    )\n    return {\n''',
+              'gate WIP calculation',
+          )
+          rank = replace_once(
+              rank,
+              '''        "preflight_state": preflight, "build_authority": item.get("build_authority"),\n        "selection_ready": ready,\n''',
+              '''        "preflight_state": preflight, "build_authority": item.get("build_authority"),\n        "work_in_progress_limit": wip_limit,\n        "active_in_progress": active_in_progress,\n        "wip_capacity_available": wip_capacity_available,\n        "selection_ready": ready,\n''',
+              'gate WIP payload',
+          )
+          rank_path.write_text(rank, encoding='utf-8')
+
+          test_path = Path('tests/test_freezer_build_assessment.py')
+          test = test_path.read_text(encoding='utf-8')
+          new_test = '''    def test_full_gate_is_false_when_wip_capacity_is_full(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            root = self.isolated_root(temp_dir)\n            self.mutate_current_item(root, "RTS-FRZ-000002", {"status": "READY"})\n            self.mutate_current_item(\n                root,\n                "RTS-FRZ-000001",\n                {"status": "IN_PROGRESS", "build_authority": "APPROVED"},\n            )\n            payload = gate_payload(root, "RTS-FRZ-000002")\n            self.assertEqual(payload["active_in_progress"], ["RTS-FRZ-000001"])\n            self.assertEqual(payload["work_in_progress_limit"], 1)\n            self.assertFalse(payload["wip_capacity_available"])\n            self.assertFalse(payload["selection_ready"])\n\n'''
+          test = replace_once(
+              test,
+              '\n\nif __name__ == "__main__":\n',
+              '\n\n' + new_test + 'if __name__ == "__main__":\n',
+              'WIP gate regression test',
+          )
+          test_path.write_text(test, encoding='utf-8')
+          PY
+      - name: Rebuild and validate
+        run: |
+          python -m freezer.cli reindex
+          python -B -m unittest discover -s tests -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Commit code and tests only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freezer tests
+          git commit -m 'Include WIP capacity in FREEZER selection readiness'
+          git push origin HEAD:feature/freezer-build-assessment-v1
