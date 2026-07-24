@@ -1,0 +1,52 @@
+name: Apply FREEZER Assessment Gate Code
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply-code:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/freezer-build-assessment-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Reuse validated patch recipe without workflow mutations
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path('.github/workflows/apply-freezer-assessment-gate.yml').read_text(encoding='utf-8')
+          opening = "          python - <<'PY'\n"
+          start = workflow.index(opening) + len(opening)
+          end = workflow.index("\n          PY\n", start)
+          script = textwrap.dedent(workflow[start:end])
+          cleanup_start = script.index("clean_workflow = '''name: FREEZER Tests")
+          cleanup_line = "Path('.github/workflows/apply-freezer-assessment-gate.yml').unlink()"
+          cleanup_end = script.index(cleanup_line, cleanup_start) + len(cleanup_line)
+          script = script[:cleanup_start] + script[cleanup_end:]
+          exec(compile(script, '<assessment-gate-recipe>', 'exec'))
+          PY
+      - name: Rebuild and validate
+        run: |
+          python -m freezer.cli reindex
+          python -B -m unittest discover -s tests -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Commit code and records only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freezer tests
+          git commit -m 'Enforce build assessment gate in FREEZER selection'
+          git push origin HEAD:feature/freezer-build-assessment-v1
