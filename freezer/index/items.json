@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T07:59:00Z",
+  "generated_at": "2026-07-24T14:09:00Z",
   "count": 7,
   "items": [
     {
@@ -119,10 +119,10 @@
     },
     {
       "item_id": "RTS-FRZ-000006",
-      "version": 2,
+      "version": 6,
       "title": "Governed Execution Controller",
       "type": "architecture",
-      "status": "FROZEN",
+      "status": "COMPLETED",
       "priority_score": 67.05,
       "estimated_hours": {
         "minimum": 24,
@@ -136,9 +136,9 @@
         "rollback",
         "human-gate"
       ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T05:20:26Z"
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-07-24T14:09:00Z"
     },
     {
       "item_id": "RTS-FRZ-000007",

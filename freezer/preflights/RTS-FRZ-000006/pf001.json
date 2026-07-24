@@ -1,0 +1,86 @@
+{
+  "data_migration": {
+    "required": false,
+    "notes": "No migration. v1 appends controller-local events/checkpoints only below an explicit state directory and appends governed FREEZER history in this repository."
+  },
+  "risks": [
+    "Dry-run results may be misread as live external execution",
+    "Budget or gate drift must stop or escalate before another attempt",
+    "Checkpoint corruption must block resume",
+    "Future provider adapters could accidentally widen authority if added without a new gate"
+  ],
+  "external_interfaces": [
+    "None in v1; repository-local governed reads and explicit controller-local state writes only",
+    "No network, subprocess, shell, provider API, GitHub write, deployment, publication, messaging, scheduling, customer action or adjacent-repository mutation"
+  ],
+  "regression_tests": [
+    "python -m asset_manifest.cli verify",
+    "python -m freezer.cli verify",
+    "python -m freezer.build_assessment verify",
+    "python -m loop_core.cli verify",
+    "python -m execution_controller.cli verify",
+    "python -B -m unittest discover -s tests -v",
+    "semantic generated-output freshness verification",
+    "Unicode Guard"
+  ],
+  "assessor": "human-and-ai-ground-survey",
+  "approval_changes": [
+    "RTS-FRZ-000006 alone receives APPROVED build authority and an explicit human-approved lifecycle",
+    "Controller runtime authority is limited to DRY_RUN_APPROVED and LOCAL_CHECKPOINT_WRITE",
+    "RTS-FRZ-000007 remains FROZEN / NOT_APPROVED and unimplemented"
+  ],
+  "existing_assumptions": [
+    "RTS-FRZ-000004 and RTS-FRZ-000005 are completed on main",
+    "Committed FREEZER and Asset Manifest indexes are the governed inputs",
+    "Python standard library is sufficient",
+    "events.jsonl is append-only source of truth and checkpoint.json is derived",
+    "Dry-run output is SIMULATED_ONLY and never claims external verification"
+  ],
+  "public_documents": [
+    "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md",
+    "execution_controller/README.md",
+    "docs/overview/EXECUTION_AND_EVIDENCE.md",
+    "asset_manifest/index/assets.json"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "rationale": "The work is bounded to a deterministic local controller, explicit authorization contract, dry-run adapter, budgets, state transitions, append-only hash-chained events, checkpoint verification, stop/resume/escalation, focused tests and governed CI. It cannot perform external actions and keeps provider execution outside v1.",
+  "affected_boundaries": [
+    "execution_controller local planning/runtime/store/adapter boundary",
+    "FREEZER item, Build Assessment, Preflight, indexes and manifest",
+    "Read-Only Loop Core completed-child verification boundary",
+    "governed CI path filters and validation",
+    "minimal execution_record output boundary"
+  ],
+  "rollback_boundary": "Revert PR #231. No adjacent repository, external service, credential, provider, deployment, publication, message, schedule, customer state or external side effect is mutated by v1.",
+  "hidden_dependencies": [
+    "Assessment and Preflight fingerprints must remain current across lifecycle-only revisions",
+    "Manifest hashes and semantic indexes must be regenerated after governed record changes",
+    "Resume requires unchanged input and authorization fingerprints",
+    "WIP=1 must hold while the controller item is SELECTED or IN_PROGRESS",
+    "Loop Core verification must recognize 000006 as completed while preserving 000007 as future/unapproved"
+  ],
+  "completion_conditions": [
+    "Only an explicitly authorized current FREEZER item can produce a plan",
+    "Plans are deterministic for identical governed inputs and authorization",
+    "Only the dry-run adapter and LOCAL_CHECKPOINT_WRITE capability are accepted",
+    "Attempts, elapsed time, changed files, changed bytes and events are bounded",
+    "Events are append-only and hash chained; checkpoint disagreement fails closed",
+    "Retryable failure requires explicit resume and cannot exceed attempt budget",
+    "Emergency stop and human escalation are structured and terminal",
+    "Execution record uses canonical required fields and is labelled SIMULATED_ONLY",
+    "RTS-FRZ-000006 has current BUILD_NOW assessment and PASS Preflight",
+    "Lifecycle records show SELECTED, IN_PROGRESS, VERIFIED and COMPLETED",
+    "RTS-FRZ-000007 remains FROZEN / NOT_APPROVED",
+    "All governed validation, focused tests and Unicode Guard pass"
+  ],
+  "outcome": "PASS",
+  "preflight_id": "RTS-PF-000006-001",
+  "item_id": "RTS-FRZ-000006",
+  "preflight_version": 1,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "da953bc98b7b0549ee67cdd527749e664327b49bcf0311ef0e90272a344b9707",
+  "created_at": "2026-07-24T14:05:00Z"
+}

@@ -19,7 +19,7 @@ from execution_controller.models import (
     sha256_value,
     validate_transition,
 )
-from execution_controller.store import verify_checkpoint
+from execution_controller.store import checkpoint_path, verify_checkpoint
 
 
 class ExecutionControllerTests(unittest.TestCase):
@@ -39,6 +39,12 @@ class ExecutionControllerTests(unittest.TestCase):
 
     def resign(self, document: dict) -> None:
         document["authorization_fingerprint"] = sha256_value(authorization_material(document))
+
+    def set_budget(self, field: str, value: int) -> None:
+        document = self.read_json(self.auth)
+        document["budgets"][field] = value
+        self.resign(document)
+        self.write_json(self.auth, document)
 
     def test_plan_is_deterministic(self) -> None:
         self.assertEqual(plan_execution(self.root, self.auth), plan_execution(self.root, self.auth))
@@ -161,6 +167,74 @@ class ExecutionControllerTests(unittest.TestCase):
         result = run_execution(self.root, self.auth, self.state, self.script)
         self.assertEqual(result["state"], "ESCALATED")
         self.assertEqual(result["usage"]["changed_files"], 0)
+
+    def test_elapsed_and_changed_byte_budgets_escalate(self) -> None:
+        cases = (("max_elapsed_seconds", "elapsed_seconds"), ("max_changed_bytes", "changed_bytes"))
+        for budget_field, usage_field in cases:
+            with self.subTest(budget=budget_field), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary) / "repo"
+                state = Path(temporary) / "state"
+                auth, script_path = _verification_fixture(root)
+                document = self.read_json(auth)
+                document["budgets"][budget_field] = 0
+                self.resign(document)
+                self.write_json(auth, document)
+                script = self.read_json(script_path)
+                script["usage"][usage_field] = 1
+                self.write_json(script_path, script)
+                result = run_execution(root, auth, state, script_path)
+                self.assertEqual(result["state"], "ESCALATED")
+                self.assertEqual(result["usage"][usage_field], 0)
+
+    def test_event_budget_escalates_instead_of_raising(self) -> None:
+        self.set_budget("max_events", 5)
+        retry = {
+            "kind": "failure",
+            "summary": "retryable fixture failure",
+            "retryable": True,
+            "usage": {"elapsed_seconds": 1, "changed_files": 0, "changed_bytes": 0},
+            "result": {"reason": "fixture"},
+            "timestamp": "2026-07-24T00:00:01Z",
+        }
+        self.write_json(self.script, retry)
+        first = run_execution(self.root, self.auth, self.state, self.script)
+        self.assertEqual(first["state"], "RUNNING")
+        success = {
+            "kind": "success",
+            "summary": "success requires a terminal verification event",
+            "retryable": False,
+            "usage": {"elapsed_seconds": 1, "changed_files": 0, "changed_bytes": 0},
+            "result": {"status": "ok"},
+            "timestamp": "2026-07-24T00:00:02Z",
+        }
+        self.write_json(self.script, success)
+        second = resume_execution(self.root, self.auth, self.state, self.script)
+        self.assertEqual(second["state"], "ESCALATED")
+        self.assertEqual(second["usage"]["events"], 5)
+
+    def test_checkpoint_disagreement_is_detected(self) -> None:
+        result = run_execution(self.root, self.auth, self.state, self.script)
+        path = self.state / result["plan_id"] / "checkpoint.json"
+        checkpoint = self.read_json(path)
+        checkpoint["state"] = "FAILED"
+        self.write_json(path, checkpoint)
+        with self.assertRaisesRegex(ControllerError, "checkpoint disagrees"):
+            verify_checkpoint(self.state, result["plan_id"])
+
+    def test_run_identifier_cannot_escape_state_directory(self) -> None:
+        with self.assertRaisesRegex(ControllerError, "unsafe characters"):
+            checkpoint_path(self.state, "../escape")
+
+    def test_committed_child_boundary(self) -> None:
+        repository_root = Path(__file__).resolve().parents[1]
+        index_path = repository_root / "freezer" / "index" / "items.json"
+        if not index_path.exists():
+            self.skipTest("governed repository index is unavailable")
+        rows = {row["item_id"]: row for row in self.read_json(index_path)["items"]}
+        self.assertEqual(rows["RTS-FRZ-000006"]["status"], "COMPLETED")
+        self.assertEqual(rows["RTS-FRZ-000006"]["build_authority"], "APPROVED")
+        self.assertEqual(rows["RTS-FRZ-000007"]["status"], "FROZEN")
+        self.assertEqual(rows["RTS-FRZ-000007"]["build_authority"], "NOT_APPROVED")
 
     def test_emergency_stop_preserves_prior_events(self) -> None:
         retry = {

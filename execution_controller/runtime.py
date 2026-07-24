@@ -97,33 +97,49 @@ def _execute_attempt(
 
     if response["kind"] == "success":
         verify_usage = dict(projected)
-        _append(
-            state_dir,
-            plan,
-            authorization,
-            event_type="ADAPTER_SUCCESS",
-            before="RUNNING",
-            after="VERIFYING",
-            attempt=attempt,
-            usage=verify_usage,
-            timestamp=timestamp,
-            summary=response["summary"],
-        )
         success_usage = _project_usage(verify_usage, event=True)
-        if _budget_excess(success_usage, plan["budgets"]):
-            raise ControllerError("max_events cannot record successful verification")
-        _append(
-            state_dir,
-            plan,
-            authorization,
-            event_type="DRY_RUN_VERIFIED",
-            before="VERIFYING",
-            after="SUCCEEDED",
-            attempt=attempt,
-            usage=success_usage,
-            timestamp=timestamp,
-            summary="Dry-run result verified as simulated-only output",
-        )
+        terminal_excess = _budget_excess(success_usage, plan["budgets"])
+        if terminal_excess:
+            _append(
+                state_dir,
+                plan,
+                authorization,
+                event_type="BUDGET_ESCALATION",
+                before="RUNNING",
+                after="ESCALATED",
+                attempt=attempt,
+                usage=verify_usage,
+                timestamp=timestamp,
+                summary=(
+                    "Projected successful verification exceeded: "
+                    + ", ".join(terminal_excess)
+                ),
+            )
+        else:
+            _append(
+                state_dir,
+                plan,
+                authorization,
+                event_type="ADAPTER_SUCCESS",
+                before="RUNNING",
+                after="VERIFYING",
+                attempt=attempt,
+                usage=verify_usage,
+                timestamp=timestamp,
+                summary=response["summary"],
+            )
+            _append(
+                state_dir,
+                plan,
+                authorization,
+                event_type="DRY_RUN_VERIFIED",
+                before="VERIFYING",
+                after="SUCCEEDED",
+                attempt=attempt,
+                usage=success_usage,
+                timestamp=timestamp,
+                summary="Dry-run result verified as simulated-only output",
+            )
     elif response["kind"] == "stop":
         _append(
             state_dir,

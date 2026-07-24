@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-24T07:59:00Z",
-  "count": 4,
+  "generated_at": "2026-07-24T14:09:00Z",
+  "count": 3,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -30,29 +30,6 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "DECOMPOSE_REQUIRED",
-      "updated_at": "2026-07-24T05:20:26Z"
-    },
-    {
-      "item_id": "RTS-FRZ-000006",
-      "version": 2,
-      "title": "Governed Execution Controller",
-      "type": "architecture",
-      "status": "FROZEN",
-      "priority_score": 67.05,
-      "estimated_hours": {
-        "minimum": 24,
-        "maximum": 48
-      },
-      "tags": [
-        "controller",
-        "execution",
-        "agent",
-        "budget",
-        "rollback",
-        "human-gate"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
       "updated_at": "2026-07-24T05:20:26Z"
     },
     {
