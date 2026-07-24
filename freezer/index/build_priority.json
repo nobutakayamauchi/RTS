@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T05:09:54Z",
+  "generated_at": "2026-07-24T05:20:26Z",
   "count": 5,
   "policy": {
     "priority_weight": 0.35,
@@ -12,7 +12,7 @@
   "items": [
     {
       "item_id": "RTS-FRZ-000005",
-      "version": 1,
+      "version": 2,
       "title": "Read-Only Loop Core",
       "status": "FROZEN",
       "priority_score": 75.41,
@@ -27,7 +27,7 @@
     },
     {
       "item_id": "RTS-FRZ-000003",
-      "version": 1,
+      "version": 2,
       "title": "Governed Execution and Learning Loop",
       "status": "FROZEN",
       "priority_score": 72.46,
@@ -42,7 +42,7 @@
     },
     {
       "item_id": "RTS-FRZ-000006",
-      "version": 1,
+      "version": 2,
       "title": "Governed Execution Controller",
       "status": "FROZEN",
       "priority_score": 67.05,
@@ -72,7 +72,7 @@
     },
     {
       "item_id": "RTS-FRZ-000007",
-      "version": 1,
+      "version": 2,
       "title": "Outcome Learning and Skill Promotion",
       "status": "FROZEN",
       "priority_score": 63.28,

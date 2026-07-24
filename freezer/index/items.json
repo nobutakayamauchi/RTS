@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T05:09:54Z",
+  "generated_at": "2026-07-24T05:20:26Z",
   "count": 7,
   "items": [
     {
@@ -51,7 +51,7 @@
     },
     {
       "item_id": "RTS-FRZ-000003",
-      "version": 1,
+      "version": 2,
       "title": "Governed Execution and Learning Loop",
       "type": "architecture",
       "status": "FROZEN",
@@ -70,11 +70,11 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "DECOMPOSE_REQUIRED",
-      "updated_at": "2026-07-24T03:47:32Z"
+      "updated_at": "2026-07-24T05:20:26Z"
     },
     {
       "item_id": "RTS-FRZ-000004",
-      "version": 5,
+      "version": 6,
       "title": "Cross-Repo Asset Manifest v1",
       "type": "architecture",
       "status": "COMPLETED",
@@ -93,11 +93,11 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-07-24T05:09:54Z"
+      "updated_at": "2026-07-24T05:20:26Z"
     },
     {
       "item_id": "RTS-FRZ-000005",
-      "version": 1,
+      "version": 2,
       "title": "Read-Only Loop Core",
       "type": "feature",
       "status": "FROZEN",
@@ -115,11 +115,11 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T03:47:33Z"
+      "updated_at": "2026-07-24T05:20:26Z"
     },
     {
       "item_id": "RTS-FRZ-000006",
-      "version": 1,
+      "version": 2,
       "title": "Governed Execution Controller",
       "type": "architecture",
       "status": "FROZEN",
@@ -138,11 +138,11 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T03:47:33Z"
+      "updated_at": "2026-07-24T05:20:26Z"
     },
     {
       "item_id": "RTS-FRZ-000007",
-      "version": 1,
+      "version": 2,
       "title": "Outcome Learning and Skill Promotion",
       "type": "feature",
       "status": "FROZEN",
@@ -160,7 +160,7 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T03:47:34Z"
+      "updated_at": "2026-07-24T05:20:26Z"
     }
   ]
 }

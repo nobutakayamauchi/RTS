@@ -1,0 +1,67 @@
+{
+  "item_id": "RTS-FRZ-000006",
+  "title": "Governed Execution Controller",
+  "type": "architecture",
+  "status": "FROZEN",
+  "summary": "Add bounded execution state transitions, retry/time/change budgets, stop/escalation rules, checkpoints, and agent dispatch behind explicit human approval.",
+  "original_problem": "No current component safely turns a selected candidate into a bounded agent execution while preserving authority, evidence, retry limits, rollback, and reconstruction.",
+  "why_it_matters": "This is the execution half of the loop, but it is unsafe until read-only evaluation has proven the contracts and failure modes.",
+  "reason_frozen": "Must follow the asset manifest and read-only loop; execution authority cannot be introduced on unvalidated observations.",
+  "preserved_value": [
+    "Loop controller, WIP enforcement, attempt/time/diff budgets, provider abstraction, checkpoint/resume, structured failure and human escalation."
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 2,
+    "strategic_fit": 5,
+    "readiness": 2,
+    "revenue_value": 4,
+    "dependency_value": 4,
+    "risk_reduction": 5,
+    "confidence": 3,
+    "effort": 5,
+    "uncertainty": 4
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000004 and 000005 completed",
+    "Read-only loop produces stable evidence",
+    "Rollback and emergency stop contracts tested"
+  ],
+  "negative_triggers": [
+    "Autonomous start or publish/send authority",
+    "Unbounded retries or code changes",
+    "Provider lock-in",
+    "No human escalation path"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000004",
+    "RTS-FRZ-000005"
+  ],
+  "source_refs": [
+    "RTS-Hermes-Drive orchestration asset via asset manifest",
+    "RTS-AGE provider adapter/dry-run assets via asset manifest",
+    "freezer/README.md"
+  ],
+  "possible_destinations": [
+    "RTS-Hermes-Drive",
+    "RTS-AGE adapters"
+  ],
+  "estimated_hours": {
+    "minimum": 24,
+    "maximum": 48
+  },
+  "tags": [
+    "controller",
+    "execution",
+    "agent",
+    "budget",
+    "rollback",
+    "human-gate"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 2,
+  "created_at": "2026-07-24T03:47:33Z",
+  "updated_at": "2026-07-24T05:20:26Z",
+  "supersedes": "v001"
+}

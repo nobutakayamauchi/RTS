@@ -1,8 +1,8 @@
 {
   "item_id": "RTS-FRZ-000004",
-  "current_preflight_version": 2,
-  "path": "freezer/preflights/RTS-FRZ-000004/pf002.json",
+  "current_preflight_version": 3,
+  "path": "freezer/preflights/RTS-FRZ-000004/pf003.json",
   "outcome": "PASS",
-  "item_fingerprint": "adcbbe123e0c997f7075ce235b46186c773fc7b7fb69924539c6d42ad9da8ad4",
-  "updated_at": "2026-07-24T05:09:54Z"
+  "item_fingerprint": "befa1538579ebbb88ad14974ea4fc803f613786dd402401b3b93226e10e45683",
+  "updated_at": "2026-07-24T05:20:26Z"
 }
