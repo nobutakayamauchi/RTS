@@ -77,6 +77,18 @@ Also run the existing semantic stale-index check or an equivalent temporary-copy
 - do not weaken Build Assessment, Preflight, explicit human approval, or WIP=1
 - do not add temporary transfer bundles, workflow hacks, or diagnostic files to the final diff
 
+## Completion evidence
+
+The append-only current records now bind completion to the already-merged implementation:
+
+- item: `freezer/items/RTS-FRZ-000004/v005.json`
+- Build Assessment: `freezer/assessments/RTS-FRZ-000004/ba002.json`
+- Implementation Preflight: `freezer/preflights/RTS-FRZ-000004/pf002.json`
+- implementation PR: `#228`
+- implementation merge commit: `9bafaa74ff56e5765060408c133ac106337a4574`
+
+Earlier item, assessment, and Preflight versions remain immutable. The current pointers select the evidence-complete versions.
+
 ## Completion condition
 
 The task is complete only when CI is green, review findings are resolved, the final diff contains only the required governed records/tests/generated outputs, and `main` can verify all three systems: FREEZER, Build Assessment, and Asset Manifest.
