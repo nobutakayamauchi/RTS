@@ -1,0 +1,78 @@
+{
+  "$id": "RTS-EXECUTION-PLAN-V1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_id": {
+      "const": "dry-run"
+    },
+    "allowed_capabilities": {
+      "type": "array"
+    },
+    "authority": {
+      "const": "DRY_RUN_APPROVED"
+    },
+    "authorization_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorization_id": {
+      "type": "string"
+    },
+    "budgets": {
+      "type": "object"
+    },
+    "execution_identifiers": {
+      "type": "object"
+    },
+    "external_execution_authorized": {
+      "const": false
+    },
+    "gate_evidence": {
+      "type": "object"
+    },
+    "initial_state": {
+      "const": "PLANNED"
+    },
+    "inputs": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "item_id": {
+      "type": "string"
+    },
+    "item_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "plan_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "RTS-EXECUTION-PLAN-V1"
+    },
+    "stop_conditions": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "authority",
+    "external_execution_authorized",
+    "item_id",
+    "item_version",
+    "authorization_id",
+    "authorization_fingerprint",
+    "adapter_id",
+    "execution_identifiers",
+    "allowed_capabilities",
+    "budgets",
+    "stop_conditions",
+    "initial_state",
+    "inputs",
+    "gate_evidence"
+  ],
+  "type": "object"
+}

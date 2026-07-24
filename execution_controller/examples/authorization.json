@@ -1,0 +1,31 @@
+{
+  "adapter_id": "dry-run",
+  "allowed_capabilities": [
+    "LOCAL_CHECKPOINT_WRITE"
+  ],
+  "as_of": "2026-07-24T09:00:00Z",
+  "authorization_fingerprint": "fdb2b98b951cb3e34a95f89bde8fc71e93e23b957291976970aaaab653ac0ee7",
+  "authorization_id": "RTS-AUTH-000006-DRYRUN-001",
+  "budgets": {
+    "max_attempts": 2,
+    "max_changed_bytes": 0,
+    "max_changed_files": 0,
+    "max_elapsed_seconds": 300,
+    "max_events": 12
+  },
+  "drive_id": "RTS-Hermes-Drive",
+  "issued_at": "2026-07-24T09:00:00Z",
+  "issued_by": "human-operator",
+  "item_id": "RTS-FRZ-000006",
+  "item_version": 3,
+  "pack_id": "local-dry-run",
+  "skill_id": "execution-controller-v1",
+  "stop_conditions": [
+    "adapter_failure",
+    "budget_exceeded",
+    "gate_became_stale",
+    "human_stop",
+    "unexpected_side_effect"
+  ],
+  "trigger": "explicit-human-approved-controller-verification"
+}

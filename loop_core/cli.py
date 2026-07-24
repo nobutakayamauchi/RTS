@@ -59,22 +59,26 @@ def command_verify(root: Path) -> None:
     ):
         raise LoopCoreError("authority boundary verification failed")
     items = load_json(root / "freezer" / "index" / "items.json")["items"]
-    future = {
+    children = {
         row["item_id"]: row
         for row in items
         if row["item_id"] in {"RTS-FRZ-000006", "RTS-FRZ-000007"}
     }
-    if set(future) != {"RTS-FRZ-000006", "RTS-FRZ-000007"}:
-        raise LoopCoreError("future child records are missing")
-    for item_id, row in future.items():
-        if row["build_authority"] != "NOT_APPROVED" or row["status"] in {
-            "SELECTED",
-            "IN_PROGRESS",
-            "COMPLETED",
-        }:
-            raise LoopCoreError(
-                f"{item_id}: future child crossed the advisory boundary"
-            )
+    if set(children) != {"RTS-FRZ-000006", "RTS-FRZ-000007"}:
+        raise LoopCoreError("controller/learning child records are missing")
+    controller = children["RTS-FRZ-000006"]
+    if (
+        controller["build_authority"] != "APPROVED"
+        or controller["status"] != "COMPLETED"
+    ):
+        raise LoopCoreError("RTS-FRZ-000006 controller lifecycle is not completed")
+    learning = children["RTS-FRZ-000007"]
+    if learning["build_authority"] != "NOT_APPROVED" or learning["status"] in {
+        "SELECTED",
+        "IN_PROGRESS",
+        "COMPLETED",
+    }:
+        raise LoopCoreError("RTS-FRZ-000007 crossed the advisory boundary")
     print("Read-Only Loop Core verification passed")
 
 

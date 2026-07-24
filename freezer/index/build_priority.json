@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-24T07:59:00Z",
-  "count": 4,
+  "generated_at": "2026-07-24T14:09:00Z",
+  "count": 3,
   "policy": {
     "priority_weight": 0.35,
     "build_assessment_weight": 0.65,
@@ -19,21 +19,6 @@
       "assessment_state": "MISSING",
       "build_score": null,
       "ranking_score": 25.36,
-      "recommendation": "ASSESSMENT_REQUIRED",
-      "net_hours": null,
-      "reuse_hours_saved": null,
-      "implementation_efficiency": null,
-      "build_authority": "NOT_APPROVED"
-    },
-    {
-      "item_id": "RTS-FRZ-000006",
-      "version": 2,
-      "title": "Governed Execution Controller",
-      "status": "FROZEN",
-      "priority_score": 67.05,
-      "assessment_state": "MISSING",
-      "build_score": null,
-      "ranking_score": 23.47,
       "recommendation": "ASSESSMENT_REQUIRED",
       "net_hours": null,
       "reuse_hours_saved": null,

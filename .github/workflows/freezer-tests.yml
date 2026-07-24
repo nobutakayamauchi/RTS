@@ -6,11 +6,14 @@ on:
       - "freezer/**"
       - "asset_manifest/**"
       - "loop_core/**"
+      - "execution_controller/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
+      - "tests/test_execution_controller.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
+      - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
   push:
     branches:
@@ -19,11 +22,14 @@ on:
       - "freezer/**"
       - "asset_manifest/**"
       - "loop_core/**"
+      - "execution_controller/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
+      - "tests/test_execution_controller.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
+      - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
 
 permissions:
@@ -43,6 +49,7 @@ jobs:
           python -m freezer.build_assessment verify
           python -m asset_manifest.cli verify
           python -m loop_core.cli verify
+          python -m execution_controller.cli verify
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
@@ -98,3 +105,4 @@ jobs:
           python -m freezer.build_assessment verify
           python -m asset_manifest.cli verify
           python -m loop_core.cli verify
+          python -m execution_controller.cli verify

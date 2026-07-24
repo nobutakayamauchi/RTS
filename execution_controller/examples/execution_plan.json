@@ -1,0 +1,88 @@
+{
+  "adapter_id": "dry-run",
+  "allowed_capabilities": [
+    "LOCAL_CHECKPOINT_WRITE"
+  ],
+  "authority": "DRY_RUN_APPROVED",
+  "authorization_fingerprint": "9550602018bdca6d6f7e1dea00d7106bfa3582f08e7e2348718e7056fedbb30f",
+  "authorization_id": "RTS-AUTH-VERIFY-001",
+  "budgets": {
+    "max_attempts": 2,
+    "max_changed_bytes": 0,
+    "max_changed_files": 0,
+    "max_elapsed_seconds": 10,
+    "max_events": 10
+  },
+  "execution_identifiers": {
+    "drive_id": "verify-drive",
+    "pack_id": "verify-pack",
+    "skill_id": "verify-skill",
+    "trigger": "explicit-local-verification"
+  },
+  "external_execution_authorized": false,
+  "gate_evidence": {
+    "active_item_ids": [
+      "RTS-FRZ-999999"
+    ],
+    "assessment_recommendation": "BUILD_NOW",
+    "assessment_state": "CURRENT",
+    "build_authority": "APPROVED",
+    "human_authorization_supplied": true,
+    "item_status": "SELECTED",
+    "preflight_state": "PASS",
+    "wip_count": 1
+  },
+  "initial_state": "PLANNED",
+  "inputs": [
+    {
+      "path": "asset_manifest/index/assets.json",
+      "sha256": "c04d161ec30f76460a4dce11e89f385e3f272aba3c9243c2a3ab78d8df55dfd7"
+    },
+    {
+      "path": "authorization.json",
+      "sha256": "63b6cb3a97af9951bc8cb7b6351df17a8496c1f8d8353a3ebcf5206fd735b48e"
+    },
+    {
+      "path": "freezer/assessments/RTS-FRZ-999999/ba001.json",
+      "sha256": "d8cc363831d9894bdedbcb6880849f79ff1ef11a30681dbbcebd4cca76a576c8"
+    },
+    {
+      "path": "freezer/assessments/RTS-FRZ-999999/current.json",
+      "sha256": "e117f89019e7491b04d083a3d65e6e289538394f15717221ddfd6274c5318269"
+    },
+    {
+      "path": "freezer/index/build_priority.json",
+      "sha256": "b129ccd46696427607ca35de75e5801df87cb49f2258b6b26c00647c8213c8ca"
+    },
+    {
+      "path": "freezer/index/items.json",
+      "sha256": "c06baafd0d74b4ba011da27596ff189f9845ddd190faae703ff05bc03337cd5f"
+    },
+    {
+      "path": "freezer/items/RTS-FRZ-999999/current.json",
+      "sha256": "cac26b1bd4faa6a147e729a69070823125a0e04e5e221f7fc382527b5a4b32d2"
+    },
+    {
+      "path": "freezer/items/RTS-FRZ-999999/v001.json",
+      "sha256": "e58bf874b474cba40ec2748e22ddf9d8fed396c9958bccaddd78551c7dd5a63b"
+    },
+    {
+      "path": "freezer/preflights/RTS-FRZ-999999/current.json",
+      "sha256": "7ed72984c7104cc521af2e5bb926a7d0b00762a21fae93b5a5d813eb32dc33e1"
+    },
+    {
+      "path": "freezer/preflights/RTS-FRZ-999999/pf001.json",
+      "sha256": "0db5d711f7069b71b9501e4419027ffca400514f3d51a4530caf8795f319b9e9"
+    }
+  ],
+  "item_id": "RTS-FRZ-999999",
+  "item_version": 1,
+  "plan_id": "225b60748e3f87980df6ea579c7ddabb54261c2df628ed3053fa2d17735d67af",
+  "schema_version": "RTS-EXECUTION-PLAN-V1",
+  "stop_conditions": [
+    "adapter_failure",
+    "budget_exceeded",
+    "human_stop",
+    "unexpected_side_effect"
+  ]
+}
