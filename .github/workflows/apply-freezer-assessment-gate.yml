@@ -1,0 +1,163 @@
+name: Apply FREEZER Assessment Gate
+
+on:
+  push:
+    branches:
+      - feature/freezer-build-assessment-v1
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/freezer-build-assessment-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Apply assessment gate and regression coverage
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              if text.count(old) != 1:
+                  raise SystemExit(f"{label}: expected one match, found {text.count(old)}")
+              return text.replace(old, new, 1)
+
+          cli_path = Path('freezer/cli.py')
+          cli = cli_path.read_text(encoding='utf-8')
+          cli = replace_once(
+              cli,
+              'from freezer.preflight import (\n',
+              'from freezer.assessment_core import BuildAssessmentError\n'
+              'from freezer.assessment_store import require_build_now_assessment\n'
+              'from freezer.preflight import (\n',
+              'cli assessment imports',
+          )
+          cli = replace_once(
+              cli,
+              '''        try:\n            require_passing_preflight(root, item)\n        except PreflightError as exc:\n            raise FreezerError(str(exc)) from exc\n''',
+              '''        try:\n            require_build_now_assessment(root, item)\n        except BuildAssessmentError as exc:\n            raise FreezerError(str(exc)) from exc\n        try:\n            require_passing_preflight(root, item)\n        except PreflightError as exc:\n            raise FreezerError(str(exc)) from exc\n''',
+              'cli active assessment gate',
+          )
+          cli = replace_once(
+              cli,
+              '''                "human_approval_required": config["selection_policy"]["human_approval_required"],\n                "implementation_preflight_required": True,\n''',
+              '''                "human_approval_required": config["selection_policy"]["human_approval_required"],\n                "build_assessment_required": True,\n                "implementation_preflight_required": True,\n''',
+              'cli priority policy',
+          )
+          cli = replace_once(
+              cli,
+              '''    rebuild_manifest(root)\n    return by_priority\n''',
+              '''    from freezer.assessment_rank import rebuild_index\n    rebuild_index(root)\n    rebuild_manifest(root)\n    return by_priority\n''',
+              'cli combined index rebuild',
+          )
+          cli_path.write_text(cli, encoding='utf-8')
+
+          ba_path = Path('freezer/build_assessment.py')
+          ba = ba_path.read_text(encoding='utf-8')
+          ba = replace_once(
+              ba,
+              '''        if args.command == "create":\n            record = create_assessment(root, args.item_id, args.input.resolve())\n            rebuild_index(root)\n            print(record["assessment_id"])\n''',
+              '''        if args.command == "create":\n            record = create_assessment(root, args.item_id, args.input.resolve())\n            from freezer.cli import rebuild\n            rebuild(root)\n            print(record["assessment_id"])\n''',
+              'assessment create rebuild',
+          )
+          ba = replace_once(
+              ba,
+              '''        elif args.command == "reindex":\n            print(f"indexed {len(rebuild_index(root))} build candidate(s)")\n''',
+              '''        elif args.command == "reindex":\n            from freezer.cli import rebuild\n            rebuild(root)\n            rows = load_json(root / "freezer" / "index" / "build_priority.json")["items"]\n            print(f"indexed {len(rows)} build candidate(s)")\n''',
+              'assessment reindex rebuild',
+          )
+          ba_path.write_text(ba, encoding='utf-8')
+
+          test_path = Path('tests/test_freezer.py')
+          test = test_path.read_text(encoding='utf-8')
+          test = replace_once(
+              test,
+              'from freezer.cli import (\n',
+              'from freezer.assessment_store import create_assessment\nfrom freezer.cli import (\n',
+              'test assessment import',
+          )
+          assessment_helpers = '''    def assessment_payload(self) -> dict:\n        return {\n            "assessor": "test-review",\n            "rationale": "GitHub reuse, effect, and implementation cost were assessed.",\n            "expected_effect": {\n                "impact": 5,\n                "strategic_fit": 5,\n                "revenue_leverage": 4,\n                "risk_reduction": 5,\n                "recurrence": 5,\n                "confidence": 5,\n            },\n            "implementation": {\n                "from_scratch_hours": 10,\n                "integration_hours": 1,\n                "validation_hours": 1,\n                "unknown_buffer_hours": 0,\n            },\n            "github_scan": {\n                "performed": True,\n                "repositories": ["owner/repo"],\n                "queries": ["reuse schema test"],\n                "assets": [\n                    {\n                        "repository": "owner/repo",\n                        "path": "path/to/asset.py",\n                        "ref": "main",\n                        "kind": "code",\n                        "reuse_mode": "ADAPT",\n                        "license_status": "OWNED",\n                        "estimated_hours_saved": 6,\n                        "notes": "Reusable validation and storage pattern.",\n                    }\n                ],\n                "gaps": ["Search coverage is not guaranteed."],\n            },\n            "risks": ["Reuse may hide integration work."],\n        }\n\n'''
+          test = replace_once(
+              test,
+              '    def write_json(self, path: Path, payload: dict) -> Path:\n',
+              assessment_helpers + '    def write_json(self, path: Path, payload: dict) -> Path:\n',
+              'test assessment payload',
+          )
+          test = replace_once(
+              test,
+              '''    def create_pass_preflight(self, root: Path, item_id: str) -> dict:\n        source = self.write_json(root / "preflight.json", self.preflight_payload())\n        return create_preflight(root, item_id, source)\n\n''',
+              '''    def create_pass_preflight(self, root: Path, item_id: str) -> dict:\n        source = self.write_json(root / "preflight.json", self.preflight_payload())\n        return create_preflight(root, item_id, source)\n\n    def create_build_now_assessment(self, root: Path, item_id: str) -> dict:\n        source = self.write_json(\n            root / f"assessment-{item_id}.json",\n            self.assessment_payload(),\n        )\n        record = create_assessment(root, item_id, source)\n        self.assertEqual(record["derived"]["recommendation"], "BUILD_NOW")\n        return record\n\n''',
+              'test assessment helper',
+          )
+          no_assessment_test = '''    def test_approved_item_without_assessment_cannot_be_selected(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")\n            changes = self.write_json(\n                temp_root / "changes.json",\n                {"status": "SELECTED", "build_authority": "APPROVED"},\n            )\n            with self.assertRaisesRegex(FreezerError, "current build assessment"):\n                revise_item(temp_root, "RTS-FRZ-000001", changes)\n\n'''
+          test = replace_once(
+              test,
+              '    def test_approved_item_without_preflight_cannot_be_selected(self):\n',
+              no_assessment_test + '    def test_approved_item_without_preflight_cannot_be_selected(self):\n',
+              'test missing assessment gate',
+          )
+          test = replace_once(
+              test,
+              '''    def test_approved_item_without_preflight_cannot_be_selected(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            changes = self.write_json(\n''',
+              '''    def test_approved_item_without_preflight_cannot_be_selected(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")\n            changes = self.write_json(\n''',
+              'test preflight gate setup',
+          )
+          test = replace_once(
+              test,
+              '''    def test_passing_preflight_allows_selection(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")\n''',
+              '''    def test_passing_preflight_allows_selection(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")\n''',
+              'test passing all gates',
+          )
+          test = replace_once(
+              test,
+              '''            revised = revise_item(temp_root, "RTS-FRZ-000001", plan_change)\n            self.assertEqual(preflight_state(temp_root, revised)["state"], "STALE")\n\n            select = self.write_json(\n''',
+              '''            revised = revise_item(temp_root, "RTS-FRZ-000001", plan_change)\n            self.assertEqual(preflight_state(temp_root, revised)["state"], "STALE")\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")\n\n            select = self.write_json(\n''',
+              'test stale preflight after current assessment',
+          )
+          test = replace_once(
+              test,
+              '''    def test_decomposition_required_preflight_blocks_selection(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            source = self.write_json(\n''',
+              '''    def test_decomposition_required_preflight_blocks_selection(self):\n        with tempfile.TemporaryDirectory() as temp_dir:\n            temp_root = self.isolated_root(temp_dir)\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")\n            source = self.write_json(\n''',
+              'test decomposition assessment setup',
+          )
+          test = replace_once(
+              test,
+              '''            add_item(temp_root, source)\n\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000003")\n''',
+              '''            add_item(temp_root, source)\n\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000003")\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000003")\n''',
+              'test WIP second assessment',
+          )
+          test = replace_once(
+              test,
+              '''            revise_item(temp_root, "RTS-FRZ-000003", activate_second)\n\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")\n''',
+              '''            revise_item(temp_root, "RTS-FRZ-000003", activate_second)\n\n            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")\n            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")\n''',
+              'test WIP first assessment',
+          )
+          test_path.write_text(test, encoding='utf-8')
+
+          clean_workflow = '''name: FREEZER Tests\n\non:\n  pull_request:\n    paths:\n      - "freezer/**"\n      - "tests/test_freezer.py"\n      - "tests/test_freezer_build_assessment.py"\n      - ".github/workflows/freezer-tests.yml"\n  push:\n    branches:\n      - main\n    paths:\n      - "freezer/**"\n      - "tests/test_freezer.py"\n      - "tests/test_freezer_build_assessment.py"\n      - ".github/workflows/freezer-tests.yml"\n\npermissions:\n  contents: read\n\njobs:\n  freezer:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: "3.11"\n      - name: Verify committed FREEZER snapshot\n        run: |\n          python -m freezer.cli verify\n          python -m freezer.build_assessment verify\n      - name: Fail on stale committed indexes\n        run: |\n          python - <<'PY2'\n          import json\n          import subprocess\n          import sys\n          from pathlib import Path\n\n          paths = [\n              Path("freezer/index/items.json"),\n              Path("freezer/index/priority.json"),\n              Path("freezer/index/build_priority.json"),\n          ]\n\n          def semantic(path):\n              data = json.loads(path.read_text(encoding="utf-8"))\n              data.pop("generated_at", None)\n              return data\n\n          committed = {path: semantic(path) for path in paths}\n          subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)\n          rebuilt = {path: semantic(path) for path in paths}\n\n          stale = [str(path) for path in paths if committed[path] != rebuilt[path]]\n          if stale:\n              print("Committed FREEZER indexes are stale:")\n              for path in stale:\n                  print(f"- {path}")\n              print("Run: python -m freezer.cli reindex")\n              raise SystemExit(1)\n          PY2\n      - name: Run FREEZER tests\n        run: python -B -m unittest discover -s tests -v\n      - name: Verify rebuilt FREEZER records\n        run: |\n          python -m freezer.cli verify\n          python -m freezer.build_assessment verify\n'''
+          Path('.github/workflows/freezer-tests.yml').write_text(clean_workflow, encoding='utf-8')
+          Path('.github/workflows/apply-freezer-assessment-gate.yml').unlink()
+          PY
+      - name: Rebuild indexes and manifest
+        run: python -m freezer.cli reindex
+      - name: Run full validation
+        run: |
+          python -B -m unittest discover -s tests -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Commit fixes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Enforce build assessment gate in FREEZER selection'
+          git push origin HEAD:feature/freezer-build-assessment-v1
