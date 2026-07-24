@@ -8,7 +8,7 @@ from typing import Any
 from freezer.assessment_core import (
     BuildAssessmentError, iter_current_items, load_config, load_current_item, load_json, write_json,
 )
-from freezer.assessment_store import assessment_state, verify_histories
+from freezer.assessment_store import assessment_state, require_build_now_assessment, verify_histories
 
 
 def _score(value: Any, *, field: str) -> float:
