@@ -1,7 +1,10 @@
 # SNAP Index — 2026-07
 
 - updated_at_utc: `2026-07-24T08:11:45Z`
-- total: `0`
+
+## Latest
 
 - (none)
+
+## Recent (latest 50)
 
