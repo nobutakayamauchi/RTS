@@ -1,0 +1,62 @@
+{
+  "bundle_fingerprint": "37336ead6e1a507aff1960c3993850f1cddd8a386fedaaa706df0f77ed0818fe",
+  "bundle_id": "RTS-OUTCOME-000002",
+  "classification_rationale": "The verified claim is bounded budget escalation in a local simulation, not external success.",
+  "controller": {
+    "authorization_fingerprint": "c18c5ba44ed4f068eecddab12b600716c43b2ed3b0a1cdb66fdfe34b8a4c16a4",
+    "budget_usage": {
+      "attempts": 2,
+      "changed_bytes": 0,
+      "changed_files": 0,
+      "elapsed_seconds": 2,
+      "events": 5
+    },
+    "external_execution_performed": false,
+    "plan_fingerprint": "a241d820c72a8fecdba0d7e1abb25387d6c6a77b80b911e1a01caa9ca197d0f2",
+    "terminal_state": "ESCALATED"
+  },
+  "criteria": {
+    "failure": [
+      "run remains non-terminal after the event budget is exhausted"
+    ],
+    "observed": [
+      "terminal escalation and cumulative usage were reconstructed"
+    ],
+    "success": [
+      "controller records ESCALATED before exceeding the event budget"
+    ]
+  },
+  "evidence_integrity": {
+    "RTS-EVIDENCE-OUTCOME-000002": "224450c9e5621c611b375f1a57bb9994904d654fb2e7acaac90c58b661d248f8"
+  },
+  "evidence_refs": [
+    {
+      "evidence_id": "RTS-EVIDENCE-OUTCOME-000002",
+      "retrieved_at": "2026-07-24T20:30:02Z",
+      "source_ref": "outcome_evidence/evidence/escalation-controller-result.json",
+      "source_type": "local_controller_fixture"
+    }
+  ],
+  "execution_record": {
+    "drive_id": "local-dry-run-drive",
+    "pack_id": "no-external-tools",
+    "result": {
+      "scenario": "ESCALATION",
+      "summary": "Projected event usage triggered bounded escalation before an illegal transition.",
+      "verification": "SIMULATED_ONLY"
+    },
+    "skill_id": "fixture-skill-v1",
+    "timestamp": "2026-07-24T20:30:02Z",
+    "trigger": "governed-outcome-escalation-fixture"
+  },
+  "execution_scope": "SIMULATED_ONLY",
+  "outcome_classification": "VERIFIED",
+  "promotion_blockers": [
+    "no candidate Skill was evaluated",
+    "no external outcome was attempted",
+    "promotion evidence is intentionally incomplete"
+  ],
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "scenario": "ESCALATION",
+  "schema_version": "RTS-OUTCOME-BUNDLE-V1"
+}

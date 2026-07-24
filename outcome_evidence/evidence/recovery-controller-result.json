@@ -1,0 +1,21 @@
+{
+  "authorization_fingerprint": "64520b5da0655a7841057bf4586925084a2ae221fc306545f7165a09bd5efde0",
+  "authorization_id": "RTS-AUTH-OUTCOME-003",
+  "evidence_id": "RTS-EVIDENCE-OUTCOME-000003",
+  "external_execution_performed": false,
+  "plan_fingerprint": "961feff72e61d0b5dfc8685cf8d6f3f19cb5eac48dadc3ed470062303098f12e",
+  "plan_id": "961feff72e61d0b5dfc8685cf8d6f3f19cb5eac48dadc3ed470062303098f12e",
+  "scenario": "RECOVERY",
+  "schema_version": "RTS-OUTCOME-EVIDENCE-SOURCE-V1",
+  "summary": "Explicit stop preserved reconstructable local state for a future rollback decision.",
+  "terminal_state": "STOPPED",
+  "timestamp": "2026-07-24T20:30:03Z",
+  "usage": {
+    "attempts": 1,
+    "changed_bytes": 0,
+    "changed_files": 0,
+    "elapsed_seconds": 1,
+    "events": 5
+  },
+  "verification": "SIMULATED_ONLY"
+}

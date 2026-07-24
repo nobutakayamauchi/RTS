@@ -1,0 +1,21 @@
+{
+  "authorization_fingerprint": "d365631618b882fa167cfbbab5e1581d9da55c36e5c47232463fabaaede88d89",
+  "authorization_id": "RTS-AUTH-OUTCOME-001",
+  "evidence_id": "RTS-EVIDENCE-OUTCOME-000001",
+  "external_execution_performed": false,
+  "plan_fingerprint": "f50db0eb556e63bace2cf455029069e7fd5828c4028b15f2c98043767a164ae1",
+  "plan_id": "f50db0eb556e63bace2cf455029069e7fd5828c4028b15f2c98043767a164ae1",
+  "scenario": "SUCCESS",
+  "schema_version": "RTS-OUTCOME-EVIDENCE-SOURCE-V1",
+  "summary": "Deterministic local dry-run completed the expected path.",
+  "terminal_state": "SUCCEEDED",
+  "timestamp": "2026-07-24T20:30:01Z",
+  "usage": {
+    "attempts": 1,
+    "changed_bytes": 0,
+    "changed_files": 0,
+    "elapsed_seconds": 2,
+    "events": 5
+  },
+  "verification": "SIMULATED_ONLY"
+}
