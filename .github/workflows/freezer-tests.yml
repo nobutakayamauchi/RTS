@@ -31,6 +31,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr228-working-tree
+          path: |
+            freezer
+            asset_manifest
+            tests
+            .github/workflows/freezer-tests.yml
       - name: Verify committed governed records
         run: |
           python -m freezer.cli verify
@@ -62,10 +70,8 @@ jobs:
 
           committed_freezer = {path: semantic(path) for path in freezer_paths}
           committed_assets = {path: semantic(path) for path in asset_paths}
-
           subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
           subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
-
           rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
           rebuilt_assets = {path: semantic(path) for path in asset_paths}
           stale = [
