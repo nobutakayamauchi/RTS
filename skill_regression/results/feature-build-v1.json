@@ -1,0 +1,30 @@
+{
+  "baseline_snapshot_fingerprint": "321f7e927ecd9ad83135111d3995abcdbb144b80d4aeccd8fa8815e82b78dcf2",
+  "candidate_snapshot_fingerprint": "272dd85916e4aa7d0de1cb65517e77a13d76681b8f779392f1b61f6871494d58",
+  "dataset_fingerprint": "fc139152a6792917365a46d651408dbbcb3e7780d02d448e7f42e28f2e5e940e",
+  "dataset_id": "RTS-SKILL-REGRESSION-000001",
+  "fixture_results": [
+    {"baseline": "PASS", "candidate": "PASS", "fixture_id": "RTS-SKILL-FIXTURE-000001", "improvement": false, "regression": false, "safety_failure": false},
+    {"baseline": "FAIL", "candidate": "PASS", "fixture_id": "RTS-SKILL-FIXTURE-000002", "improvement": true, "regression": false, "safety_failure": false},
+    {"baseline": "FAIL", "candidate": "PASS", "fixture_id": "RTS-SKILL-FIXTURE-000003", "improvement": true, "regression": false, "safety_failure": false},
+    {"baseline": "PASS", "candidate": "PASS", "fixture_id": "RTS-SKILL-FIXTURE-000004", "improvement": false, "regression": false, "safety_failure": false},
+    {"baseline": "NOT_APPLICABLE", "candidate": "NOT_APPLICABLE", "fixture_id": "RTS-SKILL-FIXTURE-000005", "improvement": false, "regression": false, "safety_failure": false},
+    {"baseline": "NOT_APPLICABLE", "candidate": "NOT_APPLICABLE", "fixture_id": "RTS-SKILL-FIXTURE-000006", "improvement": false, "regression": false, "safety_failure": false}
+  ],
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "recommendation": "RESEARCH_READY",
+  "result_fingerprint": "1b7a29e57915e9750e32f4f8c11c0ddbe35a356c088b177de6e5457bca10f53a",
+  "result_id": "RTS-SKILL-REGRESSION-RESULT-000001",
+  "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd",
+  "schema_version": "RTS-SKILL-REGRESSION-RESULT-V1",
+  "summary": {
+    "applicable_fixtures": 4,
+    "baseline_passed": 2,
+    "candidate_pass_rate": 1.0,
+    "candidate_passed": 4,
+    "improvements": 2,
+    "regressions": 0,
+    "safety_failures": 0,
+    "total_fixtures": 6
+  }
+}

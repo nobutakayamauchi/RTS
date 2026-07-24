@@ -1,0 +1,51 @@
+{
+  "content_path": "skill_regression/snapshots/feature-build/candidate.md",
+  "content_sha256": "6ed1a4a8ff27cba7aa795d525289e262901f9223d5f0608f4e4fd12fb5a4127e",
+  "contract": {
+    "expected_outputs": [
+      "Clarified requirement contract",
+      "Continuation-ready handoff package",
+      "Evidence-backed verified/unverified/assumed report",
+      "Explicit scope boundary statement",
+      "Immutable local rollback snapshot",
+      "Minimal implementation diff summary",
+      "Ordered scoped implementation plan"
+    ],
+    "not_for": [
+      "TINY_ONE_STEP_CHANGE",
+      "URGENT_BREAK_FIX"
+    ],
+    "ordered_steps": [
+      "requirement-clarifier",
+      "task-decomposer",
+      "scope-locker",
+      "safe-implementer",
+      "verification-runner",
+      "rollback-snapshot-writer",
+      "handoff-writer"
+    ],
+    "safety_rules": [
+      "ADJACENT_REPOSITORY_INTERNALS_FORBIDDEN",
+      "AUTOMATIC_CANONICAL_PROMOTION_FORBIDDEN",
+      "FACT_ASSUMPTION_UNVERIFIED_SEPARATION_REQUIRED",
+      "HUMAN_APPROVAL_REQUIRED",
+      "ROLLBACK_SNAPSHOT_REQUIRED",
+      "RUNTIME_IMPLEMENTATION_FORBIDDEN"
+    ]
+  },
+  "external_mutation_performed": false,
+  "promotion_eligibility": "NOT_ELIGIBLE",
+  "role": "CANDIDATE",
+  "schema_version": "RTS-SKILL-SNAPSHOT-V1",
+  "skill_id": "feature-build",
+  "snapshot_fingerprint": "272dd85916e4aa7d0de1cb65517e77a13d76681b8f779392f1b61f6871494d58",
+  "snapshot_id": "RTS-SKILL-SNAPSHOT-000002",
+  "source": {
+    "derived_from_snapshot_id": "RTS-SKILL-SNAPSHOT-000001",
+    "path": "skill_regression/snapshots/feature-build/candidate.md",
+    "reference_commit_sha": "cf3782619fdb455087ee574d7570d607c941bc58",
+    "repository": "nobutakayamauchi/RTS",
+    "source_content_sha256": "6ed1a4a8ff27cba7aa795d525289e262901f9223d5f0608f4e4fd12fb5a4127e",
+    "source_type": "LOCAL_CANDIDATE_FIXTURE"
+  }
+}
