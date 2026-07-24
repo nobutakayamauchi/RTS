@@ -7,14 +7,17 @@ on:
       - "asset_manifest/**"
       - "loop_core/**"
       - "execution_controller/**"
+      - "outcome_evidence/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
       - "tests/test_execution_controller.py"
       - "tests/test_execution_controller_state_continuity.py"
+      - "tests/test_outcome_evidence.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
+      - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
   push:
     branches:
@@ -24,14 +27,17 @@ on:
       - "asset_manifest/**"
       - "loop_core/**"
       - "execution_controller/**"
+      - "outcome_evidence/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
       - "tests/test_execution_controller.py"
       - "tests/test_execution_controller_state_continuity.py"
+      - "tests/test_outcome_evidence.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
+      - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
 
 permissions:
@@ -52,6 +58,7 @@ jobs:
           python -m asset_manifest.cli verify
           python -m loop_core.cli verify
           python -m execution_controller.cli verify
+          python -m outcome_evidence.cli verify
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
@@ -108,3 +115,4 @@ jobs:
           python -m asset_manifest.cli verify
           python -m loop_core.cli verify
           python -m execution_controller.cli verify
+          python -m outcome_evidence.cli verify
