@@ -1,0 +1,130 @@
+name: Repair FREEZER List Contract
+
+on:
+  push:
+    branches:
+      - fix/complete-cross-repo-asset-manifest-freezer-v1
+    paths:
+      - ".github/workflows/fix-freezer-list-contract.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/complete-cross-repo-asset-manifest-freezer-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Append schema-compliant revisions and harden validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import tempfile
+          from pathlib import Path
+
+          from freezer.assessment_core import INPUT_FIELDS as ASSESSMENT_INPUT_FIELDS
+          from freezer.assessment_store import create_assessment
+          from freezer.cli import load_current, revise_item
+          from freezer.preflight import INPUT_FIELDS as PREFLIGHT_INPUT_FIELDS, create_preflight
+
+          root = Path('.').resolve()
+          item_ids = [
+              'RTS-FRZ-000003',
+              'RTS-FRZ-000004',
+              'RTS-FRZ-000005',
+              'RTS-FRZ-000006',
+              'RTS-FRZ-000007',
+          ]
+
+          assessment_previous = json.loads(
+              (root / 'freezer/assessments/RTS-FRZ-000004/ba002.json').read_text(encoding='utf-8')
+          )
+          parent_preflight_previous = json.loads(
+              (root / 'freezer/preflights/RTS-FRZ-000003/pf001.json').read_text(encoding='utf-8')
+          )
+          child_preflight_previous = json.loads(
+              (root / 'freezer/preflights/RTS-FRZ-000004/pf002.json').read_text(encoding='utf-8')
+          )
+
+          with tempfile.TemporaryDirectory() as directory:
+              directory = Path(directory)
+              for item_id in item_ids:
+                  item = load_current(root, item_id)
+                  value = item['preserved_value']
+                  if isinstance(value, str):
+                      source = directory / f'{item_id}.json'
+                      source.write_text(
+                          json.dumps({'preserved_value': [value]}, ensure_ascii=False, indent=2) + '\n',
+                          encoding='utf-8',
+                      )
+                      revised = revise_item(root, item_id, source)
+                      assert isinstance(revised['preserved_value'], list)
+                      assert revised['preserved_value'] == [value]
+
+              assessment_input = {
+                  field: assessment_previous[field] for field in ASSESSMENT_INPUT_FIELDS
+              }
+              assessment_source = directory / 'assessment.json'
+              assessment_source.write_text(
+                  json.dumps(assessment_input, ensure_ascii=False, indent=2) + '\n',
+                  encoding='utf-8',
+              )
+              assessment = create_assessment(root, 'RTS-FRZ-000004', assessment_source)
+              assert assessment['assessment_version'] == 3
+              assert assessment['derived']['recommendation'] == 'BUILD_NOW'
+
+              for item_id, previous, expected_version in (
+                  ('RTS-FRZ-000003', parent_preflight_previous, 2),
+                  ('RTS-FRZ-000004', child_preflight_previous, 3),
+              ):
+                  preflight_input = {
+                      field: previous[field] for field in PREFLIGHT_INPUT_FIELDS
+                  }
+                  preflight_source = directory / f'{item_id}-preflight.json'
+                  preflight_source.write_text(
+                      json.dumps(preflight_input, ensure_ascii=False, indent=2) + '\n',
+                      encoding='utf-8',
+                  )
+                  preflight = create_preflight(root, item_id, preflight_source)
+                  assert preflight['preflight_version'] == expected_version
+                  expected_outcome = 'DECOMPOSE_REQUIRED' if item_id.endswith('000003') else 'PASS'
+                  assert preflight['outcome'] == expected_outcome
+
+          cli_path = root / 'freezer/cli.py'
+          cli_text = cli_path.read_text(encoding='utf-8')
+          needle = '''    hours = item["estimated_hours"]\n    if not isinstance(hours, dict) or "minimum" not in hours or "maximum" not in hours:\n        raise FreezerError(f"{item_id}: estimated_hours requires minimum and maximum")\n    if hours["minimum"] < 0 or hours["maximum"] < hours["minimum"]:\n        raise FreezerError(f"{item_id}: invalid estimated_hours range")\n'''
+          replacement = needle + '''\n    string_list_fields = {\n        "preserved_value",\n        "trigger_conditions",\n        "negative_triggers",\n        "dependencies",\n        "source_refs",\n        "possible_destinations",\n        "tags",\n    }\n    for field in sorted(string_list_fields):\n        values = item[field]\n        if not isinstance(values, list) or not all(isinstance(value, str) for value in values):\n            raise FreezerError(f"{item_id}: {field} must be an array of strings")\n'''
+          if replacement not in cli_text:
+              if needle not in cli_text:
+                  raise RuntimeError('validate_item insertion point not found')
+              cli_path.write_text(cli_text.replace(needle, replacement, 1), encoding='utf-8')
+
+          test_path = root / 'tests/test_freezer_item_schema_contract.py'
+          test_path.write_text('''from __future__ import annotations\n\nimport unittest\nfrom pathlib import Path\n\nfrom freezer.cli import FreezerError, iter_current_items, load_config, load_current, validate_item\n\n\nROOT = Path(__file__).resolve().parents[1]\n\n\nclass FreezerItemSchemaContractTests(unittest.TestCase):\n    def test_current_string_list_fields_match_published_contract(self) -> None:\n        fields = {\n            "preserved_value",\n            "trigger_conditions",\n            "negative_triggers",\n            "dependencies",\n            "source_refs",\n            "possible_destinations",\n            "tags",\n        }\n        for item in iter_current_items(ROOT):\n            for field in fields:\n                with self.subTest(item_id=item["item_id"], field=field):\n                    self.assertIsInstance(item[field], list)\n                    self.assertTrue(all(isinstance(value, str) for value in item[field]))\n\n    def test_string_preserved_value_is_rejected(self) -> None:\n        item = dict(load_current(ROOT, "RTS-FRZ-000004"))\n        item["preserved_value"] = "invalid scalar"\n        with self.assertRaisesRegex(FreezerError, "preserved_value must be an array of strings"):\n            validate_item(item, load_config(ROOT))\n\n\nif __name__ == "__main__":\n    unittest.main()\n''', encoding='utf-8')
+          PY
+
+          python -m freezer.cli reindex
+          python -m asset_manifest.cli verify
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -B -m unittest discover -s tests -v
+          python -m freezer.cli recall RTS-FRZ-000004 > /tmp/recall.md
+          grep -F -- '- Append-only snapshots' /tmp/recall.md
+
+          rm -f .github/workflows/fix-freezer-list-contract.yml
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type f -name '*.pyc' -delete
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Enforce FREEZER string-list schema contract"
+          git push origin HEAD:fix/complete-cross-repo-asset-manifest-freezer-v1
