@@ -1,0 +1,104 @@
+{
+  "data_migration": {
+    "required": false,
+    "notes": "No migration. v1 may append repository-local proposal and human-review records only; it does not rewrite outcome, regression, Skill, lifecycle, or adjacent-repository history."
+  },
+  "risks": [
+    "SIMULATED_ONLY outcome evidence could be mistaken for external business or user success",
+    "A generated learning proposal could be mistaken for Skill promotion authority",
+    "A model or automation could attempt to approve its own proposal",
+    "Regression thresholds or rollback references could drift from their immutable governed inputs",
+    "Private prompts, credentials, customer data, provider payloads, or repository bodies could leak into proposal records",
+    "A future adapter could widen the boundary into RTS-Skills or another adjacent repository without a new approval gate"
+  ],
+  "external_interfaces": [
+    "None in v1; read-only access to committed RTS outcome, regression, Asset Manifest, FREEZER, and schema records",
+    "Repository-local append-only proposal and human-review records only",
+    "No network, subprocess, shell, provider API, GitHub write outside the implementation PR, Skill mutation, adjacent-repository write, deployment, publication, messaging, scheduling, customer action, or automatic rollback"
+  ],
+  "regression_tests": [
+    "python -m freezer.cli verify",
+    "python -m freezer.build_assessment verify",
+    "python -m asset_manifest.cli verify",
+    "python -m loop_core.cli verify",
+    "python -m execution_controller.cli verify",
+    "python -m outcome_evidence.cli verify",
+    "python -m skill_regression.cli verify",
+    "proposal package verify command fails closed on stale fingerprints, missing evidence, privacy-sensitive keys, self-approval, or adjacent-repository authority",
+    "deterministic proposal generation produces byte-equivalent canonical records for identical governed inputs",
+    "human-review records cannot be authored or approved by the proposal generator identity",
+    "python -B -m unittest discover -s tests -v",
+    "semantic generated-output freshness verification",
+    "Unicode Guard"
+  ],
+  "assessor": "human-and-ai-ground-survey",
+  "approval_changes": [
+    "This Preflight records implementation readiness only; RTS-FRZ-000007 remains FROZEN / NOT_APPROVED",
+    "A separate explicit human lifecycle revision is required before SELECTED or IN_PROGRESS",
+    "v1 may create recommendations and review records but cannot approve, apply, publish, promote, retire, mutate, or roll back a Skill",
+    "Any future adjacent-repository mutation, real-world outcome ingestion, or promotion application requires a new Assessment, Preflight, and human approval"
+  ],
+  "existing_assumptions": [
+    "RTS-FRZ-000004 through RTS-FRZ-000006 are COMPLETED on main",
+    "RTS-BA-000007-002 is current and recommends BUILD_NOW",
+    "outcome_evidence contains at least three privacy-safe governed SIMULATED_ONLY bundles and permanently marks them NOT_ELIGIBLE for promotion",
+    "skill_regression contains pinned baseline and candidate fixtures, zero-regression thresholds, and an immutable rollback snapshot",
+    "The current RTS-Skills promotion-review manifest is reference-only and grants no implementation or mutation authority",
+    "Python standard library and repository-local deterministic processing are sufficient for v1",
+    "WIP=1 is currently available but is not consumed by this Preflight-only change"
+  ],
+  "public_documents": [
+    "outcome_evidence/README.md",
+    "skill_regression/README.md",
+    "evolution/RTS_EVOLUTION_ENGINE.md",
+    "evolution/RTS_SUCCESS_REPLICATION_ENGINE.md",
+    "asset_manifest/snapshots/v002.json",
+    "freezer/assessments/RTS-FRZ-000007/ba002.json",
+    "future proposal-only v1 README and schemas created only after explicit lifecycle approval"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "rationale": "The implementation ground is now sufficiently bounded for a proposal-only v1. It can deterministically read committed governed outcome and regression evidence, emit local immutable learning proposals linked to exact fingerprints, and support a separately authored human review record. It cannot treat simulated evidence as external success, approve its own output, change Skill content, write to adjacent repositories, publish, execute external actions, or apply rollback. Those exclusions keep promotion authority outside the implementation and preserve human control.",
+  "affected_boundaries": [
+    "new repository-local proposal-only package, schemas, fixtures, verifier, CLI, README, and focused tests",
+    "read-only outcome_evidence input and evidence-classification boundary",
+    "read-only skill_regression baseline, candidate, threshold, result, and rollback-snapshot boundary",
+    "Asset Manifest references to canonical outcome verification, regression, and promotion-review contracts",
+    "FREEZER Assessment, Preflight, lifecycle, WIP=1, indexes, and manifest boundary",
+    "canonical execution_record and evidence_ref linkage boundary for reconstructable proposal provenance",
+    "governed CI path filters and semantic freshness verification"
+  ],
+  "rollback_boundary": "Revert only the future proposal-only implementation PR and its append-only RTS-local records before any separate promotion decision. The pinned RTS-Skills baseline, immutable rollback snapshot, outcome corpus, regression dataset, adjacent repositories, external services, credentials, provider state, deployment, publication, messages, schedules, customer state, and real Skills remain unchanged by v1.",
+  "hidden_dependencies": [
+    "Assessment and Preflight fingerprints must remain current for the substantive item plan",
+    "The proposal generator identity must be distinct from the human reviewer identity and must never emit an approved decision",
+    "Every proposal must pin exact outcome bundle, evidence, baseline, candidate, regression-result, threshold, and rollback-snapshot fingerprints",
+    "All consumed outcome classifications must preserve VERIFIED, UNVERIFIED, ASSUMED, and SIMULATED_ONLY semantics without promotion overclaim",
+    "Manifest hashes and semantic indexes must be regenerated after governed record changes",
+    "WIP=1 must hold before any later SELECTED or IN_PROGRESS transition",
+    "No proposal may name an adjacent-repository write, Skill mutation, publication, or external action as an executable capability"
+  ],
+  "completion_conditions": [
+    "Identical governed inputs generate the same canonical proposal identifier, content fingerprint, evidence references, and recommendation",
+    "Only current verified outcome bundles and a current passing regression result may be referenced",
+    "Every proposal separates confirmed facts, assumptions, unverified claims, risks, and exact evidence references",
+    "SIMULATED_ONLY inputs can support only bounded local recommendations and never external success claims",
+    "Every proposal references the immutable rollback snapshot and the exact baseline and candidate fingerprints",
+    "Proposal status is proposal-only and defaults to NOT_APPROVED / NOT_APPLIED",
+    "The generator cannot create an APPROVED decision or act as the human reviewer",
+    "Human review records are append-only, identity-explicit, and do not mutate or publish a Skill",
+    "No network, provider, subprocess, shell, adjacent-repository write, Skill mutation, deployment, publication, messaging, scheduling, customer action, or automatic rollback exists",
+    "Privacy-sensitive keys, path escape, raw prompts, credentials, customer data, provider payloads, and repository bodies are rejected",
+    "All proposal, regression, outcome, FREEZER, Asset Manifest, controller, loop, unit, stale-index, and Unicode checks pass",
+    "RTS-FRZ-000007 remains FROZEN / NOT_APPROVED until a separate explicit human lifecycle revision"
+  ],
+  "outcome": "PASS",
+  "preflight_id": "RTS-PF-000007-001",
+  "item_id": "RTS-FRZ-000007",
+  "preflight_version": 1,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "c3d5b0b4c0dbce3a75117638d0828c2354f8b96baf8830903dfb903c94ec22c4",
+  "created_at": "2026-07-24T23:27:00Z"
+}
