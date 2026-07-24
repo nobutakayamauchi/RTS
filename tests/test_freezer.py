@@ -297,25 +297,25 @@ class FreezerTests(unittest.TestCase):
             all_items = json.loads(
                 (temp_root / "freezer" / "index" / "items.json").read_text(encoding="utf-8")
             )
-            self.assertEqual(all_items["count"], 1)
+            self.assertEqual(all_items["count"], 2)
 
     def test_work_in_progress_limit_is_enforced(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = self.isolated_root(temp_dir)
             second = json.loads(json.dumps(self.item))
-            second["item_id"] = "RTS-FRZ-000002"
+            second["item_id"] = "RTS-FRZ-000003"
             second["title"] = "Second active item"
             second["status"] = "FROZEN"
             second["build_authority"] = "NOT_APPROVED"
             source = self.write_json(temp_root / "second.json", second)
             add_item(temp_root, source)
 
-            self.create_pass_preflight(temp_root, "RTS-FRZ-000002")
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000003")
             activate_second = self.write_json(
                 temp_root / "activate-second.json",
                 {"status": "IN_PROGRESS", "build_authority": "APPROVED"},
             )
-            revise_item(temp_root, "RTS-FRZ-000002", activate_second)
+            revise_item(temp_root, "RTS-FRZ-000003", activate_second)
 
             self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
             activate_first = self.write_json(
