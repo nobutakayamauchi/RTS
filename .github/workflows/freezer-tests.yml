@@ -31,26 +31,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Capture governed-record diagnostics
-        run: |
-          set +e
-          {
-            echo "== freezer =="
-            python -m freezer.cli verify
-            echo "== build assessment =="
-            python -m freezer.build_assessment verify
-            echo "== asset manifest =="
-            python -m asset_manifest.cli verify
-            echo "== actual asset sha256 =="
-            find asset_manifest -type f ! -path '*/__pycache__/*' ! -name '*.pyc' ! -path 'asset_manifest/manifests/manifest.sha256' -print0 | sort -z | xargs -0 sha256sum
-            echo "== committed manifest =="
-            cat asset_manifest/manifests/manifest.sha256
-          } > governed-record-diagnostic.txt 2>&1
-          exit 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: governed-record-diagnostic
-          path: governed-record-diagnostic.txt
       - name: Verify committed governed records
         run: |
           python -m freezer.cli verify
@@ -82,11 +62,21 @@ jobs:
 
           committed_freezer = {path: semantic(path) for path in freezer_paths}
           committed_assets = {path: semantic(path) for path in asset_paths}
+
           subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
           subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
+
           rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
           rebuilt_assets = {path: semantic(path) for path in asset_paths}
-          stale = [str(path) for path in freezer_paths if committed_freezer[path] != rebuilt_freezer[path]] + [str(path) for path in asset_paths if committed_assets[path] != rebuilt_assets[path]]
+          stale = [
+              str(path)
+              for path in freezer_paths
+              if committed_freezer[path] != rebuilt_freezer[path]
+          ] + [
+              str(path)
+              for path in asset_paths
+              if committed_assets[path] != rebuilt_assets[path]
+          ]
           if stale:
               print("Committed derived indexes are stale:")
               for path in stale:
