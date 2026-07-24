@@ -45,6 +45,8 @@ def load_current_assessment(root: Path, item_id: str) -> dict[str, Any]:
         raise BuildAssessmentError(f"{item_id}: assessment pointer id mismatch")
     if pointer.get("recommendation") != record["derived"]["recommendation"]:
         raise BuildAssessmentError(f"{item_id}: assessment pointer recommendation mismatch")
+    if pointer.get("decision_score") != record["derived"]["decision_score"]:
+        raise BuildAssessmentError(f"{item_id}: assessment pointer decision_score mismatch")
     if pointer.get("item_fingerprint") != record["item_fingerprint"]:
         raise BuildAssessmentError(f"{item_id}: assessment pointer fingerprint mismatch")
     return record

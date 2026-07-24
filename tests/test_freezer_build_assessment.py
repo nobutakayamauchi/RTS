@@ -320,5 +320,36 @@ class BuildAssessmentTests(unittest.TestCase):
             self.assertFalse(payload["wip_capacity_available"])
             self.assertFalse(payload["selection_ready"])
 
+    def test_full_gate_is_true_for_frozen_seed_with_all_gates(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = self.isolated_root(temp_dir)
+            self.mutate_current_item(root, "RTS-FRZ-000002", {"status": "FROZEN"})
+            rebuild_index(root)
+            payload = gate_payload(root, "RTS-FRZ-000002")
+            self.assertEqual(payload["status"], "FROZEN")
+            self.assertEqual(payload["recommendation"], "BUILD_NOW")
+            self.assertEqual(payload["preflight_state"], "PASS")
+            self.assertTrue(payload["wip_capacity_available"])
+            self.assertTrue(payload["selection_ready"])
+
+    def test_tampered_pointer_decision_score_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = self.isolated_root(temp_dir)
+            pointer_path = (
+                root
+                / "freezer"
+                / "assessments"
+                / "RTS-FRZ-000002"
+                / "current.json"
+            )
+            pointer = json.loads(pointer_path.read_text(encoding="utf-8"))
+            pointer["decision_score"] += 1
+            self.write_json(pointer_path, pointer)
+            with self.assertRaisesRegex(
+                BuildAssessmentError,
+                "assessment pointer decision_score mismatch",
+            ):
+                load_current_assessment(root, "RTS-FRZ-000002")
+
 if __name__ == "__main__":
     unittest.main()

@@ -143,7 +143,7 @@ def gate_payload(root: Path, item_id: str) -> dict[str, Any]:
     ready = (
         state["state"] == "CURRENT" and recommendation == "BUILD_NOW" and preflight == "PASS"
         and item.get("build_authority") == "APPROVED"
-        and item.get("status") in {"READY", "SELECTED", "IN_PROGRESS"}
+        and item.get("status") in {"FROZEN", "READY", "SELECTED", "IN_PROGRESS"}
         and wip_capacity_available
     )
     return {
