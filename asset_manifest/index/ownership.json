@@ -1,0 +1,32 @@
+{
+  "schema_version": "RTS-ASSET-MANIFEST-V1",
+  "snapshot_version": 1,
+  "generated_at": "2026-07-24T03:10:00Z",
+  "count": 24,
+  "capabilities": [
+    {"capability":"agent-decision-log-reader","claims":[{"asset_id":"RTS-AM-A0014","repository":"nobutakayamauchi/RTS-AGE","canonicality":"REUSABLE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"agent-decision-report","claims":[{"asset_id":"RTS-AM-A0015","repository":"nobutakayamauchi/RTS-AGE","canonicality":"REUSABLE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"agent-provider-adapter","claims":[{"asset_id":"RTS-AM-A0012","repository":"nobutakayamauchi/RTS-AGE","canonicality":"REUSABLE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"business-trace-and-human-gates","claims":[{"asset_id":"RTS-AM-A0018","repository":"nobutakayamauchi/RTS-minicompany","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PRIVATE_METADATA_ONLY"}]},
+    {"capability":"connector-permission-pack-contract","claims":[{"asset_id":"RTS-AM-A0017","repository":"nobutakayamauchi/RTS-MCP-Packs","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"deferred-work-governance","claims":[{"asset_id":"RTS-AM-A0001","repository":"nobutakayamauchi/RTS","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"design-decision-provenance","claims":[{"asset_id":"RTS-AM-A0021","repository":"nobutakayamauchi/RTS-Design-Research","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"development-protocol-inventory","claims":[{"asset_id":"RTS-AM-A0020","repository":"nobutakayamauchi/rts-dev-protocol","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"evidence-reference-contract","claims":[{"asset_id":"RTS-AM-A0003","repository":"nobutakayamauchi/RTS","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"execution-aware-ev-pattern","claims":[{"asset_id":"RTS-AM-A0024","repository":"nobutakayamauchi/AIX","canonicality":"FROZEN","reuse_mode":"NO_REUSE","sensitivity":"PRIVATE_METADATA_ONLY"}]},
+    {"capability":"execution-record-contract","claims":[{"asset_id":"RTS-AM-A0002","repository":"nobutakayamauchi/RTS","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"feature-build-sequence","claims":[{"asset_id":"RTS-AM-A0010","repository":"nobutakayamauchi/RTS-Skills-","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"governed-component-promotion","claims":[{"asset_id":"RTS-AM-A0019","repository":"nobutakayamauchi/RTS-Talent-Registry","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"governed-improvement-proposal-spec","claims":[{"asset_id":"RTS-AM-A0007","repository":"nobutakayamauchi/RTS","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"legacy-append-only-audit","claims":[{"asset_id":"RTS-AM-A0006","repository":"nobutakayamauchi/RTS","canonicality":"REFERENCE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"legacy-operational-memory-index","claims":[{"asset_id":"RTS-AM-A0005","repository":"nobutakayamauchi/RTS","canonicality":"REFERENCE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"legacy-repository-state-detection","claims":[{"asset_id":"RTS-AM-A0004","repository":"nobutakayamauchi/RTS","canonicality":"REFERENCE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"local-agent-dry-run","claims":[{"asset_id":"RTS-AM-A0013","repository":"nobutakayamauchi/RTS-AGE","canonicality":"REUSABLE","reuse_mode":"ADAPT","sensitivity":"PUBLIC"}]},
+    {"capability":"minimal-reconstructable-runtime-flow","claims":[{"asset_id":"RTS-AM-A0009","repository":"nobutakayamauchi/RTS-Minimal-Runtime","canonicality":"REFERENCE","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"orchestration-responsibility","claims":[{"asset_id":"RTS-AM-A0016","repository":"nobutakayamauchi/RTS-Hermes-Drive","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"signal-fact-assumption-separation","claims":[{"asset_id":"RTS-AM-A0022","repository":"nobutakayamauchi/RTS-Signal-Feeds","canonicality":"FROZEN","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"success-pattern-replication-spec","claims":[{"asset_id":"RTS-AM-A0008","repository":"nobutakayamauchi/RTS","canonicality":"REFERENCE","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]},
+    {"capability":"verification-runner","claims":[{"asset_id":"RTS-AM-A0011","repository":"nobutakayamauchi/RTS-Skills-","canonicality":"CANONICAL","reuse_mode":"DIRECT","sensitivity":"PUBLIC"}]},
+    {"capability":"video-workflow-scaffold","claims":[{"asset_id":"RTS-AM-A0023","repository":"nobutakayamauchi/rts-video-flow","canonicality":"FROZEN","reuse_mode":"REFERENCE_ONLY","sensitivity":"PUBLIC"}]}
+  ]
+}
