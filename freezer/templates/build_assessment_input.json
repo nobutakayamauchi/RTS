@@ -1,0 +1,45 @@
+{
+  "assessor": "operator-or-reviewer",
+  "rationale": "Explain why the evidence supports the scores and time estimates.",
+  "expected_effect": {
+    "impact": 0,
+    "strategic_fit": 0,
+    "revenue_leverage": 0,
+    "risk_reduction": 0,
+    "recurrence": 0,
+    "confidence": 0
+  },
+  "implementation": {
+    "from_scratch_hours": 1,
+    "integration_hours": 0,
+    "validation_hours": 0,
+    "unknown_buffer_hours": 0
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "owner/repository"
+    ],
+    "queries": [
+      "terms used to find reusable code, data, schemas, tests, or documentation"
+    ],
+    "assets": [
+      {
+        "repository": "owner/repository",
+        "path": "path/to/asset",
+        "ref": "commit-or-branch",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "REVIEW_REQUIRED",
+        "estimated_hours_saved": 0,
+        "notes": "Describe compatibility, boundaries, and adaptation work."
+      }
+    ],
+    "gaps": [
+      "Record search gaps, unknown repositories, naming mismatches, or evidence limits."
+    ]
+  },
+  "risks": [
+    "Record false precision, integration, licensing, security, privacy, and maintenance risks."
+  ]
+}
