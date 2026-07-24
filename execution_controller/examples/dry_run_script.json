@@ -1,0 +1,14 @@
+{
+  "kind": "success",
+  "result": {
+    "status": "simulated-success"
+  },
+  "retryable": false,
+  "summary": "bounded deterministic dry-run",
+  "timestamp": "2026-07-24T09:00:01Z",
+  "usage": {
+    "changed_bytes": 0,
+    "changed_files": 0,
+    "elapsed_seconds": 1
+  }
+}

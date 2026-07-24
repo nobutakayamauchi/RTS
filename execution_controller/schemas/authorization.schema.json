@@ -1,0 +1,123 @@
+{
+  "$id": "RTS-EXECUTION-AUTHORIZATION-V1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_id": {
+      "const": "dry-run"
+    },
+    "allowed_capabilities": {
+      "items": {
+        "const": "LOCAL_CHECKPOINT_WRITE"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "as_of": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorization_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorization_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "budgets": {
+      "additionalProperties": false,
+      "properties": {
+        "max_attempts": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_changed_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_changed_files": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_elapsed_seconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_events": {
+          "minimum": 5,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_attempts",
+        "max_elapsed_seconds",
+        "max_changed_files",
+        "max_changed_bytes",
+        "max_events"
+      ],
+      "type": "object"
+    },
+    "drive_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "issued_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "issued_by": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "item_id": {
+      "pattern": "^RTS-FRZ-[0-9]{6}$",
+      "type": "string"
+    },
+    "item_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "pack_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "skill_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "stop_conditions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "trigger": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "authorization_id",
+    "item_id",
+    "item_version",
+    "issued_by",
+    "issued_at",
+    "as_of",
+    "adapter_id",
+    "skill_id",
+    "drive_id",
+    "pack_id",
+    "trigger",
+    "allowed_capabilities",
+    "budgets",
+    "stop_conditions",
+    "authorization_fingerprint"
+  ],
+  "type": "object"
+}

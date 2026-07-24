@@ -1,0 +1,66 @@
+{
+  "$id": "RTS-EXECUTION-EVENT-V1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attempt": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "event_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "event_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "event_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "previous_event_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "RTS-EXECUTION-EVENT-V1"
+    },
+    "sequence": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "state_after": {
+      "type": "string"
+    },
+    "state_before": {
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "timestamp": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "usage": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "sequence",
+    "event_id",
+    "previous_event_hash",
+    "event_hash",
+    "event_type",
+    "state_before",
+    "state_after",
+    "attempt",
+    "usage",
+    "timestamp",
+    "summary"
+  ],
+  "type": "object"
+}
