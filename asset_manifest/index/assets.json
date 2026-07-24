@@ -15,10 +15,14 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "FREEZER, build assessment, Preflight and WIP=1 selection boundary.",
       "risks": [],
-      "evidence_refs": ["freezer/README.md"]
+      "evidence_refs": [
+        "freezer/README.md"
+      ]
     },
     {
       "asset_id": "RTS-AM-A0002",
@@ -31,10 +35,15 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-AGE"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-AGE"
+      ],
       "notes": "",
       "risks": [],
-      "evidence_refs": ["docs/overview/EXECUTION_AND_EVIDENCE.md"]
+      "evidence_refs": [
+        "docs/overview/EXECUTION_AND_EVIDENCE.md"
+      ]
     },
     {
       "asset_id": "RTS-AM-A0003",
@@ -47,10 +56,15 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-AGE"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-AGE"
+      ],
       "notes": "",
       "risks": [],
-      "evidence_refs": ["docs/overview/EXECUTION_AND_EVIDENCE.md"]
+      "evidence_refs": [
+        "docs/overview/EXECUTION_AND_EVIDENCE.md"
+      ]
     },
     {
       "asset_id": "RTS-AM-A0004",
@@ -63,9 +77,13 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Legacy/repair-required; do not promote without contract alignment.",
-      "risks": ["CLI/module drift observed"],
+      "risks": [
+        "CLI/module drift observed"
+      ],
       "evidence_refs": []
     },
     {
@@ -79,9 +97,13 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Useful tokenizer/index patterns; current integration requires repair.",
-      "risks": ["Function/API drift"],
+      "risks": [
+        "Function/API drift"
+      ],
       "evidence_refs": []
     },
     {
@@ -95,7 +117,9 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Hash-chain concepts are reusable after stronger invariants.",
       "risks": [],
       "evidence_refs": []
@@ -111,7 +135,10 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-Skills-"
+      ],
       "notes": "Legacy specification; human approval retained.",
       "risks": [],
       "evidence_refs": []
@@ -127,7 +154,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Skills-"
+      ],
       "notes": "Reference for outcome learning, not active runtime.",
       "risks": [],
       "evidence_refs": []
@@ -143,7 +172,10 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-AGE"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-AGE"
+      ],
       "notes": "intent -> spec -> execution_record -> manifest -> reconstruction.",
       "risks": [],
       "evidence_refs": []
@@ -159,10 +191,15 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-AGE"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-AGE"
+      ],
       "notes": "",
       "risks": [],
-      "evidence_refs": ["rts-skills/README.md"]
+      "evidence_refs": [
+        "rts-skills/README.md"
+      ]
     },
     {
       "asset_id": "RTS-AM-A0011",
@@ -175,7 +212,10 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-AGE"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-AGE"
+      ],
       "notes": "Separate verified, unverified and assumed outcomes.",
       "risks": [],
       "evidence_refs": []
@@ -191,7 +231,9 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Typed adapter boundary with structured error result.",
       "risks": [],
       "evidence_refs": []
@@ -207,7 +249,9 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Deterministic local path; no external provider call.",
       "risks": [],
       "evidence_refs": []
@@ -223,7 +267,9 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Reads safe JSONL fields and ignores request text.",
       "risks": [],
       "evidence_refs": []
@@ -239,7 +285,9 @@
       "reuse_mode": "ADAPT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Aggregate routing metrics without prompt exposure.",
       "risks": [],
       "evidence_refs": []
@@ -255,7 +303,9 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Trigger, skill dispatch, pack loading and result handoff boundary.",
       "risks": [],
       "evidence_refs": []
@@ -271,7 +321,10 @@
       "reuse_mode": "DIRECT",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-Skills-"
+      ],
       "notes": "Tool bundle and read/write permission separation.",
       "risks": [],
       "evidence_refs": []
@@ -287,7 +340,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "NOT_APPLICABLE",
       "sensitivity": "PRIVATE_METADATA_ONLY",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Metadata-only reference to trace.jsonl and human decision boundaries; no customer data or private paths.",
       "risks": [],
       "evidence_refs": []
@@ -303,7 +358,10 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive", "RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive",
+        "RTS-Skills-"
+      ],
       "notes": "Promotion evidence states and retirement path.",
       "risks": [],
       "evidence_refs": []
@@ -319,7 +377,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Skills-"
+      ],
       "notes": "Development doctrine shelf; inventory before promotion.",
       "risks": [],
       "evidence_refs": []
@@ -335,7 +395,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Skills-"
+      ],
       "notes": "Design research to reconstructable decision artifacts.",
       "risks": [],
       "evidence_refs": []
@@ -351,7 +413,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Hermes-Drive"],
+      "consumer_candidates": [
+        "RTS-Hermes-Drive"
+      ],
       "notes": "Non-executable signal skeleton.",
       "risks": [],
       "evidence_refs": []
@@ -367,7 +431,9 @@
       "reuse_mode": "REFERENCE_ONLY",
       "license_status": "COMPATIBLE",
       "sensitivity": "PUBLIC",
-      "consumer_candidates": ["RTS-Skills-"],
+      "consumer_candidates": [
+        "RTS-Skills-"
+      ],
       "notes": "Review before use; starter files only.",
       "risks": [],
       "evidence_refs": []
