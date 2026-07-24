@@ -92,21 +92,24 @@ class AssetManifestTests(unittest.TestCase):
 
     def test_append_only_create_and_diff(self) -> None:
         root = self.isolated_root()
-        input_snapshot = deepcopy(self.seed)
+        current = load_current_snapshot(root)
+        current_version = current["snapshot_version"]
+        next_version = current_version + 1
+        input_snapshot = deepcopy(current)
         for field in ("schema_version", "snapshot_version"):
             input_snapshot.pop(field, None)
-        input_snapshot["generated_at"] = "2026-07-24T04:00:00Z"
-        input_snapshot["known_gaps"].append("second snapshot")
+        input_snapshot["generated_at"] = "2026-07-24T23:30:00Z"
+        input_snapshot["known_gaps"].append("next snapshot")
         source = root / "input.json"
         source.write_text(json.dumps(input_snapshot, ensure_ascii=False), encoding="utf-8")
         created = create_snapshot(root, source)
-        self.assertEqual(2, created["snapshot_version"])
-        self.assertTrue((root / "asset_manifest/snapshots/v001.json").exists())
-        self.assertTrue((root / "asset_manifest/snapshots/v002.json").exists())
-        delta = diff_snapshots(root, 1, 2)
+        self.assertEqual(next_version, created["snapshot_version"])
+        self.assertTrue((root / f"asset_manifest/snapshots/v{current_version:03d}.json").exists())
+        self.assertTrue((root / f"asset_manifest/snapshots/v{next_version:03d}.json").exists())
+        delta = diff_snapshots(root, current_version, next_version)
         self.assertEqual([], delta["assets"]["added"])
         self.assertEqual([], delta["repositories"]["changed"])
-        self.assertEqual(2, load_current_snapshot(root)["snapshot_version"])
+        self.assertEqual(next_version, load_current_snapshot(root)["snapshot_version"])
         self.assertEqual([], verify(root))
 
     def test_stale_pointer_is_rejected(self) -> None:

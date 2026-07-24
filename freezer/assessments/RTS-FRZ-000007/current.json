@@ -1,10 +1,1 @@
-{
-  "item_id": "RTS-FRZ-000007",
-  "current_assessment_version": 1,
-  "path": "freezer/assessments/RTS-FRZ-000007/ba001.json",
-  "assessment_id": "RTS-BA-000007-001",
-  "recommendation": "RESEARCH_REQUIRED",
-  "decision_score": 60.09,
-  "item_fingerprint": "b1923902f3c35b92cb2575e019a9651ce8ac5ff6088f86fbde855c24cc7cced3",
-  "updated_at": "2026-07-24T20:12:21Z"
-}
+{"item_id":"RTS-FRZ-000007","current_assessment_version":2,"path":"freezer/assessments/RTS-FRZ-000007/ba002.json","assessment_id":"RTS-BA-000007-002","recommendation":"BUILD_NOW","decision_score":71.41,"item_fingerprint":"b1923902f3c35b92cb2575e019a9651ce8ac5ff6088f86fbde855c24cc7cced3","updated_at":"2026-07-24T23:00:00Z"}
