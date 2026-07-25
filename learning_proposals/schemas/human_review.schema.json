@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-SKILL-PROMOTION-REVIEW-V1",
+  "title": "RTS Human Review Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "decision_id", "proposal_id", "proposal_fingerprint",
+    "status", "reviewer", "generator_identity", "separation_of_duties",
+    "rationale", "skill_mutation_authorized",
+    "adjacent_repository_write_authorized", "application_status",
+    "decision_fingerprint"
+  ],
+  "properties": {
+    "schema_version": {"const": "RTS-SKILL-PROMOTION-REVIEW-V1"},
+    "decision_id": {"type": "string"},
+    "proposal_id": {"type": "string"},
+    "proposal_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["PENDING", "APPROVED", "REJECTED"]},
+    "reviewer": {"type": "object"},
+    "generator_identity": {"const": "rts-proposal-generator-v1"},
+    "separation_of_duties": {"const": true},
+    "rationale": {"type": "string"},
+    "skill_mutation_authorized": {"const": false},
+    "adjacent_repository_write_authorized": {"const": false},
+    "application_status": {"const": "NOT_APPLIED"},
+    "decision_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
