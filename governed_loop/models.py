@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import string
 from pathlib import PurePosixPath
 from typing import Any
 
@@ -61,6 +62,16 @@ COMPONENT_FIELDS = {
     "learning_proposal",
 }
 SOURCE_ROW_FIELDS = {"path", "sha256"}
+OUTCOME_LINK_FIELDS = {
+    "bundle_id",
+    "bundle_fingerprint",
+    "plan_fingerprint",
+    "authorization_fingerprint",
+    "terminal_state",
+    "execution_scope",
+    "outcome_classification",
+}
+CLASSIFICATIONS = {"VERIFIED", "UNVERIFIED", "ASSUMED"}
 
 
 def run_material(record: dict[str, Any]) -> dict[str, Any]:
@@ -68,6 +79,40 @@ def run_material(record: dict[str, Any]) -> dict[str, Any]:
     material.pop("run_id", None)
     material.pop("run_fingerprint", None)
     return material
+
+
+def _sha256(value: Any, *, field: str) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in string.hexdigits.lower() for character in value)
+        or value != value.lower()
+    ):
+        raise GovernedLoopError(f"{field} must be a lowercase SHA-256 digest")
+    return value
+
+
+def _integer(value: Any, *, field: str, minimum: int = 0) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        raise GovernedLoopError(f"{field} must be an integer >= {minimum}")
+    return value
+
+
+def _safe_relative_path(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise GovernedLoopError(f"{field} is required")
+    pure = PurePosixPath(value)
+    if pure.is_absolute() or ".." in pure.parts:
+        raise GovernedLoopError(f"unsafe {field}: {value}")
+    return value
+
+
+def _string_list(value: Any, *, field: str, non_empty: bool = True) -> list[str]:
+    if not isinstance(value, list) or (non_empty and not value):
+        raise GovernedLoopError(f"{field} must be a string list")
+    if any(not isinstance(entry, str) or not entry for entry in value):
+        raise GovernedLoopError(f"{field} must contain non-empty strings")
+    return value
 
 
 def validate_record(record: dict[str, Any]) -> dict[str, Any]:
@@ -88,15 +133,10 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
     paths: list[str] = []
     for index, row in enumerate(rows):
         row = exact_object(row, SOURCE_ROW_FIELDS, field=f"source_fingerprints[{index}]")
-        path = row["path"]
-        digest = row["sha256"]
-        if not isinstance(path, str) or not path:
-            raise GovernedLoopError("source fingerprint path is required")
-        pure = PurePosixPath(path)
-        if pure.is_absolute() or ".." in pure.parts:
-            raise GovernedLoopError(f"unsafe source fingerprint path: {path}")
-        if not isinstance(digest, str) or len(digest) != 64:
-            raise GovernedLoopError(f"invalid source fingerprint digest: {path}")
+        path = _safe_relative_path(
+            row["path"], field=f"source_fingerprints[{index}].path"
+        )
+        _sha256(row["sha256"], field=f"source_fingerprints[{index}].sha256")
         paths.append(path)
     if paths != sorted(paths) or len(paths) != len(set(paths)):
         raise GovernedLoopError("source_fingerprints must be sorted and unique")
@@ -104,11 +144,23 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
     components = exact_object(record["components"], COMPONENT_FIELDS, field="components")
     asset = exact_object(
         components["asset_manifest"],
-        {"verification", "snapshot_version", "snapshot_path", "snapshot_sha256", "asset_count", "repository_count"},
+        {
+            "verification",
+            "snapshot_version",
+            "snapshot_path",
+            "snapshot_sha256",
+            "asset_count",
+            "repository_count",
+        },
         field="components.asset_manifest",
     )
     if asset["verification"] != "PASSED":
         raise GovernedLoopError("asset manifest verification did not pass")
+    _integer(asset["snapshot_version"], field="asset snapshot_version", minimum=1)
+    _safe_relative_path(asset["snapshot_path"], field="asset snapshot_path")
+    _sha256(asset["snapshot_sha256"], field="asset snapshot_sha256")
+    _integer(asset["asset_count"], field="asset_count", minimum=1)
+    _integer(asset["repository_count"], field="repository_count", minimum=1)
 
     loop = exact_object(
         components["read_only_loop"],
@@ -127,6 +179,28 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
     )
     if loop["verification"] != "PASSED" or loop["authority"] != "ADVISORY_ONLY":
         raise GovernedLoopError("read-only loop authority boundary widened")
+    _sha256(loop["evaluation_id"], field="read-only evaluation_id")
+    active_ids = _string_list(
+        loop["active_item_ids"], field="read-only active_item_ids", non_empty=False
+    )
+    if active_ids != sorted(active_ids) or len(active_ids) != len(set(active_ids)):
+        raise GovernedLoopError("active_item_ids must be sorted and unique")
+    wip_count = _integer(loop["wip_count"], field="read-only wip_count")
+    if wip_count != len(active_ids):
+        raise GovernedLoopError("read-only wip_count does not match active_item_ids")
+    if not isinstance(loop["state"], str) or not loop["state"]:
+        raise GovernedLoopError("read-only state is required")
+    if not isinstance(loop["audit_level"], str) or not loop["audit_level"]:
+        raise GovernedLoopError("read-only audit_level is required")
+    if not isinstance(loop["recommendation_action"], str) or not loop["recommendation_action"]:
+        raise GovernedLoopError("read-only recommendation_action is required")
+    recommendation_item = loop["recommendation_item_id"]
+    if recommendation_item is not None and (
+        not isinstance(recommendation_item, str) or not recommendation_item
+    ):
+        raise GovernedLoopError("invalid read-only recommendation_item_id")
+    if wip_count == 1 and recommendation_item not in active_ids:
+        raise GovernedLoopError("active recommendation item must match the sole WIP item")
 
     controller = exact_object(
         components["execution_controller"],
@@ -139,8 +213,32 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
         or controller["external_execution_performed"] is not False
     ):
         raise GovernedLoopError("execution controller boundary widened")
-    if not isinstance(controller["outcome_links"], list) or not controller["outcome_links"]:
+    links = controller["outcome_links"]
+    if not isinstance(links, list) or not links:
         raise GovernedLoopError("execution controller outcome_links are required")
+    link_ids: list[str] = []
+    link_fingerprints: list[str] = []
+    for index, link in enumerate(links):
+        link = exact_object(
+            link, OUTCOME_LINK_FIELDS, field=f"execution_controller.outcome_links[{index}]"
+        )
+        for field in ("bundle_id", "terminal_state"):
+            if not isinstance(link[field], str) or not link[field]:
+                raise GovernedLoopError(f"outcome link {field} is required")
+        for field in (
+            "bundle_fingerprint",
+            "plan_fingerprint",
+            "authorization_fingerprint",
+        ):
+            _sha256(link[field], field=f"outcome link {field}")
+        if link["execution_scope"] != "SIMULATED_ONLY":
+            raise GovernedLoopError("controller outcome execution scope widened")
+        if link["outcome_classification"] not in CLASSIFICATIONS:
+            raise GovernedLoopError("invalid controller outcome classification")
+        link_ids.append(link["bundle_id"])
+        link_fingerprints.append(link["bundle_fingerprint"])
+    if link_ids != sorted(link_ids) or len(link_ids) != len(set(link_ids)):
+        raise GovernedLoopError("controller outcome links must be sorted and unique")
 
     outcome = exact_object(
         components["outcome_evidence"],
@@ -161,6 +259,22 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
         or outcome["promotion_eligibility"] != "NOT_ELIGIBLE"
     ):
         raise GovernedLoopError("outcome evidence boundary widened")
+    bundle_count = _integer(outcome["bundle_count"], field="outcome bundle_count", minimum=3)
+    bundle_ids = _string_list(outcome["bundle_ids"], field="outcome bundle_ids")
+    bundle_fingerprints = _string_list(
+        outcome["bundle_fingerprints"], field="outcome bundle_fingerprints"
+    )
+    for digest in bundle_fingerprints:
+        _sha256(digest, field="outcome bundle fingerprint")
+    classifications = _string_list(
+        outcome["classifications"], field="outcome classifications"
+    )
+    if any(value not in CLASSIFICATIONS for value in classifications):
+        raise GovernedLoopError("invalid outcome classification")
+    if bundle_count != len(bundle_ids) or bundle_count != len(bundle_fingerprints):
+        raise GovernedLoopError("outcome bundle_count does not match bundle arrays")
+    if bundle_ids != link_ids or bundle_fingerprints != link_fingerprints:
+        raise GovernedLoopError("controller and outcome bundle linkage mismatch")
 
     regression = exact_object(
         components["skill_regression"],
@@ -183,6 +297,17 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
         or regression["promotion_eligibility"] != "NOT_ELIGIBLE"
     ):
         raise GovernedLoopError("skill regression boundary widened")
+    if not isinstance(regression["dataset_id"], str) or not regression["dataset_id"]:
+        raise GovernedLoopError("regression dataset_id is required")
+    _sha256(regression["result_fingerprint"], field="regression result_fingerprint")
+    if _integer(regression["regressions"], field="regressions") != 0:
+        raise GovernedLoopError("regression count widened")
+    _integer(regression["improvements"], field="improvements")
+    if _integer(regression["safety_failures"], field="safety_failures") != 0:
+        raise GovernedLoopError("safety failure count widened")
+    pass_rate = regression["candidate_pass_rate"]
+    if isinstance(pass_rate, bool) or not isinstance(pass_rate, (int, float)) or not 0 <= pass_rate <= 1:
+        raise GovernedLoopError("candidate_pass_rate must be between 0 and 1")
 
     proposal = exact_object(
         components["learning_proposal"],
@@ -207,12 +332,13 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
         or proposal["application_status"] != "NOT_APPLIED"
     ):
         raise GovernedLoopError("learning proposal boundary widened")
+    if not isinstance(proposal["proposal_id"], str) or not proposal["proposal_id"]:
+        raise GovernedLoopError("proposal_id is required")
+    _sha256(proposal["proposal_fingerprint"], field="proposal_fingerprint")
 
     evidence = exact_object(record["evidence_summary"], EVIDENCE_FIELDS, field="evidence_summary")
     for field in sorted(EVIDENCE_FIELDS):
-        values = evidence[field]
-        if not isinstance(values, list) or not values or any(not isinstance(v, str) or not v for v in values):
-            raise GovernedLoopError(f"evidence_summary.{field} must be a non-empty string list")
+        _string_list(evidence[field], field=f"evidence_summary.{field}")
 
     authority = exact_object(record["authority"], AUTHORITY_FIELDS, field="authority")
     expected_authority = {
