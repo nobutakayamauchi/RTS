@@ -11,5 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Print checkout tree
-        run: git rev-parse 'HEAD^{tree}'
+      - name: Capture checkout tree
+        run: git rev-parse 'HEAD^{tree}' > tree-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checkout-tree-sha
+          path: tree-sha.txt
