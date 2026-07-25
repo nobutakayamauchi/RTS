@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T07:23:28Z",
+  "generated_at": "2026-07-25T07:40:07Z",
   "count": 3,
   "policy": {
     "work_in_progress_limit": 1,
@@ -30,7 +30,7 @@
         "one-shot"
       ],
       "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
+      "preflight_state": "PASS",
       "updated_at": "2026-07-25T07:23:28Z"
     },
     {
