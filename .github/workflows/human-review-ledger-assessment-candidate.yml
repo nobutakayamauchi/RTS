@@ -1,0 +1,40 @@
+name: Human Review Ledger Assessment Candidate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate assessment candidate
+        run: python .github/scripts/generate_human_review_ledger_assessment.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: human-review-ledger-assessment-candidate
+          path: human-review-ledger-assessment-candidate
+      - name: Verify governed records
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m asset_manifest.cli verify
+          python -m loop_core.cli verify
+          python -m execution_controller.cli verify
+          python -m outcome_evidence.cli verify
+          python -m skill_regression.cli verify
+          python -m learning_proposals.cli verify
+          python -m governed_loop.cli verify
+      - name: Run full tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Verify governed records after tests
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m governed_loop.cli verify
