@@ -4,7 +4,7 @@ import ast
 from pathlib import Path
 from typing import Any
 
-from outcome_evidence.corpus import verify_all as verify_outcome_evidence
+from outcome_evidence.corpus import corpus_summary
 from skill_regression.corpus import verify_all as verify_skill_regression
 
 from .common import LearningProposalError, load_json, pretty_json, sha256_file
@@ -75,10 +75,16 @@ def verify_all(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     _verify_forbidden_imports(root)
     _verify_schema_ids(root)
     try:
-        verify_outcome_evidence(root)
+        outcome_summary = corpus_summary(root)
         regression_summary = verify_skill_regression(root)
     except RuntimeError as exc:
         raise LearningProposalError(f"source governed package verification failed: {exc}") from exc
+    if outcome_summary.get("execution_scope") != "SIMULATED_ONLY":
+        raise LearningProposalError("source outcome execution scope widened")
+    if outcome_summary.get("promotion_eligibility") != "NOT_ELIGIBLE":
+        raise LearningProposalError("source outcome promotion eligibility widened")
+    if outcome_summary.get("bundle_count", 0) < 3:
+        raise LearningProposalError("source outcome corpus is incomplete")
     if regression_summary.get("recommendation") != "RESEARCH_READY":
         raise LearningProposalError("source regression recommendation is not RESEARCH_READY")
     if regression_summary.get("promotion_eligibility") != "NOT_ELIGIBLE":
