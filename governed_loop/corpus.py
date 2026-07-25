@@ -40,13 +40,11 @@ def _verify_forbidden_imports(root: Path) -> None:
                     )
 
 
-def verify_all(root: Path = DEFAULT_ROOT, *, require_committed: bool = True) -> dict[str, Any]:
+def verify_all(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     root = root.resolve()
     schema_path = root / SCHEMA_PATH
-    governed = source_paths(root) + [schema_path]
     run_path = root / RUN_PATH
-    if run_path.exists():
-        governed.append(run_path)
+    governed = source_paths(root) + [schema_path, run_path]
     before = {path: sha256_file(path) for path in governed}
 
     _verify_forbidden_imports(root)
@@ -60,13 +58,10 @@ def verify_all(root: Path = DEFAULT_ROOT, *, require_committed: bool = True) -> 
         raise GovernedLoopError("governed loop generation is not deterministic")
     validate_record(first)
 
-    if run_path.exists():
-        committed = load_json(run_path)
-        validate_record(committed)
-        if pretty_json(committed) != pretty_json(first):
-            raise GovernedLoopError("committed governed loop run is stale")
-    elif require_committed:
-        raise GovernedLoopError("committed governed loop run is missing")
+    committed = load_json(run_path)
+    validate_record(committed)
+    if pretty_json(committed) != pretty_json(first):
+        raise GovernedLoopError("committed governed loop run is stale")
 
     after = {path: sha256_file(path) for path in governed}
     if before != after:
