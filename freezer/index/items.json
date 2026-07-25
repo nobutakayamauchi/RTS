@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T23:47:00Z",
+  "generated_at": "2026-07-25T05:51:00Z",
   "count": 7,
   "items": [
     {
@@ -142,10 +142,10 @@
     },
     {
       "item_id": "RTS-FRZ-000007",
-      "version": 4,
+      "version": 6,
       "title": "Outcome Learning and Skill Promotion",
       "type": "feature",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 63.28,
       "estimated_hours": {
         "minimum": 24,
@@ -160,7 +160,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-07-24T23:47:00Z"
+      "updated_at": "2026-07-25T05:51:00Z"
     }
   ]
 }
