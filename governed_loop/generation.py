@@ -29,6 +29,7 @@ SOURCE_PATHS = (
     "asset_manifest/index/repositories.json",
     "freezer/index/items.json",
     "freezer/index/build_priority.json",
+    "governed_loop/schemas/loop_run.schema.json",
     "outcome_evidence/examples/escalation.json",
     "outcome_evidence/examples/recovery.json",
     "outcome_evidence/examples/success.json",
