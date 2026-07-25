@@ -1,0 +1,18 @@
+{
+  "adjacent_repository_write_authorized": false,
+  "application_status": "NOT_APPLIED",
+  "decision_fingerprint": "a5219ac45ac83a6f2e01c054c75f4c78a85d21df17468ad57abac66de13ab60d",
+  "decision_id": "RTS-SKILL-REVIEW-000001",
+  "generator_identity": "rts-proposal-generator-v1",
+  "proposal_fingerprint": "8aa32ba9129e5dc239c46bff5f0c8362914ff11567763a162193692f90842521",
+  "proposal_id": "RTS-SKILL-PROPOSAL-000001",
+  "rationale": "Human review has not yet occurred; this record is a non-authorizing review request.",
+  "reviewer": {
+    "identity": null,
+    "type": "UNASSIGNED"
+  },
+  "schema_version": "RTS-SKILL-PROMOTION-REVIEW-V1",
+  "separation_of_duties": true,
+  "skill_mutation_authorized": false,
+  "status": "PENDING"
+}
