@@ -15,7 +15,11 @@ jobs:
         with:
           python-version: "3.11"
       - name: Generate assessment candidate
-        run: python .github/scripts/generate_human_review_ledger_assessment.py
+        run: |
+          python .github/scripts/generate_human_review_ledger_assessment.py
+          python .github/scripts/update_human_review_ledger_assessment_test.py
+          mkdir -p human-review-ledger-assessment-candidate/tests
+          cp tests/test_governed_loop.py human-review-ledger-assessment-candidate/tests/test_governed_loop.py
       - uses: actions/upload-artifact@v4
         with:
           name: human-review-ledger-assessment-candidate
