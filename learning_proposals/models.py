@@ -8,6 +8,7 @@ from .common import (
     exact,
     optional_text,
     reject_private_keys,
+    require_relative_path,
     safe_id,
     sha256_value,
     string_list,
@@ -27,6 +28,11 @@ EXPECTED_OUTCOMES = {
     "RTS-OUTCOME-000002": ("ESCALATION", "VERIFIED", "ESCALATED"),
     "RTS-OUTCOME-000003": ("RECOVERY", "ASSUMED", "STOPPED"),
 }
+EXPECTED_EVIDENCE_IDS = {
+    "RTS-OUTCOME-000001": "RTS-EVIDENCE-OUTCOME-000001",
+    "RTS-OUTCOME-000002": "RTS-EVIDENCE-OUTCOME-000002",
+    "RTS-OUTCOME-000003": "RTS-EVIDENCE-OUTCOME-000003",
+}
 
 PROPOSAL_FIELDS = {
     "schema_version", "proposal_id", "generator_identity", "proposal_status",
@@ -36,8 +42,9 @@ PROPOSAL_FIELDS = {
 GENERATED_FROM_FIELDS = {"outcome_bundles", "regression", "rollback"}
 OUTCOME_FIELDS = {
     "bundle_id", "bundle_fingerprint", "scenario", "outcome_classification",
-    "execution_scope", "terminal_state",
+    "execution_scope", "terminal_state", "evidence_refs", "evidence_integrity",
 }
+EVIDENCE_REF_FIELDS = {"evidence_id", "source_type", "source_ref", "retrieved_at"}
 REGRESSION_FIELDS = {
     "dataset_id", "dataset_fingerprint", "result_id", "result_fingerprint",
     "recommendation", "promotion_eligibility", "baseline_snapshot_fingerprint",
@@ -48,7 +55,7 @@ ROLLBACK_FIELDS = {
     "human_approval_required", "mutation_authorized",
     "adjacent_repository_write_authorized",
 }
-EVIDENCE_FIELDS = {"confirmed_facts", "assumptions", "unverified_claims"}
+EVIDENCE_FIELDS = {"confirmed_facts", "assumptions", "unverified_claims", "risks"}
 RECOMMENDATION_FIELDS = {
     "action", "target_skill_id", "candidate_snapshot_id",
     "candidate_snapshot_fingerprint", "rationale",
@@ -105,6 +112,26 @@ def validate_proposal(value: Any) -> dict[str, Any]:
             raise LearningProposalError(f"outcome semantics mismatch for {bundle_id}")
         if row["execution_scope"] != "SIMULATED_ONLY":
             raise LearningProposalError("outcome execution_scope must remain SIMULATED_ONLY")
+
+        refs = row["evidence_refs"]
+        if not isinstance(refs, list) or len(refs) != 1:
+            raise LearningProposalError(f"{bundle_id}: exactly one evidence reference is required")
+        ref = exact(refs[0], EVIDENCE_REF_FIELDS, f"{bundle_id}.evidence_refs[0]")
+        evidence_id = safe_id(ref["evidence_id"], f"{bundle_id}.evidence_id")
+        if evidence_id != EXPECTED_EVIDENCE_IDS[bundle_id]:
+            raise LearningProposalError(f"{bundle_id}: unexpected evidence ID")
+        if ref["source_type"] != "local_controller_fixture":
+            raise LearningProposalError(f"{bundle_id}: evidence source_type mismatch")
+        require_relative_path(
+            ref["source_ref"],
+            f"{bundle_id}.evidence.source_ref",
+            "outcome_evidence/evidence/",
+        )
+        text(ref["retrieved_at"], f"{bundle_id}.evidence.retrieved_at", 64)
+        integrity = row["evidence_integrity"]
+        if not isinstance(integrity, dict) or set(integrity) != {evidence_id}:
+            raise LearningProposalError(f"{bundle_id}: evidence integrity keys mismatch")
+        digest(integrity[evidence_id], f"{bundle_id}.evidence_integrity.{evidence_id}")
     if observed_ids != OUTCOME_IDS:
         raise LearningProposalError("outcome bundle references must use the governed order")
 
@@ -137,6 +164,7 @@ def validate_proposal(value: Any) -> dict[str, Any]:
     string_list(evidence["confirmed_facts"], "evidence.confirmed_facts", minimum=1)
     string_list(evidence["assumptions"], "evidence.assumptions", minimum=1)
     string_list(evidence["unverified_claims"], "evidence.unverified_claims", minimum=1)
+    string_list(evidence["risks"], "evidence.risks", minimum=1)
 
     recommendation = exact(proposal["recommendation"], RECOMMENDATION_FIELDS, "proposal.recommendation")
     if recommendation["action"] != ACTION:
