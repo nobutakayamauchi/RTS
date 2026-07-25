@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-25T05:51:00Z",
-  "count": 7,
+  "generated_at": "2026-07-25T07:23:28Z",
+  "count": 8,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -161,6 +161,30 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-07-25T05:51:00Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000008",
+      "version": 1,
+      "title": "Read-Only Governed Loop Orchestrator v1",
+      "type": "architecture",
+      "status": "FROZEN",
+      "priority_score": 79.02,
+      "estimated_hours": {
+        "minimum": 16,
+        "maximum": 28
+      },
+      "tags": [
+        "orchestrator",
+        "read-only",
+        "loop",
+        "integration",
+        "deterministic",
+        "governance",
+        "one-shot"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-07-25T07:23:28Z"
     }
   ]
 }
