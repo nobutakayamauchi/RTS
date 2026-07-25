@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 import tempfile
 import unittest
@@ -29,6 +30,19 @@ class LearningProposalTests(unittest.TestCase):
     def test_generation_is_deterministic(self) -> None:
         self.assertEqual(generate_proposal(self.root), generate_proposal(self.root))
 
+    def test_exact_evidence_provenance_is_retained(self) -> None:
+        proposal = generate_proposal(self.root)
+        outcome = proposal["generated_from"]["outcome_bundles"][0]
+        self.assertEqual(outcome["evidence_refs"][0]["evidence_id"], "RTS-EVIDENCE-OUTCOME-000001")
+        self.assertEqual(
+            outcome["evidence_refs"][0]["source_ref"],
+            "outcome_evidence/evidence/success-controller-result.json",
+        )
+        self.assertEqual(
+            outcome["evidence_integrity"]["RTS-EVIDENCE-OUTCOME-000001"],
+            "3ba5ec9128769c751391ffc32566c988b0608ff9ee6d24eda23274b3ec5788d7",
+        )
+
     def test_proposal_fingerprint_mutation_is_rejected(self) -> None:
         proposal = generate_proposal(self.root)
         proposal["recommendation"]["rationale"] += " changed"
@@ -40,6 +54,27 @@ class LearningProposalTests(unittest.TestCase):
         proposal["generated_from"]["outcome_bundles"][0]["execution_scope"] = "EXTERNAL"
         proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
         with self.assertRaisesRegex(LearningProposalError, "SIMULATED_ONLY"):
+            validate_proposal(proposal)
+
+    def test_missing_evidence_reference_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["outcome_bundles"][0]["evidence_refs"] = []
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "exactly one evidence reference"):
+            validate_proposal(proposal)
+
+    def test_evidence_reference_path_escape_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["outcome_bundles"][0]["evidence_refs"][0]["source_ref"] = "../escape.json"
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "escapes the allowed path boundary"):
+            validate_proposal(proposal)
+
+    def test_risk_classification_is_required(self) -> None:
+        proposal = generate_proposal(self.root)
+        del proposal["evidence_summary"]["risks"]
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "missing fields: risks"):
             validate_proposal(proposal)
 
     def test_regression_eligibility_cannot_widen(self) -> None:
@@ -89,6 +124,19 @@ class LearningProposalTests(unittest.TestCase):
         proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
         with self.assertRaisesRegex(LearningProposalError, "forbidden private field"):
             validate_proposal(proposal)
+
+    def test_json_schemas_encode_nested_fail_closed_contracts(self) -> None:
+        proposal_schema = json.loads(
+            (self.root / "learning_proposals/schemas/promotion_proposal.schema.json").read_text(encoding="utf-8")
+        )
+        review_schema = json.loads(
+            (self.root / "learning_proposals/schemas/human_review.schema.json").read_text(encoding="utf-8")
+        )
+        self.assertFalse(proposal_schema["properties"]["generated_from"]["additionalProperties"])
+        self.assertFalse(proposal_schema["$defs"]["outcome"]["additionalProperties"])
+        self.assertFalse(proposal_schema["$defs"]["safeguards"]["additionalProperties"])
+        self.assertIn("risks", proposal_schema["$defs"]["evidence_summary"]["required"])
+        self.assertFalse(review_schema["properties"]["reviewer"]["additionalProperties"])
 
     def test_forbidden_external_action_import_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
