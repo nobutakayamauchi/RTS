@@ -1,0 +1,153 @@
+from __future__ import annotations
+
+import json
+import shutil
+import tempfile
+import unittest
+from pathlib import Path
+
+from learning_proposals.common import LearningProposalError, sha256_value
+from learning_proposals.corpus import _verify_forbidden_imports, verify_all
+from learning_proposals.generation import generate_pending_review, generate_proposal
+from learning_proposals.models import (
+    proposal_material,
+    review_material,
+    validate_proposal,
+    validate_review,
+)
+
+
+class LearningProposalTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.root = Path(__file__).resolve().parents[1]
+
+    def test_committed_records_verify(self) -> None:
+        summary = verify_all(self.root)
+        self.assertEqual(summary["proposal_status"], "REVIEW_REQUIRED")
+        self.assertEqual(summary["review_status"], "PENDING")
+        self.assertEqual(summary["application_status"], "NOT_APPLIED")
+
+    def test_generation_is_deterministic(self) -> None:
+        self.assertEqual(generate_proposal(self.root), generate_proposal(self.root))
+
+    def test_exact_evidence_provenance_is_retained(self) -> None:
+        proposal = generate_proposal(self.root)
+        outcome = proposal["generated_from"]["outcome_bundles"][0]
+        self.assertEqual(outcome["evidence_refs"][0]["evidence_id"], "RTS-EVIDENCE-OUTCOME-000001")
+        self.assertEqual(
+            outcome["evidence_refs"][0]["source_ref"],
+            "outcome_evidence/evidence/success-controller-result.json",
+        )
+        self.assertEqual(
+            outcome["evidence_integrity"]["RTS-EVIDENCE-OUTCOME-000001"],
+            "3ba5ec9128769c751391ffc32566c988b0608ff9ee6d24eda23274b3ec5788d7",
+        )
+
+    def test_proposal_fingerprint_mutation_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["recommendation"]["rationale"] += " changed"
+        with self.assertRaisesRegex(LearningProposalError, "fingerprint mismatch"):
+            validate_proposal(proposal)
+
+    def test_simulated_outcome_scope_cannot_widen(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["outcome_bundles"][0]["execution_scope"] = "EXTERNAL"
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "SIMULATED_ONLY"):
+            validate_proposal(proposal)
+
+    def test_missing_evidence_reference_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["outcome_bundles"][0]["evidence_refs"] = []
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "exactly one evidence reference"):
+            validate_proposal(proposal)
+
+    def test_evidence_reference_path_escape_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["outcome_bundles"][0]["evidence_refs"][0]["source_ref"] = "../escape.json"
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "escapes the allowed path boundary"):
+            validate_proposal(proposal)
+
+    def test_risk_classification_is_required(self) -> None:
+        proposal = generate_proposal(self.root)
+        del proposal["evidence_summary"]["risks"]
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "missing fields: risks"):
+            validate_proposal(proposal)
+
+    def test_regression_eligibility_cannot_widen(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["generated_from"]["regression"]["promotion_eligibility"] = "ELIGIBLE"
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "NOT_ELIGIBLE"):
+            validate_proposal(proposal)
+
+    def test_proposal_cannot_authorize_mutation(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["safeguards"]["mutation_authorized"] = True
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "must be false"):
+            validate_proposal(proposal)
+
+    def test_pending_review_cannot_claim_human_identity(self) -> None:
+        review = generate_pending_review(generate_proposal(self.root))
+        review["reviewer"] = {"type": "HUMAN", "identity": "reviewer-1"}
+        review["decision_fingerprint"] = sha256_value(review_material(review))
+        with self.assertRaisesRegex(LearningProposalError, "remain unassigned"):
+            validate_review(review)
+
+    def test_generator_cannot_self_approve(self) -> None:
+        review = generate_pending_review(generate_proposal(self.root))
+        review["status"] = "APPROVED"
+        review["reviewer"] = {
+            "type": "HUMAN",
+            "identity": review["generator_identity"],
+        }
+        review["decision_fingerprint"] = sha256_value(review_material(review))
+        with self.assertRaisesRegex(LearningProposalError, "cannot review its own"):
+            validate_review(review)
+
+    def test_committed_v1_review_must_remain_pending(self) -> None:
+        review = generate_pending_review(generate_proposal(self.root))
+        review["status"] = "REJECTED"
+        review["reviewer"] = {"type": "HUMAN", "identity": "human-reviewer-1"}
+        review["rationale"] = "Rejected by a human reviewer."
+        review["decision_fingerprint"] = sha256_value(review_material(review))
+        with self.assertRaisesRegex(LearningProposalError, "must remain PENDING"):
+            validate_review(review, committed_pending_only=True)
+
+    def test_private_content_field_is_rejected(self) -> None:
+        proposal = generate_proposal(self.root)
+        proposal["recommendation"]["provider_payload"] = "not allowed"
+        proposal["proposal_fingerprint"] = sha256_value(proposal_material(proposal))
+        with self.assertRaisesRegex(LearningProposalError, "forbidden private field"):
+            validate_proposal(proposal)
+
+    def test_json_schemas_encode_nested_fail_closed_contracts(self) -> None:
+        proposal_schema = json.loads(
+            (self.root / "learning_proposals/schemas/promotion_proposal.schema.json").read_text(encoding="utf-8")
+        )
+        review_schema = json.loads(
+            (self.root / "learning_proposals/schemas/human_review.schema.json").read_text(encoding="utf-8")
+        )
+        self.assertFalse(proposal_schema["properties"]["generated_from"]["additionalProperties"])
+        self.assertFalse(proposal_schema["$defs"]["outcome"]["additionalProperties"])
+        self.assertFalse(proposal_schema["$defs"]["safeguards"]["additionalProperties"])
+        self.assertIn("risks", proposal_schema["$defs"]["evidence_summary"]["required"])
+        self.assertFalse(review_schema["properties"]["reviewer"]["additionalProperties"])
+
+    def test_forbidden_external_action_import_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shutil.copytree(self.root / "learning_proposals", root / "learning_proposals")
+            (root / "learning_proposals" / "unsafe.py").write_text(
+                "import subprocess\n", encoding="utf-8"
+            )
+            with self.assertRaisesRegex(LearningProposalError, "forbidden external-action import"):
+                _verify_forbidden_imports(root)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,132 @@
+{
+  "blockers": [
+    "external outcome success remains unverified",
+    "human approval has not been recorded",
+    "real rollback restoration has not been exercised",
+    "skill mutation and adjacent-repository writes are not authorized"
+  ],
+  "evidence_summary": {
+    "assumptions": [
+      "recovery relevance is inferred from preserved local checkpoint evidence",
+      "the candidate may improve future feature-build safety if separately approved and applied"
+    ],
+    "confirmed_facts": [
+      "candidate passes all four applicable deterministic fixtures",
+      "regression result records two improvements and zero regressions",
+      "rollback snapshot reconstructs the pinned baseline content hash",
+      "the bounded local escalation claim is classified VERIFIED"
+    ],
+    "risks": [
+      "a future implementation could attempt Skill mutation or an adjacent-repository write without a new approval gate",
+      "a reviewer could overgeneralize SIMULATED_ONLY evidence into an external success claim",
+      "governed fingerprints or regression thresholds could drift before a later decision"
+    ],
+    "unverified_claims": [
+      "external business or user success has not been observed",
+      "the Skill rollback restoration path has not been executed",
+      "the simulated success bundle remains UNVERIFIED"
+    ]
+  },
+  "generated_from": {
+    "outcome_bundles": [
+      {
+        "bundle_fingerprint": "47a00d31aa03a0a64c93ddc784bceaec0fabbf611873ae97c48399ac761b2571",
+        "bundle_id": "RTS-OUTCOME-000001",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000001": "3ba5ec9128769c751391ffc32566c988b0608ff9ee6d24eda23274b3ec5788d7"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000001",
+            "retrieved_at": "2026-07-24T20:30:01Z",
+            "source_ref": "outcome_evidence/evidence/success-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
+        "execution_scope": "SIMULATED_ONLY",
+        "outcome_classification": "UNVERIFIED",
+        "scenario": "SUCCESS",
+        "terminal_state": "SUCCEEDED"
+      },
+      {
+        "bundle_fingerprint": "37336ead6e1a507aff1960c3993850f1cddd8a386fedaaa706df0f77ed0818fe",
+        "bundle_id": "RTS-OUTCOME-000002",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000002": "224450c9e5621c611b375f1a57bb9994904d654fb2e7acaac90c58b661d248f8"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000002",
+            "retrieved_at": "2026-07-24T20:30:02Z",
+            "source_ref": "outcome_evidence/evidence/escalation-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
+        "execution_scope": "SIMULATED_ONLY",
+        "outcome_classification": "VERIFIED",
+        "scenario": "ESCALATION",
+        "terminal_state": "ESCALATED"
+      },
+      {
+        "bundle_fingerprint": "0084528328cece383d24aebd71fd8c154203aa2e026da780bada69434059b91b",
+        "bundle_id": "RTS-OUTCOME-000003",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000003": "0d3a95f275fbd9ee346fda7b8d1159305d6f5602ea8a18cae6af941675a5b69d"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000003",
+            "retrieved_at": "2026-07-24T20:30:03Z",
+            "source_ref": "outcome_evidence/evidence/recovery-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
+        "execution_scope": "SIMULATED_ONLY",
+        "outcome_classification": "ASSUMED",
+        "scenario": "RECOVERY",
+        "terminal_state": "STOPPED"
+      }
+    ],
+    "regression": {
+      "baseline_snapshot_fingerprint": "321f7e927ecd9ad83135111d3995abcdbb144b80d4aeccd8fa8815e82b78dcf2",
+      "candidate_snapshot_fingerprint": "272dd85916e4aa7d0de1cb65517e77a13d76681b8f779392f1b61f6871494d58",
+      "candidate_snapshot_id": "RTS-SKILL-SNAPSHOT-000002",
+      "dataset_fingerprint": "fc139152a6792917365a46d651408dbbcb3e7780d02d448e7f42e28f2e5e940e",
+      "dataset_id": "RTS-SKILL-REGRESSION-000001",
+      "promotion_eligibility": "NOT_ELIGIBLE",
+      "recommendation": "RESEARCH_READY",
+      "result_fingerprint": "1b7a29e57915e9750e32f4f8c11c0ddbe35a356c088b177de6e5457bca10f53a",
+      "result_id": "RTS-SKILL-REGRESSION-RESULT-000001",
+      "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd"
+    },
+    "rollback": {
+      "adjacent_repository_write_authorized": false,
+      "human_approval_required": true,
+      "mutation_authorized": false,
+      "restore_content_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+      "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd",
+      "rollback_id": "RTS-SKILL-ROLLBACK-000001"
+    }
+  },
+  "generator_identity": "rts-proposal-generator-v1",
+  "proposal_fingerprint": "80f1a86c7d55aa31a8a7d628fdf85ca1a86684feaf49717603ef9b75ef41004e",
+  "proposal_id": "RTS-SKILL-PROPOSAL-000001",
+  "proposal_status": "REVIEW_REQUIRED",
+  "recommendation": {
+    "action": "REQUEST_HUMAN_REVIEW",
+    "candidate_snapshot_fingerprint": "272dd85916e4aa7d0de1cb65517e77a13d76681b8f779392f1b61f6871494d58",
+    "candidate_snapshot_id": "RTS-SKILL-SNAPSHOT-000002",
+    "rationale": "The local candidate satisfies the immutable deterministic regression policy and has an exact rollback snapshot. Because all governed outcomes are SIMULATED_ONLY and no external success or rollback execution was observed, the only authorized next action is separate human review.",
+    "target_skill_id": "feature-build"
+  },
+  "safeguards": {
+    "adjacent_repository_write_authorized": false,
+    "application_status": "NOT_APPLIED",
+    "approval_status": "NOT_APPROVED",
+    "automatic_rollback_authorized": false,
+    "external_execution_performed": false,
+    "mutation_authorized": false,
+    "self_approval_authorized": false
+  },
+  "schema_version": "RTS-SKILL-PROMOTION-PROPOSAL-V1"
+}
