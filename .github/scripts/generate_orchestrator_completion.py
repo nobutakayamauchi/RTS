@@ -83,28 +83,27 @@ def write_completion_doc(run: dict[str, object]) -> None:
         / "implementation"
         / "READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_COMPLETION_TASK.md"
     )
-    path.write_text(
-        f"""# Read-Only Governed Loop Orchestrator v1 — Completion\n\n"
-        f"## Governed lifecycle\n\n"
-        f"- `v003`: `IN_PROGRESS / APPROVED`\n"
-        f"- `v004`: `VERIFIED / APPROVED`\n"
-        f"- `v005`: `COMPLETED / APPROVED`\n"
-        f"- current Assessment: `RTS-BA-000008-001 / BUILD_NOW`\n"
-        f"- current Preflight: `RTS-PF-000008-001 / PASS`\n\n"
-        f"## Verified implementation\n\n"
-        f"- package: `governed_loop/`\n"
-        f"- mode: `ONE_SHOT_READ_ONLY`\n"
+    text = (
+        "# Read-Only Governed Loop Orchestrator v1 — Completion\n\n"
+        "## Governed lifecycle\n\n"
+        "- `v003`: `IN_PROGRESS / APPROVED`\n"
+        "- `v004`: `VERIFIED / APPROVED`\n"
+        "- `v005`: `COMPLETED / APPROVED`\n"
+        "- current Assessment: `RTS-BA-000008-001 / BUILD_NOW`\n"
+        "- current Preflight: `RTS-PF-000008-001 / PASS`\n\n"
+        "## Verified implementation\n\n"
+        "- package: `governed_loop/`\n"
+        "- mode: `ONE_SHOT_READ_ONLY`\n"
         f"- committed run: `{run['run_id']}`\n"
         f"- run fingerprint: `{run['run_fingerprint']}`\n"
-        f"- WIP after completion: `0`\n"
-        f"- next advisory action: `REQUEST_HUMAN_APPROVAL` for `RTS-FRZ-000003`\n\n"
-        f"## Preserved boundaries\n\n"
-        f"No scheduler, polling, daemon, network, provider, subprocess, shell, publication, deployment, messaging, customer action, adjacent-repository write, Skill mutation, Skill application, automatic promotion, or automatic rollback authority was added. Outcome data remains `SIMULATED_ONLY`; the learning proposal remains `REVIEW_REQUIRED / NOT_APPROVED / NOT_APPLIED`.\n\n"
-        f"## Completion evidence\n\n"
-        f"The completion PR must pass strict committed-record verification, deterministic regeneration of the loop run, all focused and full tests, Unicode Guard, review-thread resolution, merge, and main re-verification.\n"
-        f""",
-        encoding="utf-8",
+        "- WIP after completion: `0`\n"
+        "- next advisory action: `REQUEST_HUMAN_APPROVAL` for `RTS-FRZ-000003`\n\n"
+        "## Preserved boundaries\n\n"
+        "No scheduler, polling, daemon, network, provider, subprocess, shell, publication, deployment, messaging, customer action, adjacent-repository write, Skill mutation, Skill application, automatic promotion, or automatic rollback authority was added. Outcome data remains `SIMULATED_ONLY`; the learning proposal remains `REVIEW_REQUIRED / NOT_APPROVED / NOT_APPLIED`.\n\n"
+        "## Completion evidence\n\n"
+        "The completion PR must pass strict committed-record verification, deterministic regeneration of the loop run, all focused and full tests, Unicode Guard, review-thread resolution, merge, and main re-verification.\n"
     )
+    path.write_text(text, encoding="utf-8")
 
 
 def collect_candidate() -> None:
