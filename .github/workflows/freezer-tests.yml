@@ -100,29 +100,36 @@ jobs:
               Path("asset_manifest/index/assets.json"),
               Path("asset_manifest/index/ownership.json"),
           ]
+          all_paths = freezer_paths + asset_paths
 
           def semantic(path):
               data = json.loads(path.read_text(encoding="utf-8"))
               data.pop("generated_at", None)
               return data
 
+          committed_bytes = {path: path.read_bytes() for path in all_paths}
           committed_freezer = {path: semantic(path) for path in freezer_paths}
           committed_assets = {path: semantic(path) for path in asset_paths}
+          stale = []
+          try:
+              subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
+              subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
 
-          subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
-          subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
+              rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
+              rebuilt_assets = {path: semantic(path) for path in asset_paths}
+              stale = [
+                  str(path)
+                  for path in freezer_paths
+                  if committed_freezer[path] != rebuilt_freezer[path]
+              ] + [
+                  str(path)
+                  for path in asset_paths
+                  if committed_assets[path] != rebuilt_assets[path]
+              ]
+          finally:
+              for path, payload in committed_bytes.items():
+                  path.write_bytes(payload)
 
-          rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
-          rebuilt_assets = {path: semantic(path) for path in asset_paths}
-          stale = [
-              str(path)
-              for path in freezer_paths
-              if committed_freezer[path] != rebuilt_freezer[path]
-          ] + [
-              str(path)
-              for path in asset_paths
-              if committed_assets[path] != rebuilt_assets[path]
-          ]
           if stale:
               print("Committed derived indexes are stale:")
               for path in stale:
