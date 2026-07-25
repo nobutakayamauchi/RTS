@@ -71,6 +71,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Generate schema-bound governed-loop fixture candidate
+        run: python -m governed_loop.cli generate > governed-loop-current.json
+      - name: Upload schema-bound governed-loop fixture candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: governed-loop-schema-bound-candidate
+          path: governed-loop-current.json
+          if-no-files-found: error
       - name: Verify committed governed records
         run: |
           python -m freezer.cli verify
