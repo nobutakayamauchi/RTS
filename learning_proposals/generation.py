@@ -49,6 +49,8 @@ def generate_proposal(root: Path) -> dict[str, Any]:
             "outcome_classification": item["outcome_classification"],
             "execution_scope": item["execution_scope"],
             "terminal_state": item["controller"]["terminal_state"],
+            "evidence_refs": item["evidence_refs"],
+            "evidence_integrity": item["evidence_integrity"],
         }
         for item in outcomes
     ]
@@ -95,6 +97,11 @@ def generate_proposal(root: Path) -> dict[str, Any]:
                 "external business or user success has not been observed",
                 "the simulated success bundle remains UNVERIFIED",
                 "the Skill rollback restoration path has not been executed",
+            ]),
+            "risks": sorted([
+                "a future implementation could attempt Skill mutation or an adjacent-repository write without a new approval gate",
+                "a reviewer could overgeneralize SIMULATED_ONLY evidence into an external success claim",
+                "governed fingerprints or regression thresholds could drift before a later decision",
             ]),
         },
         "recommendation": {
