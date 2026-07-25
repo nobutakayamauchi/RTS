@@ -1,0 +1,15 @@
+name: Print Tree Temp
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  print-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print checkout tree
+        run: git rev-parse 'HEAD^{tree}'
