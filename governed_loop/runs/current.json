@@ -134,8 +134,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "c4026256e709420126dcc7ab877fbab47dfca3c758db4955a081fbcb4ed8482a",
-  "run_id": "RTS-LOOP-RUN-C4026256E7094201",
+  "run_fingerprint": "a6ac7f921b51e8bc08414b67246db722dcab0fb855cb24c96e0968eedf43ab7c",
+  "run_id": "RTS-LOOP-RUN-A6AC7F921B51E8BC",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -161,6 +161,10 @@
     {
       "path": "freezer/index/items.json",
       "sha256": "923123fe86feb1151468801264a6a7482636a7e91dd6787843b8d5943e78d220"
+    },
+    {
+      "path": "governed_loop/schemas/loop_run.schema.json",
+      "sha256": "4fa1ffededa01fd938a6c4a3740487755d521ec4d74913c6f052801d5a705a71"
     },
     {
       "path": "learning_proposals/proposals/feature-build-v1.json",
