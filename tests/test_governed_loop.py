@@ -16,6 +16,10 @@ class GovernedLoopTests(unittest.TestCase):
     def setUp(self) -> None:
         self.root = Path(__file__).resolve().parents[1]
 
+    def resign(self, run: dict) -> None:
+        run["run_fingerprint"] = sha256_value(run_material(run))
+        run["run_id"] = f"RTS-LOOP-RUN-{run['run_fingerprint'][:16].upper()}"
+
     def test_generation_is_deterministic(self) -> None:
         self.assertEqual(generate_run(self.root), generate_run(self.root))
 
@@ -53,25 +57,38 @@ class GovernedLoopTests(unittest.TestCase):
     def test_widened_authority_is_rejected_even_when_resigned(self) -> None:
         run = generate_run(self.root)
         run["authority"]["provider_authorized"] = True
-        run["run_fingerprint"] = sha256_value(run_material(run))
-        run["run_id"] = f"RTS-LOOP-RUN-{run['run_fingerprint'][:16].upper()}"
+        self.resign(run)
         with self.assertRaisesRegex(GovernedLoopError, "authority boundary widened"):
             validate_record(run)
 
     def test_private_content_is_rejected(self) -> None:
         run = generate_run(self.root)
         run["evidence_summary"]["assumptions"].append("credential: secret")
-        run["run_fingerprint"] = sha256_value(run_material(run))
-        run["run_id"] = f"RTS-LOOP-RUN-{run['run_fingerprint'][:16].upper()}"
+        self.resign(run)
         with self.assertRaisesRegex(GovernedLoopError, "forbidden private marker"):
             validate_record(run)
 
     def test_source_path_escape_is_rejected(self) -> None:
         run = generate_run(self.root)
         run["source_fingerprints"][0]["path"] = "../escape.json"
-        run["run_fingerprint"] = sha256_value(run_material(run))
-        run["run_id"] = f"RTS-LOOP-RUN-{run['run_fingerprint'][:16].upper()}"
-        with self.assertRaisesRegex(GovernedLoopError, "unsafe source fingerprint path"):
+        self.resign(run)
+        with self.assertRaisesRegex(GovernedLoopError, "unsafe source_fingerprints"):
+            validate_record(run)
+
+    def test_controller_outcome_link_mismatch_is_rejected(self) -> None:
+        run = generate_run(self.root)
+        run["components"]["execution_controller"]["outcome_links"][0][
+            "bundle_fingerprint"
+        ] = "0" * 64
+        self.resign(run)
+        with self.assertRaisesRegex(GovernedLoopError, "bundle linkage mismatch"):
+            validate_record(run)
+
+    def test_wip_count_mismatch_is_rejected(self) -> None:
+        run = generate_run(self.root)
+        run["components"]["read_only_loop"]["wip_count"] = 0
+        self.resign(run)
+        with self.assertRaisesRegex(GovernedLoopError, "wip_count does not match"):
             validate_record(run)
 
     def test_proposal_remains_pending_and_not_applied(self) -> None:
@@ -81,6 +98,21 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(proposal["review_status"], "PENDING")
         self.assertEqual(proposal["approval_status"], "NOT_APPROVED")
         self.assertEqual(proposal["application_status"], "NOT_APPLIED")
+
+    def test_schema_encodes_non_authorizing_constants(self) -> None:
+        schema = json.loads(
+            (self.root / "governed_loop/schemas/loop_run.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        authority = schema["properties"]["authority"]["properties"]
+        self.assertEqual(authority["read_only"]["const"], True)
+        self.assertEqual(authority["provider_authorized"]["const"], False)
+        self.assertEqual(
+            authority["adjacent_repository_write_authorized"]["const"], False
+        )
+        self.assertEqual(authority["approval_status"]["const"], "NOT_APPROVED")
+        self.assertEqual(authority["application_status"]["const"], "NOT_APPLIED")
 
     def test_forbidden_external_action_import_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -94,18 +126,13 @@ class GovernedLoopTests(unittest.TestCase):
             ):
                 _verify_forbidden_imports(root)
 
-    def test_verify_without_committed_fixture_for_bootstrap(self) -> None:
-        summary = verify_all(self.root, require_committed=False)
-        self.assertEqual(summary["mode"], "ONE_SHOT_READ_ONLY")
-        self.assertEqual(summary["approval_status"], "NOT_APPROVED")
-
-    def test_committed_fixture_matches_when_present(self) -> None:
+    def test_committed_fixture_matches(self) -> None:
         path = self.root / "governed_loop" / "runs" / "current.json"
-        if not path.exists():
-            self.skipTest("bootstrap branch has not committed the generated run yet")
         committed = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(committed, generate_run(self.root))
-        verify_all(self.root)
+        summary = verify_all(self.root)
+        self.assertEqual(summary["run_id"], committed["run_id"])
+        self.assertEqual(summary["approval_status"], "NOT_APPROVED")
 
 
 if __name__ == "__main__":
