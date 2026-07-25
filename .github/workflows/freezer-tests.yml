@@ -65,18 +65,12 @@ permissions:
 
 jobs:
   freezer:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Generate orchestrator completion candidate
-        run: python .github/scripts/generate_orchestrator_completion.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: orchestrator-completion-candidate
-          path: completion-candidate
       - name: Verify committed governed records
         run: |
           python -m freezer.cli verify
