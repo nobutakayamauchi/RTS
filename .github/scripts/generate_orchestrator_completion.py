@@ -1,3 +1,7 @@
+"""Generate the exact RTS-FRZ-000008 completion candidate for CI validation.
+
+This file and its workflow step are temporary and must be removed before merge.
+"""
 from __future__ import annotations
 
 import copy
