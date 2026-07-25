@@ -16,6 +16,11 @@
       "rollback snapshot reconstructs the pinned baseline content hash",
       "the bounded local escalation claim is classified VERIFIED"
     ],
+    "risks": [
+      "a future implementation could attempt Skill mutation or an adjacent-repository write without a new approval gate",
+      "a reviewer could overgeneralize SIMULATED_ONLY evidence into an external success claim",
+      "governed fingerprints or regression thresholds could drift before a later decision"
+    ],
     "unverified_claims": [
       "external business or user success has not been observed",
       "the Skill rollback restoration path has not been executed",
@@ -27,6 +32,17 @@
       {
         "bundle_fingerprint": "47a00d31aa03a0a64c93ddc784bceaec0fabbf611873ae97c48399ac761b2571",
         "bundle_id": "RTS-OUTCOME-000001",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000001": "3ba5ec9128769c751391ffc32566c988b0608ff9ee6d24eda23274b3ec5788d7"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000001",
+            "retrieved_at": "2026-07-24T20:30:01Z",
+            "source_ref": "outcome_evidence/evidence/success-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
         "execution_scope": "SIMULATED_ONLY",
         "outcome_classification": "UNVERIFIED",
         "scenario": "SUCCESS",
@@ -35,6 +51,17 @@
       {
         "bundle_fingerprint": "37336ead6e1a507aff1960c3993850f1cddd8a386fedaaa706df0f77ed0818fe",
         "bundle_id": "RTS-OUTCOME-000002",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000002": "224450c9e5621c611b375f1a57bb9994904d654fb2e7acaac90c58b661d248f8"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000002",
+            "retrieved_at": "2026-07-24T20:30:02Z",
+            "source_ref": "outcome_evidence/evidence/escalation-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
         "execution_scope": "SIMULATED_ONLY",
         "outcome_classification": "VERIFIED",
         "scenario": "ESCALATION",
@@ -43,6 +70,17 @@
       {
         "bundle_fingerprint": "0084528328cece383d24aebd71fd8c154203aa2e026da780bada69434059b91b",
         "bundle_id": "RTS-OUTCOME-000003",
+        "evidence_integrity": {
+          "RTS-EVIDENCE-OUTCOME-000003": "0d3a95f275fbd9ee346fda7b8d1159305d6f5602ea8a18cae6af941675a5b69d"
+        },
+        "evidence_refs": [
+          {
+            "evidence_id": "RTS-EVIDENCE-OUTCOME-000003",
+            "retrieved_at": "2026-07-24T20:30:03Z",
+            "source_ref": "outcome_evidence/evidence/recovery-controller-result.json",
+            "source_type": "local_controller_fixture"
+          }
+        ],
         "execution_scope": "SIMULATED_ONLY",
         "outcome_classification": "ASSUMED",
         "scenario": "RECOVERY",
@@ -71,7 +109,7 @@
     }
   },
   "generator_identity": "rts-proposal-generator-v1",
-  "proposal_fingerprint": "8aa32ba9129e5dc239c46bff5f0c8362914ff11567763a162193692f90842521",
+  "proposal_fingerprint": "80f1a86c7d55aa31a8a7d628fdf85ca1a86684feaf49717603ef9b75ef41004e",
   "proposal_id": "RTS-SKILL-PROPOSAL-000001",
   "proposal_status": "REVIEW_REQUIRED",
   "recommendation": {
