@@ -1,0 +1,80 @@
+{
+  "item_id": "RTS-FRZ-000008",
+  "version": 3,
+  "title": "Read-Only Governed Loop Orchestrator v1",
+  "type": "architecture",
+  "status": "IN_PROGRESS",
+  "summary": "Compose the completed RTS asset, read-only evaluation, bounded execution-record, outcome-evidence, regression, and learning-proposal components into one deterministic repository-local one-shot loop that produces a reconstructable run record without external execution or mutation authority.",
+  "original_problem": "RTS now has independently verified components for asset discovery, read-only evaluation, bounded execution records, governed outcomes, regression comparison, and learning proposals, but no single current contract links their exact fingerprints into one reproducible loop run.",
+  "why_it_matters": "A read-only orchestrator can demonstrate end-to-end value, expose integration drift, and provide one reviewable run record before any scheduler, provider, adjacent-repository write, or Skill-application authority is considered.",
+  "reason_frozen": "Integration could accidentally recreate hidden coupling or widen execution and mutation authority. A current BUILD_NOW Assessment, PASS Implementation Preflight, explicit human approval, and WIP=1 transition are required before implementation.",
+  "preserved_value": [
+    "One-shot deterministic orchestration across the completed RTS child components.",
+    "Exact fingerprint linkage from observed assets through evaluation, execution record, outcome evidence, regression result, and learning proposal.",
+    "Immutable repository-local loop-run records with reconstructable inputs and outputs.",
+    "Fail-closed authority boundaries that preserve human approval and prohibit external side effects."
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 3,
+    "strategic_fit": 5,
+    "readiness": 4,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000004 through RTS-FRZ-000007 are COMPLETED with current governed records.",
+    "RTS-FRZ-000003 has a current BUILD_NOW parent Assessment.",
+    "The orchestrator remains repository-local, one-shot, deterministic, and read-only.",
+    "A loop-run schema can pin exact component inputs and outputs without private content."
+  ],
+  "negative_triggers": [
+    "Automatic scheduling, continuous polling, or unattended execution is introduced.",
+    "Network, provider, subprocess, shell, publication, deployment, messaging, or customer-action authority is added.",
+    "The orchestrator mutates a Skill, writes to an adjacent repository, or treats a proposal as approval.",
+    "Raw prompts, credentials, customer data, provider payloads, or private repository bodies are persisted.",
+    "Component verification is bypassed or fingerprints are accepted without recomputation."
+  ],
+  "dependencies": [
+    "RTS-FRZ-000004",
+    "RTS-FRZ-000005",
+    "RTS-FRZ-000006",
+    "RTS-FRZ-000007"
+  ],
+  "source_refs": [
+    "freezer/assessments/RTS-FRZ-000003/ba001.json",
+    "asset_manifest/snapshots/current.json",
+    "read_only_loop/",
+    "execution_controller/",
+    "outcome_evidence/",
+    "skill_regression/",
+    "learning_proposals/"
+  ],
+  "possible_destinations": [
+    "RTS repository-local governed_loop package",
+    "RTS governance loop-run records",
+    "future human-reviewed Hermes Drive orchestration adapter"
+  ],
+  "estimated_hours": {
+    "minimum": 16,
+    "maximum": 28
+  },
+  "tags": [
+    "orchestrator",
+    "read-only",
+    "loop",
+    "integration",
+    "deterministic",
+    "governance",
+    "one-shot"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "supersedes": "v002",
+  "created_at": "2026-07-25T07:23:28Z",
+  "updated_at": "2026-07-25T07:59:00Z"
+}

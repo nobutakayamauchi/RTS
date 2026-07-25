@@ -1,0 +1,419 @@
+import json
+import shutil
+import tempfile
+import unittest
+from pathlib import Path
+
+from freezer.assessment_store import create_assessment
+from freezer.cli import (
+    FreezerError,
+    add_item,
+    all_item_ids,
+    compute_score,
+    load_config,
+    next_item_id,
+    rebuild,
+    revise_item,
+    validate_item,
+    verify,
+)
+from freezer.preflight import (
+    PreflightError,
+    create_preflight,
+    preflight_state,
+    validate_preflight,
+    verify_preflights,
+)
+
+
+class FreezerTests(unittest.TestCase):
+    def setUp(self):
+        self.repo_root = Path(__file__).resolve().parents[1]
+        self.config = load_config(self.repo_root)
+        self.item = json.loads(
+            (
+                self.repo_root
+                / "freezer"
+                / "items"
+                / "RTS-FRZ-000001"
+                / "v001.json"
+            ).read_text(encoding="utf-8")
+        )
+
+    def isolated_root(self, temp_dir: str) -> Path:
+        temp_root = Path(temp_dir)
+        shutil.copytree(self.repo_root / "freezer", temp_root / "freezer")
+        pointer_path = (
+            temp_root
+            / "freezer"
+            / "items"
+            / "RTS-FRZ-000007"
+            / "current.json"
+        )
+        if pointer_path.exists():
+            pointer = json.loads(pointer_path.read_text(encoding="utf-8"))
+            learning_path = temp_root / pointer["path"]
+            learning = json.loads(learning_path.read_text(encoding="utf-8"))
+            if learning["status"] in {"SELECTED", "IN_PROGRESS"}:
+                learning["status"] = "FROZEN"
+                learning["build_authority"] = "NOT_APPROVED"
+                learning_path.write_text(
+                    json.dumps(learning, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+        rebuild(temp_root)
+        return temp_root
+
+    def preflight_payload(
+        self,
+        *,
+        outcome: str = "PASS",
+        decomposition_required: bool = False,
+    ) -> dict:
+        return {
+            "outcome": outcome,
+            "assessor": "test-review",
+            "rationale": "The affected ground was inspected before construction.",
+            "affected_boundaries": ["core_logic", "tests"],
+            "existing_assumptions": ["Existing item storage remains append-only."],
+            "data_migration": {
+                "required": False,
+                "notes": "No migration is needed for this test.",
+            },
+            "external_interfaces": [],
+            "approval_changes": ["Human approval remains mandatory."],
+            "public_documents": [],
+            "regression_tests": ["Run the FREEZER unit tests."],
+            "hidden_dependencies": [],
+            "rollback_boundary": "Return to the commit before this candidate is selected.",
+            "completion_conditions": ["The bounded candidate passes its tests."],
+            "decomposition": {
+                "required": decomposition_required,
+                "child_candidates": ["Child A", "Child B"] if decomposition_required else [],
+            },
+            "risks": ["A hidden dependency may invalidate the plan."],
+        }
+
+    def assessment_payload(self) -> dict:
+        return {
+            "assessor": "test-review",
+            "rationale": "GitHub reuse, effect, and implementation cost were assessed.",
+            "expected_effect": {
+                "impact": 5,
+                "strategic_fit": 5,
+                "revenue_leverage": 4,
+                "risk_reduction": 5,
+                "recurrence": 5,
+                "confidence": 5,
+            },
+            "implementation": {
+                "from_scratch_hours": 10,
+                "integration_hours": 1,
+                "validation_hours": 1,
+                "unknown_buffer_hours": 0,
+            },
+            "github_scan": {
+                "performed": True,
+                "repositories": ["owner/repo"],
+                "queries": ["reuse schema test"],
+                "assets": [
+                    {
+                        "repository": "owner/repo",
+                        "path": "path/to/asset.py",
+                        "ref": "main",
+                        "kind": "code",
+                        "reuse_mode": "ADAPT",
+                        "license_status": "OWNED",
+                        "estimated_hours_saved": 6,
+                        "notes": "Reusable validation and storage pattern.",
+                    }
+                ],
+                "gaps": ["Search coverage is not guaranteed."],
+            },
+            "risks": ["Reuse may hide integration work."],
+        }
+
+    def write_json(self, path: Path, payload: dict) -> Path:
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return path
+
+    def create_pass_preflight(self, root: Path, item_id: str) -> dict:
+        source = self.write_json(root / "preflight.json", self.preflight_payload())
+        return create_preflight(root, item_id, source)
+
+    def create_build_now_assessment(self, root: Path, item_id: str) -> dict:
+        source = self.write_json(
+            root / f"assessment-{item_id}.json",
+            self.assessment_payload(),
+        )
+        record = create_assessment(root, item_id, source)
+        self.assertEqual(record["derived"]["recommendation"], "BUILD_NOW")
+        return record
+
+    def test_seed_item_is_valid(self):
+        validate_item(self.item, self.config)
+
+    def test_priority_score_is_deterministic(self):
+        self.assertEqual(compute_score(self.item, self.config), 65.25)
+
+    def test_effort_reduction_improves_score(self):
+        easier = json.loads(json.dumps(self.item))
+        easier["priority"]["effort"] = 1
+        self.assertGreater(
+            compute_score(easier, self.config),
+            compute_score(self.item, self.config),
+        )
+
+    def test_invalid_score_is_rejected(self):
+        invalid = json.loads(json.dumps(self.item))
+        invalid["priority"]["impact"] = 6
+        with self.assertRaises(FreezerError):
+            validate_item(invalid, self.config)
+
+    def test_invalid_enum_values_are_rejected(self):
+        for field, value in (
+            ("status", "DONE"),
+            ("type", "idea"),
+            ("build_authority", "MAYBE"),
+            ("recall_mode", "AUTO"),
+        ):
+            invalid = json.loads(json.dumps(self.item))
+            invalid[field] = value
+            with self.subTest(field=field):
+                with self.assertRaises(FreezerError):
+                    validate_item(invalid, self.config)
+
+    def test_rebuild_and_verify_in_isolated_copy(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            rows = rebuild(temp_root)
+            by_id = {row["item_id"]: row for row in rows}
+            self.assertIn("RTS-FRZ-000001", by_id)
+            self.assertEqual(by_id["RTS-FRZ-000001"]["preflight_state"], "MISSING")
+            self.assertEqual(verify(temp_root), [])
+
+    def test_partial_priority_revision_preserves_other_dimensions(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            changes = self.write_json(
+                temp_root / "changes.json",
+                {"priority": {"urgency": 5}},
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", changes)
+            self.assertEqual(revised["version"], 2)
+            self.assertEqual(revised["priority"]["urgency"], 5)
+            self.assertEqual(revised["priority"]["impact"], 5)
+            self.assertEqual(verify(temp_root), [])
+
+    def test_unapproved_item_cannot_be_selected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            changes = self.write_json(
+                temp_root / "changes.json",
+                {"status": "SELECTED"},
+            )
+            with self.assertRaises(FreezerError):
+                revise_item(temp_root, "RTS-FRZ-000001", changes)
+
+    def test_approved_item_without_assessment_cannot_be_selected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            changes = self.write_json(
+                temp_root / "changes.json",
+                {"status": "SELECTED", "build_authority": "APPROVED"},
+            )
+            with self.assertRaisesRegex(FreezerError, "current build assessment"):
+                revise_item(temp_root, "RTS-FRZ-000001", changes)
+
+    def test_approved_item_without_preflight_cannot_be_selected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
+            changes = self.write_json(
+                temp_root / "changes.json",
+                {"status": "SELECTED", "build_authority": "APPROVED"},
+            )
+            with self.assertRaisesRegex(FreezerError, "PASS preflight"):
+                revise_item(temp_root, "RTS-FRZ-000001", changes)
+
+    def test_passing_preflight_allows_selection(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            changes = self.write_json(
+                temp_root / "changes.json",
+                {"status": "SELECTED", "build_authority": "APPROVED"},
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", changes)
+            self.assertEqual(revised["status"], "SELECTED")
+            self.assertEqual(preflight_state(temp_root, revised)["state"], "PASS")
+            self.assertEqual(verify(temp_root), [])
+
+    def test_status_and_authority_changes_do_not_stale_preflight(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            authority = self.write_json(
+                temp_root / "authority.json",
+                {"build_authority": "APPROVED"},
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", authority)
+            self.assertEqual(preflight_state(temp_root, revised)["state"], "PASS")
+
+    def test_priority_reranking_does_not_stale_preflight(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            rerank = self.write_json(
+                temp_root / "rerank.json",
+                {
+                    "priority": {"urgency": 5, "revenue_value": 4},
+                    "estimated_hours": {"minimum": 25, "maximum": 60},
+                },
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", rerank)
+            self.assertEqual(preflight_state(temp_root, revised)["state"], "PASS")
+
+    def test_substantive_revision_makes_preflight_stale(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            plan_change = self.write_json(
+                temp_root / "plan-change.json",
+                {"summary": "The implementation scope has materially changed."},
+            )
+            revised = revise_item(temp_root, "RTS-FRZ-000001", plan_change)
+            self.assertEqual(preflight_state(temp_root, revised)["state"], "STALE")
+            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
+
+            select = self.write_json(
+                temp_root / "select.json",
+                {"status": "SELECTED", "build_authority": "APPROVED"},
+            )
+            with self.assertRaisesRegex(FreezerError, "state=STALE"):
+                revise_item(temp_root, "RTS-FRZ-000001", select)
+
+    def test_decomposition_required_preflight_blocks_selection(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
+            source = self.write_json(
+                temp_root / "preflight.json",
+                self.preflight_payload(
+                    outcome="DECOMPOSE_REQUIRED",
+                    decomposition_required=True,
+                ),
+            )
+            create_preflight(temp_root, "RTS-FRZ-000001", source)
+            select = self.write_json(
+                temp_root / "select.json",
+                {"status": "SELECTED", "build_authority": "APPROVED"},
+            )
+            with self.assertRaisesRegex(FreezerError, "DECOMPOSE_REQUIRED"):
+                revise_item(temp_root, "RTS-FRZ-000001", select)
+
+    def test_invalid_pass_preflight_is_rejected(self):
+        record = self.preflight_payload()
+        record.update(
+            {
+                "preflight_id": "RTS-PF-000001-001",
+                "item_id": "RTS-FRZ-000001",
+                "preflight_version": 1,
+                "item_version_snapshot": 1,
+                "item_fingerprint": "0" * 64,
+                "created_at": "2026-07-24T00:00:00Z",
+            }
+        )
+        record["regression_tests"] = []
+        with self.assertRaises(PreflightError):
+            validate_preflight(record)
+
+    def test_unknown_preflight_input_field_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            payload = self.preflight_payload()
+            payload["surprise"] = "not part of the schema"
+            source = self.write_json(temp_root / "preflight.json", payload)
+            with self.assertRaisesRegex(PreflightError, "unknown preflight input fields"):
+                create_preflight(temp_root, "RTS-FRZ-000001", source)
+
+    def test_standalone_preflight_verify_catches_selected_item_without_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            item_path = (
+                temp_root
+                / "freezer"
+                / "items"
+                / "RTS-FRZ-000001"
+                / "v001.json"
+            )
+            item = json.loads(item_path.read_text(encoding="utf-8"))
+            item["status"] = "SELECTED"
+            item["build_authority"] = "APPROVED"
+            item_path.write_text(
+                json.dumps(item, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            errors = verify_preflights(temp_root)
+            self.assertTrue(any("PASS preflight" in error for error in errors))
+
+    def test_completed_items_leave_priority_queue(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            item_path = (
+                temp_root
+                / "freezer"
+                / "items"
+                / "RTS-FRZ-000001"
+                / "v001.json"
+            )
+            item = json.loads(item_path.read_text(encoding="utf-8"))
+            item["status"] = "COMPLETED"
+            item_path.write_text(
+                json.dumps(item, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            rows = rebuild(temp_root)
+            self.assertNotIn("RTS-FRZ-000001", {row["item_id"] for row in rows})
+            all_items = json.loads(
+                (temp_root / "freezer" / "index" / "items.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(all_items["count"], len(all_item_ids(temp_root)))
+
+    def test_work_in_progress_limit_is_enforced(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = self.isolated_root(temp_dir)
+            second = json.loads(json.dumps(self.item))
+            second_id = next_item_id(temp_root)
+            second["item_id"] = second_id
+            second["title"] = "Second active item"
+            second["status"] = "FROZEN"
+            second["build_authority"] = "NOT_APPROVED"
+            source = self.write_json(temp_root / "second.json", second)
+            add_item(temp_root, source)
+
+            self.create_build_now_assessment(temp_root, second_id)
+            self.create_pass_preflight(temp_root, second_id)
+            activate_second = self.write_json(
+                temp_root / "activate-second.json",
+                {"status": "IN_PROGRESS", "build_authority": "APPROVED"},
+            )
+            revise_item(temp_root, second_id, activate_second)
+
+            self.create_build_now_assessment(temp_root, "RTS-FRZ-000001")
+            self.create_pass_preflight(temp_root, "RTS-FRZ-000001")
+            activate_first = self.write_json(
+                temp_root / "activate-first.json",
+                {"status": "IN_PROGRESS", "build_authority": "APPROVED"},
+            )
+            with self.assertRaisesRegex(FreezerError, "work-in-progress limit"):
+                revise_item(temp_root, "RTS-FRZ-000001", activate_first)
+
+
+if __name__ == "__main__":
+    unittest.main()
