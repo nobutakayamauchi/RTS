@@ -100,14 +100,17 @@ jobs:
               Path("asset_manifest/index/assets.json"),
               Path("asset_manifest/index/ownership.json"),
           ]
-          all_paths = freezer_paths + asset_paths
+          restoration_paths = freezer_paths + asset_paths + [
+              Path("freezer/manifests/manifest.sha256"),
+              Path("asset_manifest/manifests/manifest.sha256"),
+          ]
 
           def semantic(path):
               data = json.loads(path.read_text(encoding="utf-8"))
               data.pop("generated_at", None)
               return data
 
-          committed_bytes = {path: path.read_bytes() for path in all_paths}
+          committed_bytes = {path: path.read_bytes() for path in restoration_paths}
           committed_freezer = {path: semantic(path) for path in freezer_paths}
           committed_assets = {path: semantic(path) for path in asset_paths}
           stale = []
@@ -157,16 +160,7 @@ jobs:
       - name: Run learning-proposal tests
         run: python -B -m unittest discover -s tests -p 'test_learning_proposals.py' -v
       - name: Run governed-loop tests
-        run: |
-          set -o pipefail
-          python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v 2>&1 | tee governed-loop-test.log
-      - name: Upload governed-loop test diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: governed-loop-test-diagnostics
-          path: governed-loop-test.log
-          if-no-files-found: error
+        run: python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
       - name: Run governed-record tests
         run: python -B -m unittest discover -s tests -v
       - name: Verify rebuilt governed records
