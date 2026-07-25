@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T05:51:00Z",
+  "generated_at": "2026-07-25T06:44:57Z",
   "count": 2,
   "policy": {
     "priority_weight": 0.35,
@@ -16,13 +16,13 @@
       "title": "Governed Execution and Learning Loop",
       "status": "FROZEN",
       "priority_score": 72.46,
-      "assessment_state": "MISSING",
-      "build_score": null,
-      "ranking_score": 25.36,
-      "recommendation": "ASSESSMENT_REQUIRED",
-      "net_hours": null,
-      "reuse_hours_saved": null,
-      "implementation_efficiency": null,
+      "assessment_state": "CURRENT",
+      "build_score": 71.83,
+      "ranking_score": 72.05,
+      "recommendation": "BUILD_NOW",
+      "net_hours": 28.0,
+      "reuse_hours_saved": 80.0,
+      "implementation_efficiency": 3.43,
       "build_authority": "NOT_APPROVED"
     },
     {
