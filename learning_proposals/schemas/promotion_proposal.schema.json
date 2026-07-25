@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-SKILL-PROMOTION-PROPOSAL-V1",
+  "title": "RTS Proposal-Only Skill Promotion Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "proposal_id", "generator_identity", "proposal_status",
+    "generated_from", "evidence_summary", "recommendation", "safeguards",
+    "blockers", "proposal_fingerprint"
+  ],
+  "properties": {
+    "schema_version": {"const": "RTS-SKILL-PROMOTION-PROPOSAL-V1"},
+    "proposal_id": {"type": "string"},
+    "generator_identity": {"const": "rts-proposal-generator-v1"},
+    "proposal_status": {"const": "REVIEW_REQUIRED"},
+    "generated_from": {"type": "object"},
+    "evidence_summary": {"type": "object"},
+    "recommendation": {"type": "object"},
+    "safeguards": {"type": "object"},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "proposal_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
