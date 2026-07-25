@@ -22,7 +22,7 @@ from governed_loop.generation import generate_run
 ITEM_ID = "RTS-FRZ-000008"
 VERIFIED_AT = "2026-07-25T12:10:00Z"
 COMPLETED_AT = "2026-07-25T12:11:00Z"
-OUTPUT_ROOT = ROOT / ".completion-candidate"
+OUTPUT_ROOT = ROOT / "completion-candidate"
 
 
 def write_json(path: Path, value: object) -> None:
