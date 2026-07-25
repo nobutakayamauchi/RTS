@@ -1,0 +1,219 @@
+{
+  "as_of": "2026-07-25T07:59:00Z",
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "application_status": "NOT_APPLIED",
+    "approval_status": "NOT_APPROVED",
+    "automatic_rollback_authorized": false,
+    "external_execution_performed": false,
+    "provider_authorized": false,
+    "read_only": true,
+    "scheduler_authorized": false,
+    "skill_mutation_authorized": false
+  },
+  "components": {
+    "asset_manifest": {
+      "asset_count": 26,
+      "repository_count": 19,
+      "snapshot_path": "asset_manifest/snapshots/v002.json",
+      "snapshot_sha256": "8e53d277ebd7bef3f2880f0c13970503988328f46aa0ae4d7919671e0b3ca877",
+      "snapshot_version": 2,
+      "verification": "PASSED"
+    },
+    "execution_controller": {
+      "execution_scope": "LOCAL_DRY_RUN_ONLY",
+      "external_execution_performed": false,
+      "outcome_links": [
+        {
+          "authorization_fingerprint": "d365631618b882fa167cfbbab5e1581d9da55c36e5c47232463fabaaede88d89",
+          "bundle_fingerprint": "47a00d31aa03a0a64c93ddc784bceaec0fabbf611873ae97c48399ac761b2571",
+          "bundle_id": "RTS-OUTCOME-000001",
+          "execution_scope": "SIMULATED_ONLY",
+          "outcome_classification": "UNVERIFIED",
+          "plan_fingerprint": "f50db0eb556e63bace2cf455029069e7fd5828c4028b15f2c98043767a164ae1",
+          "terminal_state": "SUCCEEDED"
+        },
+        {
+          "authorization_fingerprint": "c18c5ba44ed4f068eecddab12b600716c43b2ed3b0a1cdb66fdfe34b8a4c16a4",
+          "bundle_fingerprint": "37336ead6e1a507aff1960c3993850f1cddd8a386fedaaa706df0f77ed0818fe",
+          "bundle_id": "RTS-OUTCOME-000002",
+          "execution_scope": "SIMULATED_ONLY",
+          "outcome_classification": "VERIFIED",
+          "plan_fingerprint": "a241d820c72a8fecdba0d7e1abb25387d6c6a77b80b911e1a01caa9ca197d0f2",
+          "terminal_state": "ESCALATED"
+        },
+        {
+          "authorization_fingerprint": "64520b5da0655a7841057bf4586925084a2ae221fc306545f7165a09bd5efde0",
+          "bundle_fingerprint": "0084528328cece383d24aebd71fd8c154203aa2e026da780bada69434059b91b",
+          "bundle_id": "RTS-OUTCOME-000003",
+          "execution_scope": "SIMULATED_ONLY",
+          "outcome_classification": "ASSUMED",
+          "plan_fingerprint": "961feff72e61d0b5dfc8685cf8d6f3f19cb5eac48dadc3ed470062303098f12e",
+          "terminal_state": "STOPPED"
+        }
+      ],
+      "verification": "PASSED"
+    },
+    "learning_proposal": {
+      "application_status": "NOT_APPLIED",
+      "approval_status": "NOT_APPROVED",
+      "proposal_fingerprint": "80f1a86c7d55aa31a8a7d628fdf85ca1a86684feaf49717603ef9b75ef41004e",
+      "proposal_id": "RTS-SKILL-PROPOSAL-000001",
+      "proposal_status": "REVIEW_REQUIRED",
+      "recommendation": "REQUEST_HUMAN_REVIEW",
+      "review_status": "PENDING",
+      "verification": "PASSED"
+    },
+    "outcome_evidence": {
+      "bundle_count": 3,
+      "bundle_fingerprints": [
+        "47a00d31aa03a0a64c93ddc784bceaec0fabbf611873ae97c48399ac761b2571",
+        "37336ead6e1a507aff1960c3993850f1cddd8a386fedaaa706df0f77ed0818fe",
+        "0084528328cece383d24aebd71fd8c154203aa2e026da780bada69434059b91b"
+      ],
+      "bundle_ids": [
+        "RTS-OUTCOME-000001",
+        "RTS-OUTCOME-000002",
+        "RTS-OUTCOME-000003"
+      ],
+      "classifications": [
+        "ASSUMED",
+        "UNVERIFIED",
+        "VERIFIED"
+      ],
+      "execution_scope": "SIMULATED_ONLY",
+      "promotion_eligibility": "NOT_ELIGIBLE",
+      "verification": "PASSED"
+    },
+    "read_only_loop": {
+      "active_item_ids": [
+        "RTS-FRZ-000008"
+      ],
+      "audit_level": "NORMAL",
+      "authority": "ADVISORY_ONLY",
+      "evaluation_id": "feeed2e1355a742b6b76352ef4077bcf58a8925baf90c1a2c1d51f96157a841d",
+      "recommendation_action": "CONTINUE_OR_VERIFY_ACTIVE_ITEM",
+      "recommendation_item_id": "RTS-FRZ-000008",
+      "state": "FOCUS",
+      "verification": "PASSED",
+      "wip_count": 1
+    },
+    "skill_regression": {
+      "candidate_pass_rate": 1.0,
+      "dataset_id": "RTS-SKILL-REGRESSION-000001",
+      "improvements": 2,
+      "promotion_eligibility": "NOT_ELIGIBLE",
+      "recommendation": "RESEARCH_READY",
+      "regressions": 0,
+      "result_fingerprint": "1b7a29e57915e9750e32f4f8c11c0ddbe35a356c088b177de6e5457bca10f53a",
+      "safety_failures": 0,
+      "verification": "PASSED"
+    }
+  },
+  "evidence_summary": {
+    "assumptions": [
+      "repository-local component verification is sufficient for the bounded one-shot integration claim",
+      "future human review will interpret this run without treating it as Skill-application authority"
+    ],
+    "confirmed_facts": [
+      "all six repository-local component verification stages passed in the fixed governed order",
+      "the current loop evaluation observed exactly the active items recorded in the FREEZER index",
+      "three governed outcome bundles remain linked to exact controller plan and authorization fingerprints",
+      "the deterministic Skill regression result contains zero regressions and zero safety failures",
+      "the learning proposal and pending review remain reconstructable from exact committed sources"
+    ],
+    "risks": [
+      "component contracts may drift after this run and require a newly generated fingerprint set",
+      "SIMULATED_ONLY outcomes could be overgeneralized beyond their bounded local claim",
+      "a future adapter could attempt scheduling, provider use, or adjacent writes without a new gate"
+    ],
+    "unverified_claims": [
+      "no external business or user success was observed",
+      "no live provider execution or adjacent-repository application was exercised",
+      "real-run pilot value has not yet been measured"
+    ]
+  },
+  "mode": "ONE_SHOT_READ_ONLY",
+  "run_fingerprint": "a6ac7f921b51e8bc08414b67246db722dcab0fb855cb24c96e0968eedf43ab7c",
+  "run_id": "RTS-LOOP-RUN-A6AC7F921B51E8BC",
+  "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
+  "source_fingerprints": [
+    {
+      "path": "asset_manifest/index/assets.json",
+      "sha256": "7ba91bdffa9018d7ffc8e469fb871a3e2bfe68fb6d105fcd1cf87fdb6c88c696"
+    },
+    {
+      "path": "asset_manifest/index/repositories.json",
+      "sha256": "fd3e90ed6792eaf78c1f43ad04f910a09eb0463eaa37474e9b7f0057e0d96770"
+    },
+    {
+      "path": "asset_manifest/snapshots/current.json",
+      "sha256": "a9455ccd85666213e497b09891bea17f36598d171adb8ed6b89fad2b954ad4c7"
+    },
+    {
+      "path": "asset_manifest/snapshots/v002.json",
+      "sha256": "8e53d277ebd7bef3f2880f0c13970503988328f46aa0ae4d7919671e0b3ca877"
+    },
+    {
+      "path": "freezer/index/build_priority.json",
+      "sha256": "a1fa9627733b7fe7dcd629620a9fb07d83214fee5745d5c36a1f411803453153"
+    },
+    {
+      "path": "freezer/index/items.json",
+      "sha256": "923123fe86feb1151468801264a6a7482636a7e91dd6787843b8d5943e78d220"
+    },
+    {
+      "path": "governed_loop/schemas/loop_run.schema.json",
+      "sha256": "4fa1ffededa01fd938a6c4a3740487755d521ec4d74913c6f052801d5a705a71"
+    },
+    {
+      "path": "learning_proposals/proposals/feature-build-v1.json",
+      "sha256": "1d96d0f84b24d44afa1eb4d67bd731e0cb042d44f9d00e868913a7244ff463a6"
+    },
+    {
+      "path": "learning_proposals/reviews/feature-build-v1.pending.json",
+      "sha256": "f9169becdd59fcc8be1aa6e6b1f99d3115b62c7c06c8f7f738edfb62b61a5f96"
+    },
+    {
+      "path": "outcome_evidence/examples/escalation.json",
+      "sha256": "aba35dd5731c0e3b7771bb99cde0c68e8d90f03294c54128ed71d368492f812a"
+    },
+    {
+      "path": "outcome_evidence/examples/recovery.json",
+      "sha256": "f99655d7c948be1a4f8f39a58d5280b95d5ec3bf82fa9f399fc9c3cbaa549891"
+    },
+    {
+      "path": "outcome_evidence/examples/success.json",
+      "sha256": "4ec06168df2857d5f032e6deb2159d6a145636476492de01f3f5e219a7a35efd"
+    },
+    {
+      "path": "skill_regression/datasets/feature-build-v1.json",
+      "sha256": "3c8eb9cc122a82e4891fcdba8bb6619e147f4379b6aeb826e9b6173f89bfe04d"
+    },
+    {
+      "path": "skill_regression/results/feature-build-v1.json",
+      "sha256": "6d982682bae4aa8fe3b6bf01731109aa046a6a9e616f9e40ef2b575c6d374eff"
+    },
+    {
+      "path": "skill_regression/rollback/feature-build-v1.json",
+      "sha256": "97678d8e946eb2a4b82ef2eba495c6c2423d6bded1d109e37f1888e28c738152"
+    },
+    {
+      "path": "skill_regression/snapshots/feature-build/baseline.json",
+      "sha256": "e1147168a4e7d07ffbcab146888141e37d3b235cd88cbe08ebb1ade7845390c1"
+    },
+    {
+      "path": "skill_regression/snapshots/feature-build/candidate.json",
+      "sha256": "10a678acb2b96f1f4c75fce390f42a0df2db1de23b038cbb94e117a01f87f735"
+    }
+  ],
+  "status": "RECONSTRUCTED",
+  "verification_order": [
+    "asset_manifest",
+    "read_only_loop",
+    "execution_controller",
+    "outcome_evidence",
+    "skill_regression",
+    "learning_proposals"
+  ]
+}
