@@ -334,8 +334,9 @@ class ExecutionControllerTests(unittest.TestCase):
         rows = {row["item_id"]: row for row in self.read_json(index_path)["items"]}
         self.assertEqual(rows["RTS-FRZ-000006"]["status"], "COMPLETED")
         self.assertEqual(rows["RTS-FRZ-000006"]["build_authority"], "APPROVED")
-        self.assertEqual(rows["RTS-FRZ-000007"]["status"], "FROZEN")
-        self.assertEqual(rows["RTS-FRZ-000007"]["build_authority"], "NOT_APPROVED")
+        self.assertEqual(rows["RTS-FRZ-000007"]["status"], "IN_PROGRESS")
+        self.assertEqual(rows["RTS-FRZ-000007"]["build_authority"], "APPROVED")
+        self.assertEqual(rows["RTS-FRZ-000007"]["preflight_state"], "PASS")
 
     def test_emergency_stop_preserves_prior_events(self) -> None:
         retry = {
