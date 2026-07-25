@@ -10,12 +10,13 @@ from .generation import generate_run
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="RTS Read-Only Governed Loop Orchestrator v1")
+    parser = argparse.ArgumentParser(
+        description="RTS Read-Only Governed Loop Orchestrator v1"
+    )
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("generate")
-    verify = sub.add_parser("verify")
-    verify.add_argument("--allow-missing-committed-run", action="store_true")
+    sub.add_parser("verify")
     sub.add_parser("summary")
     return parser
 
@@ -27,10 +28,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "generate":
             sys.stdout.write(pretty_json(generate_run(root)))
         elif args.command == "verify":
-            summary = verify_all(
-                root,
-                require_committed=not args.allow_missing_committed_run,
-            )
+            summary = verify_all(root)
             print(
                 "Read-Only Governed Loop verification passed "
                 f"({summary['run_id']})"
