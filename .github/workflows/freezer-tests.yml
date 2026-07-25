@@ -71,12 +71,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Generate human review ledger registration candidate
-        run: python .github/scripts/generate_human_review_ledger_registration.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: human-review-ledger-registration-candidate
-          path: human-review-ledger-registration-candidate
       - name: Verify committed governed records
         run: |
           python -m freezer.cli verify
