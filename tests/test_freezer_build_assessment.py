@@ -16,6 +16,7 @@ from freezer.build_assessment import (
     validate_record,
     verify_assessments,
 )
+from freezer.cli import rebuild
 
 
 class BuildAssessmentTests(unittest.TestCase):
@@ -25,6 +26,25 @@ class BuildAssessmentTests(unittest.TestCase):
     def isolated_root(self, temp_dir: str) -> Path:
         root = Path(temp_dir)
         shutil.copytree(self.repo_root / "freezer", root / "freezer")
+        pointer_path = (
+            root
+            / "freezer"
+            / "items"
+            / "RTS-FRZ-000007"
+            / "current.json"
+        )
+        if pointer_path.exists():
+            pointer = json.loads(pointer_path.read_text(encoding="utf-8"))
+            learning_path = root / pointer["path"]
+            learning = json.loads(learning_path.read_text(encoding="utf-8"))
+            if learning["status"] in {"SELECTED", "IN_PROGRESS"}:
+                learning["status"] = "FROZEN"
+                learning["build_authority"] = "NOT_APPROVED"
+                learning_path.write_text(
+                    json.dumps(learning, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+        rebuild(root)
         return root
 
     def write_json(self, path: Path, payload: dict) -> Path:
@@ -304,7 +324,6 @@ class BuildAssessmentTests(unittest.TestCase):
             self.assertEqual(payload["preflight_state"], "PASS")
             self.assertTrue(payload["selection_ready"])
 
-
     def test_full_gate_is_false_when_wip_capacity_is_full(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = self.isolated_root(temp_dir)
@@ -350,6 +369,7 @@ class BuildAssessmentTests(unittest.TestCase):
                 "assessment pointer decision_score mismatch",
             ):
                 load_current_assessment(root, "RTS-FRZ-000002")
+
 
 if __name__ == "__main__":
     unittest.main()

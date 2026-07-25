@@ -3,6 +3,11 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
+
+from freezer.assessment_core import BuildAssessmentError, load_current_item
+from freezer.assessment_store import require_build_now_assessment
+from freezer.preflight import PreflightError, require_passing_preflight
 
 from .core import DEFAULT_INPUTS, evaluate
 from .models import (
@@ -16,6 +21,61 @@ from .models import (
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_ROOT = PACKAGE_DIR.parent
+LEARNING_GOVERNED_STATUSES = {"SELECTED", "IN_PROGRESS", "VERIFIED", "COMPLETED"}
+
+
+def validate_learning_index_boundary(learning: dict[str, Any]) -> bool:
+    """Validate the index-level authority boundary for RTS-FRZ-000007.
+
+    Returns True when current Assessment and Preflight gates must also be
+    revalidated from their immutable records.
+    """
+
+    status = learning.get("status")
+    authority = learning.get("build_authority")
+    preflight = learning.get("preflight_state")
+
+    if status == "FROZEN":
+        if authority != "NOT_APPROVED":
+            raise LoopCoreError(
+                "RTS-FRZ-000007 FROZEN state requires build_authority=NOT_APPROVED"
+            )
+        return False
+
+    if status not in LEARNING_GOVERNED_STATUSES:
+        raise LoopCoreError(
+            f"RTS-FRZ-000007 has unsupported governed status={status!r}"
+        )
+    if authority != "APPROVED":
+        raise LoopCoreError(
+            f"RTS-FRZ-000007 {status} state requires build_authority=APPROVED"
+        )
+    if preflight != "PASS":
+        raise LoopCoreError(
+            f"RTS-FRZ-000007 {status} state requires preflight_state=PASS"
+        )
+    return True
+
+
+def validate_learning_current_gates(root: Path, learning: dict[str, Any]) -> None:
+    """Fail closed unless an active/terminal learning item has current gates."""
+
+    if not validate_learning_index_boundary(learning):
+        return
+    try:
+        item = load_current_item(root, "RTS-FRZ-000007")
+        require_build_now_assessment(root, item)
+        require_passing_preflight(root, item)
+    except (BuildAssessmentError, PreflightError) as exc:
+        raise LoopCoreError(
+            f"RTS-FRZ-000007 governed lifecycle gate failed: {exc}"
+        ) from exc
+
+    for field in ("status", "build_authority"):
+        if item.get(field) != learning.get(field):
+            raise LoopCoreError(
+                f"RTS-FRZ-000007 item/index {field} mismatch"
+            )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -72,13 +132,7 @@ def command_verify(root: Path) -> None:
         or controller["status"] != "COMPLETED"
     ):
         raise LoopCoreError("RTS-FRZ-000006 controller lifecycle is not completed")
-    learning = children["RTS-FRZ-000007"]
-    if learning["build_authority"] != "NOT_APPROVED" or learning["status"] in {
-        "SELECTED",
-        "IN_PROGRESS",
-        "COMPLETED",
-    }:
-        raise LoopCoreError("RTS-FRZ-000007 crossed the advisory boundary")
+    validate_learning_current_gates(root, children["RTS-FRZ-000007"])
     print("Read-Only Loop Core verification passed")
 
 

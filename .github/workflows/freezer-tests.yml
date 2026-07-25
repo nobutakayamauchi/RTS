@@ -13,6 +13,7 @@ on:
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
+      - "tests/test_loop_core_learning_lifecycle.py"
       - "tests/test_execution_controller.py"
       - "tests/test_execution_controller_state_continuity.py"
       - "tests/test_outcome_evidence.py"
@@ -36,6 +37,7 @@ on:
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
       - "tests/test_loop_core.py"
+      - "tests/test_loop_core_learning_lifecycle.py"
       - "tests/test_execution_controller.py"
       - "tests/test_execution_controller_state_continuity.py"
       - "tests/test_outcome_evidence.py"
@@ -113,6 +115,24 @@ jobs:
                   print(f"- {path}")
               raise SystemExit(1)
           PY
+      - name: Run freezer tests
+        run: python -B -m unittest discover -s tests -p 'test_freezer.py' -v
+      - name: Run build-assessment tests
+        run: python -B -m unittest discover -s tests -p 'test_freezer_build_assessment.py' -v
+      - name: Run asset-manifest tests
+        run: python -B -m unittest discover -s tests -p 'test_asset_manifest.py' -v
+      - name: Run loop-core tests
+        run: python -B -m unittest discover -s tests -p 'test_loop_core.py' -v
+      - name: Run learning lifecycle tests
+        run: python -B -m unittest discover -s tests -p 'test_loop_core_learning_lifecycle.py' -v
+      - name: Run execution-controller tests
+        run: python -B -m unittest discover -s tests -p 'test_execution_controller.py' -v
+      - name: Run controller-continuity tests
+        run: python -B -m unittest discover -s tests -p 'test_execution_controller_state_continuity.py' -v
+      - name: Run outcome-evidence tests
+        run: python -B -m unittest discover -s tests -p 'test_outcome_evidence.py' -v
+      - name: Run skill-regression tests
+        run: python -B -m unittest discover -s tests -p 'test_skill_regression.py' -v
       - name: Run governed-record tests
         run: python -B -m unittest discover -s tests -v
       - name: Verify rebuilt governed records

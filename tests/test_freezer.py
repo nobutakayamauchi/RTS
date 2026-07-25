@@ -43,6 +43,25 @@ class FreezerTests(unittest.TestCase):
     def isolated_root(self, temp_dir: str) -> Path:
         temp_root = Path(temp_dir)
         shutil.copytree(self.repo_root / "freezer", temp_root / "freezer")
+        pointer_path = (
+            temp_root
+            / "freezer"
+            / "items"
+            / "RTS-FRZ-000007"
+            / "current.json"
+        )
+        if pointer_path.exists():
+            pointer = json.loads(pointer_path.read_text(encoding="utf-8"))
+            learning_path = temp_root / pointer["path"]
+            learning = json.loads(learning_path.read_text(encoding="utf-8"))
+            if learning["status"] in {"SELECTED", "IN_PROGRESS"}:
+                learning["status"] = "FROZEN"
+                learning["build_authority"] = "NOT_APPROVED"
+                learning_path.write_text(
+                    json.dumps(learning, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+        rebuild(temp_root)
         return temp_root
 
     def preflight_payload(
