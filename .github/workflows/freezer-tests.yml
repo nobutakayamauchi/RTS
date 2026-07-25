@@ -83,7 +83,13 @@ jobs:
           python -m learning_proposals.cli verify
           python -m governed_loop.cli verify --allow-missing-committed-run
       - name: Generate governed-loop fixture candidate
-        run: python -m governed_loop.cli generate
+        run: python -m governed_loop.cli generate > governed-loop-current.json
+      - name: Upload governed-loop fixture candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: governed-loop-candidate
+          path: governed-loop-current.json
+          if-no-files-found: error
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
