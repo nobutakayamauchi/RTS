@@ -10,6 +10,7 @@ on:
       - "outcome_evidence/**"
       - "skill_regression/**"
       - "learning_proposals/**"
+      - "governed_loop/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
@@ -20,11 +21,13 @@ on:
       - "tests/test_outcome_evidence.py"
       - "tests/test_skill_regression.py"
       - "tests/test_learning_proposals.py"
+      - "tests/test_governed_loop.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
       - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
       - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
       - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
+      - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
   push:
     branches:
@@ -37,6 +40,7 @@ on:
       - "outcome_evidence/**"
       - "skill_regression/**"
       - "learning_proposals/**"
+      - "governed_loop/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
       - "tests/test_asset_manifest.py"
@@ -47,11 +51,13 @@ on:
       - "tests/test_outcome_evidence.py"
       - "tests/test_skill_regression.py"
       - "tests/test_learning_proposals.py"
+      - "tests/test_governed_loop.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
       - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
       - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
       - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
+      - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
 
 permissions:
@@ -75,6 +81,9 @@ jobs:
           python -m outcome_evidence.cli verify
           python -m skill_regression.cli verify
           python -m learning_proposals.cli verify
+          python -m governed_loop.cli verify --allow-missing-committed-run
+      - name: Generate governed-loop fixture candidate
+        run: python -m governed_loop.cli generate
       - name: Fail on stale committed indexes
         run: |
           python - <<'PY'
@@ -142,6 +151,8 @@ jobs:
         run: python -B -m unittest discover -s tests -p 'test_skill_regression.py' -v
       - name: Run learning-proposal tests
         run: python -B -m unittest discover -s tests -p 'test_learning_proposals.py' -v
+      - name: Run governed-loop tests
+        run: python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
       - name: Run governed-record tests
         run: python -B -m unittest discover -s tests -v
       - name: Verify rebuilt governed records
@@ -154,3 +165,4 @@ jobs:
           python -m outcome_evidence.cli verify
           python -m skill_regression.cli verify
           python -m learning_proposals.cli verify
+          python -m governed_loop.cli verify --allow-missing-committed-run
