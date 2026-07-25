@@ -3,14 +3,18 @@ from __future__ import annotations
 import copy
 import json
 import shutil
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import freezer.assessment_core as assessment_core
 import freezer.cli as freezer_cli
 from governed_loop.common import pretty_json
 from governed_loop.generation import generate_run
 
-ROOT = Path(__file__).resolve().parents[2]
 ITEM_ID = "RTS-FRZ-000008"
 VERIFIED_AT = "2026-07-25T12:10:00Z"
 COMPLETED_AT = "2026-07-25T12:11:00Z"
@@ -69,11 +73,15 @@ def rebuild_governed_outputs() -> dict[str, object]:
 def update_focused_test() -> None:
     path = ROOT / "tests" / "test_governed_loop.py"
     text = path.read_text(encoding="utf-8")
-    old = '''        self.assertEqual(\n            run["components"]["read_only_loop"]["active_item_ids"],\n            ["RTS-FRZ-000008"],\n        )\n'''
-    new = '''        loop = run["components"]["read_only_loop"]\n        self.assertEqual(loop["active_item_ids"], [])\n        self.assertEqual(loop["wip_count"], 0)\n        self.assertEqual(loop["state"], "NORMAL")\n        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")\n        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")\n'''
-    if old not in text:
-        raise RuntimeError("governed-loop focused test block changed unexpectedly")
-    path.write_text(text.replace(old, new, 1), encoding="utf-8")
+    active_old = '''        self.assertEqual(\n            run["components"]["read_only_loop"]["active_item_ids"],\n            ["RTS-FRZ-000008"],\n        )\n'''
+    active_new = '''        loop = run["components"]["read_only_loop"]\n        self.assertEqual(loop["active_item_ids"], [])\n        self.assertEqual(loop["wip_count"], 0)\n        self.assertEqual(loop["state"], "NORMAL")\n        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")\n        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")\n'''
+    mismatch_old = '        run["components"]["read_only_loop"]["wip_count"] = 0\n'
+    mismatch_new = '        run["components"]["read_only_loop"]["wip_count"] = 1\n'
+    if active_old not in text or mismatch_old not in text:
+        raise RuntimeError("governed-loop focused test blocks changed unexpectedly")
+    text = text.replace(active_old, active_new, 1)
+    text = text.replace(mismatch_old, mismatch_new, 1)
+    path.write_text(text, encoding="utf-8")
 
 
 def write_completion_doc(run: dict[str, object]) -> None:
