@@ -4,14 +4,19 @@ import ast
 from pathlib import Path
 from typing import Any
 
+from outcome_evidence.corpus import verify_all as verify_outcome_evidence
+from skill_regression.corpus import verify_all as verify_skill_regression
+
 from .common import LearningProposalError, load_json, pretty_json, sha256_file
 from .generation import generate_pending_review, generate_proposal
-from .models import validate_proposal, validate_review
+from .models import PROPOSAL_SCHEMA, REVIEW_SCHEMA, validate_proposal, validate_review
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_ROOT = PACKAGE_DIR.parent
 PROPOSAL_PATH = "learning_proposals/proposals/feature-build-v1.json"
 REVIEW_PATH = "learning_proposals/reviews/feature-build-v1.pending.json"
+PROPOSAL_SCHEMA_PATH = "learning_proposals/schemas/promotion_proposal.schema.json"
+REVIEW_SCHEMA_PATH = "learning_proposals/schemas/human_review.schema.json"
 FORBIDDEN_IMPORTS = {"subprocess", "socket", "requests", "urllib", "http", "ftplib"}
 
 
@@ -34,6 +39,15 @@ def _verify_forbidden_imports(root: Path) -> None:
                     raise LearningProposalError(f"forbidden external-action import in {path}: {name}")
 
 
+def _verify_schema_ids(root: Path) -> None:
+    proposal_schema = load_json(root / PROPOSAL_SCHEMA_PATH)
+    review_schema = load_json(root / REVIEW_SCHEMA_PATH)
+    if not isinstance(proposal_schema, dict) or proposal_schema.get("$id") != PROPOSAL_SCHEMA:
+        raise LearningProposalError("proposal schema identifier mismatch")
+    if not isinstance(review_schema, dict) or review_schema.get("$id") != REVIEW_SCHEMA:
+        raise LearningProposalError("review schema identifier mismatch")
+
+
 def load_committed(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     proposal = load_json(root / PROPOSAL_PATH)
     review = load_json(root / REVIEW_PATH)
@@ -47,6 +61,8 @@ def verify_all(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     governed_paths = [
         root / PROPOSAL_PATH,
         root / REVIEW_PATH,
+        root / PROPOSAL_SCHEMA_PATH,
+        root / REVIEW_SCHEMA_PATH,
         root / "outcome_evidence/examples/success.json",
         root / "outcome_evidence/examples/escalation.json",
         root / "outcome_evidence/examples/recovery.json",
@@ -57,6 +73,17 @@ def verify_all(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     ]
     before = {path: sha256_file(path) for path in governed_paths}
     _verify_forbidden_imports(root)
+    _verify_schema_ids(root)
+    try:
+        verify_outcome_evidence(root)
+        regression_summary = verify_skill_regression(root)
+    except RuntimeError as exc:
+        raise LearningProposalError(f"source governed package verification failed: {exc}") from exc
+    if regression_summary.get("recommendation") != "RESEARCH_READY":
+        raise LearningProposalError("source regression recommendation is not RESEARCH_READY")
+    if regression_summary.get("promotion_eligibility") != "NOT_ELIGIBLE":
+        raise LearningProposalError("source regression promotion eligibility widened")
+
     committed_proposal, committed_review = load_committed(root)
     validate_proposal(committed_proposal)
     validate_review(committed_review, committed_pending_only=True)
