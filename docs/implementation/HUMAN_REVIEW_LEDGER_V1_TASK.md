@@ -5,7 +5,8 @@
 - item: `RTS-FRZ-000009`
 - Assessment: `RTS-BA-000009-001 / BUILD_NOW`
 - Preflight: `RTS-PF-000009-001 / PASS`
-- lifecycle during this implementation: `IN_PROGRESS / APPROVED`
+- lifecycle during implementation: `IN_PROGRESS / APPROVED`
+- completion lifecycle: `VERIFIED -> COMPLETED / APPROVED`
 
 ## Purpose
 
