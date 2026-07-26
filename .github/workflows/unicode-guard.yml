@@ -27,15 +27,6 @@ jobs:
         run: |
           rm -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
           PYTHONPATH=. python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
-      - name: Upload generator diagnostic
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: promotion-preview-generator-diagnostic
-          path: |
-            docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
-            .tmp/promotion_preview_prepare_error.txt
-          if-no-files-found: warn
       - name: Verify generated state
         run: |
           test ! -s docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
@@ -45,6 +36,29 @@ jobs:
           python -B -m freezer.preflight verify
           python -B -m governed_loop.cli verify
           python -B -m unittest discover -s tests -v
+      - name: List generated changes
+        run: |
+          git diff --name-only > promotion-preview-generated-files.txt
+          git diff > promotion-preview-generated.patch
+          cat promotion-preview-generated-files.txt
+      - name: Upload verified generated state
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-preview-verified-gate-state
+          path: |
+            promotion-preview-generated-files.txt
+            promotion-preview-generated.patch
+            freezer/assessments/RTS-FRZ-000010/**
+            freezer/preflights/RTS-FRZ-000010/**
+            freezer/items/RTS-FRZ-000010/**
+            freezer/index/items.json
+            freezer/index/priority.json
+            freezer/index/build_priority.json
+            freezer/manifests/manifest.sha256
+            governed_loop/runs/current.json
+            tests/test_governed_loop.py
+            docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md
+          if-no-files-found: error
 
   guard:
     runs-on: ubuntu-latest
