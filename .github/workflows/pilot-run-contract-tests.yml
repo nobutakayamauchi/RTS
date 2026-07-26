@@ -20,7 +20,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,3 +30,5 @@ jobs:
         run: python -B -m pilot_run_contract.cli verify
       - name: Run focused tests
         run: python -B -m unittest discover -s tests -p 'test_pilot_run_contract.py' -v
+      - name: Run full repository tests
+        run: python -B -m unittest discover -s tests -v
