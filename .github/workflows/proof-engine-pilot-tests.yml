@@ -15,6 +15,7 @@ on:
       - "tests/test_proof_engine_publication_review.py"
       - "tests/test_proof_engine_release.py"
       - "tests/test_proof_engine_cross_repo_validation.py"
+      - "tests/test_proof_engine_cross_repo_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -31,6 +32,7 @@ on:
       - "tests/test_proof_engine_publication_review.py"
       - "tests/test_proof_engine_release.py"
       - "tests/test_proof_engine_cross_repo_validation.py"
+      - "tests/test_proof_engine_cross_repo_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -115,6 +117,12 @@ jobs:
           python -B -m proof_engine_pilot.cross_repo_cli verify
           python -B -m proof_engine_pilot.cross_repo_cli summary
           python -B -m proof_engine_pilot.cross_repo_cli review-template > /tmp/proof-engine-cross-repo-review-template.json
+      - name: Verify Round 2 cross-repository review
+        run: |
+          python -B -m proof_engine_pilot.cross_repo_review_cli verify-round-2
+          python -B -m proof_engine_pilot.cross_repo_review_cli summary-round-2
+          python -B -m proof_engine_pilot.cross_repo_review_cli effective-round-2 > /tmp/proof-engine-cross-repo-effective-round-2.json
+          python -B -m proof_engine_pilot.cross_repo_review_cli round-3-template > /tmp/proof-engine-cross-repo-round-3-template.json
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
@@ -126,5 +134,6 @@ jobs:
           python -B -m unittest discover -s tests -p 'test_proof_engine_publication_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_release.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_validation.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_review.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
