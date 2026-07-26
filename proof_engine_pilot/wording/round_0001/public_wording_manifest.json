@@ -1,0 +1,11 @@
+{
+  "draft_id": "PROOF-ENGINE-PUBLIC-WORDING-DRAFT-0001",
+  "expected_draft_fingerprint": "91a21a9eb8119fc474d2f6a1c3429ae265c7c1997066f8148e2a612ef6167782",
+  "expected_markdown_fingerprint": "08c642b73c6caadcf5eb823ebf2abf7e45e06304ff96fdac3b447bc2e71fc337",
+  "manifest_fingerprint": "c27a22e8ac727d11512a06c4e27030de14ca9e6774d97efb94dd8e378f863056",
+  "manifest_id": "PROOF-ENGINE-PUBLIC-WORDING-MANIFEST-0001",
+  "publication_status": "NOT_PUBLISHED",
+  "review_state": "PUBLICATION_REVIEW_REQUIRED",
+  "schema_version": "PROOF-ENGINE-PUBLIC-WORDING-MANIFEST-V1",
+  "wording_count": 6
+}
