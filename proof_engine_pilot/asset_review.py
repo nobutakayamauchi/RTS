@@ -39,12 +39,16 @@ def _verify_fingerprint(value: dict[str, Any], field: str, label: str) -> str:
     return actual
 
 
-def load_decisions(index: dict[str, Any]) -> list[dict[str, Any]]:
+def load_decisions(
+    index: dict[str, Any],
+    segment_overrides: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     decisions: list[dict[str, Any]] = []
     previous_segment = None
+    overrides = segment_overrides or {}
     for entry in index.get("segments", []):
-        path = ROOT / entry["path"]
-        segment = load(path)
+        path_string = entry["path"]
+        segment = copy.deepcopy(overrides[path_string]) if path_string in overrides else load(ROOT / path_string)
         segment_fp = _verify_fingerprint(segment, "segment_fingerprint", "asset review segment")
         if segment_fp != entry.get("segment_fingerprint"):
             raise ProofEngineError("asset review segment/index mismatch")
@@ -59,17 +63,23 @@ def load_decisions(index: dict[str, Any]) -> list[dict[str, Any]]:
     return decisions
 
 
-def verify_asset_review() -> dict[str, Any]:
+def verify_asset_review(
+    *,
+    index: dict[str, Any] | None = None,
+    summary: dict[str, Any] | None = None,
+    checkpoint: dict[str, Any] | None = None,
+    segment_overrides: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     draft = build_internal_asset_draft()
     assets = {item["asset_id"]: item for item in draft["assets"]}
     if len(assets) != 6:
         raise ProofEngineError("asset review source count mismatch")
 
-    index = load(INDEX_PATH)
+    index = load(INDEX_PATH) if index is None else copy.deepcopy(index)
     index_fp = _verify_fingerprint(index, "decision_index_fingerprint", "asset review index")
     if index.get("source_draft_id") != draft["draft_id"] or index.get("source_draft_fingerprint") != draft["draft_fingerprint"]:
         raise ProofEngineError("asset review source draft mismatch")
-    decisions = load_decisions(index)
+    decisions = load_decisions(index, segment_overrides)
     if index.get("decision_count") != len(decisions) or len(decisions) != 6:
         raise ProofEngineError("asset review decision count mismatch")
 
@@ -106,7 +116,7 @@ def verify_asset_review() -> dict[str, Any]:
     if index.get("last_decision_fingerprint") != previous:
         raise ProofEngineError("asset review final decision mismatch")
 
-    summary = load(SUMMARY_PATH)
+    summary = load(SUMMARY_PATH) if summary is None else copy.deepcopy(summary)
     summary_fp = _verify_fingerprint(summary, "summary_fingerprint", "asset review summary")
     if summary.get("source_draft_id") != draft["draft_id"] or summary.get("source_draft_fingerprint") != draft["draft_fingerprint"]:
         raise ProofEngineError("asset review summary source mismatch")
@@ -139,7 +149,7 @@ def verify_asset_review() -> dict[str, Any]:
         if item.get("effective_status") != "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT":
             raise ProofEngineError("asset review effective status mismatch")
 
-    checkpoint = load(CHECKPOINT_PATH)
+    checkpoint = load(CHECKPOINT_PATH) if checkpoint is None else copy.deepcopy(checkpoint)
     _verify_fingerprint(checkpoint, "checkpoint_fingerprint", "asset review checkpoint")
     links = {
         "source_draft_fingerprint": draft["draft_fingerprint"],
