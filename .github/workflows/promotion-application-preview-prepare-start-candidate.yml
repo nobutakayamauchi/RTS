@@ -1,0 +1,98 @@
+name: Promotion Application Preview Prepare Start Candidate
+
+on:
+  pull_request:
+    paths:
+      - ".tmp/promotion_application_preview_assessment.json"
+      - ".tmp/promotion_application_preview_preflight.json"
+      - ".github/workflows/promotion-application-preview-prepare-start-candidate.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  prepare-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Create Assessment and Preflight and start the approved item
+        run: |
+          python -m freezer.build_assessment create RTS-FRZ-000010 --input .tmp/promotion_application_preview_assessment.json
+          python -m freezer.preflight create RTS-FRZ-000010 --input .tmp/promotion_application_preview_preflight.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.').resolve()
+          selected = root / '.tmp/promotion_application_preview_selected.json'
+          started = root / '.tmp/promotion_application_preview_started.json'
+          selected.write_text(json.dumps({
+              'status': 'SELECTED',
+              'build_authority': 'APPROVED'
+          }, indent=2) + '\n', encoding='utf-8')
+          started.write_text(json.dumps({
+              'status': 'IN_PROGRESS'
+          }, indent=2) + '\n', encoding='utf-8')
+          PY
+          python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/promotion_application_preview_selected.json
+          python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/promotion_application_preview_started.json
+          python - <<'PY'
+          from pathlib import Path
+          from governed_loop.common import pretty_json
+          from governed_loop.generation import generate_run
+
+          root = Path('.').resolve()
+          test_path = root / 'tests/test_governed_loop.py'
+          text = test_path.read_text(encoding='utf-8')
+          before = '''        self.assertEqual(loop["active_item_ids"], [])
+        self.assertEqual(loop["wip_count"], 0)
+        self.assertEqual(loop["state"], "NORMAL")
+        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")
+        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")'''
+          after = '''        self.assertEqual(loop["active_item_ids"], ["RTS-FRZ-000010"])
+        self.assertEqual(loop["wip_count"], 1)
+        self.assertEqual(loop["state"], "FOCUS")
+        self.assertEqual(loop["recommendation_action"], "CONTINUE_OR_VERIFY_ACTIVE_ITEM")
+        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000010")'''
+          if before not in text:
+              raise SystemExit('expected idle governed-loop assertion block not found')
+          test_path.write_text(text.replace(before, after), encoding='utf-8')
+
+          docs = root / 'docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md'
+          docs.write_text('''# Promotion Application Preview v1 Implementation Contract\n\n## Governed item\n\n- item: `RTS-FRZ-000010`\n- Assessment: `RTS-BA-000010-001 / BUILD_NOW`\n- Preflight: `RTS-PF-000010-001 / PASS`\n- lifecycle: `v001 FROZEN / NOT_APPROVED -> v002 SELECTED / APPROVED -> v003 IN_PROGRESS / APPROVED`\n- WIP: `1`\n\n## Human authorization\n\nThe operator explicitly instructed the governed loop-engine completion route to proceed. This authorization covers only the repository-local, read-only, non-applying Promotion Application Preview v1 boundary described by the current Assessment and PASS Preflight.\n\n## Allowed implementation\n\n- deterministic standard-library package\n- exact proposal, pending-review, review-ledger, regression, rollback, policy, reviewer-scope, and target-snapshot fingerprints\n- canonical proposed change set\n- explicit blockers, prerequisites, validation steps, stop conditions, and rollback references\n- `generate`, `verify`, and `summary` only\n- committed blocked fixture for the current empty ledger\n- governed-loop read-only integration\n- focused tests and CI\n\n## Not authorized\n\nNo human decision creation, self-approval, Skill mutation, application, promotion, target write, adjacent-repository write, commit, merge, provider, scheduler, network, subprocess, shell, publication, deployment, messaging, customer action, or automatic rollback.\n''', encoding='utf-8')
+
+          run = generate_run(root)
+          (root / 'governed_loop/runs/current.json').write_text(pretty_json(run), encoding='utf-8')
+          PY
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+      - name: Persist generated governed state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Prepare and start Promotion Application Preview v1"
+          git push
+      - name: Verify gates and governed state
+        run: |
+          python -B -m freezer.cli verify
+          python -B -m freezer.build_assessment verify
+          python -B -m freezer.preflight verify
+          python -B -m governed_loop.cli verify
+          python -B -m unittest discover -s tests -v
+      - name: Remove candidate machinery
+        run: |
+          rm -f .tmp/promotion_application_preview_assessment.json
+          rm -f .tmp/promotion_application_preview_preflight.json
+          rm -f .tmp/promotion_application_preview_selected.json
+          rm -f .tmp/promotion_application_preview_started.json
+          rm -f .github/workflows/promotion-application-preview-prepare-start-candidate.yml
+          rmdir .tmp 2>/dev/null || true
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          git add -A
+          git commit -m "Finalize Promotion Application Preview start gates"
+          git push
