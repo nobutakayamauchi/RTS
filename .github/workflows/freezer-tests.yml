@@ -73,7 +73,7 @@ permissions:
   contents: write
 
 jobs:
-  prepare-start-candidate:
+  prepare_start_candidate:
     if: github.event_name == 'pull_request' && github.head_ref == 'feature/prepare-start-promotion-application-preview'
     runs-on: ubuntu-latest
     steps:
@@ -158,8 +158,8 @@ jobs:
           git push
 
   freezer:
-    needs: prepare-start-candidate
-    if: always() && (needs.prepare-start-candidate.result == 'success' || needs.prepare-start-candidate.result == 'skipped')
+    needs: prepare_start_candidate
+    if: always() && (needs.prepare_start_candidate.result == 'success' || needs.prepare_start_candidate.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
