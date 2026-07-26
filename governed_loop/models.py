@@ -22,6 +22,7 @@ VERIFICATION_ORDER = [
     "outcome_evidence",
     "skill_regression",
     "learning_proposals",
+    "human_review_ledger",
 ]
 ROOT_FIELDS = {
     "schema_version",
@@ -60,6 +61,7 @@ COMPONENT_FIELDS = {
     "outcome_evidence",
     "skill_regression",
     "learning_proposal",
+    "human_review_ledger",
 }
 SOURCE_ROW_FIELDS = {"path", "sha256"}
 OUTCOME_LINK_FIELDS = {
@@ -335,6 +337,71 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(proposal["proposal_id"], str) or not proposal["proposal_id"]:
         raise GovernedLoopError("proposal_id is required")
     _sha256(proposal["proposal_fingerprint"], field="proposal_fingerprint")
+
+    ledger = exact_object(
+        components["human_review_ledger"],
+        {
+            "verification",
+            "ledger_id",
+            "record_count",
+            "state",
+            "current_decision_id",
+            "current_decision_type",
+            "current_decision_fingerprint",
+            "approval_status",
+            "application_status",
+            "stale",
+            "expired",
+            "policy_fingerprint",
+            "reviewer_scope_fingerprint",
+            "manifest_fingerprint",
+            "summary_fingerprint",
+        },
+        field="components.human_review_ledger",
+    )
+    if ledger["verification"] != "PASSED":
+        raise GovernedLoopError("human review ledger verification did not pass")
+    if ledger["ledger_id"] != "RTS-HUMAN-REVIEW-LEDGER-000001":
+        raise GovernedLoopError("human review ledger identifier mismatch")
+    record_count = _integer(ledger["record_count"], field="human review record_count")
+    if ledger["application_status"] != "NOT_APPLIED":
+        raise GovernedLoopError("human review ledger application authority widened")
+    for field in ("stale", "expired"):
+        if not isinstance(ledger[field], bool):
+            raise GovernedLoopError(f"human review ledger {field} must be boolean")
+    for field in (
+        "policy_fingerprint",
+        "reviewer_scope_fingerprint",
+        "manifest_fingerprint",
+        "summary_fingerprint",
+    ):
+        _sha256(ledger[field], field=f"human review ledger {field}")
+    if record_count == 0:
+        if (
+            ledger["state"] != "NO_DECISIONS"
+            or ledger["current_decision_id"] is not None
+            or ledger["current_decision_type"] is not None
+            or ledger["current_decision_fingerprint"] is not None
+            or ledger["approval_status"] != "NOT_APPROVED"
+            or ledger["stale"] is not False
+            or ledger["expired"] is not False
+        ):
+            raise GovernedLoopError("empty human review ledger boundary widened")
+    else:
+        if not isinstance(ledger["current_decision_id"], str) or not ledger["current_decision_id"]:
+            raise GovernedLoopError("human review current_decision_id is required")
+        if ledger["current_decision_type"] not in {
+            "APPROVE", "REJECT", "RETURN_FOR_REVISION", "EXPIRE", "SUPERSEDE"
+        }:
+            raise GovernedLoopError("human review current_decision_type mismatch")
+        _sha256(
+            ledger["current_decision_fingerprint"],
+            field="human review current_decision_fingerprint",
+        )
+        if ledger["approval_status"] not in {"APPROVED", "NOT_APPROVED"}:
+            raise GovernedLoopError("human review approval status mismatch")
+        if (ledger["stale"] or ledger["expired"]) and ledger["approval_status"] != "NOT_APPROVED":
+            raise GovernedLoopError("stale or expired human review evidence remained approved")
 
     evidence = exact_object(record["evidence_summary"], EVIDENCE_FIELDS, field="evidence_summary")
     for field in sorted(EVIDENCE_FIELDS):

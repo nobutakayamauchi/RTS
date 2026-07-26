@@ -33,6 +33,11 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(loop["state"], "FOCUS")
         self.assertEqual(loop["recommendation_action"], "CONTINUE_OR_VERIFY_ACTIVE_ITEM")
         self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000009")
+        ledger = run["components"]["human_review_ledger"]
+        self.assertEqual(ledger["record_count"], 0)
+        self.assertEqual(ledger["state"], "NO_DECISIONS")
+        self.assertEqual(ledger["approval_status"], "NOT_APPROVED")
+        self.assertEqual(ledger["application_status"], "NOT_APPLIED")
         self.assertTrue(run["authority"]["read_only"])
         for field in (
             "external_execution_performed",
@@ -91,6 +96,13 @@ class GovernedLoopTests(unittest.TestCase):
         run["components"]["read_only_loop"]["wip_count"] += 1
         self.resign(run)
         with self.assertRaisesRegex(GovernedLoopError, "wip_count does not match"):
+            validate_record(run)
+
+    def test_human_review_application_authority_cannot_widen(self) -> None:
+        run = generate_run(self.root)
+        run["components"]["human_review_ledger"]["application_status"] = "APPLIED"
+        self.resign(run)
+        with self.assertRaisesRegex(GovernedLoopError, "application authority widened"):
             validate_record(run)
 
     def test_proposal_remains_pending_and_not_applied(self) -> None:

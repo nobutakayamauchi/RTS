@@ -18,12 +18,27 @@
     "authority"
   ],
   "properties": {
-    "schema_version": {"const": "RTS-GOVERNED-LOOP-RUN-V1"},
-    "run_id": {"type": "string", "pattern": "^RTS-LOOP-RUN-[0-9A-F]{16}$"},
-    "run_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "mode": {"const": "ONE_SHOT_READ_ONLY"},
-    "status": {"const": "RECONSTRUCTED"},
-    "as_of": {"type": "string", "minLength": 1},
+    "schema_version": {
+      "const": "RTS-GOVERNED-LOOP-RUN-V1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^RTS-LOOP-RUN-[0-9A-F]{16}$"
+    },
+    "run_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mode": {
+      "const": "ONE_SHOT_READ_ONLY"
+    },
+    "status": {
+      "const": "RECONSTRUCTED"
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 1
+    },
     "verification_order": {
       "const": [
         "asset_manifest",
@@ -31,7 +46,8 @@
         "execution_controller",
         "outcome_evidence",
         "skill_regression",
-        "learning_proposals"
+        "learning_proposals",
+        "human_review_ledger"
       ]
     },
     "source_fingerprints": {
@@ -40,10 +56,19 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "sha256"],
+        "required": [
+          "path",
+          "sha256"
+        ],
         "properties": {
-          "path": {"type": "string", "minLength": 1},
-          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
         }
       }
     },
@@ -56,7 +81,8 @@
         "execution_controller",
         "outcome_evidence",
         "skill_regression",
-        "learning_proposal"
+        "learning_proposal",
+        "human_review_ledger"
       ],
       "properties": {
         "asset_manifest": {
@@ -71,12 +97,29 @@
             "repository_count"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "snapshot_version": {"type": "integer", "minimum": 1},
-            "snapshot_path": {"type": "string", "minLength": 1},
-            "snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-            "asset_count": {"type": "integer", "minimum": 1},
-            "repository_count": {"type": "integer", "minimum": 1}
+            "verification": {
+              "const": "PASSED"
+            },
+            "snapshot_version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "snapshot_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "snapshot_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "asset_count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "repository_count": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         },
         "read_only_loop": {
@@ -94,15 +137,44 @@
             "recommendation_item_id"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "evaluation_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-            "authority": {"const": "ADVISORY_ONLY"},
-            "state": {"type": "string", "minLength": 1},
-            "audit_level": {"type": "string", "minLength": 1},
-            "wip_count": {"type": "integer", "minimum": 0},
-            "active_item_ids": {"type": "array", "items": {"type": "string"}},
-            "recommendation_action": {"type": "string", "minLength": 1},
-            "recommendation_item_id": {"type": ["string", "null"]}
+            "verification": {
+              "const": "PASSED"
+            },
+            "evaluation_id": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "authority": {
+              "const": "ADVISORY_ONLY"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            },
+            "audit_level": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wip_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "active_item_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "recommendation_action": {
+              "type": "string",
+              "minLength": 1
+            },
+            "recommendation_item_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         },
         "execution_controller": {
@@ -115,9 +187,15 @@
             "outcome_links"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "execution_scope": {"const": "LOCAL_DRY_RUN_ONLY"},
-            "external_execution_performed": {"const": false},
+            "verification": {
+              "const": "PASSED"
+            },
+            "execution_scope": {
+              "const": "LOCAL_DRY_RUN_ONLY"
+            },
+            "external_execution_performed": {
+              "const": false
+            },
             "outcome_links": {
               "type": "array",
               "minItems": 1,
@@ -134,13 +212,36 @@
                   "outcome_classification"
                 ],
                 "properties": {
-                  "bundle_id": {"type": "string", "minLength": 1},
-                  "bundle_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-                  "plan_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-                  "authorization_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-                  "terminal_state": {"type": "string", "minLength": 1},
-                  "execution_scope": {"const": "SIMULATED_ONLY"},
-                  "outcome_classification": {"enum": ["VERIFIED", "UNVERIFIED", "ASSUMED"]}
+                  "bundle_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bundle_fingerprint": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "plan_fingerprint": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "authorization_fingerprint": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "terminal_state": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "execution_scope": {
+                    "const": "SIMULATED_ONLY"
+                  },
+                  "outcome_classification": {
+                    "enum": [
+                      "VERIFIED",
+                      "UNVERIFIED",
+                      "ASSUMED"
+                    ]
+                  }
                 }
               }
             }
@@ -159,20 +260,44 @@
             "promotion_eligibility"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "bundle_count": {"type": "integer", "minimum": 3},
-            "bundle_ids": {"type": "array", "minItems": 3, "items": {"type": "string"}},
+            "verification": {
+              "const": "PASSED"
+            },
+            "bundle_count": {
+              "type": "integer",
+              "minimum": 3
+            },
+            "bundle_ids": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "type": "string"
+              }
+            },
             "bundle_fingerprints": {
               "type": "array",
               "minItems": 3,
-              "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
             },
             "classifications": {
               "type": "array",
-              "items": {"enum": ["VERIFIED", "UNVERIFIED", "ASSUMED"]}
+              "items": {
+                "enum": [
+                  "VERIFIED",
+                  "UNVERIFIED",
+                  "ASSUMED"
+                ]
+              }
             },
-            "execution_scope": {"const": "SIMULATED_ONLY"},
-            "promotion_eligibility": {"const": "NOT_ELIGIBLE"}
+            "execution_scope": {
+              "const": "SIMULATED_ONLY"
+            },
+            "promotion_eligibility": {
+              "const": "NOT_ELIGIBLE"
+            }
           }
         },
         "skill_regression": {
@@ -190,15 +315,38 @@
             "candidate_pass_rate"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "dataset_id": {"type": "string", "minLength": 1},
-            "result_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-            "recommendation": {"const": "RESEARCH_READY"},
-            "promotion_eligibility": {"const": "NOT_ELIGIBLE"},
-            "regressions": {"const": 0},
-            "improvements": {"type": "integer", "minimum": 0},
-            "safety_failures": {"const": 0},
-            "candidate_pass_rate": {"type": "number", "minimum": 0, "maximum": 1}
+            "verification": {
+              "const": "PASSED"
+            },
+            "dataset_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "result_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recommendation": {
+              "const": "RESEARCH_READY"
+            },
+            "promotion_eligibility": {
+              "const": "NOT_ELIGIBLE"
+            },
+            "regressions": {
+              "const": 0
+            },
+            "improvements": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "safety_failures": {
+              "const": 0
+            },
+            "candidate_pass_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           }
         },
         "learning_proposal": {
@@ -215,14 +363,123 @@
             "application_status"
           ],
           "properties": {
-            "verification": {"const": "PASSED"},
-            "proposal_id": {"type": "string", "minLength": 1},
-            "proposal_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-            "proposal_status": {"const": "REVIEW_REQUIRED"},
-            "review_status": {"const": "PENDING"},
-            "recommendation": {"const": "REQUEST_HUMAN_REVIEW"},
-            "approval_status": {"const": "NOT_APPROVED"},
-            "application_status": {"const": "NOT_APPLIED"}
+            "verification": {
+              "const": "PASSED"
+            },
+            "proposal_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "proposal_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "proposal_status": {
+              "const": "REVIEW_REQUIRED"
+            },
+            "review_status": {
+              "const": "PENDING"
+            },
+            "recommendation": {
+              "const": "REQUEST_HUMAN_REVIEW"
+            },
+            "approval_status": {
+              "const": "NOT_APPROVED"
+            },
+            "application_status": {
+              "const": "NOT_APPLIED"
+            }
+          }
+        },
+        "human_review_ledger": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verification",
+            "ledger_id",
+            "record_count",
+            "state",
+            "current_decision_id",
+            "current_decision_type",
+            "current_decision_fingerprint",
+            "approval_status",
+            "application_status",
+            "stale",
+            "expired",
+            "policy_fingerprint",
+            "reviewer_scope_fingerprint",
+            "manifest_fingerprint",
+            "summary_fingerprint"
+          ],
+          "properties": {
+            "verification": {
+              "const": "PASSED"
+            },
+            "ledger_id": {
+              "const": "RTS-HUMAN-REVIEW-LEDGER-000001"
+            },
+            "record_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "state": {
+              "enum": [
+                "NO_DECISIONS",
+                "CURRENT_DECISION",
+                "STALE_DECISION",
+                "EXPIRED_DECISION"
+              ]
+            },
+            "current_decision_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "current_decision_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "current_decision_fingerprint": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "approval_status": {
+              "enum": [
+                "APPROVED",
+                "NOT_APPROVED"
+              ]
+            },
+            "application_status": {
+              "const": "NOT_APPLIED"
+            },
+            "stale": {
+              "type": "boolean"
+            },
+            "expired": {
+              "type": "boolean"
+            },
+            "policy_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "reviewer_scope_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "manifest_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "summary_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
           }
         }
       }
@@ -230,12 +487,45 @@
     "evidence_summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["confirmed_facts", "assumptions", "unverified_claims", "risks"],
+      "required": [
+        "confirmed_facts",
+        "assumptions",
+        "unverified_claims",
+        "risks"
+      ],
       "properties": {
-        "confirmed_facts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-        "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-        "unverified_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-        "risks": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        "confirmed_facts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unverified_claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "risks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
     "authority": {
@@ -253,15 +543,33 @@
         "automatic_rollback_authorized"
       ],
       "properties": {
-        "read_only": {"const": true},
-        "external_execution_performed": {"const": false},
-        "scheduler_authorized": {"const": false},
-        "provider_authorized": {"const": false},
-        "adjacent_repository_write_authorized": {"const": false},
-        "skill_mutation_authorized": {"const": false},
-        "approval_status": {"const": "NOT_APPROVED"},
-        "application_status": {"const": "NOT_APPLIED"},
-        "automatic_rollback_authorized": {"const": false}
+        "read_only": {
+          "const": true
+        },
+        "external_execution_performed": {
+          "const": false
+        },
+        "scheduler_authorized": {
+          "const": false
+        },
+        "provider_authorized": {
+          "const": false
+        },
+        "adjacent_repository_write_authorized": {
+          "const": false
+        },
+        "skill_mutation_authorized": {
+          "const": false
+        },
+        "approval_status": {
+          "const": "NOT_APPROVED"
+        },
+        "application_status": {
+          "const": "NOT_APPLIED"
+        },
+        "automatic_rollback_authorized": {
+          "const": false
+        }
       }
     }
   }

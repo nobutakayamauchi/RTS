@@ -7,6 +7,7 @@ from typing import Any
 
 from asset_manifest.core import load_current_snapshot, verify as verify_asset_manifest
 from execution_controller.cli import command_verify as verify_execution_controller
+from human_review_ledger.corpus import verify_all as verify_human_review_ledger
 from learning_proposals.corpus import verify_all as verify_learning_proposals
 from loop_core.core import evaluate
 from loop_core.models import validate_evaluation
@@ -30,6 +31,15 @@ SOURCE_PATHS = (
     "freezer/index/items.json",
     "freezer/index/build_priority.json",
     "governed_loop/schemas/loop_run.schema.json",
+    "human_review_ledger/policy/v1.json",
+    "human_review_ledger/reviewer_scopes/default.json",
+    "human_review_ledger/ledger/manifest.json",
+    "human_review_ledger/ledger/current.json",
+    "human_review_ledger/schemas/decision.schema.json",
+    "human_review_ledger/schemas/policy.schema.json",
+    "human_review_ledger/schemas/reviewer_scope.schema.json",
+    "human_review_ledger/schemas/manifest.schema.json",
+    "human_review_ledger/schemas/current_summary.schema.json",
     "outcome_evidence/examples/escalation.json",
     "outcome_evidence/examples/recovery.json",
     "outcome_evidence/examples/success.json",
@@ -81,6 +91,7 @@ def _verify_sources(root: Path) -> dict[str, Any]:
     outcome = corpus_summary(root)
     regression = verify_skill_regression(root)
     proposal = verify_learning_proposals(root)
+    human_review = verify_human_review_ledger(root)
     return {
         "asset_snapshot": asset_snapshot,
         "loop_evaluation": first_evaluation,
@@ -88,6 +99,7 @@ def _verify_sources(root: Path) -> dict[str, Any]:
         "outcome_summary": outcome,
         "regression_summary": regression,
         "proposal_summary": proposal,
+        "human_review_summary": human_review,
     }
 
 
@@ -107,6 +119,7 @@ def generate_run(root: Path) -> dict[str, Any]:
     outcome = sources["outcome_summary"]
     regression = sources["regression_summary"]
     proposal = sources["proposal_summary"]
+    human_review = sources["human_review_summary"]
 
     outcome_links = [
         {
@@ -188,14 +201,32 @@ def generate_run(root: Path) -> dict[str, Any]:
                 "approval_status": proposal["approval_status"],
                 "application_status": proposal["application_status"],
             },
+            "human_review_ledger": {
+                "verification": "PASSED",
+                "ledger_id": human_review["ledger_id"],
+                "record_count": human_review["record_count"],
+                "state": human_review["state"],
+                "current_decision_id": human_review["current_decision_id"],
+                "current_decision_type": human_review["current_decision_type"],
+                "current_decision_fingerprint": human_review["current_decision_fingerprint"],
+                "approval_status": human_review["approval_status"],
+                "application_status": human_review["application_status"],
+                "stale": human_review["stale"],
+                "expired": human_review["expired"],
+                "policy_fingerprint": human_review["policy_fingerprint"],
+                "reviewer_scope_fingerprint": human_review["reviewer_scope_fingerprint"],
+                "manifest_fingerprint": human_review["manifest_fingerprint"],
+                "summary_fingerprint": human_review["summary_fingerprint"],
+            },
         },
         "evidence_summary": {
             "confirmed_facts": [
-                "all six repository-local component verification stages passed in the fixed governed order",
+                "all seven repository-local component verification stages passed in the fixed governed order",
                 "the current loop evaluation observed exactly the active items recorded in the FREEZER index",
                 "three governed outcome bundles remain linked to exact controller plan and authorization fingerprints",
                 "the deterministic Skill regression result contains zero regressions and zero safety failures",
                 "the learning proposal and pending review remain reconstructable from exact committed sources",
+                "the Human Review Ledger verifies as an empty non-authorizing append-only ledger with no manufactured human decision",
             ],
             "assumptions": [
                 "repository-local component verification is sufficient for the bounded one-shot integration claim",
