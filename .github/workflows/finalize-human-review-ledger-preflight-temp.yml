@@ -1,0 +1,97 @@
+name: Finalize Human Review Ledger Preflight Temp
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-human-review-ledger-preflight-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feature/preflight-human-review-ledger' &&
+      github.actor == 'nobutakayamauchi'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify expected base and temporary inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          test "$(git merge-base HEAD origin/main)" = "4278c4c707fc9c37001694e06ad2f321b8eab6f2"
+          test -f .github/scripts/generate_human_review_ledger_preflight.py
+          test -f .github/workflows/human-review-ledger-preflight-candidate.yml
+          test -f .github/workflows/finalize-human-review-ledger-preflight-temp.yml
+      - name: Generate exact preflight candidate
+        run: python .github/scripts/generate_human_review_ledger_preflight.py
+      - name: Verify generated governed state
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m asset_manifest.cli verify
+          python -m loop_core.cli verify
+          python -m execution_controller.cli verify
+          python -m outcome_evidence.cli verify
+          python -m skill_regression.cli verify
+          python -m learning_proposals.cli verify
+          python -m governed_loop.cli verify
+          python -B -m unittest discover -s tests -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m governed_loop.cli verify
+      - name: Remove temporary machinery and audit final diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf human-review-ledger-preflight-candidate
+          rm .github/scripts/generate_human_review_ledger_preflight.py
+          rm .github/workflows/human-review-ledger-preflight-candidate.yml
+          rm .github/workflows/finalize-human-review-ledger-preflight-temp.yml
+          git add -A
+          git diff --cached --name-only > /tmp/changed.txt
+          cat > /tmp/expected.txt <<'EOF'
+          docs/implementation/HUMAN_REVIEW_LEDGER_V1_PREFLIGHT_TASK.md
+          freezer/index/build_priority.json
+          freezer/index/items.json
+          freezer/index/priority.json
+          freezer/manifests/manifest.sha256
+          freezer/preflights/RTS-FRZ-000009/current.json
+          freezer/preflights/RTS-FRZ-000009/pf001.json
+          governed_loop/runs/current.json
+          EOF
+          sort -o /tmp/changed.txt /tmp/changed.txt
+          sort -o /tmp/expected.txt /tmp/expected.txt
+          diff -u /tmp/expected.txt /tmp/changed.txt
+          test "$(python - <<'PY'
+          import json
+          print(json.load(open('freezer/preflights/RTS-FRZ-000009/pf001.json'))['outcome'])
+          PY
+          )" = PASS
+          test "$(python - <<'PY'
+          import json
+          print(json.load(open('freezer/items/RTS-FRZ-000009/v001.json'))['build_authority'])
+          PY
+          )" = NOT_APPROVED
+      - name: Commit exact final candidate to PR branch
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Finalize PASS preflight for Human Review Ledger v1'
+          git push origin "HEAD:${HEAD_REF}"
