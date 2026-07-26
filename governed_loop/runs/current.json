@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-26T04:31:00Z",
+  "as_of": "2026-07-26T05:12:38Z",
   "authority": {
     "adjacent_repository_write_authorized": false,
     "application_status": "NOT_APPLIED",
@@ -103,17 +103,15 @@
       "verification": "PASSED"
     },
     "read_only_loop": {
-      "active_item_ids": [
-        "RTS-FRZ-000009"
-      ],
+      "active_item_ids": [],
       "audit_level": "NORMAL",
       "authority": "ADVISORY_ONLY",
-      "evaluation_id": "2be30dedf28a8b62741112b5ebff0e5ada25e7b119e05f551440edb837dd07d0",
-      "recommendation_action": "CONTINUE_OR_VERIFY_ACTIVE_ITEM",
-      "recommendation_item_id": "RTS-FRZ-000009",
-      "state": "FOCUS",
+      "evaluation_id": "51d40213ae3d40c0fb7f345fff7baa80590cc6a7720b388bfa1d40039578f33c",
+      "recommendation_action": "REQUEST_HUMAN_APPROVAL",
+      "recommendation_item_id": "RTS-FRZ-000003",
+      "state": "NORMAL",
       "verification": "PASSED",
-      "wip_count": 1
+      "wip_count": 0
     },
     "skill_regression": {
       "candidate_pass_rate": 1.0,
@@ -152,8 +150,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "a54a92f642f86cd3d396d0d081e60de35cc8bd88613641f812153d953fbca5ae",
-  "run_id": "RTS-LOOP-RUN-A54A92F642F86CD3",
+  "run_fingerprint": "42a7e41bf524e57aad3f10e3ffd83c84b7665fe662b78c6ac61456141401b362",
+  "run_id": "RTS-LOOP-RUN-42A7E41BF524E57A",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -174,11 +172,11 @@
     },
     {
       "path": "freezer/index/build_priority.json",
-      "sha256": "75e02eb4a69e60db54a73266ce01c19dd33a9ed1e118cc0a226b2c6b226e8a93"
+      "sha256": "5fb11f8636efacc9cb8172c77e701242d76720526deb790bc75948fa90d4543f"
     },
     {
       "path": "freezer/index/items.json",
-      "sha256": "302333a673165423a2b1930e7df804b04fb8e3ad1a01133aba2c4db628160485"
+      "sha256": "92f40c90159bc19a50c51d28fe4434187694a58f9d74c19dc8cced894a894f7f"
     },
     {
       "path": "governed_loop/schemas/loop_run.schema.json",
