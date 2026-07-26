@@ -23,36 +23,10 @@ def revise(item_id: str, name: str, changes: dict) -> dict:
 preview_verified = revise("RTS-FRZ-000010", "preview-verified.json", {"status": "VERIFIED"})
 preview_completed = revise("RTS-FRZ-000010", "preview-completed.json", {"status": "COMPLETED"})
 
-parent_changes = {
-    "status": "VERIFIED",
-    "summary": "Completed parent integration for the governed one-shot loop: deterministic asset discovery, advisory work selection, bounded dry-run control, outcome evidence, regression analysis, proposal generation, append-only human review, non-applying promotion preview, and a verified pilot seed/run contract.",
-    "dependencies": [
-        "RTS-FRZ-000004",
-        "RTS-FRZ-000005",
-        "RTS-FRZ-000006",
-        "RTS-FRZ-000007",
-        "RTS-FRZ-000008",
-        "RTS-FRZ-000009",
-        "RTS-FRZ-000010"
-    ],
-    "source_refs": [
-        "asset_manifest/snapshots/current.json",
-        "execution_controller/README.md",
-        "governed_loop/runs/current.json",
-        "human_review_ledger/ledger/current.json",
-        "learning_proposals/proposals/feature-build-v1.json",
-        "outcome_evidence/examples/success.json",
-        "pilot_run_contract/examples/value-discovery-case-001.json",
-        "promotion_application_preview/previews/current.json",
-        "skill_regression/results/feature-build-v1.json"
-    ],
-    "possible_destinations": [
-        "CASE-001 governed practical test",
-        "RTS repository-local governed pilot loop",
-        "future separately approved provider and repository adapters"
-    ]
-}
-parent_verified = revise("RTS-FRZ-000003", "parent-verified.json", parent_changes)
+# Parent completion changes only lifecycle state. The exact integrated child and
+# pilot-entry evidence is recorded in the separate completion document so the
+# existing evidence-backed Assessment remains current.
+parent_verified = revise("RTS-FRZ-000003", "parent-verified.json", {"status": "VERIFIED"})
 parent_completed = revise("RTS-FRZ-000003", "parent-completed.json", {"status": "COMPLETED"})
 
 # The completion state has no active WIP. Preserve safety assertions while avoiding
@@ -108,6 +82,10 @@ asset discovery
 - WIP: `1`
 - human gate: required
 - execution/provider/publication/target-write authority: not authorized
+
+## Completion evidence
+
+The parent is closed by the independently verified child packages and the canonical eight-stage governed-loop fixture. The parent item body is not substantively rewritten during completion, preserving the current Build Assessment fingerprint. This document records the integrated result and practical-test entry point.
 
 ## Preserved boundary
 
