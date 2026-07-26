@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 from pathlib import Path
 
-from pilot_run_contract.models import validate_seed
-
 ROOT = Path(__file__).resolve().parent
+REPOSITORY_ROOT = ROOT.parents[2]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+from pilot_run_contract.models import validate_seed
 
 
 def validate_manifest() -> None:
