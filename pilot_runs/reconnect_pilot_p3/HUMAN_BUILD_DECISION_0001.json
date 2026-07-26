@@ -1,0 +1,45 @@
+{
+  "allowed_writes": [
+    "proof_engine_pilot/**",
+    "pilot_runs/reconnect_pilot_p3/**",
+    "tests/test_proof_engine_pilot.py",
+    ".github/workflows/proof-engine-pilot-tests.yml"
+  ],
+  "decision": "APPROVE_P3_BUILD",
+  "decision_fingerprint": "ceaacd2f36ab9a6d2f39c20de677da3a63c12bcb8a35a4c9046380a124721cfc",
+  "decision_id": "RECONNECT-P3-BUILD-DECISION-0001",
+  "implementation_target": "RTS/proof_engine_pilot",
+  "maximum_scope": [
+    "fixed public source loader",
+    "deterministic 10+ candidate generator",
+    "evidence links",
+    "contribution maps",
+    "value assessments",
+    "human review queue",
+    "blocked NOT_PUBLISHED output draft",
+    "manifest/checkpoint",
+    "focused and full tests"
+  ],
+  "next_stop": "After candidate generation and verification, before any candidate approval or public output.",
+  "prohibited": [
+    "automatic approval",
+    "publication",
+    "outreach",
+    "contracts",
+    "provider calls",
+    "external execution",
+    "adjacent repository writes",
+    "private data",
+    "multi-repository ingestion",
+    "human ranking"
+  ],
+  "reason": "The source boundary is exact, public, reversible, useful for both product validation and a future manual report, and bounded enough for one-person development.",
+  "recorded_from": "Explicit instruction to apply the stated judgment criteria, decide, and continue",
+  "schema_version": "RTS-RECONNECT-P3-BUILD-DECISION-V1",
+  "source_boundary": {
+    "prs": [242, 261],
+    "repository": "nobutakayamauchi/RTS",
+    "snapshot_ref": "575c9c5ebaef34dfb7e8e1510e2b0efb3a1b73c4"
+  },
+  "status": "APPROVED"
+}
