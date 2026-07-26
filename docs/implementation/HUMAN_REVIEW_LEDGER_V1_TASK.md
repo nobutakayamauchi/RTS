@@ -32,9 +32,11 @@ There is no command to create, approve, apply, merge, mutate, publish, or send a
 - manifest file digests and head linkage
 - exact policy and reviewer-scope fingerprints
 - explicit `HUMAN` authorship assertion and identity source
-- reviewer differs from proposer and implementer
+- reviewer differs from the proposer identity derived from the governed proposal and the implementer identity pinned by policy
+- unmanifested decision files are rejected rather than ignored
 - `APPROVE`, `REJECT`, `RETURN_FOR_REVISION`, `EXPIRE`, and `SUPERSEDE`
-- expiry and stale-source invalidation
+- elapsed approval expiry is evaluated during ordinary summary and verification, not only with an explicit test clock
+- stale-source invalidation
 - privacy and repository path safety
 - all application, mutation, merge, adjacent-write, and external-action authority remains false
 - governed-loop linkage remains read-only and `NOT_APPLIED`
