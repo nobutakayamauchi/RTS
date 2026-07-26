@@ -14,6 +14,8 @@ adjacent_repository_write_authorized: false
 
 The preview describes one proposed target-file replacement, its expected before/after hashes, prerequisites, blockers, validation steps, stop conditions, and rollback reference. It never writes, patches, commits, merges, publishes, deploys, messages, schedules, or mutates a target.
 
+The published JSON Schema mirrors the Python contract at every nested boundary: all governed source fingerprints, target identifiers, operation, before/after hashes, rollback fields, and non-authorizing authority constants are required and additional properties are rejected.
+
 ## Commands
 
 ```text
