@@ -1,15 +1,1 @@
-{
-  "approved_asset_count": 6,
-  "checkpoint_fingerprint": "6a6a1b168388481e3678c286b880c0671605815699fab1b0ec19fdfeaebf1eba",
-  "checkpoint_id": "PROOF-ENGINE-ASSET-REVIEW-CHECKPOINT-0005",
-  "decision_index_fingerprint": "213b3d9951d88b6cc6cb293666decc1904ab7a48fc3b59e4ef674842f847199a",
-  "external_actions_performed": false,
-  "next_action": "Generate six public-wording drafts without publishing them.",
-  "original_internal_assets_preserved": true,
-  "publication_performed": false,
-  "review_round_id": "PROOF-ENGINE-ASSET-REVIEW-ROUND-0001",
-  "schema_version": "PROOF-ENGINE-ASSET-REVIEW-CHECKPOINT-V1",
-  "source_draft_fingerprint": "e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834",
-  "state": "PUBLIC_WORDING_DRAFT_READY",
-  "summary_fingerprint": "f8ad36065bb4968e4e09db9e8774e0b1ad4d9824ac76c29f6a30b7e259f3fc36"
-}
+{"approved_asset_count":6,"checkpoint_fingerprint":"c2c627adad66fc522b908d6c8a967b3d6568bfb47e1a0e727467221d5e1c3388","checkpoint_id":"PROOF-ENGINE-ASSET-REVIEW-CHECKPOINT-0005","decision_index_fingerprint":"f7ab3e18fa7fb64c1593400c2f3dfd06326fdc36462af51f9efc150cfb13a78b","external_actions_performed":false,"next_action":"Generate six public-wording drafts without publishing them.","original_internal_assets_preserved":true,"publication_performed":false,"review_round_id":"PROOF-ENGINE-ASSET-REVIEW-ROUND-0001","schema_version":"PROOF-ENGINE-ASSET-REVIEW-CHECKPOINT-V1","source_draft_fingerprint":"e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834","state":"PUBLIC_WORDING_DRAFT_READY","summary_fingerprint":"d640a781fdbda40dd281f4406a910f2e34d490cedb61834e5882e6de5809a91e"}
