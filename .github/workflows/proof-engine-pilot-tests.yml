@@ -11,6 +11,7 @@ on:
       - "tests/test_proof_engine_asset_draft.py"
       - "tests/test_proof_engine_asset_review.py"
       - "tests/test_proof_engine_public_wording.py"
+      - "tests/test_proof_engine_publication_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -23,6 +24,7 @@ on:
       - "tests/test_proof_engine_asset_draft.py"
       - "tests/test_proof_engine_asset_review.py"
       - "tests/test_proof_engine_public_wording.py"
+      - "tests/test_proof_engine_publication_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -92,6 +94,12 @@ jobs:
           assert draft['draft_fingerprint'] == manifest['expected_draft_fingerprint']
           assert fingerprint(markdown) == manifest['expected_markdown_fingerprint']
           PY
+      - name: Verify delegated publication wording review
+        run: |
+          python -B -m proof_engine_pilot.publication_review_cli verify
+          python -B -m proof_engine_pilot.publication_review_cli summary
+          python -B -m proof_engine_pilot.publication_review_cli effective > /tmp/proof-engine-effective-public-wording.json
+          python -B -m proof_engine_pilot.publication_review_cli release-template > /tmp/proof-engine-release-template.json
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
@@ -100,5 +108,6 @@ jobs:
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_draft.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_public_wording.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_publication_review.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
