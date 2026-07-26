@@ -1,0 +1,46 @@
+name: Loop Engine Pilot Completion Candidate
+
+on:
+  pull_request:
+    paths:
+      - "pilot_run_contract/**"
+      - "scripts/tmp_complete_loop_engine_pilot.py"
+      - ".github/workflows/loop-engine-pilot-completion-candidate.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate lifecycle completion and pilot entry state
+        run: PYTHONPATH=. python -B scripts/tmp_complete_loop_engine_pilot.py
+      - name: Verify completed governed state
+        run: |
+          python -B -m freezer.cli verify
+          python -B -m freezer.build_assessment verify
+          python -B -m freezer.preflight verify
+          python -B -m pilot_run_contract.cli verify
+          python -B -m promotion_application_preview.cli verify
+          python -B -m governed_loop.cli verify
+          python -B -m unittest discover -s tests -p 'test_pilot_run_contract.py' -v
+          python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
+          python -B -m unittest discover -s tests -v
+      - name: Commit verified completion state
+        run: |
+          rm -f scripts/tmp_complete_loop_engine_pilot.py
+          rm -f .github/workflows/loop-engine-pilot-completion-candidate.yml
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Complete governed loop engine pilot v1"
+          git push
