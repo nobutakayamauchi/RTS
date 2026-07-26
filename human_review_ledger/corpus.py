@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +21,9 @@ from .common import (
 from .models import (
     DECISION_SCHEMA,
     LEDGER_ID,
+    IMPLEMENTER_IDENTITY,
     MANIFEST_SCHEMA,
+    PROPOSER_IDENTITY,
     POLICY_SCHEMA,
     SCOPE_SCHEMA,
     SUMMARY_SCHEMA,
@@ -106,6 +109,8 @@ def current_source_fingerprints(
     rollback = load_json(root / "skill_regression/rollback/feature-build-v1.json")
     if proposal_summary["proposal_fingerprint"] != proposal["proposal_fingerprint"]:
         raise HumanReviewLedgerError("proposal verifier and committed proposal disagree")
+    if proposal.get("generator_identity") != PROPOSER_IDENTITY:
+        raise HumanReviewLedgerError("governed proposal generator identity mismatch")
     outcome_material = [
         {"bundle_id": bundle["bundle_id"], "bundle_fingerprint": bundle["bundle_fingerprint"]}
         for bundle in sorted(bundles, key=lambda row: row["bundle_id"])
@@ -164,6 +169,29 @@ def load_records(
     if not isinstance(manifest_value, dict):
         raise HumanReviewLedgerError("ledger manifest must be an object")
     manifest = validate_manifest(manifest_value)
+    decision_directory = root / DECISIONS_PREFIX
+    actual_paths = (
+        sorted(
+            path.relative_to(root).as_posix()
+            for path in decision_directory.glob("*.json")
+            if path.is_file()
+        )
+        if decision_directory.exists()
+        else []
+    )
+    manifest_paths = [row["path"] for row in manifest["records"]]
+    if actual_paths != manifest_paths:
+        missing = sorted(set(manifest_paths) - set(actual_paths))
+        extras = sorted(set(actual_paths) - set(manifest_paths))
+        raise HumanReviewLedgerError(
+            f"decision directory and manifest disagree; missing={missing}; unmanifested={extras}"
+        )
+    proposal = load_json(root / "learning_proposals/proposals/feature-build-v1.json")
+    if not isinstance(proposal, dict) or proposal.get("generator_identity") != PROPOSER_IDENTITY:
+        raise HumanReviewLedgerError("governed proposal generator identity mismatch")
+    expected_proposer_identity = proposal["generator_identity"]
+    if policy["separation_of_duties"]["implementer_identity"] != IMPLEMENTER_IDENTITY:
+        raise HumanReviewLedgerError("governed implementer identity mismatch")
     records: list[dict[str, Any]] = []
     prior_fingerprint: str | None = None
     decision_ids: set[str] = set()
@@ -179,6 +207,7 @@ def load_records(
             policy=policy,
             scope=scope,
             allow_test_only=allow_test_only,
+            expected_proposer_identity=expected_proposer_identity,
         )
         if decision["sequence"] != row["sequence"]:
             raise HumanReviewLedgerError("manifest and decision sequence disagree")
@@ -226,10 +255,14 @@ def summarize_records(
         current = records[-1]
         stale = current["source_fingerprints"] != source_fingerprints
         expired = current["decision_type"] == "EXPIRE"
-        if as_of is not None and current["expires_at"] is not None:
-            clock = optional_time(as_of, "as_of")
+        clock = (
+            optional_time(as_of, "as_of")
+            if as_of is not None
+            else datetime.now(timezone.utc)
+        )
+        if current["expires_at"] is not None:
             expiry = optional_time(current["expires_at"], "expires_at")
-            expired = bool(clock and expiry and clock >= expiry)
+            expired = expired or bool(clock and expiry and clock >= expiry)
         approval = (
             "APPROVED"
             if current["decision_type"] == "APPROVE" and not stale and not expired

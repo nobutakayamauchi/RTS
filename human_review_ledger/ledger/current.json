@@ -11,7 +11,7 @@
   "application_status": "NOT_APPLIED",
   "stale": false,
   "expired": false,
-  "policy_fingerprint": "c7fe72ae7bce620f0c8a7e6a796b73b55f30326f7a7c79b29e58c18bd4d13502",
+  "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931",
   "reviewer_scope_fingerprint": "873be2309bcfaf446698497a0c54f3bd4208dedda6e789401b1ee45db1f3274f",
-  "summary_fingerprint": "3f8d0ae0443d59f832e2c0b1019e5920b59878934cb28a510a69ac281aac14bd"
+  "summary_fingerprint": "9c19d7de522d32df3ca9b61427804c2b7bde3e0e7a7ba6a5ef21053508e9abd3"
 }

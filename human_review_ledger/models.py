@@ -24,6 +24,8 @@ DECISION_SCHEMA = "RTS-HUMAN-REVIEW-DECISION-V1"
 MANIFEST_SCHEMA = "RTS-HUMAN-REVIEW-LEDGER-MANIFEST-V1"
 SUMMARY_SCHEMA = "RTS-HUMAN-REVIEW-LEDGER-SUMMARY-V1"
 LEDGER_ID = "RTS-HUMAN-REVIEW-LEDGER-000001"
+PROPOSER_IDENTITY = "rts-proposal-generator-v1"
+IMPLEMENTER_IDENTITY = "rts-implementation-agent-v1"
 DECISION_TYPES = {
     "APPROVE",
     "REJECT",
@@ -80,11 +82,20 @@ def validate_policy(record: dict[str, Any]) -> dict[str, Any]:
         raise HumanReviewLedgerError("policy source requirements mismatch")
     duties = exact(
         record["separation_of_duties"],
-        {"reviewer_must_differ_from_proposer", "reviewer_must_differ_from_implementer"},
+        {
+            "reviewer_must_differ_from_proposer",
+            "reviewer_must_differ_from_implementer",
+            "proposer_identity_source",
+            "implementer_identity",
+        },
         "policy.separation_of_duties",
     )
     if duties["reviewer_must_differ_from_proposer"] is not True or duties["reviewer_must_differ_from_implementer"] is not True:
         raise HumanReviewLedgerError("policy separation-of-duties boundary widened")
+    if duties["proposer_identity_source"] != "learning_proposals/proposals/feature-build-v1.json#generator_identity":
+        raise HumanReviewLedgerError("policy proposer identity source mismatch")
+    if duties["implementer_identity"] != IMPLEMENTER_IDENTITY:
+        raise HumanReviewLedgerError("policy implementer identity mismatch")
     expiry = exact(
         record["expiry_rules"],
         {"approve_requires_expiry", "explicit_expire_record_supported", "stale_source_invalidates_current_approval"},
@@ -145,6 +156,7 @@ def validate_decision(
     policy: dict[str, Any],
     scope: dict[str, Any],
     allow_test_only: bool = False,
+    expected_proposer_identity: str = PROPOSER_IDENTITY,
 ) -> dict[str, Any]:
     record = exact(
         record,
@@ -204,9 +216,18 @@ def validate_decision(
     )
     proposer = safe_id(duties["proposer_identity"], "proposer_identity")
     implementer = safe_id(duties["implementer_identity"], "implementer_identity")
-    if duties["reviewer_differs_from_proposer"] is not True or identity == proposer:
+    governed_proposer = safe_id(expected_proposer_identity, "expected_proposer_identity")
+    governed_implementer = safe_id(
+        policy["separation_of_duties"]["implementer_identity"],
+        "policy.separation_of_duties.implementer_identity",
+    )
+    if proposer != governed_proposer:
+        raise HumanReviewLedgerError("declared proposer identity does not match the governed proposal")
+    if implementer != governed_implementer:
+        raise HumanReviewLedgerError("declared implementer identity does not match the governed policy")
+    if duties["reviewer_differs_from_proposer"] is not True or identity == governed_proposer:
         raise HumanReviewLedgerError("reviewer must differ from proposer")
-    if duties["reviewer_differs_from_implementer"] is not True or identity == implementer:
+    if duties["reviewer_differs_from_implementer"] is not True or identity == governed_implementer:
         raise HumanReviewLedgerError("reviewer must differ from implementer")
 
     reviewed_at = optional_time(record["reviewed_at"], "reviewed_at")

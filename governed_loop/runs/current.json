@@ -63,12 +63,12 @@
       "expired": false,
       "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
       "manifest_fingerprint": "e63a67c74fb8ec08d589045f9251c765d77ac1fb8d27f0fd050339a0e01a63c5",
-      "policy_fingerprint": "c7fe72ae7bce620f0c8a7e6a796b73b55f30326f7a7c79b29e58c18bd4d13502",
+      "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931",
       "record_count": 0,
       "reviewer_scope_fingerprint": "873be2309bcfaf446698497a0c54f3bd4208dedda6e789401b1ee45db1f3274f",
       "stale": false,
       "state": "NO_DECISIONS",
-      "summary_fingerprint": "3f8d0ae0443d59f832e2c0b1019e5920b59878934cb28a510a69ac281aac14bd",
+      "summary_fingerprint": "9c19d7de522d32df3ca9b61427804c2b7bde3e0e7a7ba6a5ef21053508e9abd3",
       "verification": "PASSED"
     },
     "learning_proposal": {
@@ -152,8 +152,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "3f92d952809b97fb7a5599d7dd859cda1e4bd442ced895536fa16583ebf40301",
-  "run_id": "RTS-LOOP-RUN-3F92D952809B97FB",
+  "run_fingerprint": "a54a92f642f86cd3d396d0d081e60de35cc8bd88613641f812153d953fbca5ae",
+  "run_id": "RTS-LOOP-RUN-A54A92F642F86CD3",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -186,7 +186,7 @@
     },
     {
       "path": "human_review_ledger/ledger/current.json",
-      "sha256": "e8ce5b7ced18622b76c38b60414bada02a77878965a74772ae2b8ef5954a2ada"
+      "sha256": "fad6a9d0b2050b1bce0f48ffac1384b8b704f74d0b97b11db373b993c622eda4"
     },
     {
       "path": "human_review_ledger/ledger/manifest.json",
@@ -194,7 +194,7 @@
     },
     {
       "path": "human_review_ledger/policy/v1.json",
-      "sha256": "f47c1522858f5c2b4dd1a6280ec302027732187fa0a7ceec768f195b0e266570"
+      "sha256": "c6b827ebf67d299a0a765985cd47bc9708eb11329d05a57c554c1609f9d5142c"
     },
     {
       "path": "human_review_ledger/reviewer_scopes/default.json",
@@ -214,7 +214,7 @@
     },
     {
       "path": "human_review_ledger/schemas/policy.schema.json",
-      "sha256": "985b924f9a20e9900caaa14a1cffeaba5c4991f9a66b78f4f46a6fa686273fc6"
+      "sha256": "fcc5d950c0adf483febfcfd8cd36225188bfd0cd421d72a53d72c5d69a0d9326"
     },
     {
       "path": "human_review_ledger/schemas/reviewer_scope.schema.json",

@@ -24,7 +24,9 @@
   ],
   "separation_of_duties": {
     "reviewer_must_differ_from_proposer": true,
-    "reviewer_must_differ_from_implementer": true
+    "reviewer_must_differ_from_implementer": true,
+    "proposer_identity_source": "learning_proposals/proposals/feature-build-v1.json#generator_identity",
+    "implementer_identity": "rts-implementation-agent-v1"
   },
   "expiry_rules": {
     "approve_requires_expiry": true,
@@ -39,5 +41,5 @@
     "merge_authorized": false,
     "external_action_authorized": false
   },
-  "policy_fingerprint": "c7fe72ae7bce620f0c8a7e6a796b73b55f30326f7a7c79b29e58c18bd4d13502"
+  "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931"
 }

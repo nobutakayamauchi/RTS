@@ -40,7 +40,7 @@ Existing records are immutable. `EXPIRE` and `SUPERSEDE` append a new record tha
 
 ## Identity boundary
 
-The ledger records an asserted human identity and its declared source. Repository-local v1 does not claim cryptographic identity proof. The reviewer must differ from both the proposal generator and the implementation identity, and the allowed reviewer role must exist in the current policy and reviewer-scope records.
+The ledger records an asserted human identity and its declared source. Repository-local v1 does not claim cryptographic identity proof. The reviewer must differ from both the generator identity read from the governed proposal and the implementation identity pinned by the current policy; self-asserted identities in a decision cannot replace those sources. The allowed reviewer role must exist in the current policy and reviewer-scope records.
 
 ## Privacy boundary
 

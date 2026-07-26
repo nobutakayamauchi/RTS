@@ -261,6 +261,56 @@ class HumanReviewLedgerTests(unittest.TestCase):
         self.assertNotIn("apply", help_text)
         self.assertNotIn("approve", help_text)
 
+    def test_forged_proposer_field_cannot_bypass_independence(self) -> None:
+        with self.copied_root() as temporary:
+            root = Path(temporary)
+            record = self.decision(
+                root,
+                sequence=1,
+                decision_type="REJECT",
+                identity="rts-proposal-generator-v1",
+            )
+            record["separation_of_duties"]["proposer_identity"] = "someone-else"
+            record["decision_fingerprint"] = sha256_value(
+                fingerprint_material(record, "decision_fingerprint")
+            )
+            with self.assertRaisesRegex(HumanReviewLedgerError, "governed proposal"):
+                validate_decision(
+                    record,
+                    policy=load_policy(root),
+                    scope=load_scope(root),
+                    allow_test_only=True,
+                )
+
+    def test_unmanifested_decision_file_is_rejected(self) -> None:
+        with self.copied_root() as temporary:
+            root = Path(temporary)
+            record = self.decision(root, sequence=1, decision_type="REJECT")
+            path = root / decision_path(record)
+            write_json(path, record)
+            with self.assertRaisesRegex(HumanReviewLedgerError, "unmanifested"):
+                verify_all(root, allow_test_only=True)
+
+    def test_normal_summary_expires_elapsed_approval(self) -> None:
+        with self.copied_root() as temporary:
+            root = Path(temporary)
+            record = self.decision(root, sequence=1, decision_type="APPROVE")
+            record["reviewed_at"] = "2025-01-01T00:00:00Z"
+            record["expires_at"] = "2025-02-01T00:00:00Z"
+            record["decision_fingerprint"] = sha256_value(
+                fingerprint_material(record, "decision_fingerprint")
+            )
+            policy = load_policy(root)
+            scope = load_scope(root)
+            summary = summarize_records(
+                [record],
+                source_fingerprints=current_source_fingerprints(root, policy=policy, scope=scope),
+                policy=policy,
+                scope=scope,
+            )
+            self.assertEqual(summary["state"], "EXPIRED_DECISION")
+            self.assertEqual(summary["approval_status"], "NOT_APPROVED")
+
     def test_schemas_encode_non_authorizing_constants(self) -> None:
         policy_schema = json.loads(
             (self.root / "human_review_ledger/schemas/policy.schema.json").read_text(encoding="utf-8")
