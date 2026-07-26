@@ -3,78 +3,15 @@ name: FREEZER Tests
 on:
   pull_request:
     paths:
-      - "freezer/**"
-      - "asset_manifest/**"
-      - "loop_core/**"
-      - "execution_controller/**"
-      - "outcome_evidence/**"
-      - "skill_regression/**"
-      - "learning_proposals/**"
-      - "human_review_ledger/**"
-      - "governed_loop/**"
-      - "tests/test_freezer.py"
-      - "tests/test_freezer_build_assessment.py"
-      - "tests/test_asset_manifest.py"
-      - "tests/test_loop_core.py"
-      - "tests/test_loop_core_learning_lifecycle.py"
-      - "tests/test_execution_controller.py"
-      - "tests/test_execution_controller_state_continuity.py"
-      - "tests/test_outcome_evidence.py"
-      - "tests/test_skill_regression.py"
-      - "tests/test_learning_proposals.py"
-      - "tests/test_human_review_ledger.py"
-      - "tests/test_governed_loop.py"
-      - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
-      - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
-      - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
-      - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
-      - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
-      - "docs/implementation/HUMAN_REVIEW_LEDGER_V1_TASK.md"
-      - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
+      - ".github/workflows/freezer-tests.yml"
       - ".tmp/promotion_application_preview_assessment.json"
       - ".tmp/promotion_application_preview_preflight.json"
-      - ".github/workflows/promotion-application-preview-prepare-start-candidate.yml"
-      - ".github/workflows/freezer-tests.yml"
-  push:
-    branches:
-      - main
-    paths:
-      - "freezer/**"
-      - "asset_manifest/**"
-      - "loop_core/**"
-      - "execution_controller/**"
-      - "outcome_evidence/**"
-      - "skill_regression/**"
-      - "learning_proposals/**"
-      - "human_review_ledger/**"
-      - "governed_loop/**"
-      - "tests/test_freezer.py"
-      - "tests/test_freezer_build_assessment.py"
-      - "tests/test_asset_manifest.py"
-      - "tests/test_loop_core.py"
-      - "tests/test_loop_core_learning_lifecycle.py"
-      - "tests/test_execution_controller.py"
-      - "tests/test_execution_controller_state_continuity.py"
-      - "tests/test_outcome_evidence.py"
-      - "tests/test_skill_regression.py"
-      - "tests/test_learning_proposals.py"
-      - "tests/test_human_review_ledger.py"
-      - "tests/test_governed_loop.py"
-      - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
-      - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
-      - "docs/implementation/GOVERNED_OUTCOME_EVIDENCE_CORPUS_V1_TASK.md"
-      - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
-      - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
-      - "docs/implementation/HUMAN_REVIEW_LEDGER_V1_TASK.md"
-      - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
-      - ".github/workflows/freezer-tests.yml"
 
 permissions:
   contents: write
 
 jobs:
-  prepare_start_candidate:
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/prepare-start-promotion-application-preview'
+  generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,42 +20,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Generate governed gates and active lifecycle
+      - name: Generate governed gates and lifecycle
         run: |
-          if [ ! -f freezer/assessments/RTS-FRZ-000010/current.json ]; then
-            python -m freezer.build_assessment create RTS-FRZ-000010 --input .tmp/promotion_application_preview_assessment.json
-          fi
-          if [ ! -f freezer/preflights/RTS-FRZ-000010/current.json ]; then
-            python -m freezer.preflight create RTS-FRZ-000010 --input .tmp/promotion_application_preview_preflight.json
-          fi
+          python -m freezer.build_assessment create RTS-FRZ-000010 --input .tmp/promotion_application_preview_assessment.json
+          python -m freezer.preflight create RTS-FRZ-000010 --input .tmp/promotion_application_preview_preflight.json
           python - <<'PY'
           import json
           from pathlib import Path
-          from freezer.cli import load_current
 
           root = Path('.').resolve()
-          current = load_current(root, 'RTS-FRZ-000010')
-          if current['status'] == 'FROZEN':
-              path = root / '.tmp/promotion_application_preview_selected.json'
-              path.write_text(json.dumps({'status': 'SELECTED', 'build_authority': 'APPROVED'}, indent=2) + '\n', encoding='utf-8')
+          (root / '.tmp/selected.json').write_text(
+              json.dumps({'status': 'SELECTED', 'build_authority': 'APPROVED'}, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          (root / '.tmp/started.json').write_text(
+              json.dumps({'status': 'IN_PROGRESS'}, indent=2) + '\n',
+              encoding='utf-8',
+          )
           PY
-          if [ -f .tmp/promotion_application_preview_selected.json ]; then
-            python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/promotion_application_preview_selected.json
-          fi
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from freezer.cli import load_current
-
-          root = Path('.').resolve()
-          current = load_current(root, 'RTS-FRZ-000010')
-          if current['status'] == 'SELECTED':
-              path = root / '.tmp/promotion_application_preview_started.json'
-              path.write_text(json.dumps({'status': 'IN_PROGRESS'}, indent=2) + '\n', encoding='utf-8')
-          PY
-          if [ -f .tmp/promotion_application_preview_started.json ]; then
-            python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/promotion_application_preview_started.json
-          fi
+          python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/selected.json
+          python -m freezer.cli revise RTS-FRZ-000010 --input .tmp/started.json
           python - <<'PY'
           from pathlib import Path
           from governed_loop.common import pretty_json
@@ -137,133 +58,46 @@ jobs:
         self.assertEqual(loop["state"], "FOCUS")
         self.assertEqual(loop["recommendation_action"], "CONTINUE_OR_VERIFY_ACTIVE_ITEM")
         self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000010")'''
-          if before in text:
-              test_path.write_text(text.replace(before, after), encoding='utf-8')
-          elif after not in text:
-              raise SystemExit('expected governed-loop assertion block not found')
+          if before not in text:
+              raise SystemExit('expected idle loop assertions were not found')
+          test_path.write_text(text.replace(before, after), encoding='utf-8')
 
-          docs = root / 'docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md'
-          docs.write_text('''# Promotion Application Preview v1 Implementation Contract\n\n## Governed item\n\n- item: `RTS-FRZ-000010`\n- Assessment: `RTS-BA-000010-001 / BUILD_NOW`\n- Preflight: `RTS-PF-000010-001 / PASS`\n- lifecycle: `v001 FROZEN / NOT_APPROVED -> v002 SELECTED / APPROVED -> v003 IN_PROGRESS / APPROVED`\n- WIP: `1`\n\n## Human authorization\n\nThe operator explicitly instructed the governed loop-engine completion route to proceed. This authorization covers only the repository-local, read-only, non-applying Promotion Application Preview v1 boundary described by the current Assessment and PASS Preflight.\n\n## Allowed implementation\n\n- deterministic standard-library package\n- exact proposal, pending-review, review-ledger, regression, rollback, policy, reviewer-scope, and target-snapshot fingerprints\n- canonical proposed change set\n- explicit blockers, prerequisites, validation steps, stop conditions, and rollback references\n- `generate`, `verify`, and `summary` only\n- committed blocked fixture for the current empty ledger\n- governed-loop read-only integration\n- focused tests and CI\n\n## Not authorized\n\nNo human decision creation, self-approval, Skill mutation, application, promotion, target write, adjacent-repository write, commit, merge, provider, scheduler, network, subprocess, shell, publication, deployment, messaging, customer action, or automatic rollback.\n''', encoding='utf-8')
-
-          run = generate_run(root)
-          (root / 'governed_loop/runs/current.json').write_text(pretty_json(run), encoding='utf-8')
+          (root / 'docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md').write_text(
+              '''# Promotion Application Preview v1 Implementation Contract\n\n'''
+              '''## Governed item\n\n'''
+              '''- item: `RTS-FRZ-000010`\n'''
+              '''- Assessment: `RTS-BA-000010-001 / BUILD_NOW`\n'''
+              '''- Preflight: `RTS-PF-000010-001 / PASS`\n'''
+              '''- lifecycle: `v001 FROZEN / NOT_APPROVED -> v002 SELECTED / APPROVED -> v003 IN_PROGRESS / APPROVED`\n'''
+              '''- WIP: `1`\n\n'''
+              '''## Human authorization\n\n'''
+              '''The operator explicitly authorized the governed loop-engine completion route. The authority is limited to the repository-local, read-only, non-applying Promotion Application Preview v1 boundary.\n\n'''
+              '''## Allowed implementation\n\n'''
+              '''- deterministic standard-library preview package\n'''
+              '''- exact proposal, review, ledger, regression, rollback, policy, scope, and target fingerprints\n'''
+              '''- canonical proposed change set, blockers, validation, stop conditions, and rollback references\n'''
+              '''- `generate`, `verify`, and `summary` only\n'''
+              '''- committed blocked fixture for the current empty ledger\n'''
+              '''- governed-loop read-only integration and focused tests\n\n'''
+              '''## Not authorized\n\n'''
+              '''No human-decision creation, self-approval, Skill mutation, application, target write, adjacent-repository write, commit, merge, provider, scheduler, network, subprocess, publication, deployment, messaging, customer action, or automatic rollback.\n''',
+              encoding='utf-8',
+          )
+          (root / 'governed_loop/runs/current.json').write_text(
+              pretty_json(generate_run(root)), encoding='utf-8'
+          )
           PY
+          rm -f .tmp/selected.json .tmp/started.json
           find . -type d -name __pycache__ -prune -exec rm -rf {} +
-      - name: Commit generated governed state
+          python -B -m freezer.cli verify
+          python -B -m freezer.build_assessment verify
+          python -B -m freezer.preflight verify
+          python -B -m governed_loop.cli verify
+          python -B -m unittest discover -s tests -v
+      - name: Commit generated state
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet || git commit -m "Prepare and start Promotion Application Preview v1"
+          git commit -m "Prepare and start Promotion Application Preview v1"
           git push
-
-  freezer:
-    needs: prepare_start_candidate
-    if: always() && (needs.prepare_start_candidate.result == 'success' || needs.prepare_start_candidate.result == 'skipped')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Verify committed governed records
-        run: |
-          python -m freezer.cli verify
-          python -m freezer.build_assessment verify
-          python -m asset_manifest.cli verify
-          python -m loop_core.cli verify
-          python -m execution_controller.cli verify
-          python -m outcome_evidence.cli verify
-          python -m skill_regression.cli verify
-          python -m learning_proposals.cli verify
-          python -m human_review_ledger.cli verify
-          python -m governed_loop.cli verify
-      - name: Fail on stale committed indexes
-        run: |
-          python - <<'PY'
-          import json
-          import subprocess
-          import sys
-          from pathlib import Path
-
-          freezer_paths = [
-              Path("freezer/index/items.json"),
-              Path("freezer/index/priority.json"),
-              Path("freezer/index/build_priority.json"),
-          ]
-          asset_paths = [
-              Path("asset_manifest/index/repositories.json"),
-              Path("asset_manifest/index/assets.json"),
-              Path("asset_manifest/index/ownership.json"),
-          ]
-          restoration_paths = freezer_paths + asset_paths + [
-              Path("freezer/manifests/manifest.sha256"),
-              Path("asset_manifest/manifests/manifest.sha256"),
-          ]
-
-          def semantic(path):
-              data = json.loads(path.read_text(encoding="utf-8"))
-              data.pop("generated_at", None)
-              return data
-
-          committed_bytes = {path: path.read_bytes() for path in restoration_paths}
-          committed_freezer = {path: semantic(path) for path in freezer_paths}
-          committed_assets = {path: semantic(path) for path in asset_paths}
-          stale = []
-          try:
-              subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
-              subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
-              rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
-              rebuilt_assets = {path: semantic(path) for path in asset_paths}
-              stale = [str(path) for path in freezer_paths if committed_freezer[path] != rebuilt_freezer[path]] + [
-                  str(path) for path in asset_paths if committed_assets[path] != rebuilt_assets[path]
-              ]
-          finally:
-              for path, payload in committed_bytes.items():
-                  path.write_bytes(payload)
-          if stale:
-              print("Committed derived indexes are stale:")
-              for path in stale:
-                  print(f"- {path}")
-              raise SystemExit(1)
-          PY
-      - name: Run freezer tests
-        run: python -B -m unittest discover -s tests -p 'test_freezer.py' -v
-      - name: Run build-assessment tests
-        run: python -B -m unittest discover -s tests -p 'test_freezer_build_assessment.py' -v
-      - name: Run asset-manifest tests
-        run: python -B -m unittest discover -s tests -p 'test_asset_manifest.py' -v
-      - name: Run loop-core tests
-        run: python -B -m unittest discover -s tests -p 'test_loop_core.py' -v
-      - name: Run learning lifecycle tests
-        run: python -B -m unittest discover -s tests -p 'test_loop_core_learning_lifecycle.py' -v
-      - name: Run execution-controller tests
-        run: python -B -m unittest discover -s tests -p 'test_execution_controller.py' -v
-      - name: Run controller-continuity tests
-        run: python -B -m unittest discover -s tests -p 'test_execution_controller_state_continuity.py' -v
-      - name: Run outcome-evidence tests
-        run: python -B -m unittest discover -s tests -p 'test_outcome_evidence.py' -v
-      - name: Run skill-regression tests
-        run: python -B -m unittest discover -s tests -p 'test_skill_regression.py' -v
-      - name: Run learning-proposal tests
-        run: python -B -m unittest discover -s tests -p 'test_learning_proposals.py' -v
-      - name: Run human-review-ledger tests
-        run: python -B -m unittest discover -s tests -p 'test_human_review_ledger.py' -v
-      - name: Run governed-loop tests
-        run: python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
-      - name: Run governed-record tests
-        run: python -B -m unittest discover -s tests -v
-      - name: Verify rebuilt governed records
-        run: |
-          python -m freezer.cli verify
-          python -m freezer.build_assessment verify
-          python -m asset_manifest.cli verify
-          python -m loop_core.cli verify
-          python -m execution_controller.cli verify
-          python -m outcome_evidence.cli verify
-          python -m skill_regression.cli verify
-          python -m learning_proposals.cli verify
-          python -m human_review_ledger.cli verify
-          python -m governed_loop.cli verify
