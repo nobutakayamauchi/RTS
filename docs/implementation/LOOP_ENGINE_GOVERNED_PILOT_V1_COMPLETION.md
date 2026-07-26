@@ -33,6 +33,8 @@ asset discovery
 
 The parent is closed by the independently verified child packages and the canonical eight-stage governed-loop fixture. The parent item body is not substantively rewritten during completion, preserving the current Build Assessment fingerprint. This document records the integrated result and practical-test entry point.
 
+The completion candidate passed the committed seed verifier, FREEZER/Assessment/Preflight verification, Promotion Application Preview verification, Governed Loop reconstruction, and the full 191-test repository suite before the generated state was committed.
+
 ## Preserved boundary
 
 Completion grants no provider, scheduler, publication, target or adjacent-repository write, Skill mutation, automatic approval, merge, contract, outreach, or external-execution authority. The prepared CASE-001 project is now eligible to enter a governed practical test; the test result itself remains unobserved.
