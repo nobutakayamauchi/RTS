@@ -1,15 +1,15 @@
 {
-  "checkpoint_fingerprint": "6749706f95de3574c2093e9fe8e8b4ef4efa4d2dba59083f9734410e0e953678",
+  "checkpoint_fingerprint": "1b1e224b89b0ae7ccb5ff0998a5d196ae21469919cf78619ceb24401daff5e75",
   "checkpoint_id": "PROOF-ENGINE-LEARNING-CHECKPOINT-0003",
   "dataset_fingerprint": "ae897a05bef32209a81d54ff6da99334a82483bd57964fea07284d6571d82f79",
   "external_actions_performed": false,
   "model_weight_update_performed": false,
   "next_action": "Run the active learning preflight on candidates generated after PROOF-ENGINE-P3-RUN-0001, then keep the human review gate.",
   "original_records_preserved": true,
-  "policy_fingerprint": "3aa2a723328705710ce158885188d069b8e9425b645030d97ef030ed78e363df",
-  "replay_fingerprint": "60287f65a78c3cafc2740221f03f4db4f3e4dc75a8433093ea4bd14721678ad0",
+  "policy_fingerprint": "c4e81d04b22f1db00d6ed43238b75c9aa855c95e33e595eaf49006c92e6b2176",
+  "replay_fingerprint": "e22d8bed853f44181a6427d79177ab2a6fd35e445f67a650cc4553fc1eaf7202",
   "review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
-  "ruleset_fingerprint": "c8c495009dcab4431d5490b70d577c87ab700c77c4a8a72667f1291b65df64ac",
+  "ruleset_fingerprint": "fad89c35f06b7891b04023dc68d96e2968876e09b8ac29c8d3633961c03cb657",
   "schema_version": "PROOF-ENGINE-LEARNING-CHECKPOINT-V1",
   "state": "LEARNING_DATA_ACTIVE_SUGGEST_ONLY"
 }
