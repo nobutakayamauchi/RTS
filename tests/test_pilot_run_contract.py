@@ -39,6 +39,13 @@ class PilotRunContractTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotRunContractError, "authority boundary widened"):
             validate_seed(seed)
 
+    def test_required_forbidden_action_cannot_be_removed(self) -> None:
+        seed = copy.deepcopy(self.seed)
+        seed["constraints"]["forbidden_actions"].remove("automatic human ranking")
+        self.resign(seed)
+        with self.assertRaisesRegex(PilotRunContractError, "removed required forbidden actions"):
+            validate_seed(seed)
+
     def test_wip_above_one_is_rejected(self) -> None:
         seed = copy.deepcopy(self.seed)
         seed["constraints"]["wip_limit"] = 2
