@@ -1,0 +1,85 @@
+{
+  "schema_version": "RTS-PILOT-SEED-V1",
+  "seed_id": "RTS-PILOT-SEED-VALUE-DISCOVERY-CASE-001",
+  "seed_fingerprint": "24826a71a196afe240338863409db6c56594748e9118ba4fd50c9424399e05cb",
+  "project": {
+    "title": "Evidence-Based Value Discovery and Reconnection Pilot",
+    "case_id": "CASE-001",
+    "purpose": "Discover overlooked work value from committed evidence, translate it into externally understandable outputs, and prepare governed connection experiments.",
+    "current_scope": "GitHub and development-log evidence only; human approval is required before publication, outreach, application, or contract."
+  },
+  "objective": {
+    "final_goal": "Build an evidence-based path that reconnects overlooked capability to people, organizations, opportunities, and suitable support.",
+    "current_goal": "Produce the master specification, public evidence structure, and first evidence-backed achievement candidates for CASE-001.",
+    "completion_conditions": [
+      "A contradiction-audited master specification is committed.",
+      "At least ten achievement candidates are linked to exact evidence.",
+      "At least one human-approved public output asset is prepared without automatic publication.",
+      "The run records a deterministic checkpoint and continuation handoff.",
+      "The run stops without widening authority."
+    ]
+  },
+  "constraints": {
+    "wip_limit": 1,
+    "human_gate_required": true,
+    "forbidden_actions": [
+      "automatic contract acceptance",
+      "automatic external publication",
+      "automatic human ranking",
+      "automatic outreach or application",
+      "automatic support-recipient selection",
+      "credential or private-data persistence",
+      "provider use without a new approval gate",
+      "target or adjacent-repository write without a new approval gate"
+    ]
+  },
+  "work_policy": {
+    "selection": "Choose exactly one highest-priority unfinished deliverable inside current_scope.",
+    "checkpoint": "Persist exact inputs, outputs, evidence, blockers, and next action after every bounded iteration.",
+    "resume": "Resume only from the latest verified checkpoint with unchanged seed and governed fingerprints.",
+    "stop_conditions": [
+      "authority would widen",
+      "completion conditions are met",
+      "evidence is missing or conflicted",
+      "human approval is required",
+      "scope would leave current_scope",
+      "the same failed action repeats twice without new evidence"
+    ]
+  },
+  "inputs": {
+    "source_refs": [
+      "GitHub repository history",
+      "Pull requests and review findings",
+      "committed specifications and development logs",
+      "human-provided CASE-001 context"
+    ]
+  },
+  "outputs": {
+    "required_artifacts": [
+      "CASE-001 evidence map",
+      "MVP implementation contract",
+      "Master Product Specification",
+      "Possibility Atlas",
+      "Public evidence-page structure",
+      "checkpoint and continuation handoff"
+    ]
+  },
+  "authority": {
+    "mode": "GOVERNED_PILOT",
+    "advisory_only": true,
+    "external_execution_authorized": false,
+    "provider_authorized": false,
+    "publication_authorized": false,
+    "target_write_authorized": false,
+    "adjacent_repository_write_authorized": false,
+    "automatic_approval_authorized": false
+  },
+  "readiness": {
+    "state": "READY_FOR_PILOT",
+    "known_gaps": [
+      "real-run effectiveness has not yet been measured",
+      "external-market response is not yet observed",
+      "no automatic provider or repository adapter is authorized"
+    ]
+  }
+}

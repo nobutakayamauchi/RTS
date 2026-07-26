@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-26T06:48:05Z",
+  "generated_at": "2026-07-26T08:15:53Z",
   "count": 10,
   "items": [
     {
@@ -51,10 +51,10 @@
     },
     {
       "item_id": "RTS-FRZ-000003",
-      "version": 2,
+      "version": 4,
       "title": "Governed Execution and Learning Loop",
       "type": "architecture",
-      "status": "FROZEN",
+      "status": "COMPLETED",
       "priority_score": 72.46,
       "estimated_hours": {
         "minimum": 56,
@@ -70,7 +70,7 @@
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "DECOMPOSE_REQUIRED",
-      "updated_at": "2026-07-24T05:20:26Z"
+      "updated_at": "2026-07-26T08:15:53Z"
     },
     {
       "item_id": "RTS-FRZ-000004",
@@ -212,10 +212,10 @@
     },
     {
       "item_id": "RTS-FRZ-000010",
-      "version": 3,
+      "version": 5,
       "title": "Promotion Application Preview v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 88.69,
       "estimated_hours": {
         "minimum": 8,
@@ -232,7 +232,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-07-26T06:48:05Z"
+      "updated_at": "2026-07-26T08:15:53Z"
     }
   ]
 }

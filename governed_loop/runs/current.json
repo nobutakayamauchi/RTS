@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-26T06:48:05Z",
+  "as_of": "2026-07-26T08:15:53Z",
   "authority": {
     "adjacent_repository_write_authorized": false,
     "application_status": "NOT_APPLIED",
@@ -114,17 +114,15 @@
       "verification": "PASSED"
     },
     "read_only_loop": {
-      "active_item_ids": [
-        "RTS-FRZ-000010"
-      ],
-      "audit_level": "NORMAL",
+      "active_item_ids": [],
+      "audit_level": "WARNING",
       "authority": "ADVISORY_ONLY",
-      "evaluation_id": "d4316aba91523a82c54725c6793468cd729cbf1410f12b01f39fa72404918043",
-      "recommendation_action": "CONTINUE_OR_VERIFY_ACTIVE_ITEM",
-      "recommendation_item_id": "RTS-FRZ-000010",
-      "state": "FOCUS",
+      "evaluation_id": "242a97229f3eb43d1e2cfb13811328bee34b019efae0ac2f611650ff02b7075d",
+      "recommendation_action": "RUN_BUILD_ASSESSMENT",
+      "recommendation_item_id": "RTS-FRZ-000001",
+      "state": "BLOCKED",
       "verification": "PASSED",
-      "wip_count": 1
+      "wip_count": 0
     },
     "skill_regression": {
       "candidate_pass_rate": 1.0,
@@ -164,8 +162,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "0289adc6297da66b57eaa41e897a781bc07608cf53ace23ef35f88e30ac21a0b",
-  "run_id": "RTS-LOOP-RUN-0289ADC6297DA66B",
+  "run_fingerprint": "2a254df6934372d858d127ff9f5555ab3788faaaf659be0d44b0e1f9e2a93b81",
+  "run_id": "RTS-LOOP-RUN-2A254DF6934372D8",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -186,11 +184,11 @@
     },
     {
       "path": "freezer/index/build_priority.json",
-      "sha256": "97589bd05c6956d9d924cb721e57fc19de545d1c80147b907345241b80e8a2ba"
+      "sha256": "ae628e1c96f5f59789c18752094d1a3274f2c42707e6eceb7e82415f99abdeb3"
     },
     {
       "path": "freezer/index/items.json",
-      "sha256": "302b9f952fe4088281af3f8611d4a96ea3fc3299afba94a0da5d0e39e43e902a"
+      "sha256": "6893e2d6903213e5f31aecc4b2c469f651f6277cd620a5b77c5612f1c104c159"
     },
     {
       "path": "governed_loop/schemas/loop_run.schema.json",

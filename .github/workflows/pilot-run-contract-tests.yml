@@ -1,0 +1,34 @@
+name: Pilot Run Contract Tests
+
+on:
+  pull_request:
+    paths:
+      - "pilot_run_contract/**"
+      - "tests/test_pilot_run_contract.py"
+      - ".github/workflows/pilot-run-contract-tests.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "pilot_run_contract/**"
+      - "tests/test_pilot_run_contract.py"
+      - ".github/workflows/pilot-run-contract-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify committed pilot seed
+        run: python -B -m pilot_run_contract.cli verify
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_pilot_run_contract.py' -v
+      - name: Run full repository tests
+        run: python -B -m unittest discover -s tests -v

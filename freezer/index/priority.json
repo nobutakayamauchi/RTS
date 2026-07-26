@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-26T06:48:05Z",
-  "count": 2,
+  "generated_at": "2026-07-26T08:15:53Z",
+  "count": 1,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -9,29 +9,6 @@
     "auto_start": false
   },
   "items": [
-    {
-      "item_id": "RTS-FRZ-000003",
-      "version": 2,
-      "title": "Governed Execution and Learning Loop",
-      "type": "architecture",
-      "status": "FROZEN",
-      "priority_score": 72.46,
-      "estimated_hours": {
-        "minimum": 56,
-        "maximum": 96
-      },
-      "tags": [
-        "loop",
-        "harness",
-        "learning",
-        "governance",
-        "cross-repo",
-        "parent"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "DECOMPOSE_REQUIRED",
-      "updated_at": "2026-07-24T05:20:26Z"
-    },
     {
       "item_id": "RTS-FRZ-000001",
       "version": 1,
