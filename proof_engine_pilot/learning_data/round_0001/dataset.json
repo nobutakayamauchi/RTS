@@ -1,0 +1,125 @@
+{
+  "correction_pairs": [
+    {
+      "approval_decision_fingerprint": "4ffe6cc495a29ef18541e375fd0643bbeda4d229a35db8a57d6ae6c86d5f5c48",
+      "approval_decision_id": "PROOF-REVIEW-0001-D013",
+      "candidate_id": "ACH-001",
+      "error_labels": [
+        "RESULT_AUTHORSHIP_CONFLATION",
+        "OUTPUT_KIND_OVERSTATEMENT"
+      ],
+      "factuality_note": "The repository history verifies the staged split and resulting boundaries. It does not prove that one person independently derived and implemented the complete decomposition without AI assistance.",
+      "original_claim": "Decomposed a broad governed execution-and-learning initiative into independently verifiable staged integration boundaries.",
+      "original_fingerprint": "31d2e2f2198486a46d21f4a2325eaf5666ddc0e820041b3cb95c10da338c3b5f",
+      "record_kind": "PROCESS_BYPRODUCT",
+      "revise_decision_fingerprint": "578c715ad2c8d7f776024c0955e5953b59403128277d9f09646a2ac4b587353a",
+      "revise_decision_id": "PROOF-REVIEW-0001-D008",
+      "revised_claim": "As a byproduct of the governed development process, the broad execution-and-learning initiative was split into separately verifiable integration boundaries: a read-only orchestrator, an append-only human review ledger, and a non-applying promotion preview.",
+      "revision_fingerprint": "f3efbdd2842e241b9c24ad11b7e8bb9a9c85c9ff3466dec3444e071519cf3acf",
+      "revision_id": "ACH-001-R1"
+    },
+    {
+      "approval_decision_fingerprint": "775f8d2ce2c91bc13d9a8a06e92b5ca363aa3c9d1ce806ab04c225942eba9f51",
+      "approval_decision_id": "PROOF-REVIEW-0001-D014",
+      "candidate_id": "ACH-002",
+      "error_labels": [
+        "DIRECT_AUTHORSHIP_OVERCLAIM",
+        "PROJECT_OUTPUT_MISCLASSIFIED"
+      ],
+      "factuality_note": "The implemented artifact and tests are verified. The wording avoids attributing all architecture and code authorship directly to the human operator.",
+      "original_claim": "Designed and implemented a deterministic repository-local read-only governed loop orchestrator.",
+      "original_fingerprint": "9bb41c8a1bc7e1d87f91e8c2825054ee1a913659a796ad5c8b6bc9dd187e0494",
+      "record_kind": "PROJECT_OUTPUT",
+      "revise_decision_fingerprint": "2847023b7a7af51fc1a9a716a418b3e027e52b0a8ccea2507a4cb75adae31970",
+      "revise_decision_id": "PROOF-REVIEW-0001-D009",
+      "revised_claim": "The repository contains a deterministic, repository-local, read-only governed loop orchestrator produced through AI-assisted development under human-set goals, constraints, acceptance criteria, and approval gates.",
+      "revision_fingerprint": "9e6008f210dff8aebd56cdf6146e8ea49f4e2cbb994a20036f573655914d2734",
+      "revision_id": "ACH-002-R1"
+    },
+    {
+      "approval_decision_fingerprint": "a6bd1e56fbe3c23e597da3e93fa945cfed196a5a4fbc6cab41490e41a6d2e580",
+      "approval_decision_id": "PROOF-REVIEW-0001-D015",
+      "candidate_id": "ACH-007",
+      "error_labels": [
+        "RESULT_AUTHORSHIP_CONFLATION",
+        "INTEGRATION_BYPRODUCT_MISCLASSIFIED"
+      ],
+      "factuality_note": "The eight-stage linkage is verified in the repository. This record describes the resulting integration artifact rather than claiming sole direct implementation by the human operator.",
+      "original_claim": "Integrated eight deterministic verification stages into one governed loop run while preserving read-only authority.",
+      "original_fingerprint": "43bcb215a8a217292f78caaff2e27d9b4b233f1d5400955372037bc447a378a3",
+      "record_kind": "INTEGRATION_BYPRODUCT",
+      "revise_decision_fingerprint": "2ea8e238d9e7d1627335807f0eeba9b7f92582e477e17fb51abeb0a07b2d5088",
+      "revise_decision_id": "PROOF-REVIEW-0001-D010",
+      "revised_claim": "As an integration byproduct of completing the governed loop, one committed loop run links eight deterministic verification stages while retaining read-only authority.",
+      "revision_fingerprint": "be2fc501112a948bca756565e18bd05b081d6afd0581737a3e24130c32504299",
+      "revision_id": "ACH-007-R1"
+    },
+    {
+      "approval_decision_fingerprint": "83a1290eb0794f1de8e124d6651d6ca097cc5682f871d6162171486e39f7a4c0",
+      "approval_decision_id": "PROOF-REVIEW-0001-D016",
+      "candidate_id": "ACH-010",
+      "error_labels": [
+        "DISCOVERY_AND_REMEDIATION_AUTHORSHIP_OVERCLAIM",
+        "AUDIT_BYPRODUCT_MISCLASSIFIED"
+      ],
+      "factuality_note": "The review findings, fixes, tests, and acceptance are evidenced by the pull request. This is an audit-remediation byproduct, not proof that the human operator personally discovered or coded every correction.",
+      "original_claim": "Resolved independent review findings that could have allowed under-governed G0 classification or weaker re-signed plans.",
+      "original_fingerprint": "8bf814b14a14019c85092f28268bd903e6a9f25075925b73aab82bdcd5dc37d8",
+      "record_kind": "AUDIT_REMEDIATION_BYPRODUCT",
+      "revise_decision_fingerprint": "3505d989d8b40d57918742cc067c3c3f941eb8e2f9844241388f4003ae4af7da",
+      "revise_decision_id": "PROOF-REVIEW-0001-D011",
+      "revised_claim": "Independent review of the Adaptive Governance Compiler identified under-governed G0 classification and context-rebinding risks; the AI-assisted development process then incorporated fixes and regression tests accepted through human review.",
+      "revision_fingerprint": "097804e888fbaf83c98fe8b9bfc04f8f63180ff284bbc988613a7c3f6e10aca5",
+      "revision_id": "ACH-010-R1"
+    },
+    {
+      "approval_decision_fingerprint": "022c05779f434b890c39151b3735a861a05c4169bfe34d126ead5a50ccfaa324",
+      "approval_decision_id": "PROOF-REVIEW-0001-D017",
+      "candidate_id": "ACH-012",
+      "error_labels": [
+        "UNSUPPORTED_GENERALIZATION",
+        "REUSABILITY_OVERCLAIM"
+      ],
+      "factuality_note": "Repeated use inside RTS is verified. General reusability and reduced failure rates outside this repository remain unverified, so the record is classified as a signal rather than a completed reusable asset.",
+      "original_claim": "Established a repeatable pattern of exact fingerprints, stale-state detection, CI verification, review correction, and completion records across multiple governed components.",
+      "original_fingerprint": "42ef649cf4e586f7c6309f0725655570f46667451039ce5ef44b06cc504ec2b6",
+      "record_kind": "REUSABILITY_SIGNAL",
+      "revise_decision_fingerprint": "a0b780ed35ec46e57e8d304fe61ecb5f89ce0f5a460cdf7e4a66809dc9dbe9aa",
+      "revise_decision_id": "PROOF-REVIEW-0001-D012",
+      "revised_claim": "Across several RTS components, the project repeatedly used exact fingerprints, stale-state checks, CI verification, review remediation, and completion records. This is evidence of a potentially reusable development pattern, not yet proof of reuse outside RTS.",
+      "revision_fingerprint": "978dd444f2809052550b24dc2e46cace974115c4f973555424676d68bd694cd2",
+      "revision_id": "ACH-012-R1"
+    }
+  ],
+  "counts": {
+    "correction_pairs": 5,
+    "human_decisions_represented": 17,
+    "positive_examples": 7
+  },
+  "dataset_fingerprint": "ae897a05bef32209a81d54ff6da99334a82483bd57964fea07284d6571d82f79",
+  "dataset_id": "PROOF-ENGINE-LEARNING-DATASET-0001",
+  "positive_examples": [
+    {"candidate_fingerprint":"c6e999358ea8bf32452025244c8bf67af9b0615a62644b2895ba0e817c9d6c02","candidate_id":"ACH-003","decision_fingerprint":"4f6844e6567b3cd777f39b8106e05c5d2944e9a1cd9c42f652461e7c081c6178","decision_id":"PROOF-REVIEW-0001-D001","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"88d64152c140ae27abc314982cbaf7d4f03073de4696e823030be6b4b5ea506a","candidate_id":"ACH-004","decision_fingerprint":"0235a64dc4364bcceea7a210bed457727a80669bd0ecba6670e18a81c1468a6f","decision_id":"PROOF-REVIEW-0001-D002","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"7946c9d5ad60f039da1b7696ab1de03c6dd35502fc47c9db1fcbfde76d8ed3c2","candidate_id":"ACH-005","decision_fingerprint":"6a48ccf42e119df2c93c77b3668ab095c885294ce11b16dc1c69a65f260ac100","decision_id":"PROOF-REVIEW-0001-D003","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"1c61cf7f44150cc2cd783e1c15f44e1f58918a6495c059459b1f044001a211c6","candidate_id":"ACH-006","decision_fingerprint":"d34173d63152b33f2e14d929d55229ecde41f3eb5bfaa5add07f02ba35e90ba6","decision_id":"PROOF-REVIEW-0001-D004","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"b43a812c99d7c7c8f1472ccd6855ed768fc88d76aec28b82a813c486b4cd7291","candidate_id":"ACH-008","decision_fingerprint":"f7231ed9d51ab2655afc40da8417865fb4ee359c9fd614416a1429736792dcbb","decision_id":"PROOF-REVIEW-0001-D005","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"2c8cc1cb6b4a10cd6535e9291615abb4015e7c9b02c9f0f9d28ec90dc8f17799","candidate_id":"ACH-009","decision_fingerprint":"c4010f4f558999db78a4f0ebade80bcc3fbdcc0c0bafa99eeb4336379c7742bd","decision_id":"PROOF-REVIEW-0001-D006","error_labels":[],"expected_action":"APPROVE"},
+    {"candidate_fingerprint":"c4f710c49bd66accd9c01cad65637336371cf98e25d1479f2614eba57d0e3af6","candidate_id":"ACH-011","decision_fingerprint":"02fd0570807ad82c953f1cdae3cf987fa32411772bc765580d2c3ee0b1593dc8","decision_id":"PROOF-REVIEW-0001-D007","error_labels":[],"expected_action":"APPROVE"}
+  ],
+  "schema_version": "PROOF-ENGINE-REVIEW-LEARNING-DATASET-V1",
+  "source_fingerprints": {
+    "base_run": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+    "decision_index": "efcd75558bff03abd881067d66923fd0dc3232d54631410ef509af5a27f8a7ba",
+    "review_summary": "eb58b8e4ffcdbebd143574109ffa99b9afd02adbeedf71e3aa1466ace48731d4",
+    "revision_ledger": "67d96b51e13df9d29b898404f26f85d1a0746573b591280f83818d4e06241606"
+  },
+  "source_review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
+  "usage_boundary": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "mode": "REPOSITORY_LOCAL_RULE_LEARNING",
+    "model_weight_training_authorized": false,
+    "publication_authorized": false
+  }
+}
