@@ -1,0 +1,93 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "publication_authorized": false
+  },
+  "contract_fingerprint": "e66845480c8b82a6c0d6d35e0039e20c464d1f6a41e880e5304ec4e59c46f383",
+  "contract_id": "PROOF-ENGINE-PUBLICATION-REVIEW-CONTRACT-0001",
+  "criteria": {
+    "contribution_separation": "REQUIRED",
+    "factuality": "REQUIRED",
+    "privacy_boundary": "REQUIRED",
+    "reader_clarity": "REQUIRED",
+    "release_authority": "SEPARATE_HUMAN_GATE_REQUIRED",
+    "scope_bounding": "REQUIRED"
+  },
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_REVIEW_DELEGATION",
+    "instruction": "オッケー、じゃあやってみようか。",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "initial_decisions": [
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The wording is fact-bounded, separates human and AI-tool roles, and clearly states that production autonomy and external effectiveness are unestablished.",
+      "wording_id": "WORDING-001"
+    },
+    {
+      "decision": "REVISE",
+      "reason": "The isolated headline should explicitly bound WIP=1 to the governed pilot rather than sounding universal.",
+      "wording_id": "WORDING-002"
+    },
+    {
+      "decision": "REVISE",
+      "reason": "Replace the unclear phrase 'stale expiry' with reader-facing language about expired or stale decisions.",
+      "wording_id": "WORDING-003"
+    },
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The wording accurately describes a non-applying preview and clearly denies write and approval authority.",
+      "wording_id": "WORDING-004"
+    },
+    {
+      "decision": "REVISE",
+      "reason": "The headline should describe governance as derived from declared change context rather than imply exact measurement of risk.",
+      "wording_id": "WORDING-005"
+    },
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The wording is limited to the verified case and explicitly states that external reuse and effectiveness remain unobserved.",
+      "wording_id": "WORDING-006"
+    }
+  ],
+  "release_boundary": {
+    "actual_publication_may_occur": false,
+    "separate_human_release_authorization_required": true,
+    "wording_review_may_complete": true
+  },
+  "review_round_id": "PROOF-ENGINE-PUBLICATION-REVIEW-ROUND-0001",
+  "reviewer": {
+    "decision_origin": "AI_REVIEW_UNDER_EXPLICIT_HUMAN_DELEGATION",
+    "role": "DELEGATED_PUBLICATION_WORDING_REVIEWER",
+    "type": "AI_ASSISTANT"
+  },
+  "revision_decisions": [
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The revised headline explicitly scopes the result to the governed pilot.",
+      "revision_id": "WORDING-002-R1",
+      "wording_id": "WORDING-002"
+    },
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The revised summary is clearer without changing the verified integrity behavior.",
+      "revision_id": "WORDING-003-R1",
+      "wording_id": "WORDING-003"
+    },
+    {
+      "decision": "APPROVE_FOR_PUBLICATION",
+      "reason": "The revised headline is aligned with the compiler's declared inputs and does not overstate risk accuracy.",
+      "revision_id": "WORDING-005-R1",
+      "wording_id": "WORDING-005"
+    }
+  ],
+  "schema_version": "PROOF-ENGINE-PUBLICATION-REVIEW-CONTRACT-V1",
+  "source_draft_fingerprint": "91a21a9eb8119fc474d2f6a1c3429ae265c7c1997066f8148e2a612ef6167782",
+  "source_draft_id": "PROOF-ENGINE-PUBLIC-WORDING-DRAFT-0001"
+}
