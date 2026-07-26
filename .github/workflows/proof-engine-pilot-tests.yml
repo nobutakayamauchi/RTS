@@ -6,6 +6,7 @@ on:
       - "proof_engine_pilot/**"
       - "pilot_runs/reconnect_pilot_p3/**"
       - "tests/test_proof_engine_pilot.py"
+      - "tests/test_proof_engine_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -13,6 +14,7 @@ on:
       - "proof_engine_pilot/**"
       - "pilot_runs/reconnect_pilot_p3/**"
       - "tests/test_proof_engine_pilot.py"
+      - "tests/test_proof_engine_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -37,7 +39,14 @@ jobs:
         run: |
           python -B -m proof_engine_pilot.cli generate --output /tmp/proof-engine-run.json
           diff -u proof_engine_pilot/runs/p3_run_0001.json /tmp/proof-engine-run.json
+      - name: Verify append-only human review
+        run: |
+          python -B -m proof_engine_pilot.review_cli verify
+          python -B -m proof_engine_pilot.review_cli summary
+          python -B -m proof_engine_pilot.review_cli effective > /tmp/proof-engine-effective.json
       - name: Run focused tests
-        run: python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
+        run: |
+          python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_review.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
