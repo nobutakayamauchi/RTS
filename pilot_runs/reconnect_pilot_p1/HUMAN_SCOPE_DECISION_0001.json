@@ -1,0 +1,42 @@
+{
+  "accepted_risks": [
+    "The first specification may overfit to CASE-001 and the RTS repository.",
+    "Achievement extraction may create false positives or inflated interpretations.",
+    "Human versus AI contribution may remain ambiguous in some records.",
+    "No customer demand, price acceptance, or market response has been validated.",
+    "P1 may reveal a need to revise the P3 source boundary before implementation."
+  ],
+  "decision_fingerprint": "3167a0bcd41bf3c82b0a9f0661e3439ab955c3222c353222a4a267bd8c2bac50",
+  "decision_id": "RECONNECT-SCOPE-DECISION-0001",
+  "decision_status": "APPROVED",
+  "decision_type": "APPROVE_P1_P3",
+  "first_audience": "AI-assisted solo developers and solo founders whose GitHub history contains useful work that is difficult to explain externally.",
+  "first_paid_product": "Evidence-Backed Achievement Discovery Report: a bounded GitHub/PR evidence audit producing approved achievement claims, contribution mapping, and reusable portfolio or sales copy.",
+  "frozen_branches": [
+    "P2 full public evidence shell, except one later human-approved output draft",
+    "P4 sales automation and large-scale outreach",
+    "P5 Support Fit and social-reconnection automation",
+    "P6 Talent DB, matching platform, enterprise API, and OEM",
+    "DNS Wave",
+    "automatic provider execution",
+    "multi-repository autonomous ingestion",
+    "automatic human ranking or eligibility decisions"
+  ],
+  "judgment_criteria": [
+    {"assessment": "P1 and P3 directly create the evidence-to-value core required by the final reconnection model.", "criterion": "FINAL_GOAL_ALIGNMENT", "weight": 5},
+    {"assessment": "A fixed RTS PR set can produce a bounded ten-candidate test without building publishing, matching, or support systems.", "criterion": "FASTEST_TESTABLE_VALUE", "weight": 5},
+    {"assessment": "The same approved output can become a manual achievement-discovery or GitHub evidence-audit deliverable.", "criterion": "CASH_REUSE", "weight": 4},
+    {"assessment": "One repository, one deterministic pipeline, WIP=1, and human review fit the current operating constraints.", "criterion": "SOLO_BUILD_FEASIBILITY", "weight": 5},
+    {"assessment": "The canonical records and evidence model can feed P2, P4, P5, and P6 without committing to those branches now.", "criterion": "REVERSIBILITY_AND_REUSE", "weight": 5}
+  ],
+  "maximum_scope": "P3 minimum vertical slice using one fixed RTS repository/PR set; no publication, outreach, provider expansion, contracts, ranking, support automation, or platform build.",
+  "next_review_point": "After P1 artifacts are complete and before any P3 code or repository mutation.",
+  "project_name": "Proof Engine (working title) within the broader Reconnect concept; public brand NOT_APPROVED.",
+  "public_disclosure_boundary": "Only human-approved PUBLIC evidence from already public repository history may enter a public draft. CASE-001 health, family, employment, legal, financial, location, credentials, private repositories, and third-party personal details remain excluded.",
+  "reason": "P1→P3 maximizes evidence-producing progress and future reuse while keeping cost, authority, privacy, and scope bounded.",
+  "recorded_at": "2026-07-26T10:20:00Z",
+  "recorded_from": "Explicit human instruction in the governing conversation",
+  "schema_version": "RTS-RECONNECT-HUMAN-SCOPE-DECISION-V1",
+  "selected_path": ["P1_MASTER_SPEC", "P3_VALUE_DISCOVERY_MVP"],
+  "source_run_id": "RECONNECT-PILOT-P0-RUN-0001"
+}
