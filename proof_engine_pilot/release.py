@@ -69,6 +69,42 @@ AI_ROLE_COPYEDITS = {
 LIMIT_COPYEDITS = {
     "WORDING-005": "The compiler has been tested inside RTS. It does not prove universal risk-classification quality or replace human judgment for consequential decisions.",
 }
+EXPECTED_CHECKPOINT_FIELDS = {
+    "adjacent_repository_write_performed",
+    "automatic_republication_performed",
+    "checkpoint_fingerprint",
+    "checkpoint_id",
+    "contract_action_performed",
+    "direct_outreach_performed",
+    "document_fingerprint",
+    "document_path",
+    "external_actions_performed",
+    "next_action",
+    "original_wording_drafts_preserved",
+    "provider_execution_performed",
+    "publication_performed",
+    "published_wording_count",
+    "release_authorization_fingerprint",
+    "release_scope_respected",
+    "repository_visibility",
+    "root_readme_promotion_performed",
+    "schema_version",
+    "social_posting_performed",
+    "source_review_round_id",
+    "state",
+    "target_branch",
+    "target_repository_write_performed",
+}
+EXPECTED_ACTION_RESULTS = {
+    "target_repository_write_performed": True,
+    "root_readme_promotion_performed": False,
+    "social_posting_performed": False,
+    "direct_outreach_performed": False,
+    "contract_action_performed": False,
+    "provider_execution_performed": False,
+    "adjacent_repository_write_performed": False,
+    "automatic_republication_performed": False,
+}
 
 
 def _verify_fingerprint(value: dict[str, Any], field: str, label: str) -> str:
@@ -185,6 +221,8 @@ def verify_publication_release(
 
     checkpoint_value = load(CHECKPOINT_PATH) if checkpoint is None else copy.deepcopy(checkpoint)
     _verify_fingerprint(checkpoint_value, "checkpoint_fingerprint", "publication release checkpoint")
+    if set(checkpoint_value) != EXPECTED_CHECKPOINT_FIELDS:
+        raise ProofEngineError("publication release checkpoint schema mismatch")
     if checkpoint_value.get("schema_version") != CHECKPOINT_SCHEMA or checkpoint_value.get("checkpoint_id") != CHECKPOINT_ID:
         raise ProofEngineError("publication release checkpoint identity mismatch")
     expected_links = {
@@ -205,13 +243,8 @@ def verify_publication_release(
         raise ProofEngineError("publication release checkpoint does not record publication")
     if checkpoint_value.get("original_wording_drafts_preserved") is not True or checkpoint_value.get("release_scope_respected") is not True:
         raise ProofEngineError("publication release preservation or scope mismatch")
-    for field in (
-        "social_posting_performed",
-        "direct_outreach_performed",
-        "contract_action_performed",
-        "adjacent_repository_write_performed",
-    ):
-        if checkpoint_value.get(field) is not False:
+    for field, expected in EXPECTED_ACTION_RESULTS.items():
+        if checkpoint_value.get(field) is not expected:
             raise ProofEngineError(f"publication release exceeded scope: {field}")
 
     return {
