@@ -69,7 +69,7 @@ jobs:
         run: |
           {
             rm -f integration-output.txt test-output.txt
-            git rm .github/scripts/finalize_human_review_ledger_implementation.py
+            git rm -f .github/scripts/finalize_human_review_ledger_implementation.py
             git rm .github/workflows/human-review-ledger-implementation-candidate.yml
             python -m freezer.cli verify
             python -m freezer.build_assessment verify
