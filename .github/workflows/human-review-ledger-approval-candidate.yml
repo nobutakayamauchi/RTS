@@ -35,12 +35,26 @@ jobs:
           python -m learning_proposals.cli verify
           python -m governed_loop.cli verify
       - name: Run full tests
-        run: python -B -m unittest discover -s tests -v
+        id: tests
+        continue-on-error: true
+        run: python -B -m unittest discover -s tests -v > test-output.txt 2>&1
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: human-review-ledger-approval-test-output
+          path: test-output.txt
+      - name: Require full tests
+        if: steps.tests.outcome != 'success'
+        run: |
+          tail -n 200 test-output.txt
+          exit 1
       - name: Finalize exact governed lifecycle artifacts
         env:
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           rm -rf human-review-ledger-approval-candidate
+          rm -f test-output.txt
           git rm .github/scripts/generate_human_review_ledger_approval.py
           git rm .github/workflows/human-review-ledger-approval-candidate.yml
           python -m freezer.cli verify
