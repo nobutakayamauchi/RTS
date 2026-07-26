@@ -21,10 +21,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Regenerate exact committed fixtures
+      - name: Regenerate fixtures and capture diagnostics
         run: |
-          python -B -m promotion_application_preview.cli generate > promotion_application_preview/previews/current.json
-          python - <<'PY'
+          set +e
+          {
+            python -B -m promotion_application_preview.cli generate > promotion_application_preview/previews/current.json
+            python - <<'PY'
           from pathlib import Path
           from governed_loop.common import pretty_json
           from governed_loop.generation import generate_run
@@ -33,11 +35,24 @@ jobs:
               pretty_json(generate_run(root)), encoding='utf-8'
           )
           PY
-      - name: Verify regenerated state
-        run: |
-          python -B -m promotion_application_preview.cli verify
-          python -B -m governed_loop.cli verify
-          python -B -m unittest discover -s tests -v
+            python -B -m promotion_application_preview.cli verify
+            python -B -m governed_loop.cli verify
+            python -B -m unittest discover -s tests -v
+          } > promotion-preview-regeneration-diagnostic.txt 2>&1
+          status=$?
+          echo "$status" > promotion-preview-regeneration-status.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: promotion-preview-regeneration-diagnostic
+          path: |
+            promotion-preview-regeneration-diagnostic.txt
+            promotion-preview-regeneration-status.txt
+            promotion_application_preview/previews/current.json
+            governed_loop/runs/current.json
+          if-no-files-found: error
+      - name: Enforce regeneration result
+        run: test "$(cat promotion-preview-regeneration-status.txt)" = "0"
       - name: Commit verified fixtures and remove temporary workflow
         run: |
           rm -f .github/workflows/promotion-preview-regeneration-candidate.yml
