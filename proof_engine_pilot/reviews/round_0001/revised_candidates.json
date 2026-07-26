@@ -1,0 +1,200 @@
+{
+  "base_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
+  "revisions": [
+    {
+      "candidate_fingerprint": "f3efbdd2842e241b9c24ad11b7e8bb9a9c85c9ff3466dec3444e071519cf3acf",
+      "candidate_id": "ACH-001",
+      "claim": "As a byproduct of the governed development process, the broad execution-and-learning initiative was split into separately verifiable integration boundaries: a read-only orchestrator, an append-only human review ledger, and a non-applying promotion preview.",
+      "contribution_map": {
+        "ai_tool": [
+          "proposed decomposition details",
+          "generated implementation, records, and tests under review"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "set the usable-loop objective",
+          "required staged and safe progress",
+          "approved, redirected, or stopped each governed boundary"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        242,
+        243
+      ],
+      "factuality_note": "The repository history verifies the staged split and resulting boundaries. It does not prove that one person independently derived and implemented the complete decomposition without AI assistance.",
+      "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
+      "record_kind": "PROCESS_BYPRODUCT",
+      "revision_id": "ACH-001-R1",
+      "schema_version": "PROOF-ENGINE-CANDIDATE-REVISION-V1",
+      "status": "REVIEW_REQUIRED",
+      "supersedes_candidate_fingerprint": "31d2e2f2198486a46d21f4a2325eaf5666ddc0e820041b3cb95c10da338c3b5f",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "The split reduced coupling and made the larger loop testable in bounded stages."
+      },
+      "version": 2
+    },
+    {
+      "candidate_fingerprint": "9e6008f210dff8aebd56cdf6146e8ea49f4e2cbb994a20036f573655914d2734",
+      "candidate_id": "ACH-002",
+      "claim": "The repository contains a deterministic, repository-local, read-only governed loop orchestrator produced through AI-assisted development under human-set goals, constraints, acceptance criteria, and approval gates.",
+      "contribution_map": {
+        "ai_tool": [
+          "drafted architecture and implementation details",
+          "generated code, fixtures, and tests",
+          "applied review-driven corrections"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "set goals and constraints",
+          "defined acceptance criteria",
+          "reviewed failures and approved the bounded result"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        244,
+        245,
+        246,
+        247,
+        248
+      ],
+      "factuality_note": "The implemented artifact and tests are verified. The wording avoids attributing all architecture and code authorship directly to the human operator.",
+      "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
+      "record_kind": "PROJECT_OUTPUT",
+      "revision_id": "ACH-002-R1",
+      "schema_version": "PROOF-ENGINE-CANDIDATE-REVISION-V1",
+      "status": "REVIEW_REQUIRED",
+      "supersedes_candidate_fingerprint": "9bb41c8a1bc7e1d87f91e8c2825054ee1a913659a796ad5c8b6bc9dd187e0494",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "The project output provides a reconstructable control loop without unattended execution authority."
+      },
+      "version": 2
+    },
+    {
+      "candidate_fingerprint": "be2fc501112a948bca756565e18bd05b081d6afd0581737a3e24130c32504299",
+      "candidate_id": "ACH-007",
+      "claim": "As an integration byproduct of completing the governed loop, one committed loop run links eight deterministic verification stages while retaining read-only authority.",
+      "contribution_map": {
+        "ai_tool": [
+          "implemented integration code and fixtures",
+          "generated verification logic and tests",
+          "repaired review findings"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "required one reconstructable loop view",
+          "set ordering and authority constraints",
+          "accepted the integrated result after CI and review"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        247,
+        254,
+        258,
+        260
+      ],
+      "factuality_note": "The eight-stage linkage is verified in the repository. This record describes the resulting integration artifact rather than claiming sole direct implementation by the human operator.",
+      "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
+      "record_kind": "INTEGRATION_BYPRODUCT",
+      "revision_id": "ACH-007-R1",
+      "schema_version": "PROOF-ENGINE-CANDIDATE-REVISION-V1",
+      "status": "REVIEW_REQUIRED",
+      "supersedes_candidate_fingerprint": "43bcb215a8a217292f78caaff2e27d9b4b233f1d5400955372037bc447a378a3",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "The integration byproduct provides a single reconstructable state view across the governed components."
+      },
+      "version": 2
+    },
+    {
+      "candidate_fingerprint": "097804e888fbaf83c98fe8b9bfc04f8f63180ff284bbc988613a7c3f6e10aca5",
+      "candidate_id": "ACH-010",
+      "claim": "Independent review of the Adaptive Governance Compiler identified under-governed G0 classification and context-rebinding risks; the AI-assisted development process then incorporated fixes and regression tests accepted through human review.",
+      "contribution_map": {
+        "ai_tool": [
+          "raised independent review findings",
+          "implemented fixes and regression tests",
+          "re-ran validation"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "judged the findings material",
+          "required fail-closed correction",
+          "accepted the repaired boundary after tests"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        259
+      ],
+      "factuality_note": "The review findings, fixes, tests, and acceptance are evidenced by the pull request. This is an audit-remediation byproduct, not proof that the human operator personally discovered or coded every correction.",
+      "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
+      "record_kind": "AUDIT_REMEDIATION_BYPRODUCT",
+      "revision_id": "ACH-010-R1",
+      "schema_version": "PROOF-ENGINE-CANDIDATE-REVISION-V1",
+      "status": "REVIEW_REQUIRED",
+      "supersedes_candidate_fingerprint": "8bf814b14a14019c85092f28268bd903e6a9f25075925b73aab82bdcd5dc37d8",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "The remediation shows that external review findings can be converted into enforceable fail-closed checks."
+      },
+      "version": 2
+    },
+    {
+      "candidate_fingerprint": "978dd444f2809052550b24dc2e46cace974115c4f973555424676d68bd694cd2",
+      "candidate_id": "ACH-012",
+      "claim": "Across several RTS components, the project repeatedly used exact fingerprints, stale-state checks, CI verification, review remediation, and completion records. This is evidence of a potentially reusable development pattern, not yet proof of reuse outside RTS.",
+      "contribution_map": {
+        "ai_tool": [
+          "implemented recurring patterns across components",
+          "generated fixtures and CI checks",
+          "applied review corrections"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "repeatedly required reconstruction, review, and completion evidence",
+          "set quality thresholds",
+          "decided how to recover after failures"
+        ]
+      },
+      "evidence_label": "INFERRED",
+      "evidence_prs": [
+        247,
+        254,
+        258,
+        259,
+        260,
+        261
+      ],
+      "factuality_note": "Repeated use inside RTS is verified. General reusability and reduced failure rates outside this repository remain unverified, so the record is classified as a signal rather than a completed reusable asset.",
+      "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
+      "record_kind": "REUSABILITY_SIGNAL",
+      "revision_id": "ACH-012-R1",
+      "schema_version": "PROOF-ENGINE-CANDIDATE-REVISION-V1",
+      "status": "REVIEW_REQUIRED",
+      "supersedes_candidate_fingerprint": "42ef649cf4e586f7c6309f0725655570f46667451039ce5ef44b06cc504ec2b6",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "The repeated pattern is a candidate for reuse and later validation in other projects."
+      },
+      "version": 2
+    }
+  ],
+  "revisions_fingerprint": "67d96b51e13df9d29b898404f26f85d1a0746573b591280f83818d4e06241606",
+  "schema_version": "PROOF-ENGINE-REVISION-LEDGER-V1"
+}
