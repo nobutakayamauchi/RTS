@@ -29,8 +29,8 @@ preview_completed = revise("RTS-FRZ-000010", "preview-completed.json", {"status"
 parent_verified = revise("RTS-FRZ-000003", "parent-verified.json", {"status": "VERIFIED"})
 parent_completed = revise("RTS-FRZ-000003", "parent-completed.json", {"status": "COMPLETED"})
 
-# The completion state has no active WIP. Preserve safety assertions while avoiding
-# coupling the test to whichever frozen item is recommended next.
+# The completion state has no active WIP. It remains BLOCKED because the next
+# frozen candidate still requires its own assessment and approval gate.
 test_path = ROOT / "tests/test_governed_loop.py"
 text = test_path.read_text(encoding="utf-8")
 before = '''        self.assertEqual(loop["active_item_ids"], ["RTS-FRZ-000010"])
@@ -40,7 +40,7 @@ before = '''        self.assertEqual(loop["active_item_ids"], ["RTS-FRZ-000010"]
         self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000010")'''
 after = '''        self.assertEqual(loop["active_item_ids"], [])
         self.assertEqual(loop["wip_count"], 0)
-        self.assertEqual(loop["state"], "NORMAL")
+        self.assertEqual(loop["state"], "BLOCKED")
         self.assertIsInstance(loop["recommendation_action"], str)
         self.assertTrue(loop["recommendation_action"])
         if loop["recommendation_item_id"] is not None:
@@ -60,6 +60,7 @@ completion = f'''# Loop Engine Governed Pilot v1 Completion
 - `RTS-FRZ-000010`: v003 IN_PROGRESS -> v{preview_verified['version']:03d} VERIFIED -> v{preview_completed['version']:03d} COMPLETED
 - `RTS-FRZ-000003`: v002 FROZEN -> v{parent_verified['version']:03d} VERIFIED -> v{parent_completed['version']:03d} COMPLETED
 - WIP after completion: `0`
+- loop state after completion: `BLOCKED` until a separately assessed and approved next item is selected
 
 ## Completed governed path
 
