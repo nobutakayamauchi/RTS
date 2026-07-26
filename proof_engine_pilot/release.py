@@ -61,6 +61,11 @@ EXPECTED_RESTRICTIONS = {
     "content_must_match_authorized_fingerprint": True,
     "publication_on_any_other_surface_requires_new_human_authorization": True,
 }
+AI_ROLE_COPYEDITS = {
+    "WORDING-003": "Implemented the ledger, verification, and regression tests; applied review-driven repairs.",
+    "WORDING-004": "Implemented the schema, preview logic, fixtures, and tests.",
+    "WORDING-005": "Implemented the compiler and tests; raised independent review findings; implemented repairs and reran validation.",
+}
 
 
 def _verify_fingerprint(value: dict[str, Any], field: str, label: str) -> str:
@@ -82,6 +87,12 @@ def _pr_links(numbers: list[int]) -> str:
 
 def _upper_first(value: str) -> str:
     return value[:1].upper() + value[1:]
+
+
+def _role_text(wording: dict[str, Any], role: str) -> str:
+    if role == "ai_tool" and wording["wording_id"] in AI_ROLE_COPYEDITS:
+        return AI_ROLE_COPYEDITS[wording["wording_id"]]
+    return _upper_first("; ".join(wording["contribution_map"][role])) + "."
 
 
 def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
@@ -106,9 +117,9 @@ def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
             "",
             f"**Evidence:** {wording['proof_note']} {evidence_label}: {_pr_links(wording['evidence_prs'])}.",
             "",
-            "**Human role:** " + _upper_first("; ".join(wording["contribution_map"]["human"])) + ".",
+            "**Human role:** " + _role_text(wording, "human"),
             "",
-            "**AI-tool role:** " + _upper_first("; ".join(wording["contribution_map"]["ai_tool"])) + ".",
+            "**AI-tool role:** " + _role_text(wording, "ai_tool"),
             "",
             f"**Limits:** {wording['factuality_note']}",
             "",
