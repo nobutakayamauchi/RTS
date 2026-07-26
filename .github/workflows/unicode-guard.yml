@@ -26,7 +26,7 @@ jobs:
       - name: Generate governed gate state
         run: |
           rm -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
-          python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
+          PYTHONPATH=. python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
       - name: Upload generator diagnostic
         if: always()
         uses: actions/upload-artifact@v4
