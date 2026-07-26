@@ -4,7 +4,7 @@ import copy
 import unittest
 
 from proof_engine_pilot.cli import build_parser
-from proof_engine_pilot.core import ProofEngineError, generate_run, verify_run
+from proof_engine_pilot.core import ProofEngineError, fingerprint, generate_run, verify_run
 
 
 class ProofEnginePilotTests(unittest.TestCase):
@@ -21,6 +21,9 @@ class ProofEnginePilotTests(unittest.TestCase):
     def test_candidate_tamper_fails_closed(self):
         run = copy.deepcopy(verify_run())
         run["candidates"][0]["claim"] += " changed"
+        material = copy.deepcopy(run)
+        material.pop("run_fingerprint")
+        run["run_fingerprint"] = fingerprint(material)
         with self.assertRaisesRegex(ProofEngineError, "candidate fingerprint mismatch"):
             verify_run(run)
 
@@ -28,7 +31,6 @@ class ProofEnginePilotTests(unittest.TestCase):
         run = copy.deepcopy(verify_run())
         candidate = run["candidates"][0]
         candidate["evidence_prs"] = [999]
-        from proof_engine_pilot.core import fingerprint
         material = copy.deepcopy(candidate)
         material.pop("candidate_fingerprint")
         candidate["candidate_fingerprint"] = fingerprint(material)
