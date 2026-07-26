@@ -22,12 +22,16 @@ class PublicationReleaseTests(unittest.TestCase):
         self.assertEqual(checkpoint["state"], "PUBLISHED_TO_AUTHORIZED_REPOSITORY_DOCUMENT")
         self.assertTrue(checkpoint["publication_performed"])
         self.assertTrue(checkpoint["external_actions_performed"])
+        self.assertTrue(checkpoint["target_repository_write_performed"])
         self.assertEqual(checkpoint["published_wording_count"], 6)
         self.assertEqual(checkpoint["document_fingerprint"], EXPECTED_DOCUMENT_FINGERPRINT)
+        self.assertFalse(checkpoint["root_readme_promotion_performed"])
         self.assertFalse(checkpoint["social_posting_performed"])
         self.assertFalse(checkpoint["direct_outreach_performed"])
         self.assertFalse(checkpoint["contract_action_performed"])
+        self.assertFalse(checkpoint["provider_execution_performed"])
         self.assertFalse(checkpoint["adjacent_repository_write_performed"])
+        self.assertFalse(checkpoint["automatic_republication_performed"])
 
     def test_document_is_deterministically_rendered_from_effective_wordings(self):
         document = DOCUMENT_PATH.read_text(encoding="utf-8")
@@ -63,6 +67,24 @@ class PublicationReleaseTests(unittest.TestCase):
         material.pop("checkpoint_fingerprint")
         checkpoint["checkpoint_fingerprint"] = fingerprint(material)
         with self.assertRaisesRegex(ProofEngineError, "exceeded scope"):
+            verify_publication_release(checkpoint=checkpoint)
+
+    def test_resigned_provider_execution_fails_closed(self):
+        checkpoint = copy.deepcopy(load(CHECKPOINT_PATH))
+        checkpoint["provider_execution_performed"] = True
+        material = copy.deepcopy(checkpoint)
+        material.pop("checkpoint_fingerprint")
+        checkpoint["checkpoint_fingerprint"] = fingerprint(material)
+        with self.assertRaisesRegex(ProofEngineError, "exceeded scope"):
+            verify_publication_release(checkpoint=checkpoint)
+
+    def test_unknown_checkpoint_action_fails_closed(self):
+        checkpoint = copy.deepcopy(load(CHECKPOINT_PATH))
+        checkpoint["unknown_external_action_performed"] = False
+        material = copy.deepcopy(checkpoint)
+        material.pop("checkpoint_fingerprint")
+        checkpoint["checkpoint_fingerprint"] = fingerprint(material)
+        with self.assertRaisesRegex(ProofEngineError, "schema mismatch"):
             verify_publication_release(checkpoint=checkpoint)
 
     def test_cli_has_no_publish_or_outreach_command(self):
