@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-25T23:09:00Z",
+  "as_of": "2026-07-25T23:45:00Z",
   "authority": {
     "adjacent_repository_write_authorized": false,
     "application_status": "NOT_APPLIED",
@@ -89,9 +89,9 @@
       "active_item_ids": [],
       "audit_level": "NORMAL",
       "authority": "ADVISORY_ONLY",
-      "evaluation_id": "cf9715bab37d1bd50559ae38971a54c1858523a870bf4a7bcf206d7e6f0f530c",
+      "evaluation_id": "6e8197f6fd2ee44036668fbb301870b0d0b5421ca313adecfe0ca934b1748bc4",
       "recommendation_action": "REQUEST_HUMAN_APPROVAL",
-      "recommendation_item_id": "RTS-FRZ-000003",
+      "recommendation_item_id": "RTS-FRZ-000009",
       "state": "NORMAL",
       "verification": "PASSED",
       "wip_count": 0
@@ -132,8 +132,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "37259ada95d80cc5d52ef94f09a9c3c0c3f6c0c784ecd136e660b61d0823b355",
-  "run_id": "RTS-LOOP-RUN-37259ADA95D80CC5",
+  "run_fingerprint": "21930a4a7876204f1afa84597200cc91c75e6c750a9decd98856119795d40eb6",
+  "run_id": "RTS-LOOP-RUN-21930A4A7876204F",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -154,11 +154,11 @@
     },
     {
       "path": "freezer/index/build_priority.json",
-      "sha256": "2299ac69f16cf7e1e5dd825b914bd8cd40e1bbd1480743b66eb61159525dbbb3"
+      "sha256": "0e5e7093398b76c7138d250251712574fafc036119e83c17208720031832cba2"
     },
     {
       "path": "freezer/index/items.json",
-      "sha256": "cf18ad9890b5ac3f71734293cc1524cec298140e90b0920b87c3e7cdb40b8d1f"
+      "sha256": "7e23790715abe6e6cdbbee2f6891551f030ddcfb64b7e4020686d8aa80d13c57"
     },
     {
       "path": "governed_loop/schemas/loop_run.schema.json",
