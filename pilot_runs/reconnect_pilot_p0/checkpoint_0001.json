@@ -8,7 +8,7 @@
     "target_write_authorized": false
   },
   "blocker": "Explicit human scope decision required.",
-  "checkpoint_fingerprint": "5bcbf96ebf28ad0cc7495a436d1513af9e99d0faf458cb73d180a03f26326927",
+  "checkpoint_fingerprint": "bb5b8791df74ad277842ad769470ecade894cc0806d85a7da710390561b3879c",
   "checkpoint_id": "RECONNECT-PILOT-P0-CP-0001",
   "completed_artifacts": [
     "Master Overview v1",
@@ -22,7 +22,7 @@
   ],
   "completed_step": "P0_SCOPE_CUT",
   "next_action": "Human selects the maximum approved scope and records a new next-run Seed.",
-  "pack_manifest_sha256": "93564b56b04093c3ca90b5b2fcafc30cd6e3597e6d0a20930adc859451c6a962",
+  "pack_manifest_sha256": "bb7b2c512cfa584acf5744c6a382bbb55aad2f4bdd301bc4781bd4340a5a5271",
   "resume_requires": [
     "unchanged seed fingerprint",
     "unchanged pack manifest digest",
