@@ -1,0 +1,77 @@
+{
+  "item_id": "RTS-FRZ-000009",
+  "title": "Human Review Ledger v1",
+  "type": "architecture",
+  "status": "SELECTED",
+  "summary": "Add a deterministic repository-local append-only ledger for human review decisions linked to exact proposal, evidence, regression, rollback, reviewer, and policy fingerprints without granting application or mutation authority.",
+  "original_problem": "RTS can generate a pending human-review request, but it has no governed append-only record that distinguishes approval, rejection, return-for-revision, expiry, and supersession while preserving reviewer identity, separation of duties, exact reviewed inputs, and non-authorizing boundaries.",
+  "why_it_matters": "Without an immutable review ledger, later application previews cannot prove who reviewed which exact proposal and evidence set, whether the reviewer was independent, or whether the decision remained current after source drift.",
+  "reason_frozen": "A review record could be mistaken for execution authority or silently rewritten. A current BUILD_NOW Assessment, PASS Implementation Preflight, explicit human approval, and WIP=1 transition are required before implementation.",
+  "preserved_value": [
+    "Append-only human review decisions with exact source fingerprints.",
+    "Explicit APPROVE, REJECT, RETURN_FOR_REVISION, EXPIRE, and SUPERSEDE semantics.",
+    "Reviewer identity, role, separation-of-duties, rationale, conditions, and expiry evidence.",
+    "Fail-closed stale-decision detection without Skill application or adjacent-repository mutation."
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 4,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 2,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000007 and RTS-FRZ-000008 are COMPLETED with current governed records.",
+    "The pending review request remains REVIEW_REQUIRED / PENDING / NOT_APPROVED / NOT_APPLIED.",
+    "Review decisions can link exact proposal, evidence, regression, rollback, policy, and reviewer fingerprints.",
+    "The ledger remains repository-local, deterministic, append-only, and human-authored."
+  ],
+  "negative_triggers": [
+    "An AI creates or infers a human approval, reviewer identity, signature, rationale, or decision.",
+    "A review decision directly mutates or applies a Skill, writes to an adjacent repository, or authorizes merge.",
+    "Existing decision records can be overwritten, deleted, reordered, or silently superseded.",
+    "A stale decision remains valid after proposal, evidence, regression, rollback, policy, or reviewer-scope drift.",
+    "Raw prompts, credentials, customer data, provider payloads, or private repository bodies are persisted."
+  ],
+  "dependencies": [
+    "RTS-FRZ-000007",
+    "RTS-FRZ-000008"
+  ],
+  "source_refs": [
+    "learning_proposals/proposals/feature-build-v1.json",
+    "learning_proposals/reviews/feature-build-v1.pending.json",
+    "learning_proposals/schemas/human_review.schema.json",
+    "governed_loop/runs/current.json",
+    "skill_regression/results/feature-build-v1.json",
+    "skill_regression/rollback/feature-build-v1.json"
+  ],
+  "possible_destinations": [
+    "RTS repository-local human_review_ledger package",
+    "RTS governance review-decision records",
+    "future human-approved promotion application preview"
+  ],
+  "estimated_hours": {
+    "minimum": 12,
+    "maximum": 22
+  },
+  "tags": [
+    "human-review",
+    "ledger",
+    "append-only",
+    "separation-of-duties",
+    "approval",
+    "evidence",
+    "governance"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 2,
+  "created_at": "2026-07-25T23:09:00Z",
+  "updated_at": "2026-07-26T04:30:00Z",
+  "supersedes": "v001"
+}
