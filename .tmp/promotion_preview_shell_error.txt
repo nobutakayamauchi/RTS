@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/runner/work/RTS/RTS/scripts/tmp_prepare_promotion_preview.py", line 9, in <module>
+    from freezer.assessment_store import assessment_current_path, create_assessment
+ModuleNotFoundError: No module named 'freezer'
