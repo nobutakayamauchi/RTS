@@ -1,0 +1,15 @@
+{
+  "checkpoint_fingerprint": "3b2f8518458fb753bcdcc0b41320cd391c27d8227546e99ecc7f427c94f21bd3",
+  "checkpoint_id": "PROOF-ENGINE-PUBLIC-WORDING-CHECKPOINT-0006",
+  "draft_fingerprint": "91a21a9eb8119fc474d2f6a1c3429ae265c7c1997066f8148e2a612ef6167782",
+  "external_actions_performed": false,
+  "manifest_fingerprint": "c27a22e8ac727d11512a06c4e27030de14ca9e6774d97efb94dd8e378f863056",
+  "markdown_fingerprint": "08c642b73c6caadcf5eb823ebf2abf7e45e06304ff96fdac3b447bc2e71fc337",
+  "next_action": "Review the six audience-facing drafts and record append-only publication decisions; do not publish without separate explicit authority.",
+  "original_internal_assets_preserved": true,
+  "publication_performed": false,
+  "schema_version": "PROOF-ENGINE-PUBLIC-WORDING-CHECKPOINT-V1",
+  "source_asset_review_summary_fingerprint": "d640a781fdbda40dd281f4406a910f2e34d490cedb61834e5882e6de5809a91e",
+  "state": "PUBLICATION_REVIEW_REQUIRED",
+  "wording_count": 6
+}
