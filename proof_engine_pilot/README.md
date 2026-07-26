@@ -28,8 +28,26 @@ python -m proof_engine_pilot.learning_cli replay
 python -m proof_engine_pilot.learning_cli preflight path/to/future_candidate.json
 ```
 
-Round 0001 stores seven accepted originals and five original-to-revision correction pairs as a repository-local learning dataset. Six active rules now provide `SUGGEST_ONLY` factuality and classification preflight for candidate runs after `PROOF-ENGINE-P3-RUN-0001`.
+Round 0001 stores seven accepted originals and five original-to-revision correction pairs as a repository-local learning dataset. Six active rules provide `SUGGEST_ONLY` factuality and classification preflight for candidate runs after `PROOF-ENGINE-P3-RUN-0001`.
 
-This is not a model-weight update. It does not silently rewrite candidates or manufacture approval. Originals remain append-only, every correction stays linked to its human decision, and all future warnings still terminate at a human review gate.
+## Six-part internal asset commands
 
-The effective reviewed set is ready only for an internal asset draft. There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command, and publication remains `NOT_PUBLISHED`.
+```bash
+python -m proof_engine_pilot.asset_cli generate
+python -m proof_engine_pilot.asset_cli verify
+python -m proof_engine_pilot.asset_cli summary
+python -m proof_engine_pilot.asset_cli review-template
+```
+
+The twelve effective reviewed candidates are consolidated exactly once into six internal asset drafts:
+
+1. Governed Loop Engine
+2. WIP=1 and Human-Gated Delivery
+3. Append-Only Human Review and Integrity Checks
+4. Promotion Application Preview
+5. Adaptive Governance Compiler and Audit Remediation
+6. Conversation-to-Seed Project Ingestion
+
+Each draft passes the active review-learning preflight and remains `HUMAN_REVIEW_REQUIRED`. This is not a model-weight update and does not silently rewrite candidates or manufacture approval. Originals and revisions remain append-only and linked to their human decisions.
+
+There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. The six-part draft remains `NOT_PUBLISHED` until a separate human wording and publication decision.
