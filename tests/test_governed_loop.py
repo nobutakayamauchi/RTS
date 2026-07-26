@@ -28,10 +28,10 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(run["mode"], "ONE_SHOT_READ_ONLY")
         self.assertEqual(run["status"], "RECONSTRUCTED")
         loop = run["components"]["read_only_loop"]
-        self.assertEqual(loop["active_item_ids"], [])
-        self.assertEqual(loop["wip_count"], 0)
-        self.assertEqual(loop["state"], "NORMAL")
-        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")
+        self.assertEqual(loop["active_item_ids"], ["RTS-FRZ-000009"])
+        self.assertEqual(loop["wip_count"], 1)
+        self.assertEqual(loop["state"], "FOCUS")
+        self.assertEqual(loop["recommendation_action"], "CONTINUE_OR_VERIFY_ACTIVE_ITEM")
         self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000009")
         self.assertTrue(run["authority"]["read_only"])
         for field in (
@@ -88,7 +88,7 @@ class GovernedLoopTests(unittest.TestCase):
 
     def test_wip_count_mismatch_is_rejected(self) -> None:
         run = generate_run(self.root)
-        run["components"]["read_only_loop"]["wip_count"] = 1
+        run["components"]["read_only_loop"]["wip_count"] += 1
         self.resign(run)
         with self.assertRaisesRegex(GovernedLoopError, "wip_count does not match"):
             validate_record(run)
