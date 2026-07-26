@@ -70,7 +70,12 @@ def classify_context(context: dict[str, Any]) -> tuple[str, list[str]]:
     level = "G0"
     reasons: list[str] = []
 
-    if not impact["read_only"] or kinds - {"DOCUMENTATION", "TEST"} or actions - {"READ"}:
+    if (
+        not impact["read_only"]
+        or impact["repository_scope"] != "LOCAL"
+        or kinds - {"DOCUMENTATION", "TEST"}
+        or actions - {"READ"}
+    ):
         level = _raise_level(level, "G1")
         reasons.append("LOCAL_CHANGE")
     if (
