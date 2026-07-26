@@ -1,0 +1,13 @@
+{
+  "active_scope": "P0_SCOPE_CUT",
+  "active_seed": "seed_active_scope_cut.json",
+  "files": [
+    "README.md",
+    "FULL_CONTEXT.md",
+    "scope_profiles.json",
+    "seed_active_scope_cut.json",
+    "validate_pack.py"
+  ],
+  "pack_id": "RECONNECT-SEED-PACK-V1",
+  "terminal_gate": "HUMAN_REVIEW_REQUIRED"
+}
