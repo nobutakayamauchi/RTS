@@ -1,0 +1,17 @@
+{
+  "base_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "checkpoint_fingerprint": "809089a75e7d813b261604d51d8149e53bc29f87485a512a53db595638e6fe9c",
+  "checkpoint_id": "RECONNECT-PILOT-P3-REVIEW-0002",
+  "decision_index_fingerprint": "efcd75558bff03abd881067d66923fd0dc3232d54631410ef509af5a27f8a7ba",
+  "effective_candidate_count": 12,
+  "external_actions_performed": false,
+  "next_action": "Create an internal public-asset draft and request a separate human publication decision.",
+  "original_candidate_count": 12,
+  "originals_preserved": true,
+  "publication_performed": false,
+  "review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
+  "revisions_fingerprint": "67d96b51e13df9d29b898404f26f85d1a0746573b591280f83818d4e06241606",
+  "schema_version": "RTS-RECONNECT-P3-REVIEW-CHECKPOINT-V1",
+  "state": "REVIEW_COMPLETE_PUBLICATION_NOT_AUTHORIZED",
+  "summary_fingerprint": "eb58b8e4ffcdbebd143574109ffa99b9afd02adbeedf71e3aa1466ace48731d4"
+}
