@@ -100,6 +100,26 @@ docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md
 
 The committed document is generated from the six effective reviewed wordings and is bound to an exact content fingerprint. The release authorization permits publication to this public RTS repository document only. It does not permit a root README link, social posting, direct outreach, contracts, provider execution, adjacent-repository writes, or automatic republication.
 
-Original candidates, corrected revisions, internal assets, public-wording drafts, and review records remain preserved. This is not a model-weight update and does not manufacture human authorship for delegated AI judgments.
+## Sequential cross-repository validation
 
-The current state is `PUBLISHED_TO_AUTHORIZED_REPOSITORY_DOCUMENT`. Any additional surface or distribution action requires a new explicit human authorization.
+```bash
+python -m proof_engine_pilot.cross_repo_cli verify
+python -m proof_engine_pilot.cross_repo_cli summary
+python -m proof_engine_pilot.cross_repo_cli review-template
+```
+
+Campaign 0001 runs three bounded read-only validation rounds in order:
+
+1. `seminar-compass` as a generalization test for a conventional learning product;
+2. `RTS-minicompany` as a private business-repository test using metadata-only evidence;
+3. `rts-video-flow` as a negative control for a frozen, untested scaffold.
+
+The campaign produces sixteen review-required candidates and withholds five unsupported claims. Unmerged Seminar Compass PRs remain in the source snapshot but are ineligible as evidence. The private MiniCompany source copies no customer payload. The video-flow round records only the scaffold and freeze state and explicitly withholds end-to-end, accuracy, and production-readiness claims.
+
+All candidates pass the active `SUGGEST_ONLY` learning preflight. This does not yet prove improved approval or revision rates; that comparison remains `HUMAN_REVIEW_REQUIRED` until the next append-only human review round.
+
+No target repository is modified. Publication, outreach, provider execution, contracts, automatic rewriting, and automatic approval remain unauthorized.
+
+Original candidates, corrected revisions, internal assets, public-wording drafts, review records, and source snapshots remain preserved. This is not a model-weight update and does not manufacture human authorship for delegated AI judgments.
+
+The current campaign state is `THREE_REPOSITORY_HUMAN_REVIEW_REQUIRED / NOT_PUBLISHED`.
