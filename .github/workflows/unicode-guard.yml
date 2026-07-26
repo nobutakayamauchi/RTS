@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   prepare:
@@ -27,16 +27,15 @@ jobs:
         run: |
           rm -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
           python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
-      - name: Commit generated state or diagnostic
-        run: |
-          printf 'diagnostic-run\n' > docs/implementation/PROMOTION_PREVIEW_DIAGNOSTIC_RUN.txt
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
-          git add -f docs/implementation/PROMOTION_PREVIEW_DIAGNOSTIC_RUN.txt
-          git add -A
-          git commit -m "Persist Promotion Application Preview diagnostic"
-          git push
+      - name: Upload generator diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-preview-generator-diagnostic
+          path: |
+            docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
+            .tmp/promotion_preview_prepare_error.txt
+          if-no-files-found: warn
       - name: Verify generated state
         run: |
           test ! -s docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
