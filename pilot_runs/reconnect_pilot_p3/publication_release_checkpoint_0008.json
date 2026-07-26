@@ -1,6 +1,7 @@
 {
   "adjacent_repository_write_performed": false,
-  "checkpoint_fingerprint": "e9126434731de115bc401a18155a650e3559c77f13446fe35478eae17fc8d5dd",
+  "automatic_republication_performed": false,
+  "checkpoint_fingerprint": "01e50678344a4998d420d5d0e6a8d3cd85b180d562bf934a9066c43d8001f853",
   "checkpoint_id": "PROOF-ENGINE-PUBLICATION-RELEASE-CHECKPOINT-0008",
   "contract_action_performed": false,
   "direct_outreach_performed": false,
@@ -9,14 +10,17 @@
   "external_actions_performed": true,
   "next_action": "Observe this bounded repository publication; any additional surface, outreach, or revision requires a new human authorization.",
   "original_wording_drafts_preserved": true,
+  "provider_execution_performed": false,
   "publication_performed": true,
   "published_wording_count": 6,
   "release_authorization_fingerprint": "51fc24ed079a834102da79be8a6ec8381ee6b1c971e05e3fc72815681a298f91",
   "release_scope_respected": true,
   "repository_visibility": "PUBLIC",
+  "root_readme_promotion_performed": false,
   "schema_version": "PROOF-ENGINE-PUBLICATION-RELEASE-CHECKPOINT-V1",
   "social_posting_performed": false,
   "source_review_round_id": "PROOF-ENGINE-PUBLICATION-REVIEW-ROUND-0001",
   "state": "PUBLISHED_TO_AUTHORIZED_REPOSITORY_DOCUMENT",
-  "target_branch": "main"
+  "target_branch": "main",
+  "target_repository_write_performed": true
 }
