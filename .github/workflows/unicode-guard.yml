@@ -25,20 +25,21 @@ jobs:
           python-version: "3.11"
       - name: Generate governed gate state
         run: python -B scripts/tmp_prepare_promotion_preview.py
+      - name: Commit generated state or diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Capture Promotion Application Preview gate state"
+          git push
       - name: Verify generated state
         run: |
+          test ! -f .tmp/promotion_preview_prepare_error.txt
           python -B -m freezer.cli verify
           python -B -m freezer.build_assessment verify
           python -B -m freezer.preflight verify
           python -B -m governed_loop.cli verify
           python -B -m unittest discover -s tests -v
-      - name: Commit generated state
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet || git commit -m "Prepare and start Promotion Application Preview v1"
-          git push
 
   guard:
     runs-on: ubuntu-latest
