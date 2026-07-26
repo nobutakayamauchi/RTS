@@ -24,3 +24,7 @@ Registration grants no implementation, approval, application, merge, adjacent-re
 3. explicit human approval
 4. `SELECTED -> IN_PROGRESS` under WIP=1
 5. implementation, CI, independent review, and completion records
+
+## Final validation
+
+The committed registration, derived indexes, SHA manifest, canonical governed-loop run, and full repository test suite must pass on the exact final PR head before merge.
