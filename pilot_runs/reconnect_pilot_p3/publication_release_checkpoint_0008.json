@@ -1,0 +1,22 @@
+{
+  "adjacent_repository_write_performed": false,
+  "checkpoint_fingerprint": "e9126434731de115bc401a18155a650e3559c77f13446fe35478eae17fc8d5dd",
+  "checkpoint_id": "PROOF-ENGINE-PUBLICATION-RELEASE-CHECKPOINT-0008",
+  "contract_action_performed": false,
+  "direct_outreach_performed": false,
+  "document_fingerprint": "682ec3d73373ea2228c4d270b5ca74bec8c59050781e7322dbfcfba1c9b50369",
+  "document_path": "docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md",
+  "external_actions_performed": true,
+  "next_action": "Observe this bounded repository publication; any additional surface, outreach, or revision requires a new human authorization.",
+  "original_wording_drafts_preserved": true,
+  "publication_performed": true,
+  "published_wording_count": 6,
+  "release_authorization_fingerprint": "51fc24ed079a834102da79be8a6ec8381ee6b1c971e05e3fc72815681a298f91",
+  "release_scope_respected": true,
+  "repository_visibility": "PUBLIC",
+  "schema_version": "PROOF-ENGINE-PUBLICATION-RELEASE-CHECKPOINT-V1",
+  "social_posting_performed": false,
+  "source_review_round_id": "PROOF-ENGINE-PUBLICATION-REVIEW-ROUND-0001",
+  "state": "PUBLISHED_TO_AUTHORIZED_REPOSITORY_DOCUMENT",
+  "target_branch": "main"
+}
