@@ -164,8 +164,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "e8bb2722b50694452ef1193ec693b2702796db2197af7f0da8b9ce48e0b672d3",
-  "run_id": "RTS-LOOP-RUN-E8BB2722B5069445",
+  "run_fingerprint": "0289adc6297da66b57eaa41e897a781bc07608cf53ace23ef35f88e30ac21a0b",
+  "run_id": "RTS-LOOP-RUN-0289ADC6297DA66B",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -258,7 +258,7 @@
     },
     {
       "path": "promotion_application_preview/schemas/preview.schema.json",
-      "sha256": "2ab3b112b0687dffb87902e9e95d1391296294c87dd2192a8becffdf2dad3bff"
+      "sha256": "9de6cb24bab5fd7ac9aa26ec651bb4dc9b91fde7c13730f76b573930df3d9465"
     },
     {
       "path": "skill_regression/datasets/feature-build-v1.json",
