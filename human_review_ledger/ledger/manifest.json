@@ -1,0 +1,8 @@
+{
+  "schema_version": "RTS-HUMAN-REVIEW-LEDGER-MANIFEST-V1",
+  "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+  "record_count": 0,
+  "records": [],
+  "head_fingerprint": null,
+  "manifest_fingerprint": "e63a67c74fb8ec08d589045f9251c765d77ac1fb8d27f0fd050339a0e01a63c5"
+}

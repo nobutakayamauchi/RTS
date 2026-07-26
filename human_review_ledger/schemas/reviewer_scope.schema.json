@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-HUMAN-REVIEW-SCOPE-V1",
+  "title": "RTS Human Review Scope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope_id", "ledger_id", "allowed_roles", "identity_source_required", "cryptographic_identity_proof", "scope_fingerprint"],
+  "properties": {
+    "schema_version": {"const": "RTS-HUMAN-REVIEW-SCOPE-V1"},
+    "scope_id": {"type": "string", "minLength": 1},
+    "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+    "allowed_roles": {"type": "array", "minItems": 1, "items": {"enum": ["INDEPENDENT_REVIEWER", "OPERATOR"]}},
+    "identity_source_required": {"const": true},
+    "cryptographic_identity_proof": {"const": false},
+    "scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

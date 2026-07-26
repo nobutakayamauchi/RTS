@@ -1,0 +1,12 @@
+{
+  "schema_version": "RTS-HUMAN-REVIEW-SCOPE-V1",
+  "scope_id": "RTS-HRL-SCOPE-DEFAULT",
+  "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+  "allowed_roles": [
+    "INDEPENDENT_REVIEWER",
+    "OPERATOR"
+  ],
+  "identity_source_required": true,
+  "cryptographic_identity_proof": false,
+  "scope_fingerprint": "873be2309bcfaf446698497a0c54f3bd4208dedda6e789401b1ee45db1f3274f"
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "RTS-HUMAN-REVIEW-DECISION-V1",
+  "decision_id": "REPLACE_WITH_UNIQUE_DECISION_ID",
+  "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+  "sequence": 0,
+  "previous_decision_fingerprint": null,
+  "decision_type": "REPLACE_WITH_DECISION_TYPE",
+  "authored_by": {
+    "type": "HUMAN",
+    "identity": "REPLACE_WITH_HUMAN_IDENTITY",
+    "identity_source": "REPLACE_WITH_IDENTITY_SOURCE",
+    "role": "INDEPENDENT_REVIEWER"
+  },
+  "separation_of_duties": {
+    "proposer_identity": "rts-proposal-generator-v1",
+    "implementer_identity": "rts-implementation-agent-v1",
+    "reviewer_differs_from_proposer": true,
+    "reviewer_differs_from_implementer": true
+  },
+  "reviewed_at": "REPLACE_WITH_ISO_8601_TIME",
+  "expires_at": null,
+  "rationale": "REPLACE_WITH_HUMAN_RATIONALE",
+  "conditions": [],
+  "source_fingerprints": {
+    "proposal": "REPLACE_WITH_SHA256",
+    "pending_review": "REPLACE_WITH_SHA256",
+    "outcome_evidence": "REPLACE_WITH_SHA256",
+    "regression_result": "REPLACE_WITH_SHA256",
+    "rollback": "REPLACE_WITH_SHA256",
+    "policy": "REPLACE_WITH_SHA256",
+    "reviewer_scope": "REPLACE_WITH_SHA256"
+  },
+  "supersedes_decision_fingerprint": null,
+  "authority": {
+    "approval_status": "NOT_APPROVED",
+    "application_status": "NOT_APPLIED",
+    "skill_mutation_authorized": false,
+    "adjacent_repository_write_authorized": false,
+    "merge_authorized": false,
+    "external_action_authorized": false
+  },
+  "test_only": false,
+  "decision_fingerprint": "REPLACE_WITH_SHA256"
+}

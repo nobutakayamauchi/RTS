@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-HUMAN-REVIEW-DECISION-V1",
+  "title": "RTS Human Review Decision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "decision_id", "ledger_id", "sequence", "previous_decision_fingerprint", "decision_type", "authored_by", "separation_of_duties", "reviewed_at", "expires_at", "rationale", "conditions", "source_fingerprints", "supersedes_decision_fingerprint", "authority", "test_only", "decision_fingerprint"],
+  "properties": {
+    "schema_version": {"const": "RTS-HUMAN-REVIEW-DECISION-V1"},
+    "decision_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "previous_decision_fingerprint": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "decision_type": {"enum": ["APPROVE", "EXPIRE", "REJECT", "RETURN_FOR_REVISION", "SUPERSEDE"]},
+    "authored_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "identity", "identity_source", "role"],
+      "properties": {
+        "type": {"const": "HUMAN"},
+        "identity": {"type": "string", "minLength": 1},
+        "identity_source": {"type": "string", "minLength": 1},
+        "role": {"enum": ["INDEPENDENT_REVIEWER", "OPERATOR"]}
+      }
+    },
+    "separation_of_duties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposer_identity", "implementer_identity", "reviewer_differs_from_proposer", "reviewer_differs_from_implementer"],
+      "properties": {
+        "proposer_identity": {"type": "string", "minLength": 1},
+        "implementer_identity": {"type": "string", "minLength": 1},
+        "reviewer_differs_from_proposer": {"const": true},
+        "reviewer_differs_from_implementer": {"const": true}
+      }
+    },
+    "reviewed_at": {"type": "string", "minLength": 1},
+    "expires_at": {"type": ["string", "null"]},
+    "rationale": {"type": "string", "minLength": 1, "maxLength": 1024},
+    "conditions": {"type": "array", "items": {"type": "string"}},
+    "source_fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposal", "pending_review", "outcome_evidence", "regression_result", "rollback", "policy", "reviewer_scope"],
+      "properties": {
+        "proposal": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pending_review": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "outcome_evidence": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "regression_result": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "rollback": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "policy": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "reviewer_scope": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "supersedes_decision_fingerprint": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_status", "application_status", "skill_mutation_authorized", "adjacent_repository_write_authorized", "merge_authorized", "external_action_authorized"],
+      "properties": {
+        "approval_status": {"enum": ["APPROVED", "NOT_APPROVED"]},
+        "application_status": {"const": "NOT_APPLIED"},
+        "skill_mutation_authorized": {"const": false},
+        "adjacent_repository_write_authorized": {"const": false},
+        "merge_authorized": {"const": false},
+        "external_action_authorized": {"const": false}
+      }
+    },
+    "test_only": {"type": "boolean"},
+    "decision_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

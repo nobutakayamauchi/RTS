@@ -54,6 +54,23 @@
       ],
       "verification": "PASSED"
     },
+    "human_review_ledger": {
+      "application_status": "NOT_APPLIED",
+      "approval_status": "NOT_APPROVED",
+      "current_decision_fingerprint": null,
+      "current_decision_id": null,
+      "current_decision_type": null,
+      "expired": false,
+      "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+      "manifest_fingerprint": "e63a67c74fb8ec08d589045f9251c765d77ac1fb8d27f0fd050339a0e01a63c5",
+      "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931",
+      "record_count": 0,
+      "reviewer_scope_fingerprint": "873be2309bcfaf446698497a0c54f3bd4208dedda6e789401b1ee45db1f3274f",
+      "stale": false,
+      "state": "NO_DECISIONS",
+      "summary_fingerprint": "9c19d7de522d32df3ca9b61427804c2b7bde3e0e7a7ba6a5ef21053508e9abd3",
+      "verification": "PASSED"
+    },
     "learning_proposal": {
       "application_status": "NOT_APPLIED",
       "approval_status": "NOT_APPROVED",
@@ -116,11 +133,12 @@
       "future human review will interpret this run without treating it as Skill-application authority"
     ],
     "confirmed_facts": [
-      "all six repository-local component verification stages passed in the fixed governed order",
+      "all seven repository-local component verification stages passed in the fixed governed order",
       "the current loop evaluation observed exactly the active items recorded in the FREEZER index",
       "three governed outcome bundles remain linked to exact controller plan and authorization fingerprints",
       "the deterministic Skill regression result contains zero regressions and zero safety failures",
-      "the learning proposal and pending review remain reconstructable from exact committed sources"
+      "the learning proposal and pending review remain reconstructable from exact committed sources",
+      "the Human Review Ledger verifies as an empty non-authorizing append-only ledger with no manufactured human decision"
     ],
     "risks": [
       "component contracts may drift after this run and require a newly generated fingerprint set",
@@ -134,8 +152,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "81a56f6b1f0c60ae692149f20734fce29b2380895dbd351c0ceff49d9a866012",
-  "run_id": "RTS-LOOP-RUN-81A56F6B1F0C60AE",
+  "run_fingerprint": "a54a92f642f86cd3d396d0d081e60de35cc8bd88613641f812153d953fbca5ae",
+  "run_id": "RTS-LOOP-RUN-A54A92F642F86CD3",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -164,7 +182,43 @@
     },
     {
       "path": "governed_loop/schemas/loop_run.schema.json",
-      "sha256": "4fa1ffededa01fd938a6c4a3740487755d521ec4d74913c6f052801d5a705a71"
+      "sha256": "62a22b2f6e534994c4c1e1f8d177a5db51334b99c48765f18bff2d8fc8ce3bae"
+    },
+    {
+      "path": "human_review_ledger/ledger/current.json",
+      "sha256": "fad6a9d0b2050b1bce0f48ffac1384b8b704f74d0b97b11db373b993c622eda4"
+    },
+    {
+      "path": "human_review_ledger/ledger/manifest.json",
+      "sha256": "b0ae0f0e7b8af9d0d3f9c07c82ebea0f623f638bf22d7e01be0183e41874ce76"
+    },
+    {
+      "path": "human_review_ledger/policy/v1.json",
+      "sha256": "c6b827ebf67d299a0a765985cd47bc9708eb11329d05a57c554c1609f9d5142c"
+    },
+    {
+      "path": "human_review_ledger/reviewer_scopes/default.json",
+      "sha256": "5fd38c7ea853d3f6f3c3e23b2f64d4a9aaea5a2ea0bdbd7b8add886b1c8b136b"
+    },
+    {
+      "path": "human_review_ledger/schemas/current_summary.schema.json",
+      "sha256": "1ab330ae2607c1bcdc22f7e9afef622fc138e3766d20b4b464b879a49c4e5ea7"
+    },
+    {
+      "path": "human_review_ledger/schemas/decision.schema.json",
+      "sha256": "f6354bdef5bf999daf5b2a2d34c31e76610a3ea508a3a9c091aeb7a254f1e475"
+    },
+    {
+      "path": "human_review_ledger/schemas/manifest.schema.json",
+      "sha256": "7ec4a16ecb6f6315f03997848c60e5b358c288049678cd399c50d54868eb8b30"
+    },
+    {
+      "path": "human_review_ledger/schemas/policy.schema.json",
+      "sha256": "fcc5d950c0adf483febfcfd8cd36225188bfd0cd421d72a53d72c5d69a0d9326"
+    },
+    {
+      "path": "human_review_ledger/schemas/reviewer_scope.schema.json",
+      "sha256": "e1a16f0888fb77d788aced1709d89c3bd1bf2a8bb5e8f1e6629d745f68c7d723"
     },
     {
       "path": "learning_proposals/proposals/feature-build-v1.json",
@@ -214,6 +268,7 @@
     "execution_controller",
     "outcome_evidence",
     "skill_regression",
-    "learning_proposals"
+    "learning_proposals",
+    "human_review_ledger"
   ]
 }

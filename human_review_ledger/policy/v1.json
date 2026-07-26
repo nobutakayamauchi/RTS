@@ -1,0 +1,45 @@
+{
+  "schema_version": "RTS-HUMAN-REVIEW-POLICY-V1",
+  "policy_id": "RTS-HRL-POLICY-000001",
+  "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+  "allowed_decisions": [
+    "APPROVE",
+    "EXPIRE",
+    "REJECT",
+    "RETURN_FOR_REVISION",
+    "SUPERSEDE"
+  ],
+  "reviewer_roles": [
+    "INDEPENDENT_REVIEWER",
+    "OPERATOR"
+  ],
+  "required_source_kinds": [
+    "outcome_evidence",
+    "pending_review",
+    "policy",
+    "proposal",
+    "regression_result",
+    "reviewer_scope",
+    "rollback"
+  ],
+  "separation_of_duties": {
+    "reviewer_must_differ_from_proposer": true,
+    "reviewer_must_differ_from_implementer": true,
+    "proposer_identity_source": "learning_proposals/proposals/feature-build-v1.json#generator_identity",
+    "implementer_identity": "rts-implementation-agent-v1"
+  },
+  "expiry_rules": {
+    "approve_requires_expiry": true,
+    "explicit_expire_record_supported": true,
+    "stale_source_invalidates_current_approval": true
+  },
+  "authority": {
+    "approval_status": "EVIDENCE_ONLY",
+    "application_status": "NOT_APPLIED",
+    "skill_mutation_authorized": false,
+    "adjacent_repository_write_authorized": false,
+    "merge_authorized": false,
+    "external_action_authorized": false
+  },
+  "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931"
+}

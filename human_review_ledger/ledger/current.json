@@ -1,0 +1,17 @@
+{
+  "schema_version": "RTS-HUMAN-REVIEW-LEDGER-SUMMARY-V1",
+  "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+  "state": "NO_DECISIONS",
+  "record_count": 0,
+  "current_decision_id": null,
+  "current_decision_type": null,
+  "current_decision_fingerprint": null,
+  "current_sequence": 0,
+  "approval_status": "NOT_APPROVED",
+  "application_status": "NOT_APPLIED",
+  "stale": false,
+  "expired": false,
+  "policy_fingerprint": "bae59179ea1129d7dc594e709a52e84681efe807065a53251072e87f43ade931",
+  "reviewer_scope_fingerprint": "873be2309bcfaf446698497a0c54f3bd4208dedda6e789401b1ee45db1f3274f",
+  "summary_fingerprint": "9c19d7de522d32df3ca9b61427804c2b7bde3e0e7a7ba6a5ef21053508e9abd3"
+}

@@ -20,8 +20,9 @@ python -m governed_loop.cli summary
 4. Outcome Evidence
 5. Skill Regression and rollback
 6. Proposal-Only Outcome Learning
+7. Human Review Ledger
 
-The controller stage uses its bounded local self-verification. It does not dispatch a live provider. Exact controller plan and authorization fingerprints are linked from the governed outcome bundles.
+The Human Review Ledger stage verifies append-only human-review evidence and remains non-authorizing. The controller stage uses its bounded local self-verification. It does not dispatch a live provider. Exact controller plan and authorization fingerprints are linked from the governed outcome bundles.
 
 ## Authority boundary
 
