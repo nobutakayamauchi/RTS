@@ -1,18 +1,18 @@
 {
   "active_dataset_fingerprint": "ae897a05bef32209a81d54ff6da99334a82483bd57964fea07284d6571d82f79",
-  "active_ruleset_fingerprint": "c8c495009dcab4431d5490b70d577c87ab700c77c4a8a72667f1291b65df64ac",
+  "active_ruleset_fingerprint": "fad89c35f06b7891b04023dc68d96e2968876e09b8ac29c8d3633961c03cb657",
   "authority": {
     "automatic_approval_authorized": false,
     "automatic_rewrite_authorized": false,
     "external_execution_authorized": false,
     "publication_authorized": false
   },
-  "latest_replay_fingerprint": "60287f65a78c3cafc2740221f03f4db4f3e4dc75a8433093ea4bd14721678ad0",
+  "latest_replay_fingerprint": "e22d8bed853f44181a6427d79177ab2a6fd35e445f67a650cc4553fc1eaf7202",
   "mode": "SUGGEST_ONLY",
   "model_weight_update_performed": false,
   "next_action": "Use the active ruleset as a pre-review factuality and classification check for the next candidate-generation run.",
   "original_records_preserved": true,
-  "policy_fingerprint": "3aa2a723328705710ce158885188d069b8e9425b645030d97ef030ed78e363df",
+  "policy_fingerprint": "c4e81d04b22f1db00d6ed43238b75c9aa855c95e33e595eaf49006c92e6b2176",
   "policy_id": "PROOF-ENGINE-LEARNING-POLICY-0001",
   "schema_version": "PROOF-ENGINE-LEARNING-POLICY-STATE-V1",
   "state": "ACTIVE_FOR_FUTURE_RUNS"
