@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import copy
 import unittest
 
-from proof_engine_pilot.learning import preflight_candidate, verify_learning_bundle
+from proof_engine_pilot.core import ProofEngineError, fingerprint, load
+from proof_engine_pilot.learning import CHECKPOINT_PATH, preflight_candidate, verify_learning_bundle
 from proof_engine_pilot.learning_cli import build_parser
 
 
@@ -18,6 +20,16 @@ class ReviewLearningTests(unittest.TestCase):
         self.assertEqual(bundle["policy"]["mode"], "SUGGEST_ONLY")
         self.assertFalse(bundle["policy"]["model_weight_update_performed"])
         self.assertTrue(bundle["policy"]["original_records_preserved"])
+        self.assertFalse(bundle["checkpoint"]["external_actions_performed"])
+
+    def test_checkpoint_external_action_fails_closed(self):
+        checkpoint = copy.deepcopy(load(CHECKPOINT_PATH))
+        checkpoint["external_actions_performed"] = True
+        material = copy.deepcopy(checkpoint)
+        material.pop("checkpoint_fingerprint")
+        checkpoint["checkpoint_fingerprint"] = fingerprint(material)
+        with self.assertRaisesRegex(ProofEngineError, "unauthorized external action"):
+            verify_learning_bundle(checkpoint=checkpoint)
 
     def test_factually_bounded_revision_passes_preflight(self):
         candidate = {
@@ -31,6 +43,34 @@ class ReviewLearningTests(unittest.TestCase):
             "public_disclosure": "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL",
         }
         self.assertEqual(preflight_candidate(candidate)["result"], "PASS")
+
+    def test_missing_core_identity_and_claim_require_review(self):
+        candidate = {
+            "record_kind": "PROJECT_OUTPUT",
+            "factuality_note": "Repository result only.",
+            "contribution_map": {"human": ["approved"], "ai_tool": ["implemented"], "collaborator": []},
+            "evidence_label": "VERIFIED",
+            "evidence_prs": [264],
+            "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+        }
+        result = preflight_candidate(candidate)
+        self.assertEqual(result["result"], "SUGGEST_REVIEW")
+        self.assertIn("MISSING_LEARNING_FIELDS", {item["code"] for item in result["issues"]})
+
+    def test_empty_core_identity_and_claim_require_review(self):
+        candidate = {
+            "candidate_id": "",
+            "claim": " ",
+            "record_kind": "PROJECT_OUTPUT",
+            "factuality_note": "Repository result only.",
+            "contribution_map": {"human": ["approved"], "ai_tool": ["implemented"], "collaborator": []},
+            "evidence_label": "VERIFIED",
+            "evidence_prs": [264],
+            "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+        }
+        codes = {item["code"] for item in preflight_candidate(candidate)["issues"]}
+        self.assertIn("INVALID_CANDIDATE_ID", codes)
+        self.assertIn("INVALID_CLAIM", codes)
 
     def test_authorship_overclaim_is_suggested_for_review(self):
         candidate = {
@@ -46,7 +86,21 @@ class ReviewLearningTests(unittest.TestCase):
         codes = {item["code"] for item in result["issues"]}
         self.assertEqual(result["result"], "SUGGEST_REVIEW")
         self.assertIn("MISSING_LEARNING_FIELDS", codes)
-        self.assertIn("AUTHORSHIP_REQUIRES_FACTUALITY_NOTE", codes)
+        self.assertIn("DIRECT_AUTHORSHIP_REQUIRES_REVIEW", codes)
+
+    def test_factuality_note_does_not_bypass_authorship_review(self):
+        candidate = {
+            "candidate_id": "ACH-NEXT",
+            "claim": "Built the complete system.",
+            "record_kind": "PERSONAL_ACHIEVEMENT",
+            "factuality_note": "The AI implemented all code.",
+            "contribution_map": {"human": ["approved"], "ai_tool": ["implemented all code"], "collaborator": []},
+            "evidence_label": "VERIFIED",
+            "evidence_prs": [264],
+            "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+        }
+        result = preflight_candidate(candidate)
+        self.assertIn("DIRECT_AUTHORSHIP_REQUIRES_REVIEW", {item["code"] for item in result["issues"]})
 
     def test_cross_project_generalization_is_downgraded(self):
         candidate = {
