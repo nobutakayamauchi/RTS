@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-26T05:11:00Z",
-  "count": 9,
+  "generated_at": "2026-07-26T06:07:59Z",
+  "count": 10,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -209,6 +209,30 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-07-26T05:11:00Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000010",
+      "version": 1,
+      "title": "Promotion Application Preview v1",
+      "type": "architecture",
+      "status": "FROZEN",
+      "priority_score": 88.69,
+      "estimated_hours": {
+        "minimum": 8,
+        "maximum": 16
+      },
+      "tags": [
+        "promotion",
+        "application-preview",
+        "read-only",
+        "change-set",
+        "rollback",
+        "human-gate",
+        "governance"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-07-26T06:07:59Z"
     }
   ]
 }
