@@ -27,9 +27,9 @@ def build_parser() -> argparse.ArgumentParser:
     compile_parser = subparsers.add_parser("compile", help="Compile a deterministic governance plan")
     compile_parser.add_argument("--context", type=Path, required=True)
     compile_parser.add_argument("--output", type=Path)
-    verify_parser = subparsers.add_parser("verify", help="Verify a compiled governance plan")
+    verify_parser = subparsers.add_parser("verify", help="Verify a compiled governance plan against its exact context")
     verify_parser.add_argument("--plan", type=Path, required=True)
-    verify_parser.add_argument("--context", type=Path)
+    verify_parser.add_argument("--context", type=Path, required=True)
     subparsers.add_parser("profiles", help="Print the fixed G0-G4 profiles")
     return parser
 
@@ -46,7 +46,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 print(rendered, end="")
         elif args.command == "verify":
-            plan = verify_plan(_load(args.plan), _load(args.context) if args.context else None)
+            plan = verify_plan(_load(args.plan), _load(args.context))
             print(pretty_json(plan), end="")
         elif args.command == "profiles":
             print(pretty_json(PROFILES), end="")
