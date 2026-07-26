@@ -1,0 +1,14 @@
+{
+  "asset_count": 6,
+  "checkpoint_fingerprint": "7d16e5306dade08dd39eb517a1eb5d05787bf8a76809b37b8997c2f08a6a55ac",
+  "checkpoint_id": "PROOF-ENGINE-INTERNAL-ASSET-CHECKPOINT-0004",
+  "draft_fingerprint": "e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834",
+  "external_actions_performed": false,
+  "learning_policy_fingerprint": "c4e81d04b22f1db00d6ed43238b75c9aa855c95e33e595eaf49006c92e6b2176",
+  "next_action": "Human reviews six consolidated internal asset drafts and records append-only decisions before any publication draft is created.",
+  "original_candidate_records_preserved": true,
+  "publication_performed": false,
+  "schema_version": "PROOF-ENGINE-INTERNAL-ASSET-CHECKPOINT-V1",
+  "source_effective_candidate_count": 12,
+  "state": "INTERNAL_ASSET_REVIEW_REQUIRED"
+}
