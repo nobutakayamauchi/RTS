@@ -10,7 +10,7 @@ from .review import effective_candidate_records, verify_review_round
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 ROOT = PACKAGE_DIR.parent
-DRAFT_PATH = PACKAGE_DIR / "assets" / "round_0001" / "internal_asset_draft.json"
+MANIFEST_PATH = PACKAGE_DIR / "assets" / "round_0001" / "internal_asset_manifest.json"
 CHECKPOINT_PATH = ROOT / "pilot_runs" / "reconnect_pilot_p3" / "internal_asset_checkpoint_0004.json"
 
 ASSET_BLUEPRINTS = [
@@ -204,34 +204,53 @@ def build_internal_asset_draft() -> dict[str, Any]:
     return draft
 
 
-def verify_internal_asset_draft(draft: dict[str, Any] | None = None, checkpoint: dict[str, Any] | None = None) -> dict[str, Any]:
-    committed = load(DRAFT_PATH) if draft is None else draft
-    _verify_fingerprint(committed, "draft_fingerprint", "internal asset draft")
+def verify_internal_asset_draft(
+    draft: dict[str, Any] | None = None,
+    checkpoint: dict[str, Any] | None = None,
+    manifest: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     expected = build_internal_asset_draft()
-    if committed != expected:
+    candidate = expected if draft is None else draft
+    _verify_fingerprint(candidate, "draft_fingerprint", "internal asset draft")
+    if candidate != expected:
         raise ProofEngineError("internal asset draft does not match deterministic aggregation")
-    if committed.get("authority") != EXPECTED_AUTHORITY:
+    if candidate.get("authority") != EXPECTED_AUTHORITY:
         raise ProofEngineError("internal asset authority widened")
-    if committed.get("asset_count") != 6:
+    if candidate.get("asset_count") != 6:
         raise ProofEngineError("internal asset count mismatch")
-    if committed.get("review_gate", {}).get("state") != "HUMAN_REVIEW_REQUIRED":
+    if candidate.get("review_gate", {}).get("state") != "HUMAN_REVIEW_REQUIRED":
         raise ProofEngineError("internal asset review gate mismatch")
-    if committed.get("review_gate", {}).get("decisions") != []:
+    if candidate.get("review_gate", {}).get("decisions") != []:
         raise ProofEngineError("internal asset draft contains manufactured decisions")
-    if committed.get("output") != {
+    if candidate.get("output") != {
         "state": "READY_FOR_INTERNAL_REVIEW",
         "publication_status": "NOT_PUBLISHED",
         "reason": "The six consolidated drafts require a separate human wording and publication decision.",
     }:
         raise ProofEngineError("internal asset publication boundary mismatch")
 
+    manifest = load(MANIFEST_PATH) if manifest is None else manifest
+    _verify_fingerprint(manifest, "manifest_fingerprint", "internal asset manifest")
+    if manifest != {
+        "schema_version": "PROOF-ENGINE-INTERNAL-ASSET-MANIFEST-V1",
+        "manifest_id": "PROOF-ENGINE-INTERNAL-ASSET-MANIFEST-0001",
+        "draft_id": candidate["draft_id"],
+        "expected_draft_fingerprint": candidate["draft_fingerprint"],
+        "asset_count": 6,
+        "effective_candidate_count": 12,
+        "review_state": "HUMAN_REVIEW_REQUIRED",
+        "publication_status": "NOT_PUBLISHED",
+        "manifest_fingerprint": manifest["manifest_fingerprint"],
+    }:
+        raise ProofEngineError("internal asset manifest mismatch")
+
     checkpoint = load(CHECKPOINT_PATH) if checkpoint is None else checkpoint
     _verify_fingerprint(checkpoint, "checkpoint_fingerprint", "internal asset checkpoint")
-    if checkpoint.get("draft_fingerprint") != committed["draft_fingerprint"]:
+    if checkpoint.get("draft_fingerprint") != candidate["draft_fingerprint"]:
         raise ProofEngineError("internal asset checkpoint draft mismatch")
     if checkpoint.get("asset_count") != 6 or checkpoint.get("source_effective_candidate_count") != 12:
         raise ProofEngineError("internal asset checkpoint counts mismatch")
-    if checkpoint.get("learning_policy_fingerprint") != committed["source_fingerprints"]["learning_policy"]:
+    if checkpoint.get("learning_policy_fingerprint") != candidate["source_fingerprints"]["learning_policy"]:
         raise ProofEngineError("internal asset checkpoint learning-policy mismatch")
     if checkpoint.get("state") != "INTERNAL_ASSET_REVIEW_REQUIRED":
         raise ProofEngineError("internal asset checkpoint state mismatch")
@@ -239,4 +258,4 @@ def verify_internal_asset_draft(draft: dict[str, Any] | None = None, checkpoint:
         raise ProofEngineError("internal asset checkpoint does not preserve source records")
     if checkpoint.get("publication_performed") is not False or checkpoint.get("external_actions_performed") is not False:
         raise ProofEngineError("internal asset checkpoint records unauthorized action")
-    return committed
+    return candidate
