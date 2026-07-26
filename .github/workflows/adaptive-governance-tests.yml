@@ -20,6 +20,7 @@ permissions:
 jobs:
   adaptive-governance:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,5 +28,9 @@ jobs:
           python-version: "3.11"
       - name: Run adaptive governance tests
         run: python -B -m unittest discover -s tests -p 'test_adaptive_governance.py' -v
+      - name: Verify deterministic example plan
+        run: python -B -m adaptive_governance.cli verify --plan adaptive_governance/example_plan.json --context adaptive_governance/example_context.json
       - name: Verify fixed profiles are readable
-        run: python -m adaptive_governance.cli profiles
+        run: python -B -m adaptive_governance.cli profiles
+      - name: Run full repository tests
+        run: python -B -m unittest discover -s tests -v
