@@ -31,8 +31,8 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(loop["active_item_ids"], [])
         self.assertEqual(loop["wip_count"], 0)
         self.assertEqual(loop["state"], "NORMAL")
-        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")
-        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")
+        self.assertEqual(loop["recommendation_action"], "RUN_BUILD_ASSESSMENT")
+        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000010")
         ledger = run["components"]["human_review_ledger"]
         self.assertEqual(ledger["record_count"], 0)
         self.assertEqual(ledger["state"], "NO_DECISIONS")
