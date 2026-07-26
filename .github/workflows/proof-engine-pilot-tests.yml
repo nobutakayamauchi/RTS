@@ -8,6 +8,7 @@ on:
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
+      - "tests/test_proof_engine_asset_draft.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
+      - "tests/test_proof_engine_asset_draft.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -51,10 +53,24 @@ jobs:
           python -B -m proof_engine_pilot.learning_cli verify
           python -B -m proof_engine_pilot.learning_cli summary
           python -B -m proof_engine_pilot.learning_cli replay > /tmp/proof-engine-learning-replay.json
+      - name: Verify six-part internal asset draft
+        run: |
+          python -B -m proof_engine_pilot.asset_cli verify
+          python -B -m proof_engine_pilot.asset_cli summary
+          python -B -m proof_engine_pilot.asset_cli review-template > /tmp/proof-engine-asset-review-template.json
+          python -B -m proof_engine_pilot.asset_cli generate --output /tmp/proof-engine-internal-assets.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          draft = json.loads(Path('/tmp/proof-engine-internal-assets.json').read_text(encoding='utf-8'))
+          manifest = json.loads(Path('proof_engine_pilot/assets/round_0001/internal_asset_manifest.json').read_text(encoding='utf-8'))
+          assert draft['draft_fingerprint'] == manifest['expected_draft_fingerprint']
+          PY
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_learning.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_asset_draft.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v

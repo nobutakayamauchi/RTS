@@ -1,0 +1,11 @@
+{
+  "asset_count": 6,
+  "draft_id": "PROOF-ENGINE-INTERNAL-ASSET-DRAFT-0001",
+  "effective_candidate_count": 12,
+  "expected_draft_fingerprint": "e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834",
+  "manifest_fingerprint": "48415a88bac9be34b9b26e46e0751b05c9112cfe713520511eb47988e88cbd49",
+  "manifest_id": "PROOF-ENGINE-INTERNAL-ASSET-MANIFEST-0001",
+  "publication_status": "NOT_PUBLISHED",
+  "review_state": "HUMAN_REVIEW_REQUIRED",
+  "schema_version": "PROOF-ENGINE-INTERNAL-ASSET-MANIFEST-V1"
+}
