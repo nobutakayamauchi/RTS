@@ -1,0 +1,44 @@
+name: Promotion Application Preview Implementation Candidate
+
+on:
+  pull_request:
+    paths:
+      - "promotion_application_preview/**"
+      - "tests/test_promotion_application_preview.py"
+      - ".github/workflows/promotion-application-preview-implementation-candidate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate committed preview candidate
+        run: |
+          mkdir -p promotion_application_preview/previews
+          python -B -m promotion_application_preview.cli generate > promotion_application_preview/previews/current.json
+      - name: Verify candidate
+        run: |
+          python -B -m promotion_application_preview.cli verify
+          python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
+          python -B -m unittest discover -s tests -v
+      - name: Export verified candidate
+        run: |
+          git diff --name-only > promotion-preview-implementation-files.txt
+          git diff > promotion-preview-implementation.patch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: promotion-preview-implementation-candidate
+          path: |
+            promotion_application_preview/previews/current.json
+            promotion-preview-implementation-files.txt
+            promotion-preview-implementation.patch
+          if-no-files-found: error
