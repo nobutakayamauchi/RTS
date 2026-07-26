@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .models import PLAN_SCHEMA, fingerprint, fingerprint_material, validate_context, validate_plan
+from .models import PLAN_SCHEMA, AdaptiveGovernanceError, fingerprint, fingerprint_material, validate_context, validate_plan
 
 PROFILES: dict[str, dict[str, Any]] = {
     "G0": {
@@ -70,7 +70,7 @@ def classify_context(context: dict[str, Any]) -> tuple[str, list[str]]:
     level = "G0"
     reasons: list[str] = []
 
-    if kinds - {"DOCUMENTATION", "TEST"} or "WRITE_LOCAL" in actions:
+    if kinds - {"DOCUMENTATION", "TEST"} or actions - {"READ"}:
         level = _raise_level(level, "G1")
         reasons.append("LOCAL_CHANGE")
     if (
@@ -197,15 +197,12 @@ def compile_plan(raw_context: dict[str, Any]) -> dict[str, Any]:
     return validate_plan(plan)
 
 
-def verify_plan(raw_plan: dict[str, Any], raw_context: dict[str, Any] | None = None) -> dict[str, Any]:
+def verify_plan(raw_plan: dict[str, Any], raw_context: dict[str, Any]) -> dict[str, Any]:
     plan = validate_plan(raw_plan)
-    if raw_context is not None:
-        context = validate_context(raw_context)
-        if plan["context_fingerprint"] != fingerprint(context):
-            from .models import AdaptiveGovernanceError
-
-            raise AdaptiveGovernanceError("plan does not match the supplied context")
-        expected = compile_plan(context)
-        if plan != expected:
-            raise AdaptiveGovernanceError("plan is not the deterministic compiled result")
+    context = validate_context(raw_context)
+    if plan["context_fingerprint"] != fingerprint(context):
+        raise AdaptiveGovernanceError("plan does not match the supplied context")
+    expected = compile_plan(context)
+    if plan != expected:
+        raise AdaptiveGovernanceError("plan is not the deterministic compiled result")
     return plan
