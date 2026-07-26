@@ -28,11 +28,11 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(run["mode"], "ONE_SHOT_READ_ONLY")
         self.assertEqual(run["status"], "RECONSTRUCTED")
         loop = run["components"]["read_only_loop"]
-        self.assertEqual(loop["active_item_ids"], ["RTS-FRZ-000009"])
-        self.assertEqual(loop["wip_count"], 1)
-        self.assertEqual(loop["state"], "FOCUS")
-        self.assertEqual(loop["recommendation_action"], "CONTINUE_OR_VERIFY_ACTIVE_ITEM")
-        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000009")
+        self.assertEqual(loop["active_item_ids"], [])
+        self.assertEqual(loop["wip_count"], 0)
+        self.assertEqual(loop["state"], "NORMAL")
+        self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")
+        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")
         ledger = run["components"]["human_review_ledger"]
         self.assertEqual(ledger["record_count"], 0)
         self.assertEqual(ledger["state"], "NO_DECISIONS")
