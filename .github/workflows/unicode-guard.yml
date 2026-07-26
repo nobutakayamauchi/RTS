@@ -29,10 +29,13 @@ jobs:
           python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
       - name: Commit generated state or diagnostic
         run: |
+          printf 'diagnostic-run\n' > docs/implementation/PROMOTION_PREVIEW_DIAGNOSTIC_RUN.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
+          git add -f docs/implementation/PROMOTION_PREVIEW_DIAGNOSTIC_RUN.txt
           git add -A
-          git diff --cached --quiet || git commit -m "Capture Promotion Application Preview diagnostic"
+          git commit -m "Persist Promotion Application Preview diagnostic"
           git push
       - name: Verify generated state
         run: |
