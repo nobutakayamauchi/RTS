@@ -66,6 +66,9 @@ AI_ROLE_COPYEDITS = {
     "WORDING-004": "Implemented the schema, preview logic, fixtures, and tests.",
     "WORDING-005": "Implemented the compiler and tests; raised independent review findings; implemented repairs and reran validation.",
 }
+LIMIT_COPYEDITS = {
+    "WORDING-005": "The compiler has been tested inside RTS. It does not prove universal risk-classification quality or replace human judgment for consequential decisions.",
+}
 
 
 def _verify_fingerprint(value: dict[str, Any], field: str, label: str) -> str:
@@ -95,6 +98,10 @@ def _role_text(wording: dict[str, Any], role: str) -> str:
     return _upper_first("; ".join(wording["contribution_map"][role])) + "."
 
 
+def _limit_text(wording: dict[str, Any]) -> str:
+    return LIMIT_COPYEDITS.get(wording["wording_id"], wording["factuality_note"])
+
+
 def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
     wordings = effective_wording_records() if records is None else records
     if len(wordings) != 6 or [item["wording_id"] for item in wordings] != [f"WORDING-{index:03d}" for index in range(1, 7)]:
@@ -121,7 +128,7 @@ def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
             "",
             "**AI-tool role:** " + _role_text(wording, "ai_tool"),
             "",
-            f"**Limits:** {wording['factuality_note']}",
+            f"**Limits:** {_limit_text(wording)}",
             "",
         ])
     lines.extend([
