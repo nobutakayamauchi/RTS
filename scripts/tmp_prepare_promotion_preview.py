@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import traceback
 from pathlib import Path
 
 from freezer.assessment_store import assessment_current_path, create_assessment
@@ -21,7 +22,7 @@ def write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
 
-def main() -> None:
+def generate() -> None:
     if not assessment_current_path(ROOT, ITEM_ID).exists():
         create_assessment(
             ROOT,
@@ -111,6 +112,17 @@ No human-decision creation, self-approval, Skill mutation, application, target w
         path.unlink()
     for cache in ROOT.rglob("__pycache__"):
         shutil.rmtree(cache)
+
+
+def main() -> None:
+    diagnostic = TMP / "promotion_preview_prepare_error.txt"
+    try:
+        generate()
+        diagnostic.unlink(missing_ok=True)
+    except Exception:
+        diagnostic.parent.mkdir(parents=True, exist_ok=True)
+        diagnostic.write_text(traceback.format_exc(), encoding="utf-8")
+        print(diagnostic.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
