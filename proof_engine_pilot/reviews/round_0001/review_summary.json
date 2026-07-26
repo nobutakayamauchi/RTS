@@ -1,0 +1,171 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "contract_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "publication_authorized": false
+  },
+  "base_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "counts": {
+    "base_candidates": 12,
+    "effective_candidates_approved": 12,
+    "originals_approved": 7,
+    "originals_revised": 5,
+    "revisions_approved": 5
+  },
+  "decision_index_fingerprint": "efcd75558bff03abd881067d66923fd0dc3232d54631410ef509af5a27f8a7ba",
+  "effective_candidates": [
+    {
+      "approval_decision_fingerprint": "4ffe6cc495a29ef18541e375fd0643bbeda4d229a35db8a57d6ae6c86d5f5c48",
+      "approval_decision_id": "PROOF-REVIEW-0001-D013",
+      "candidate_fingerprint": "f3efbdd2842e241b9c24ad11b7e8bb9a9c85c9ff3466dec3444e071519cf3acf",
+      "candidate_id": "ACH-001",
+      "candidate_version": 2,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "revision_id": "ACH-001-R1",
+      "source": "REVISION_LEDGER"
+    },
+    {
+      "approval_decision_fingerprint": "775f8d2ce2c91bc13d9a8a06e92b5ca363aa3c9d1ce806ab04c225942eba9f51",
+      "approval_decision_id": "PROOF-REVIEW-0001-D014",
+      "candidate_fingerprint": "9e6008f210dff8aebd56cdf6146e8ea49f4e2cbb994a20036f573655914d2734",
+      "candidate_id": "ACH-002",
+      "candidate_version": 2,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "revision_id": "ACH-002-R1",
+      "source": "REVISION_LEDGER"
+    },
+    {
+      "approval_decision_fingerprint": "4f6844e6567b3cd777f39b8106e05c5d2944e9a1cd9c42f652461e7c081c6178",
+      "approval_decision_id": "PROOF-REVIEW-0001-D001",
+      "candidate_fingerprint": "c6e999358ea8bf32452025244c8bf67af9b0615a62644b2895ba0e817c9d6c02",
+      "candidate_id": "ACH-003",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "0235a64dc4364bcceea7a210bed457727a80669bd0ecba6670e18a81c1468a6f",
+      "approval_decision_id": "PROOF-REVIEW-0001-D002",
+      "candidate_fingerprint": "88d64152c140ae27abc314982cbaf7d4f03073de4696e823030be6b4b5ea506a",
+      "candidate_id": "ACH-004",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "6a48ccf42e119df2c93c77b3668ab095c885294ce11b16dc1c69a65f260ac100",
+      "approval_decision_id": "PROOF-REVIEW-0001-D003",
+      "candidate_fingerprint": "7946c9d5ad60f039da1b7696ab1de03c6dd35502fc47c9db1fcbfde76d8ed3c2",
+      "candidate_id": "ACH-005",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "d34173d63152b33f2e14d929d55229ecde41f3eb5bfaa5add07f02ba35e90ba6",
+      "approval_decision_id": "PROOF-REVIEW-0001-D004",
+      "candidate_fingerprint": "1c61cf7f44150cc2cd783e1c15f44e1f58918a6495c059459b1f044001a211c6",
+      "candidate_id": "ACH-006",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "a6bd1e56fbe3c23e597da3e93fa945cfed196a5a4fbc6cab41490e41a6d2e580",
+      "approval_decision_id": "PROOF-REVIEW-0001-D015",
+      "candidate_fingerprint": "be2fc501112a948bca756565e18bd05b081d6afd0581737a3e24130c32504299",
+      "candidate_id": "ACH-007",
+      "candidate_version": 2,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "revision_id": "ACH-007-R1",
+      "source": "REVISION_LEDGER"
+    },
+    {
+      "approval_decision_fingerprint": "f7231ed9d51ab2655afc40da8417865fb4ee359c9fd614416a1429736792dcbb",
+      "approval_decision_id": "PROOF-REVIEW-0001-D005",
+      "candidate_fingerprint": "b43a812c99d7c7c8f1472ccd6855ed768fc88d76aec28b82a813c486b4cd7291",
+      "candidate_id": "ACH-008",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "c4010f4f558999db78a4f0ebade80bcc3fbdcc0c0bafa99eeb4336379c7742bd",
+      "approval_decision_id": "PROOF-REVIEW-0001-D006",
+      "candidate_fingerprint": "2c8cc1cb6b4a10cd6535e9291615abb4015e7c9b02c9f0f9d28ec90dc8f17799",
+      "candidate_id": "ACH-009",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "83a1290eb0794f1de8e124d6651d6ca097cc5682f871d6162171486e39f7a4c0",
+      "approval_decision_id": "PROOF-REVIEW-0001-D016",
+      "candidate_fingerprint": "097804e888fbaf83c98fe8b9bfc04f8f63180ff284bbc988613a7c3f6e10aca5",
+      "candidate_id": "ACH-010",
+      "candidate_version": 2,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "revision_id": "ACH-010-R1",
+      "source": "REVISION_LEDGER"
+    },
+    {
+      "approval_decision_fingerprint": "02fd0570807ad82c953f1cdae3cf987fa32411772bc765580d2c3ee0b1593dc8",
+      "approval_decision_id": "PROOF-REVIEW-0001-D007",
+      "candidate_fingerprint": "c4f710c49bd66accd9c01cad65637336371cf98e25d1479f2614eba57d0e3af6",
+      "candidate_id": "ACH-011",
+      "candidate_version": 1,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "source": "BASE_RUN"
+    },
+    {
+      "approval_decision_fingerprint": "022c05779f434b890c39151b3735a861a05c4169bfe34d126ead5a50ccfaa324",
+      "approval_decision_id": "PROOF-REVIEW-0001-D017",
+      "candidate_fingerprint": "978dd444f2809052550b24dc2e46cace974115c4f973555424676d68bd694cd2",
+      "candidate_id": "ACH-012",
+      "candidate_version": 2,
+      "effective_status": "APPROVED_FOR_INTERNAL_ASSET_DRAFT",
+      "revision_id": "ACH-012-R1",
+      "source": "REVISION_LEDGER"
+    }
+  ],
+  "factuality_policy": {
+    "project_outputs_and_byproducts_may_replace_personal_achievement_wording": true,
+    "result_and_personal_authorship_are_separate": true,
+    "revised_originals_remain_preserved": true,
+    "unsupported_generalization_is_downgraded": true
+  },
+  "next_action": "Generate an internal six-part public-asset draft from the twelve effective approved candidates and stop before publication.",
+  "original_candidate_preservation": {
+    "base_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+    "base_run_path": "proof_engine_pilot/runs/p3_run_0001.json",
+    "originals_deleted": false,
+    "originals_modified": false,
+    "revision_mode": "APPEND_ONLY"
+  },
+  "output_asset": {
+    "publication_status": "NOT_PUBLISHED",
+    "reason": "Candidate review is complete, but publication wording and release remain a separate human gate.",
+    "source_candidate_ids": [
+      "ACH-001",
+      "ACH-002",
+      "ACH-003",
+      "ACH-004",
+      "ACH-005",
+      "ACH-006",
+      "ACH-007",
+      "ACH-008",
+      "ACH-009",
+      "ACH-010",
+      "ACH-011",
+      "ACH-012"
+    ],
+    "state": "READY_FOR_INTERNAL_DRAFT"
+  },
+  "review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
+  "review_state": "ALL_EFFECTIVE_CANDIDATES_APPROVED",
+  "revisions_fingerprint": "67d96b51e13df9d29b898404f26f85d1a0746573b591280f83818d4e06241606",
+  "schema_version": "PROOF-ENGINE-REVIEW-SUMMARY-V1",
+  "summary_fingerprint": "eb58b8e4ffcdbebd143574109ffa99b9afd02adbeedf71e3aa1466ace48731d4"
+}
