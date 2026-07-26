@@ -85,8 +85,21 @@ Publication review round 0001 records the distinction between the human project 
 - `WORDING-003-R1` replaces unclear stale-expiry phrasing with expired-or-stale decision language;
 - `WORDING-005-R1` describes governance as derived from declared change and authority context rather than exact risk measurement.
 
-All six effective wordings are ready for a separate release-authorization gate. They are not published, and the review does not grant publication, outreach, contract, external-execution, automatic-rewrite, or automatic-approval authority.
+## Bounded repository publication release
 
-Original candidates, corrected revisions, internal assets, public-wording drafts, and review records remain preserved. This is not a model-weight update and does not manufacture human authorship for the delegated AI review.
+```bash
+python -m proof_engine_pilot.release_cli verify
+python -m proof_engine_pilot.release_cli summary
+```
 
-There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. The current state is `RELEASE_AUTHORIZATION_REQUIRED / NOT_PUBLISHED`.
+The project owner authorized exactly one public release surface:
+
+```text
+docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md
+```
+
+The committed document is generated from the six effective reviewed wordings and is bound to an exact content fingerprint. The release authorization permits publication to this public RTS repository document only. It does not permit a root README link, social posting, direct outreach, contracts, provider execution, adjacent-repository writes, or automatic republication.
+
+Original candidates, corrected revisions, internal assets, public-wording drafts, and review records remain preserved. This is not a model-weight update and does not manufacture human authorship for delegated AI judgments.
+
+The current state is `PUBLISHED_TO_AUTHORIZED_REPOSITORY_DOCUMENT`. Any additional surface or distribution action requires a new explicit human authorization.

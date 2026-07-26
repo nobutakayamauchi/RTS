@@ -1,0 +1,48 @@
+{
+  "authorization_fingerprint": "51fc24ed079a834102da79be8a6ec8381ee6b1c971e05e3fc72815681a298f91",
+  "authorization_id": "PROOF-ENGINE-PUBLICATION-RELEASE-AUTHORIZATION-0001",
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "automatic_republication_authorized": false,
+    "contract_authorized": false,
+    "direct_outreach_authorized": false,
+    "provider_execution_authorized": false,
+    "publication_authorized": true,
+    "social_posting_authorized": false,
+    "target_repository_write_authorized": true
+  },
+  "decision": "AUTHORIZE_RELEASE",
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_RELEASE_AUTHORIZATION",
+    "instruction": "じゃとりあえずこれもやろっか。",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "release_surface": {
+    "document_fingerprint": "682ec3d73373ea2228c4d270b5ca74bec8c59050781e7322dbfcfba1c9b50369",
+    "exact_path": "docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md",
+    "publication_mode": "REPOSITORY_DOCUMENT_ONLY",
+    "release_timing": "IMMEDIATE_ON_MERGE",
+    "repository": "nobutakayamauchi/RTS",
+    "repository_visibility": "PUBLIC",
+    "root_readme_link_authorized": false,
+    "target_branch": "main"
+  },
+  "restrictions": {
+    "allowed_publication_paths": [
+      "docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md"
+    ],
+    "content_must_match_authorized_fingerprint": true,
+    "publication_on_any_other_surface_requires_new_human_authorization": true,
+    "release_metadata_may_be_recorded_in_repository": true
+  },
+  "review_round_id": "PROOF-ENGINE-PUBLICATION-REVIEW-ROUND-0001",
+  "schema_version": "PROOF-ENGINE-PUBLICATION-RELEASE-AUTHORIZATION-V1",
+  "source": {
+    "effective_wording_count": 6,
+    "publication_review_contract_fingerprint": "e66845480c8b82a6c0d6d35e0039e20c464d1f6a41e880e5304ec4e59c46f383",
+    "revision_count": 3,
+    "source_draft_fingerprint": "91a21a9eb8119fc474d2f6a1c3429ae265c7c1997066f8148e2a612ef6167782"
+  }
+}
