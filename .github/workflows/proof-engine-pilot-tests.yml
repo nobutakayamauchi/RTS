@@ -5,6 +5,7 @@ on:
     paths:
       - "proof_engine_pilot/**"
       - "pilot_runs/reconnect_pilot_p3/**"
+      - "docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md"
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
@@ -12,12 +13,14 @@ on:
       - "tests/test_proof_engine_asset_review.py"
       - "tests/test_proof_engine_public_wording.py"
       - "tests/test_proof_engine_publication_review.py"
+      - "tests/test_proof_engine_release.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
     paths:
       - "proof_engine_pilot/**"
       - "pilot_runs/reconnect_pilot_p3/**"
+      - "docs/portfolio/RTS_EVIDENCE_BACKED_PROJECT_OUTPUTS.md"
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
@@ -25,6 +28,7 @@ on:
       - "tests/test_proof_engine_asset_review.py"
       - "tests/test_proof_engine_public_wording.py"
       - "tests/test_proof_engine_publication_review.py"
+      - "tests/test_proof_engine_release.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -100,6 +104,10 @@ jobs:
           python -B -m proof_engine_pilot.publication_review_cli summary
           python -B -m proof_engine_pilot.publication_review_cli effective > /tmp/proof-engine-effective-public-wording.json
           python -B -m proof_engine_pilot.publication_review_cli release-template > /tmp/proof-engine-release-template.json
+      - name: Verify bounded repository publication release
+        run: |
+          python -B -m proof_engine_pilot.release_cli verify
+          python -B -m proof_engine_pilot.release_cli summary
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
@@ -109,5 +117,6 @@ jobs:
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_public_wording.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_publication_review.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_release.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
