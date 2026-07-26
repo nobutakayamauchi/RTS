@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-26T00:20:00Z",
+  "generated_at": "2026-07-26T04:31:00Z",
   "count": 9,
   "items": [
     {
@@ -188,10 +188,10 @@
     },
     {
       "item_id": "RTS-FRZ-000009",
-      "version": 1,
+      "version": 3,
       "title": "Human Review Ledger v1",
       "type": "architecture",
-      "status": "FROZEN",
+      "status": "IN_PROGRESS",
       "priority_score": 84.26,
       "estimated_hours": {
         "minimum": 12,
@@ -206,9 +206,9 @@
         "evidence",
         "governance"
       ],
-      "build_authority": "NOT_APPROVED",
+      "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-07-25T23:09:00Z"
+      "updated_at": "2026-07-26T04:31:00Z"
     }
   ]
 }
