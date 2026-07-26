@@ -129,10 +129,27 @@ The project owner explicitly confirmed the `seminar-compass` review. Five origin
 
 Round 2 records an 83.3% first-pass approval rate and a 16.7% revision rate. The higher first-pass approval rate than the original RTS round is recorded only as `POSITIVE_SIGNAL_NOT_PROOF`, because the repository type and candidate count differ.
 
-The correction reinforces existing artifact-kind rule `REVIEW-RULE-002`; it does not activate a new rule or grant automatic correction or approval authority. Round 3 remains a separate human review.
+The correction reinforces existing artifact-kind rule `REVIEW-RULE-002`; it does not activate a new rule or grant automatic correction or approval authority.
+
+## Round 3 cross-repository review
+
+```bash
+python -m proof_engine_pilot.cross_repo_review_round3_cli verify
+python -m proof_engine_pilot.cross_repo_review_round3_cli summary
+python -m proof_engine_pilot.cross_repo_review_round3_cli effective
+python -m proof_engine_pilot.cross_repo_review_round3_cli round-4-template
+```
+
+The project owner explicitly advanced the review from Round 3 to Round 4. Seven original `RTS-minicompany` candidates are approved. `MC-008` is preserved, marked `REVISE`, bounded to the observed metadata-only validation, and approved as `MC-008-R1`.
+
+The review retains two unsupported claims as withheld: no selected evidence proves revenue, and the Media Engine remains manual-only rather than an automatic social publisher. No customer-specific payload is copied.
+
+Round 3 records an 87.5% first-pass approval rate and a 12.5% revision rate. The descriptive improvement over Round 2 remains `POSITIVE_SIGNAL_NOT_PROOF` because repository type, privacy boundary, evidence density, and candidate count differ.
+
+The correction reinforces existing generalization and authority-boundary rules. It does not activate a new rule, update model weights, rewrite candidates automatically, or manufacture approval.
 
 No target repository is modified. Publication, outreach, provider execution, contracts, automatic rewriting, and automatic approval remain unauthorized.
 
 Original candidates, corrected revisions, internal assets, public-wording drafts, review records, and source snapshots remain preserved. This is not a model-weight update and does not manufacture human authorship for delegated AI judgments.
 
-The current review state is `ROUND_2_COMPLETE_ROUND_3_REVIEW_REQUIRED / NOT_PUBLISHED`.
+The current review state is `ROUND_3_COMPLETE_ROUND_4_REVIEW_REQUIRED / NOT_PUBLISHED`.
