@@ -56,8 +56,20 @@ python -m proof_engine_pilot.asset_review_cli summary
 python -m proof_engine_pilot.asset_review_cli effective
 ```
 
-All six internal assets were reviewed against factuality, contribution separation, non-overlap, privacy, and internal-source readiness. They are approved only as sources for the next public-wording draft stage. The approval does not authorize publication, outreach, contracts, external execution, or automatic rewriting.
+All six internal assets were reviewed against factuality, contribution separation, non-overlap, privacy, and internal-source readiness. They are approved only as sources for the public-wording draft stage.
 
-Original candidates, corrected candidate revisions, and generated internal assets remain preserved. This is not a model-weight update and does not manufacture approval.
+## Audience-facing wording draft commands
 
-There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. Publication remains `NOT_PUBLISHED`; the next stage may generate audience-facing wording drafts but must stop at a separate publication review gate.
+```bash
+python -m proof_engine_pilot.public_wording_cli generate
+python -m proof_engine_pilot.public_wording_cli render-markdown
+python -m proof_engine_pilot.public_wording_cli verify
+python -m proof_engine_pilot.public_wording_cli summary
+python -m proof_engine_pilot.public_wording_cli review-template
+```
+
+The six approved internal sources are translated into English audience-facing wording with a headline, summary, value explanation, evidence note, human and AI-tool attribution, and explicit limits. Every draft passes the active review-learning preflight and remains `PUBLICATION_REVIEW_REQUIRED / NOT_PUBLISHED`.
+
+Original candidates, corrected revisions, internal assets, and human decisions remain preserved. This is not a model-weight update and does not manufacture approval.
+
+There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. Publication requires a separate append-only human decision and remains unauthorized in this stage.
