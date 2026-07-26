@@ -12,6 +12,7 @@ from learning_proposals.corpus import verify_all as verify_learning_proposals
 from loop_core.core import evaluate
 from loop_core.models import validate_evaluation
 from outcome_evidence.corpus import corpus_summary, load_corpus
+from promotion_application_preview.corpus import verify_all as verify_promotion_application_preview
 from skill_regression.corpus import verify_all as verify_skill_regression
 
 from .common import (
@@ -50,6 +51,8 @@ SOURCE_PATHS = (
     "skill_regression/snapshots/feature-build/candidate.json",
     "learning_proposals/proposals/feature-build-v1.json",
     "learning_proposals/reviews/feature-build-v1.pending.json",
+    "promotion_application_preview/schemas/preview.schema.json",
+    "promotion_application_preview/previews/current.json",
 )
 
 
@@ -92,6 +95,7 @@ def _verify_sources(root: Path) -> dict[str, Any]:
     regression = verify_skill_regression(root)
     proposal = verify_learning_proposals(root)
     human_review = verify_human_review_ledger(root)
+    promotion_preview = verify_promotion_application_preview(root)
     return {
         "asset_snapshot": asset_snapshot,
         "loop_evaluation": first_evaluation,
@@ -100,6 +104,7 @@ def _verify_sources(root: Path) -> dict[str, Any]:
         "regression_summary": regression,
         "proposal_summary": proposal,
         "human_review_summary": human_review,
+        "promotion_preview_summary": promotion_preview,
     }
 
 
@@ -120,6 +125,7 @@ def generate_run(root: Path) -> dict[str, Any]:
     regression = sources["regression_summary"]
     proposal = sources["proposal_summary"]
     human_review = sources["human_review_summary"]
+    promotion_preview = sources["promotion_preview_summary"]
 
     outcome_links = [
         {
@@ -218,15 +224,27 @@ def generate_run(root: Path) -> dict[str, Any]:
                 "manifest_fingerprint": human_review["manifest_fingerprint"],
                 "summary_fingerprint": human_review["summary_fingerprint"],
             },
+            "promotion_application_preview": {
+                "verification": "PASSED",
+                "preview_id": promotion_preview["preview_id"],
+                "preview_fingerprint": promotion_preview["preview_fingerprint"],
+                "state": promotion_preview["state"],
+                "blocker_count": promotion_preview["blocker_count"],
+                "approval_status": promotion_preview["approval_status"],
+                "application_status": promotion_preview["application_status"],
+                "target_write_authorized": promotion_preview["target_write_authorized"],
+                "adjacent_repository_write_authorized": promotion_preview["adjacent_repository_write_authorized"],
+            },
         },
         "evidence_summary": {
             "confirmed_facts": [
-                "all seven repository-local component verification stages passed in the fixed governed order",
+                "all eight repository-local component verification stages passed in the fixed governed order",
                 "the current loop evaluation observed exactly the active items recorded in the FREEZER index",
                 "three governed outcome bundles remain linked to exact controller plan and authorization fingerprints",
                 "the deterministic Skill regression result contains zero regressions and zero safety failures",
                 "the learning proposal and pending review remain reconstructable from exact committed sources",
                 "the Human Review Ledger verifies as an empty non-authorizing append-only ledger with no manufactured human decision",
+                "the Promotion Application Preview verifies as BLOCKED and non-applying with exact target and rollback hashes",
             ],
             "assumptions": [
                 "repository-local component verification is sufficient for the bounded one-shot integration claim",
