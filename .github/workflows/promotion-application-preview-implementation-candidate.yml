@@ -25,12 +25,18 @@ jobs:
         run: |
           mkdir -p promotion_application_preview/previews
           python -B -m promotion_application_preview.cli generate > promotion_application_preview/previews/current.json
-      - name: Verify candidate
+      - name: Verify candidate and capture diagnostics
         run: |
-          python -B -m promotion_application_preview.cli verify
-          python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
-          python -B -m unittest discover -s tests -v
-      - name: Export verified candidate
+          set +e
+          {
+            python -B -m promotion_application_preview.cli verify
+            python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
+            python -B -m unittest discover -s tests -v
+          } > promotion-preview-implementation-diagnostic.txt 2>&1
+          status=$?
+          echo "$status" > promotion-preview-implementation-status.txt
+          exit 0
+      - name: Export candidate
         run: |
           git diff --name-only > promotion-preview-implementation-files.txt
           git diff > promotion-preview-implementation.patch
@@ -41,4 +47,8 @@ jobs:
             promotion_application_preview/previews/current.json
             promotion-preview-implementation-files.txt
             promotion-preview-implementation.patch
+            promotion-preview-implementation-diagnostic.txt
+            promotion-preview-implementation-status.txt
           if-no-files-found: error
+      - name: Enforce verification result
+        run: test "$(cat promotion-preview-implementation-status.txt)" = "0"
