@@ -74,13 +74,14 @@ class PromotionApplicationPreviewTests(unittest.TestCase):
             with self.assertRaisesRegex(PromotionApplicationPreviewError, "forbidden external-action import"):
                 _verify_forbidden_imports(root)
 
-    def test_cli_has_no_apply_or_write_command(self) -> None:
-        help_text = build_parser().format_help()
-        self.assertIn("generate", help_text)
-        self.assertIn("verify", help_text)
-        self.assertIn("summary", help_text)
-        self.assertNotIn("\n    apply", help_text)
-        self.assertNotIn("\n    write", help_text)
+    def test_cli_has_only_non_applying_commands(self) -> None:
+        parser = build_parser()
+        choices = next(
+            action.choices
+            for action in parser._actions
+            if getattr(action, "dest", None) == "command"
+        )
+        self.assertEqual(set(choices), {"generate", "verify", "summary"})
 
     def test_committed_preview_matches(self) -> None:
         path = self.root / "promotion_application_preview/previews/current.json"
