@@ -1,0 +1,76 @@
+{
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "application_status": "NOT_APPLIED",
+    "approval_status": "NOT_APPROVED",
+    "commit_authorized": false,
+    "external_action_authorized": false,
+    "merge_authorized": false,
+    "skill_mutation_authorized": false,
+    "target_write_authorized": false
+  },
+  "blockers": [
+    "human review approval is not current",
+    "proposal remains pending human review",
+    "regression promotion eligibility remains NOT_ELIGIBLE",
+    "target and adjacent-repository writes are not authorized"
+  ],
+  "generated_from": {
+    "baseline_snapshot_fingerprint": "321f7e927ecd9ad83135111d3995abcdbb144b80d4aeccd8fa8815e82b78dcf2",
+    "candidate_snapshot_fingerprint": "272dd85916e4aa7d0de1cb65517e77a13d76681b8f779392f1b61f6871494d58",
+    "ledger_approval_status": "NOT_APPROVED",
+    "ledger_current_decision_fingerprint": null,
+    "ledger_id": "RTS-HUMAN-REVIEW-LEDGER-000001",
+    "ledger_manifest_fingerprint": "e63a67c74fb8ec08d589045f9251c765d77ac1fb8d27f0fd050339a0e01a63c5",
+    "ledger_record_count": 0,
+    "ledger_state": "NO_DECISIONS",
+    "ledger_summary_fingerprint": "9c19d7de522d32df3ca9b61427804c2b7bde3e0e7a7ba6a5ef21053508e9abd3",
+    "pending_review_fingerprint": "bd0d88fa1f20a099f16d89049cef17fa4440f605cd8ea6955f2cb00879df2473",
+    "proposal_fingerprint": "80f1a86c7d55aa31a8a7d628fdf85ca1a86684feaf49717603ef9b75ef41004e",
+    "proposal_id": "RTS-SKILL-PROPOSAL-000001",
+    "regression_result_fingerprint": "1b7a29e57915e9750e32f4f8c11c0ddbe35a356c088b177de6e5457bca10f53a",
+    "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd"
+  },
+  "mode": "READ_ONLY_NON_APPLYING",
+  "prerequisites": [
+    "a separately approved adjacent-repository execution adapter",
+    "a separately authored current human APPROVE decision",
+    "a verified rollback snapshot matching the expected target",
+    "an exact unchanged target content fingerprint",
+    "an explicit application authority gate outside this preview"
+  ],
+  "preview_fingerprint": "8392d2c6a8b74dccff688df1873c9cef1336b1c3df12df05d8daaae3d2157341",
+  "preview_id": "RTS-PROMOTION-PREVIEW-8392D2C6A8B74DCC",
+  "proposed_change_set": [
+    {
+      "expected_before_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+      "operation": "REPLACE_FILE",
+      "path": "rts-skills/bundles/feature-build.md",
+      "proposed_after_sha256": "6ed1a4a8ff27cba7aa795d525289e262901f9223d5f0608f4e4fd12fb5a4127e",
+      "repository": "nobutakayamauchi/RTS-Skills-"
+    }
+  ],
+  "rollback": {
+    "automatic_rollback_authorized": false,
+    "human_approval_required": true,
+    "restore_content_sha256": "04b5f118bcefda4a0057d697e452e2815ce12f8f2f79ee24be2b693f2e155fee",
+    "rollback_fingerprint": "016d65543a681b729fbf3f6d589034ae3f098b73634882db6a724a3cedd154fd",
+    "rollback_id": "RTS-SKILL-ROLLBACK-000001"
+  },
+  "schema_version": "RTS-PROMOTION-APPLICATION-PREVIEW-V1",
+  "state": "BLOCKED",
+  "stop_conditions": [
+    "any governed fingerprint changes after preview generation",
+    "human approval is absent, stale, expired, rejected, or superseded",
+    "the live target content hash differs from expected_before_sha256",
+    "the proposed target path escapes the separately approved scope",
+    "the regression or rollback verifier no longer passes"
+  ],
+  "validation_steps": [
+    "compare the live target content hash with expected_before_sha256",
+    "re-run the deterministic regression dataset before application",
+    "re-verify proposal, review ledger, rollback, and preview fingerprints",
+    "require a separate human application decision after preview review",
+    "verify the candidate content hash before any target write"
+  ]
+}
