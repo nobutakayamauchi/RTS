@@ -80,6 +80,10 @@ def _pr_links(numbers: list[int]) -> str:
     return ", ".join(links[:-1]) + ", and " + links[-1]
 
 
+def _upper_first(value: str) -> str:
+    return value[:1].upper() + value[1:]
+
+
 def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
     wordings = effective_wording_records() if records is None else records
     if len(wordings) != 6 or [item["wording_id"] for item in wordings] != [f"WORDING-{index:03d}" for index in range(1, 7)]:
@@ -102,9 +106,9 @@ def render_release_markdown(records: list[dict[str, Any]] | None = None) -> str:
             "",
             f"**Evidence:** {wording['proof_note']} {evidence_label}: {_pr_links(wording['evidence_prs'])}.",
             "",
-            "**Human role:** " + "; ".join(wording["contribution_map"]["human"]).capitalize() + ".",
+            "**Human role:** " + _upper_first("; ".join(wording["contribution_map"]["human"])) + ".",
             "",
-            "**AI-tool role:** " + "; ".join(wording["contribution_map"]["ai_tool"]).capitalize() + ".",
+            "**AI-tool role:** " + _upper_first("; ".join(wording["contribution_map"]["ai_tool"])) + ".",
             "",
             f"**Limits:** {wording['factuality_note']}",
             "",
