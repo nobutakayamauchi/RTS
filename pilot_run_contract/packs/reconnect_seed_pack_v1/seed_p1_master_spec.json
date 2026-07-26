@@ -1,0 +1,106 @@
+{
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "advisory_only": true,
+    "automatic_approval_authorized": false,
+    "external_execution_authorized": false,
+    "mode": "GOVERNED_PILOT",
+    "provider_authorized": false,
+    "publication_authorized": false,
+    "target_write_authorized": false
+  },
+  "constraints": {
+    "forbidden_actions": [
+      "automatic contract acceptance",
+      "automatic external publication",
+      "automatic human ranking",
+      "automatic outreach or application",
+      "automatic support-recipient selection",
+      "credential or private-data persistence",
+      "provider use without a new approval gate",
+      "target or adjacent-repository write without a new approval gate",
+      "P3 code implementation before an explicit P3 build decision",
+      "using sensitive CASE-001 details as product evidence or public copy",
+      "treating AI-generated interpretation as verified evidence",
+      "treating the selected RTS case as general proof",
+      "creating a global capability score",
+      "expanding from one fixed source boundary to autonomous multi-repository ingestion"
+    ],
+    "human_gate_required": true,
+    "wip_limit": 1
+  },
+  "inputs": {
+    "source_refs": [
+      "pilot_runs/reconnect_pilot_p0/P0_SCOPE_CUT_RESULT.md",
+      "pilot_runs/reconnect_pilot_p0/HUMAN_REVIEW_PACKET_V1.md",
+      "pilot_runs/reconnect_pilot_p0/run_record.json",
+      "pilot_runs/reconnect_pilot_p0/checkpoint_0001.json",
+      "pilot_run_contract/packs/reconnect_seed_pack_v1/FULL_CONTEXT.md",
+      "pilot_run_contract/packs/reconnect_seed_pack_v1/scope_profiles.json",
+      "pilot_runs/reconnect_pilot_p1/HUMAN_SCOPE_DECISION_0001.json",
+      "RTS merged pull requests 242 through 261 as the proposed fixed P3 evidence source"
+    ]
+  },
+  "objective": {
+    "completion_conditions": [
+      "A Master Product Specification defines purpose, actors, terminology, modules, boundaries, operating lanes, non-goals, privacy, authority, failure handling, and lifecycle.",
+      "A Hypothesis Map separates confirmed decisions, testable assumptions, unknowns, and falsification signals.",
+      "A canonical data model defines the ten MVP records, evidence labels, contribution dimensions, provenance, versioning, and human decisions.",
+      "One MVP Implementation Contract fixes the source boundary, processing steps, required outputs, deterministic tests, completion gate, exclusions, and rollback point.",
+      "Acceptance criteria cover functional behavior, evidence integrity, human authority, privacy, determinism, scope control, and usability.",
+      "Future branches remain frozen with measurable unlock triggers.",
+      "Contradictions and unresolved commercial decisions are recorded without silent closure.",
+      "A human review packet can approve, revise, freeze, or reject P3 implementation.",
+      "The run stops before P3 code implementation or any external action."
+    ],
+    "current_goal": "Lock the product-wide specification and one minimum P3 vertical-slice implementation contract for a fixed RTS evidence source, then stop for explicit P3 build authorization.",
+    "final_goal": "Build an evidence-based path that reconnects overlooked capability and project value to customers, collaborators, organizations, opportunities, and suitable support, then records what changes after connection."
+  },
+  "outputs": {
+    "required_artifacts": [
+      "Master Product Specification v1",
+      "Hypothesis Map v1",
+      "Canonical Data Model v1",
+      "MVP Implementation Contract v1",
+      "Acceptance Criteria v1",
+      "Future Branch Unlock Triggers v1",
+      "Contradiction Audit v1",
+      "P3 Human Review Packet v1",
+      "P1 Run Record and Checkpoint v1"
+    ]
+  },
+  "project": {
+    "case_id": "CASE-001-P1-MASTER-SPEC",
+    "current_scope": "Produce and contradiction-audit the Master Product Specification, Hypothesis Map, canonical data model, MVP Implementation Contract, acceptance criteria, future-branch unlock triggers, and a P3 build review packet. Stop before code implementation, publication, outreach, provider use, external execution, or repository mutation outside this approved specification PR.",
+    "purpose": "Define a complete evidence-based system that discovers overlooked work value, binds claims to exact evidence, separates human and AI contribution, translates value for specific audiences, and prepares governed connection experiments without exaggeration or automatic consequential action.",
+    "title": "Proof Engine / Evidence-Based Value Discovery and Reconnection"
+  },
+  "readiness": {
+    "known_gaps": [
+      "The public brand is not approved; Proof Engine is a working title.",
+      "The first buyer, price, and sales channel remain hypotheses.",
+      "The P3 implementation repository and write authority require a separate decision.",
+      "The fixed RTS PR range has not yet been processed into achievement candidates.",
+      "External users and market response have not been observed.",
+      "Legal and privacy review is required before external customer data is accepted."
+    ],
+    "state": "READY_FOR_PILOT"
+  },
+  "schema_version": "RTS-PILOT-SEED-V1",
+  "seed_fingerprint": "633a34adbe36842719e093fb4e8de49703817e2822e3d2a8b19e2c228de7f3d0",
+  "seed_id": "RTS-PILOT-SEED-RECONNECT-MASTER-SPEC-V1",
+  "work_policy": {
+    "checkpoint": "After each artifact, record source fingerprints, confirmed decisions, assumptions, unresolved items, excluded branches, next action, and whether the artifact changes the P3 contract.",
+    "resume": "Resume only from the latest verified P1 checkpoint with unchanged P0 run fingerprint, human decision fingerprint, and P1 Seed fingerprint.",
+    "selection": "Work on exactly one P1 artifact at a time in this order: human decision record, Master Product Specification, Hypothesis Map, canonical data model, MVP Implementation Contract, acceptance criteria, future unlock triggers, contradiction audit, P3 review packet.",
+    "stop_conditions": [
+      "The P1 completion conditions are met.",
+      "A specification choice would require unrecorded human preference or public-disclosure consent.",
+      "The work would enter P3 code implementation, publication, outreach, provider use, contracting, or external execution.",
+      "The proposed source boundary cannot be made exact and reproducible.",
+      "Evidence and interpretation cannot be separated.",
+      "The same contradiction repeats twice without a new decision.",
+      "Any authority boundary would widen."
+    ]
+  }
+}
