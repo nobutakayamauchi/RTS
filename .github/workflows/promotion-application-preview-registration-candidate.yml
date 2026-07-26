@@ -30,15 +30,6 @@ jobs:
           from governed_loop.generation import generate_run
 
           root = Path('.').resolve()
-          test_path = root / 'tests/test_governed_loop.py'
-          text = test_path.read_text(encoding='utf-8')
-          before = 'self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")\n        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")'
-          after = 'self.assertEqual(loop["recommendation_action"], "RUN_BUILD_ASSESSMENT")\n        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000010")'
-          if before in text:
-              test_path.write_text(text.replace(before, after), encoding='utf-8')
-          elif after not in text:
-              raise SystemExit('expected governed-loop assertion block not found')
-
           docs = root / 'docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_REGISTRATION.md'
           docs.write_text('''# Promotion Application Preview v1 Registration\n\n## Governed item\n\n- item: `RTS-FRZ-000010`\n- status: `FROZEN`\n- build authority: `NOT_APPROVED`\n- Assessment: `MISSING`\n- Preflight: `MISSING`\n- WIP: `0`\n\n## Purpose\n\nRegister the third staged integration child identified by the current parent Assessment: a deterministic repository-local application preview that emits a proposed change set and blockers without writing any target.\n\n## Permanent boundary\n\nRegistration grants no implementation, approval, application, merge, adjacent-repository write, Skill mutation, provider, scheduler, network, subprocess, publication, deployment, messaging, or external-action authority.\n\n## Next gates\n\n1. Build Assessment\n2. PASS Implementation Preflight\n3. explicit human approval\n4. `SELECTED -> IN_PROGRESS` under WIP=1\n5. implementation, CI, independent review, and completion records\n''', encoding='utf-8')
 
