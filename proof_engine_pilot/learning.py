@@ -25,7 +25,7 @@ POLICY_PATH = DATA_DIR / "policy_state.json"
 CHECKPOINT_PATH = ROOT / "pilot_runs" / "reconnect_pilot_p3" / "learning_checkpoint_0003.json"
 
 REQUIRED_FIELDS = {
-    "record_kind", "factuality_note", "contribution_map",
+    "candidate_id", "claim", "record_kind", "factuality_note", "contribution_map",
     "evidence_label", "evidence_prs", "public_disclosure",
 }
 ALLOWED_KINDS = {
@@ -171,7 +171,7 @@ def verify_ruleset(ruleset: dict[str, Any], dataset: dict[str, Any]) -> dict[str
     return ruleset
 
 
-def verify_learning_bundle() -> dict[str, Any]:
+def verify_learning_bundle(checkpoint: dict[str, Any] | None = None) -> dict[str, Any]:
     dataset = verify_dataset(load(DATASET_PATH))
     ruleset = verify_ruleset(load(RULESET_PATH), dataset)
 
@@ -206,7 +206,7 @@ def verify_learning_bundle() -> dict[str, Any]:
     if policy.get("authority") != {**AUTHORITY_FALSE, "external_execution_authorized": False}:
         raise ProofEngineError("learning policy authority mismatch")
 
-    checkpoint = load(CHECKPOINT_PATH)
+    checkpoint = load(CHECKPOINT_PATH) if checkpoint is None else checkpoint
     _verify_fingerprint(checkpoint, "checkpoint_fingerprint", "learning checkpoint")
     links = {
         "dataset_fingerprint": dataset["dataset_fingerprint"],
@@ -221,6 +221,8 @@ def verify_learning_bundle() -> dict[str, Any]:
         raise ProofEngineError("learning checkpoint state mismatch")
     if checkpoint.get("original_records_preserved") is not True or checkpoint.get("model_weight_update_performed") is not False:
         raise ProofEngineError("learning checkpoint preservation mismatch")
+    if checkpoint.get("external_actions_performed") is not False:
+        raise ProofEngineError("learning checkpoint records an unauthorized external action")
     return {"dataset": dataset, "ruleset": ruleset, "replay": replay, "policy": policy, "checkpoint": checkpoint}
 
 
@@ -229,24 +231,36 @@ def preflight_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     missing = sorted(REQUIRED_FIELDS - set(candidate))
     if missing:
         issues.append({"rule_id": "REVIEW-RULE-002", "code": "MISSING_LEARNING_FIELDS", "detail": ", ".join(missing)})
+
+    candidate_id = candidate.get("candidate_id")
+    if "candidate_id" in candidate and (not isinstance(candidate_id, str) or not candidate_id.strip()):
+        issues.append({"rule_id": "REVIEW-RULE-002", "code": "INVALID_CANDIDATE_ID", "detail": "candidate_id must be a non-empty string."})
+
+    claim = candidate.get("claim")
+    if "claim" in candidate and (not isinstance(claim, str) or not claim.strip()):
+        issues.append({"rule_id": "REVIEW-RULE-001", "code": "INVALID_CLAIM", "detail": "claim must be a non-empty string."})
+
     kind = candidate.get("record_kind")
     if kind is not None and kind not in ALLOWED_KINDS:
         issues.append({"rule_id": "REVIEW-RULE-002", "code": "UNKNOWN_RECORD_KIND", "detail": str(kind)})
-    claim = candidate.get("claim", "")
+
     contribution = candidate.get("contribution_map", {})
     ai_work = contribution.get("ai_tool") if isinstance(contribution, dict) else None
-    if isinstance(claim, str) and ai_work and STRONG_PREFIX.search(claim) and not candidate.get("factuality_note"):
-        issues.append({"rule_id": "REVIEW-RULE-001", "code": "AUTHORSHIP_REQUIRES_FACTUALITY_NOTE", "detail": "Strong direct-action wording is combined with material AI-tool contribution."})
+    if isinstance(claim, str) and ai_work and STRONG_PREFIX.search(claim.strip()):
+        issues.append({"rule_id": "REVIEW-RULE-001", "code": "DIRECT_AUTHORSHIP_REQUIRES_REVIEW", "detail": "Strong direct-action wording is combined with material AI-tool contribution; bound the claim itself to the observed result and supported human actions."})
+
     lower = claim.lower() if isinstance(claim, str) else ""
     if any(term in lower for term in ("reusable", "repeatable", "future projects", "across projects")):
         if candidate.get("record_kind") != "REUSABILITY_SIGNAL" or candidate.get("evidence_label") != "INFERRED":
             issues.append({"rule_id": "REVIEW-RULE-004", "code": "GENERALIZATION_EXCEEDS_EVIDENCE", "detail": "Cross-project reuse remains an INFERRED REUSABILITY_SIGNAL until externally observed."})
+
     disclosure = candidate.get("public_disclosure")
     if disclosure is not None and disclosure not in {"INTERNAL_UNTIL_APPROVED", "INTERNAL_UNTIL_SEPARATE_PUBLICATION_APPROVAL"}:
         issues.append({"rule_id": "REVIEW-RULE-006", "code": "PUBLICATION_BOUNDARY_NOT_EXPLICIT", "detail": "Candidate approval must not imply publication authority."})
+
     return {
         "schema_version": "PROOF-ENGINE-LEARNING-PREFLIGHT-V1",
-        "candidate_id": candidate.get("candidate_id"),
+        "candidate_id": candidate_id,
         "mode": "SUGGEST_ONLY",
         "result": "SUGGEST_REVIEW" if issues else "PASS",
         "issues": issues,
