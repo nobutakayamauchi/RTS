@@ -1,0 +1,79 @@
+{
+  "authority": {
+    "application_status": "NOT_APPLIED",
+    "approval_status": "REVIEW_REQUIRED",
+    "external_action_authorized": false,
+    "merge_authorized": false,
+    "mutation_authorized": false,
+    "self_approval_authorized": false
+  },
+  "change_id": "RTS-CHANGE-PROMOTION-PREVIEW-001",
+  "classification_reasons": [
+    "GOVERNED_OR_HIGH_UNCERTAINTY_CHANGE",
+    "LOCAL_CHANGE",
+    "READ_ONLY_BOUNDARY",
+    "REVERSIBLE_CHANGE"
+  ],
+  "context_fingerprint": "065c08b5bc70fd6b12ce8fd2f8c5773efbaf66b175d2a56837f56a77059cf910",
+  "governance_cost": {
+    "governance_steps": 5,
+    "implementation_steps": 5,
+    "ratio": 1.0,
+    "status": "BALANCED",
+    "warnings": []
+  },
+  "level": "G2",
+  "plan_fingerprint": "522578840db5d44e77a199989cf6311e6f418cc22b1f4b3f2b981d46eddd2322",
+  "prohibitions": [
+    "ADJACENT_REPOSITORY_WRITE",
+    "AUTHORITY_ESCALATION",
+    "EXTERNAL_ACTION",
+    "MUTATION",
+    "SELF_APPROVAL",
+    "TARGET_WRITE",
+    "UNRECORDED_POLICY_RELAXATION"
+  ],
+  "requirements": {
+    "execution_mode": "HUMAN_TRIGGERED",
+    "human_approvals": 1,
+    "independent_review": false,
+    "max_governance_steps": 6,
+    "max_pull_requests": 1,
+    "preflight": true,
+    "rollback": "REQUIRED",
+    "test_scope": "FOCUSED"
+  },
+  "schema_version": "RTS-ADAPTIVE-GOVERNANCE-PLAN-V1",
+  "workflow": [
+    {
+      "description": "Validate context and compile the minimum governance plan.",
+      "human_gate": true,
+      "order": 1,
+      "step_id": "CLASSIFY_AND_PREFLIGHT"
+    },
+    {
+      "description": "Obtain the required explicit human approval for this exact plan.",
+      "human_gate": true,
+      "order": 2,
+      "step_id": "HUMAN_APPROVAL"
+    },
+    {
+      "description": "Implement only the approved scope without widening authority.",
+      "human_gate": false,
+      "order": 3,
+      "step_id": "IMPLEMENT"
+    },
+    {
+      "description": "Run FOCUSED validation, verify rollback when required, and preserve deterministic evidence.",
+      "human_gate": false,
+      "order": 4,
+      "step_id": "VALIDATE_AND_EVIDENCE"
+    },
+    {
+      "description": "Record completion and leave application authority disabled.",
+      "human_gate": false,
+      "order": 5,
+      "step_id": "COMPLETE"
+    }
+  ]
+}
