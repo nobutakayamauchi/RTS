@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-HUMAN-REVIEW-POLICY-V1",
+  "title": "RTS Human Review Policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "ledger_id", "allowed_decisions", "reviewer_roles", "required_source_kinds", "separation_of_duties", "expiry_rules", "authority", "policy_fingerprint"],
+  "properties": {
+    "schema_version": {"const": "RTS-HUMAN-REVIEW-POLICY-V1"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+    "allowed_decisions": {"const": ["APPROVE", "EXPIRE", "REJECT", "RETURN_FOR_REVISION", "SUPERSEDE"]},
+    "reviewer_roles": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "required_source_kinds": {"const": ["outcome_evidence", "pending_review", "policy", "proposal", "regression_result", "reviewer_scope", "rollback"]},
+    "separation_of_duties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer_must_differ_from_proposer", "reviewer_must_differ_from_implementer"],
+      "properties": {
+        "reviewer_must_differ_from_proposer": {"const": true},
+        "reviewer_must_differ_from_implementer": {"const": true}
+      }
+    },
+    "expiry_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approve_requires_expiry", "explicit_expire_record_supported", "stale_source_invalidates_current_approval"],
+      "properties": {
+        "approve_requires_expiry": {"const": true},
+        "explicit_expire_record_supported": {"const": true},
+        "stale_source_invalidates_current_approval": {"const": true}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_status", "application_status", "skill_mutation_authorized", "adjacent_repository_write_authorized", "merge_authorized", "external_action_authorized"],
+      "properties": {
+        "approval_status": {"const": "EVIDENCE_ONLY"},
+        "application_status": {"const": "NOT_APPLIED"},
+        "skill_mutation_authorized": {"const": false},
+        "adjacent_repository_write_authorized": {"const": false},
+        "merge_authorized": {"const": false},
+        "external_action_authorized": {"const": false}
+      }
+    },
+    "policy_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
