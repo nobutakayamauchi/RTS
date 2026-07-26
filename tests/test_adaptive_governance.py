@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import copy
 import unittest
 
 from adaptive_governance.cli import build_parser
 from adaptive_governance.compiler import compile_plan, verify_plan
-from adaptive_governance.models import AdaptiveGovernanceError, CONTEXT_SCHEMA
+from adaptive_governance.models import (
+    AdaptiveGovernanceError,
+    CONTEXT_SCHEMA,
+    fingerprint,
+    fingerprint_material,
+)
 
 
 def context(**impact_overrides):
@@ -35,6 +41,10 @@ def context(**impact_overrides):
     }
 
 
+def resign(plan):
+    plan["plan_fingerprint"] = fingerprint(fingerprint_material(plan, "plan_fingerprint"))
+
+
 class AdaptiveGovernanceTests(unittest.TestCase):
     def test_read_only_documentation_is_g0(self):
         value = context(read_only=True)
@@ -46,6 +56,12 @@ class AdaptiveGovernanceTests(unittest.TestCase):
 
     def test_reversible_local_code_is_g1(self):
         self.assertEqual(compile_plan(context())["level"], "G1")
+
+    def test_local_execute_cannot_fall_to_g0(self):
+        value = context(read_only=True)
+        value["change_kinds"] = ["TEST"]
+        value["requested_actions"] = ["EXECUTE"]
+        self.assertEqual(compile_plan(value)["level"], "G1")
 
     def test_approval_flow_is_g2(self):
         plan = compile_plan(context(touches_approval_flow=True))
@@ -77,13 +93,24 @@ class AdaptiveGovernanceTests(unittest.TestCase):
         self.assertEqual(first, second)
 
     def test_tampered_plan_fails_closed(self):
-        plan = compile_plan(context())
+        value = context()
+        plan = compile_plan(value)
         plan["authority"]["merge_authorized"] = True
         with self.assertRaisesRegex(AdaptiveGovernanceError, "authority boundary widened"):
-            verify_plan(plan)
+            verify_plan(plan, value)
+
+    def test_resigned_weaker_profile_is_rejected(self):
+        value = context(financial_or_contractual=True)
+        plan = compile_plan(value)
+        plan["level"] = "G0"
+        plan["requirements"]["human_approvals"] = 0
+        resign(plan)
+        with self.assertRaisesRegex(AdaptiveGovernanceError, "deterministic compiled result"):
+            verify_plan(plan, value)
 
     def test_context_mismatch_is_rejected(self):
-        plan = compile_plan(context())
+        value = context()
+        plan = compile_plan(value)
         changed = context(touches_approval_flow=True)
         with self.assertRaisesRegex(AdaptiveGovernanceError, "does not match"):
             verify_plan(plan, changed)
@@ -94,11 +121,37 @@ class AdaptiveGovernanceTests(unittest.TestCase):
         with self.assertRaisesRegex(AdaptiveGovernanceError, "unknown fields"):
             compile_plan(value)
 
+    def test_empty_change_kinds_are_rejected(self):
+        value = context()
+        value["change_kinds"] = []
+        with self.assertRaisesRegex(AdaptiveGovernanceError, "must not be empty"):
+            compile_plan(value)
+
+    def test_empty_paths_are_rejected(self):
+        value = context()
+        value["affected_paths"] = []
+        with self.assertRaisesRegex(AdaptiveGovernanceError, "must not be empty"):
+            compile_plan(value)
+
+    def test_empty_actions_are_rejected(self):
+        value = context()
+        value["requested_actions"] = []
+        with self.assertRaisesRegex(AdaptiveGovernanceError, "must not be empty"):
+            compile_plan(value)
+
     def test_path_escape_is_rejected(self):
         value = context()
         value["affected_paths"] = ["../outside"]
         with self.assertRaisesRegex(AdaptiveGovernanceError, "unsafe path"):
             compile_plan(value)
+
+    def test_git_metadata_path_is_rejected(self):
+        for path in (".git", ".git/config"):
+            with self.subTest(path=path):
+                value = context()
+                value["affected_paths"] = [path]
+                with self.assertRaisesRegex(AdaptiveGovernanceError, "unsafe path"):
+                    compile_plan(value)
 
     def test_tiny_high_risk_change_is_flagged_over_governed(self):
         value = context(repository_scope="ADJACENT")
@@ -107,13 +160,13 @@ class AdaptiveGovernanceTests(unittest.TestCase):
         plan = compile_plan(value)
         self.assertEqual(plan["governance_cost"]["status"], "OVER_GOVERNED")
 
-    def test_cli_has_no_authorizing_command(self):
-        help_text = build_parser().format_help()
-        self.assertIn("compile", help_text)
-        self.assertIn("verify", help_text)
-        self.assertNotIn("apply", help_text)
-        self.assertNotIn("approve", help_text)
-        self.assertNotIn("merge", help_text)
+    def test_cli_has_no_authorizing_command_and_requires_context_for_verify(self):
+        parser = build_parser()
+        action = next(action for action in parser._actions if getattr(action, "choices", None))
+        self.assertEqual(set(action.choices), {"compile", "verify", "profiles"})
+        verify_parser = action.choices["verify"]
+        context_action = next(item for item in verify_parser._actions if item.dest == "context")
+        self.assertTrue(context_action.required)
 
     def test_profile_step_budget_is_respected(self):
         for overrides in (
