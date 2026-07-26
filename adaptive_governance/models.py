@@ -10,6 +10,7 @@ from typing import Any
 CONTEXT_SCHEMA = "RTS-ADAPTIVE-GOVERNANCE-CONTEXT-V1"
 PLAN_SCHEMA = "RTS-ADAPTIVE-GOVERNANCE-PLAN-V1"
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 LEVELS = ("G0", "G1", "G2", "G3", "G4")
 REPOSITORY_SCOPES = {"LOCAL", "ADJACENT", "EXTERNAL"}
 UNCERTAINTY_LEVELS = {"LOW", "MEDIUM", "HIGH"}
@@ -99,11 +100,18 @@ def sorted_unique_strings(value: Any, label: str, allowed: set[str] | None = Non
     return result
 
 
+def required_strings(value: Any, label: str, allowed: set[str] | None = None) -> list[str]:
+    result = sorted_unique_strings(value, label, allowed)
+    if not result:
+        raise AdaptiveGovernanceError(f"{label} must not be empty")
+    return result
+
+
 def safe_paths(value: Any, label: str) -> list[str]:
-    paths = sorted_unique_strings(value, label)
+    paths = required_strings(value, label)
     for raw in paths:
         path = PurePosixPath(raw)
-        if path.is_absolute() or ".." in path.parts or raw.startswith(".git/"):
+        if path.is_absolute() or ".." in path.parts or (path.parts and path.parts[0] == ".git"):
             raise AdaptiveGovernanceError(f"{label} contains an unsafe path")
     return paths
 
@@ -127,9 +135,9 @@ def validate_context(record: dict[str, Any]) -> dict[str, Any]:
         raise AdaptiveGovernanceError("context schema mismatch")
     safe_id(record["change_id"], "change_id")
     text(record["summary"], "summary", 2048)
-    sorted_unique_strings(record["change_kinds"], "change_kinds", CHANGE_KINDS)
+    required_strings(record["change_kinds"], "change_kinds", CHANGE_KINDS)
     safe_paths(record["affected_paths"], "affected_paths")
-    sorted_unique_strings(record["requested_actions"], "requested_actions", REQUESTED_ACTIONS)
+    required_strings(record["requested_actions"], "requested_actions", REQUESTED_ACTIONS)
     impact = exact(
         record["impact"],
         {
@@ -190,11 +198,11 @@ def validate_plan(record: dict[str, Any]) -> dict[str, Any]:
     if record["schema_version"] != PLAN_SCHEMA:
         raise AdaptiveGovernanceError("plan schema mismatch")
     safe_id(record["change_id"], "change_id")
-    if not isinstance(record["context_fingerprint"], str) or len(record["context_fingerprint"]) != 64:
+    if not isinstance(record["context_fingerprint"], str) or not SHA256.fullmatch(record["context_fingerprint"]):
         raise AdaptiveGovernanceError("context_fingerprint must be SHA-256")
     if record["level"] not in LEVELS:
         raise AdaptiveGovernanceError("plan level is unsupported")
-    sorted_unique_strings(record["classification_reasons"], "classification_reasons")
+    required_strings(record["classification_reasons"], "classification_reasons")
     requirements = exact(
         record["requirements"],
         {
@@ -230,7 +238,7 @@ def validate_plan(record: dict[str, Any]) -> dict[str, Any]:
         safe_id(step["step_id"], f"workflow[{index}].step_id")
         text(step["description"], f"workflow[{index}].description", 512)
         boolean(step["human_gate"], f"workflow[{index}].human_gate")
-    sorted_unique_strings(record["prohibitions"], "prohibitions")
+    required_strings(record["prohibitions"], "prohibitions")
     cost = exact(
         record["governance_cost"],
         {"implementation_steps", "governance_steps", "ratio", "status", "warnings"},
@@ -265,6 +273,8 @@ def validate_plan(record: dict[str, Any]) -> dict[str, Any]:
     }
     if authority != expected_authority:
         raise AdaptiveGovernanceError("plan authority boundary widened")
+    if not isinstance(record["plan_fingerprint"], str) or not SHA256.fullmatch(record["plan_fingerprint"]):
+        raise AdaptiveGovernanceError("plan_fingerprint must be SHA-256")
     expected = fingerprint(fingerprint_material(record, "plan_fingerprint"))
     if record["plan_fingerprint"] != expected:
         raise AdaptiveGovernanceError("plan fingerprint mismatch")
