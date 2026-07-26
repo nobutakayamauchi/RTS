@@ -32,7 +32,7 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(loop["wip_count"], 0)
         self.assertEqual(loop["state"], "NORMAL")
         self.assertEqual(loop["recommendation_action"], "REQUEST_HUMAN_APPROVAL")
-        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000003")
+        self.assertEqual(loop["recommendation_item_id"], "RTS-FRZ-000009")
         self.assertTrue(run["authority"]["read_only"])
         for field in (
             "external_execution_performed",
