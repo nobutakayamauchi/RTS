@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-HUMAN-REVIEW-LEDGER-MANIFEST-V1",
+  "title": "RTS Human Review Ledger Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ledger_id", "record_count", "records", "head_fingerprint", "manifest_fingerprint"],
+  "properties": {
+    "schema_version": {"const": "RTS-HUMAN-REVIEW-LEDGER-MANIFEST-V1"},
+    "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+    "record_count": {"type": "integer", "minimum": 0},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sequence", "path", "file_sha256", "decision_id", "decision_fingerprint"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 1},
+          "path": {"type": "string", "pattern": "^human_review_ledger/ledger/decisions/"},
+          "file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "decision_id": {"type": "string", "minLength": 1},
+          "decision_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "head_fingerprint": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "manifest_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
