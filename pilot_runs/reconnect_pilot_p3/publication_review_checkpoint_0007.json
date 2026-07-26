@@ -1,0 +1,17 @@
+{
+  "checkpoint_fingerprint": "ba472c05a0aa2551cafb2256b72eab581e4db018898fc33b075d1af5a2d8736f",
+  "checkpoint_id": "PROOF-ENGINE-PUBLICATION-REVIEW-CHECKPOINT-0007",
+  "effective_wording_count": 6,
+  "external_actions_performed": false,
+  "next_action": "Human reviews the effective six-wording set, selects the exact release surface, and explicitly authorizes or withholds publication.",
+  "original_wording_drafts_preserved": true,
+  "publication_performed": false,
+  "release_authorization_status": "REQUIRED",
+  "review_contract_fingerprint": "e66845480c8b82a6c0d6d35e0039e20c464d1f6a41e880e5304ec4e59c46f383",
+  "review_round_id": "PROOF-ENGINE-PUBLICATION-REVIEW-ROUND-0001",
+  "revision_count": 3,
+  "schema_version": "PROOF-ENGINE-PUBLICATION-REVIEW-CHECKPOINT-V1",
+  "separate_human_release_authorization_required": true,
+  "source_draft_fingerprint": "91a21a9eb8119fc474d2f6a1c3429ae265c7c1997066f8148e2a612ef6167782",
+  "state": "RELEASE_AUTHORIZATION_REQUIRED"
+}
