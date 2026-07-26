@@ -45,12 +45,12 @@
     ]
   },
   "result": "PASS_SCOPE_CUT_READY",
-  "run_fingerprint": "b48e5f4c1035c154871ed5aa587a06302cd2ab12a2133a6b2d4d4e47bcda5199",
+  "run_fingerprint": "6d673013ac11e264fd616cdfcee45d0a2f109d8c603e9fca56bf5c93916367de",
   "run_id": "RECONNECT-PILOT-P0-RUN-0001",
   "schema_version": "RTS-RECONNECT-PILOT-RUN-V1",
   "source": {
     "active_scope": "P0_SCOPE_CUT",
-    "pack_manifest_sha256": "621daf1c3f1e56526064d27d7f774f44cd193610c5ded4a3b32d1d0f6465e832",
+    "pack_manifest_sha256": "93564b56b04093c3ca90b5b2fcafc30cd6e3597e6d0a20930adc859451c6a962",
     "pack_path": "pilot_run_contract/packs/reconnect_seed_pack_v1",
     "seed_fingerprint": "c8bab7c96cf19835707b2df9de98ca44d22f59e162d518babf4f3d20e0f1ef7c",
     "seed_id": "RTS-PILOT-SEED-RECONNECT-SCOPE-CUT-V1",
