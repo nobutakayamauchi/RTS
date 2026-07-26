@@ -18,6 +18,16 @@ ROOT_FIELDS = {
     "schema_version", "seed_id", "seed_fingerprint", "project", "objective",
     "constraints", "work_policy", "inputs", "outputs", "authority", "readiness",
 }
+REQUIRED_FORBIDDEN_ACTIONS = {
+    "automatic contract acceptance",
+    "automatic external publication",
+    "automatic human ranking",
+    "automatic outreach or application",
+    "automatic support-recipient selection",
+    "credential or private-data persistence",
+    "provider use without a new approval gate",
+    "target or adjacent-repository write without a new approval gate",
+}
 
 
 def _digest(value: Any, label: str) -> str:
@@ -54,7 +64,12 @@ def validate_seed(seed: dict[str, Any]) -> dict[str, Any]:
         raise PilotRunContractError("pilot wip_limit must remain 1")
     if constraints["human_gate_required"] is not True:
         raise PilotRunContractError("human gate must remain required")
-    string_list(constraints["forbidden_actions"], "constraints.forbidden_actions")
+    forbidden_actions = set(string_list(constraints["forbidden_actions"], "constraints.forbidden_actions"))
+    missing_forbidden = sorted(REQUIRED_FORBIDDEN_ACTIONS - forbidden_actions)
+    if missing_forbidden:
+        raise PilotRunContractError(
+            "pilot safety boundary removed required forbidden actions: " + ", ".join(missing_forbidden)
+        )
 
     policy = exact(seed["work_policy"], {"selection", "checkpoint", "resume", "stop_conditions"}, "work_policy")
     for field in ("selection", "checkpoint", "resume"):
