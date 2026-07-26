@@ -102,6 +102,17 @@
       "promotion_eligibility": "NOT_ELIGIBLE",
       "verification": "PASSED"
     },
+    "promotion_application_preview": {
+      "adjacent_repository_write_authorized": false,
+      "application_status": "NOT_APPLIED",
+      "approval_status": "NOT_APPROVED",
+      "blocker_count": 4,
+      "preview_fingerprint": "8392d2c6a8b74dccff688df1873c9cef1336b1c3df12df05d8daaae3d2157341",
+      "preview_id": "RTS-PROMOTION-PREVIEW-8392D2C6A8B74DCC",
+      "state": "BLOCKED",
+      "target_write_authorized": false,
+      "verification": "PASSED"
+    },
     "read_only_loop": {
       "active_item_ids": [
         "RTS-FRZ-000010"
@@ -133,12 +144,13 @@
       "future human review will interpret this run without treating it as Skill-application authority"
     ],
     "confirmed_facts": [
-      "all seven repository-local component verification stages passed in the fixed governed order",
+      "all eight repository-local component verification stages passed in the fixed governed order",
       "the current loop evaluation observed exactly the active items recorded in the FREEZER index",
       "three governed outcome bundles remain linked to exact controller plan and authorization fingerprints",
       "the deterministic Skill regression result contains zero regressions and zero safety failures",
       "the learning proposal and pending review remain reconstructable from exact committed sources",
-      "the Human Review Ledger verifies as an empty non-authorizing append-only ledger with no manufactured human decision"
+      "the Human Review Ledger verifies as an empty non-authorizing append-only ledger with no manufactured human decision",
+      "the Promotion Application Preview verifies as BLOCKED and non-applying with exact target and rollback hashes"
     ],
     "risks": [
       "component contracts may drift after this run and require a newly generated fingerprint set",
@@ -152,8 +164,8 @@
     ]
   },
   "mode": "ONE_SHOT_READ_ONLY",
-  "run_fingerprint": "b522a410df9abdab3b75bf15d4f9564cda2e87d037a104d9f9375a50c480d16d",
-  "run_id": "RTS-LOOP-RUN-B522A410DF9ABDAB",
+  "run_fingerprint": "0289adc6297da66b57eaa41e897a781bc07608cf53ace23ef35f88e30ac21a0b",
+  "run_id": "RTS-LOOP-RUN-0289ADC6297DA66B",
   "schema_version": "RTS-GOVERNED-LOOP-RUN-V1",
   "source_fingerprints": [
     {
@@ -182,7 +194,7 @@
     },
     {
       "path": "governed_loop/schemas/loop_run.schema.json",
-      "sha256": "62a22b2f6e534994c4c1e1f8d177a5db51334b99c48765f18bff2d8fc8ce3bae"
+      "sha256": "0b8df4a4ac8ea5be7647cfdd072367fdbb3493800a0be05759ba4802af908269"
     },
     {
       "path": "human_review_ledger/ledger/current.json",
@@ -241,6 +253,14 @@
       "sha256": "4ec06168df2857d5f032e6deb2159d6a145636476492de01f3f5e219a7a35efd"
     },
     {
+      "path": "promotion_application_preview/previews/current.json",
+      "sha256": "7cd80d424c5d0f6ac01448da1b66af0b071c59e6aebbca7e53221103b25ddbda"
+    },
+    {
+      "path": "promotion_application_preview/schemas/preview.schema.json",
+      "sha256": "9de6cb24bab5fd7ac9aa26ec651bb4dc9b91fde7c13730f76b573930df3d9465"
+    },
+    {
       "path": "skill_regression/datasets/feature-build-v1.json",
       "sha256": "3c8eb9cc122a82e4891fcdba8bb6619e147f4379b6aeb826e9b6173f89bfe04d"
     },
@@ -269,6 +289,7 @@
     "outcome_evidence",
     "skill_regression",
     "learning_proposals",
-    "human_review_ledger"
+    "human_review_ledger",
+    "promotion_application_preview"
   ]
 }

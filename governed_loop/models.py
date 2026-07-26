@@ -23,6 +23,7 @@ VERIFICATION_ORDER = [
     "skill_regression",
     "learning_proposals",
     "human_review_ledger",
+    "promotion_application_preview",
 ]
 ROOT_FIELDS = {
     "schema_version",
@@ -62,6 +63,7 @@ COMPONENT_FIELDS = {
     "skill_regression",
     "learning_proposal",
     "human_review_ledger",
+    "promotion_application_preview",
 }
 SOURCE_ROW_FIELDS = {"path", "sha256"}
 OUTCOME_LINK_FIELDS = {
@@ -402,6 +404,35 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
             raise GovernedLoopError("human review approval status mismatch")
         if (ledger["stale"] or ledger["expired"]) and ledger["approval_status"] != "NOT_APPROVED":
             raise GovernedLoopError("stale or expired human review evidence remained approved")
+
+    preview = exact_object(
+        components["promotion_application_preview"],
+        {
+            "verification",
+            "preview_id",
+            "preview_fingerprint",
+            "state",
+            "blocker_count",
+            "approval_status",
+            "application_status",
+            "target_write_authorized",
+            "adjacent_repository_write_authorized",
+        },
+        field="components.promotion_application_preview",
+    )
+    if (
+        preview["verification"] != "PASSED"
+        or preview["state"] != "BLOCKED"
+        or preview["approval_status"] != "NOT_APPROVED"
+        or preview["application_status"] != "NOT_APPLIED"
+        or preview["target_write_authorized"] is not False
+        or preview["adjacent_repository_write_authorized"] is not False
+    ):
+        raise GovernedLoopError("promotion application preview authority widened")
+    if not isinstance(preview["preview_id"], str) or not preview["preview_id"]:
+        raise GovernedLoopError("promotion application preview identifier is required")
+    _sha256(preview["preview_fingerprint"], field="promotion preview fingerprint")
+    _integer(preview["blocker_count"], field="promotion preview blocker_count", minimum=1)
 
     evidence = exact_object(record["evidence_summary"], EVIDENCE_FIELDS, field="evidence_summary")
     for field in sorted(EVIDENCE_FIELDS):

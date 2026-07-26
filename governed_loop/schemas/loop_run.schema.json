@@ -47,7 +47,8 @@
         "outcome_evidence",
         "skill_regression",
         "learning_proposals",
-        "human_review_ledger"
+        "human_review_ledger",
+        "promotion_application_preview"
       ]
     },
     "source_fingerprints": {
@@ -82,7 +83,8 @@
         "outcome_evidence",
         "skill_regression",
         "learning_proposal",
-        "human_review_ledger"
+        "human_review_ledger",
+        "promotion_application_preview"
       ],
       "properties": {
         "asset_manifest": {
@@ -479,6 +481,53 @@
             "summary_fingerprint": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "promotion_application_preview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verification",
+            "preview_id",
+            "preview_fingerprint",
+            "state",
+            "blocker_count",
+            "approval_status",
+            "application_status",
+            "target_write_authorized",
+            "adjacent_repository_write_authorized"
+          ],
+          "properties": {
+            "verification": {
+              "const": "PASSED"
+            },
+            "preview_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "preview_fingerprint": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "state": {
+              "const": "BLOCKED"
+            },
+            "blocker_count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "approval_status": {
+              "const": "NOT_APPROVED"
+            },
+            "application_status": {
+              "const": "NOT_APPLIED"
+            },
+            "target_write_authorized": {
+              "const": false
+            },
+            "adjacent_repository_write_authorized": {
+              "const": false
             }
           }
         }

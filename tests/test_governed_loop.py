@@ -38,6 +38,12 @@ class GovernedLoopTests(unittest.TestCase):
         self.assertEqual(ledger["state"], "NO_DECISIONS")
         self.assertEqual(ledger["approval_status"], "NOT_APPROVED")
         self.assertEqual(ledger["application_status"], "NOT_APPLIED")
+        preview = run["components"]["promotion_application_preview"]
+        self.assertEqual(preview["state"], "BLOCKED")
+        self.assertGreaterEqual(preview["blocker_count"], 1)
+        self.assertEqual(preview["application_status"], "NOT_APPLIED")
+        self.assertFalse(preview["target_write_authorized"])
+        self.assertFalse(preview["adjacent_repository_write_authorized"])
         self.assertTrue(run["authority"]["read_only"])
         for field in (
             "external_execution_performed",
@@ -103,6 +109,13 @@ class GovernedLoopTests(unittest.TestCase):
         run["components"]["human_review_ledger"]["application_status"] = "APPLIED"
         self.resign(run)
         with self.assertRaisesRegex(GovernedLoopError, "application authority widened"):
+            validate_record(run)
+
+    def test_promotion_preview_authority_cannot_widen(self) -> None:
+        run = generate_run(self.root)
+        run["components"]["promotion_application_preview"]["target_write_authorized"] = True
+        self.resign(run)
+        with self.assertRaisesRegex(GovernedLoopError, "promotion application preview authority widened"):
             validate_record(run)
 
     def test_proposal_remains_pending_and_not_applied(self) -> None:

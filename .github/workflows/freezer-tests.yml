@@ -11,6 +11,7 @@ on:
       - "skill_regression/**"
       - "learning_proposals/**"
       - "human_review_ledger/**"
+      - "promotion_application_preview/**"
       - "governed_loop/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
@@ -23,6 +24,7 @@ on:
       - "tests/test_skill_regression.py"
       - "tests/test_learning_proposals.py"
       - "tests/test_human_review_ledger.py"
+      - "tests/test_promotion_application_preview.py"
       - "tests/test_governed_loop.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
@@ -30,6 +32,7 @@ on:
       - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
       - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
       - "docs/implementation/HUMAN_REVIEW_LEDGER_V1_TASK.md"
+      - "docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md"
       - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
   push:
@@ -44,6 +47,7 @@ on:
       - "skill_regression/**"
       - "learning_proposals/**"
       - "human_review_ledger/**"
+      - "promotion_application_preview/**"
       - "governed_loop/**"
       - "tests/test_freezer.py"
       - "tests/test_freezer_build_assessment.py"
@@ -56,6 +60,7 @@ on:
       - "tests/test_skill_regression.py"
       - "tests/test_learning_proposals.py"
       - "tests/test_human_review_ledger.py"
+      - "tests/test_promotion_application_preview.py"
       - "tests/test_governed_loop.py"
       - "docs/implementation/READ_ONLY_LOOP_CORE_V1_TASK.md"
       - "docs/implementation/GOVERNED_EXECUTION_CONTROLLER_V1_TASK.md"
@@ -63,6 +68,7 @@ on:
       - "docs/implementation/GOVERNED_SKILL_REGRESSION_DATASET_V1_TASK.md"
       - "docs/implementation/PROPOSAL_ONLY_OUTCOME_LEARNING_V1_TASK.md"
       - "docs/implementation/HUMAN_REVIEW_LEDGER_V1_TASK.md"
+      - "docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md"
       - "docs/implementation/READ_ONLY_GOVERNED_LOOP_ORCHESTRATOR_V1_TASK.md"
       - ".github/workflows/freezer-tests.yml"
 
@@ -88,6 +94,7 @@ jobs:
           python -m skill_regression.cli verify
           python -m learning_proposals.cli verify
           python -m human_review_ledger.cli verify
+          python -m promotion_application_preview.cli verify
           python -m governed_loop.cli verify
       - name: Fail on stale committed indexes
         run: |
@@ -124,7 +131,6 @@ jobs:
           try:
               subprocess.run([sys.executable, "-m", "freezer.cli", "reindex"], check=True)
               subprocess.run([sys.executable, "-m", "asset_manifest.cli", "reindex"], check=True)
-
               rebuilt_freezer = {path: semantic(path) for path in freezer_paths}
               rebuilt_assets = {path: semantic(path) for path in asset_paths}
               stale = [
@@ -139,7 +145,6 @@ jobs:
           finally:
               for path, payload in committed_bytes.items():
                   path.write_bytes(payload)
-
           if stale:
               print("Committed derived indexes are stale:")
               for path in stale:
@@ -168,6 +173,8 @@ jobs:
         run: python -B -m unittest discover -s tests -p 'test_learning_proposals.py' -v
       - name: Run human-review-ledger tests
         run: python -B -m unittest discover -s tests -p 'test_human_review_ledger.py' -v
+      - name: Run promotion-application-preview tests
+        run: python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
       - name: Run governed-loop tests
         run: python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
       - name: Run governed-record tests
@@ -183,4 +190,5 @@ jobs:
           python -m skill_regression.cli verify
           python -m learning_proposals.cli verify
           python -m human_review_ledger.cli verify
+          python -m promotion_application_preview.cli verify
           python -m governed_loop.cli verify

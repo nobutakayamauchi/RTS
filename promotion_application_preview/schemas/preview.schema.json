@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-PROMOTION-APPLICATION-PREVIEW-V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "preview_id",
+    "preview_fingerprint",
+    "mode",
+    "state",
+    "generated_from",
+    "proposed_change_set",
+    "prerequisites",
+    "blockers",
+    "validation_steps",
+    "stop_conditions",
+    "rollback",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {"const": "RTS-PROMOTION-APPLICATION-PREVIEW-V1"},
+    "preview_id": {"type": "string", "pattern": "^RTS-PROMOTION-PREVIEW-[0-9A-F]{16}$"},
+    "preview_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "mode": {"const": "READ_ONLY_NON_APPLYING"},
+    "state": {"const": "BLOCKED"},
+    "generated_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_id",
+        "proposal_fingerprint",
+        "pending_review_fingerprint",
+        "ledger_id",
+        "ledger_record_count",
+        "ledger_state",
+        "ledger_current_decision_fingerprint",
+        "ledger_approval_status",
+        "ledger_summary_fingerprint",
+        "ledger_manifest_fingerprint",
+        "regression_result_fingerprint",
+        "rollback_fingerprint",
+        "baseline_snapshot_fingerprint",
+        "candidate_snapshot_fingerprint"
+      ],
+      "properties": {
+        "proposal_id": {"type": "string", "minLength": 1},
+        "proposal_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pending_review_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+        "ledger_record_count": {"type": "integer", "minimum": 0},
+        "ledger_state": {
+          "enum": ["NO_DECISIONS", "CURRENT_DECISION", "STALE_DECISION", "EXPIRED_DECISION"]
+        },
+        "ledger_current_decision_fingerprint": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ledger_approval_status": {"enum": ["APPROVED", "NOT_APPROVED"]},
+        "ledger_summary_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ledger_manifest_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "regression_result_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "rollback_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "baseline_snapshot_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_snapshot_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "proposed_change_set": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "repository",
+          "path",
+          "expected_before_sha256",
+          "proposed_after_sha256"
+        ],
+        "properties": {
+          "operation": {"const": "REPLACE_FILE"},
+          "repository": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)[.][.](?:/|$)).+$"},
+          "expected_before_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "proposed_after_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "prerequisites": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "blockers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "validation_steps": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "stop_conditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rollback_id",
+        "rollback_fingerprint",
+        "restore_content_sha256",
+        "human_approval_required",
+        "automatic_rollback_authorized"
+      ],
+      "properties": {
+        "rollback_id": {"type": "string", "minLength": 1},
+        "rollback_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "restore_content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "human_approval_required": {"const": true},
+        "automatic_rollback_authorized": {"const": false}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approval_status",
+        "application_status",
+        "target_write_authorized",
+        "adjacent_repository_write_authorized",
+        "skill_mutation_authorized",
+        "commit_authorized",
+        "merge_authorized",
+        "external_action_authorized"
+      ],
+      "properties": {
+        "approval_status": {"const": "NOT_APPROVED"},
+        "application_status": {"const": "NOT_APPLIED"},
+        "target_write_authorized": {"const": false},
+        "adjacent_repository_write_authorized": {"const": false},
+        "skill_mutation_authorized": {"const": false},
+        "commit_authorized": {"const": false},
+        "merge_authorized": {"const": false},
+        "external_action_authorized": {"const": false}
+      }
+    }
+  }
+}
