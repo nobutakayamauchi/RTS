@@ -7,6 +7,7 @@ on:
       - "pilot_runs/**"
       - "tests/test_pilot_run_contract.py"
       - "tests/test_reconnect_seed_pack.py"
+      - "tests/test_reconnect_p1_spec.py"
       - ".github/workflows/pilot-run-contract-tests.yml"
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - "pilot_runs/**"
       - "tests/test_pilot_run_contract.py"
       - "tests/test_reconnect_seed_pack.py"
+      - "tests/test_reconnect_p1_spec.py"
       - ".github/workflows/pilot-run-contract-tests.yml"
 
 permissions:
@@ -31,13 +33,16 @@ jobs:
           python-version: "3.11"
       - name: Verify default pilot seed
         run: python -B -m pilot_run_contract.cli verify
-      - name: Verify reconnect active seed
+      - name: Verify reconnect P0 seed
         run: python -B -m pilot_run_contract.cli verify pilot_run_contract/packs/reconnect_seed_pack_v1/seed_active_scope_cut.json
+      - name: Verify reconnect P1 seed
+        run: python -B -m pilot_run_contract.cli verify pilot_run_contract/packs/reconnect_seed_pack_v1/seed_p1_master_spec.json
       - name: Verify reconnect Pack
         run: python -B pilot_run_contract/packs/reconnect_seed_pack_v1/validate_pack.py
       - name: Run focused pilot tests
         run: |
           python -B -m unittest discover -s tests -p 'test_pilot_run_contract.py' -v
           python -B -m unittest discover -s tests -p 'test_reconnect_seed_pack.py' -v
+          python -B -m unittest discover -s tests -p 'test_reconnect_p1_spec.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v

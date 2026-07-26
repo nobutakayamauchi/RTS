@@ -1,0 +1,27 @@
+{
+  "authority": {
+    "external_execution_authorized": false,
+    "implementation_authorized": false,
+    "provider_authorized": false,
+    "publication_authorized": false,
+    "target_write_authorized": false
+  },
+  "checkpoint_fingerprint": "5802767d80fa177924d73ebb33f0114bf0e3a015c7d1b30a00dc9046793a5400",
+  "checkpoint_id": "RECONNECT-PILOT-P1-CP-0001",
+  "completed_step": "P1_MASTER_SPEC",
+  "next_action": "Human approves, revises, changes source boundary, freezes, or rejects the P3 build contract.",
+  "resume_requires": [
+    "unchanged P1 Seed fingerprint",
+    "unchanged human decision fingerprint",
+    "unchanged P1 run fingerprint",
+    "one explicit allowed P3 decision"
+  ],
+  "run_id": "RECONNECT-PILOT-P1-RUN-0001",
+  "schema_version": "RTS-RECONNECT-P1-CHECKPOINT-V1",
+  "source": {
+    "human_decision_fingerprint": "3167a0bcd41bf3c82b0a9f0661e3439ab955c3222c353222a4a267bd8c2bac50",
+    "p0_run_fingerprint": "1909fad25f7ff0246be24ea3492fb89b638fa1154db7df02967c701dcd5f4d50",
+    "p1_seed_fingerprint": "633a34adbe36842719e093fb4e8de49703817e2822e3d2a8b19e2c228de7f3d0"
+  },
+  "state": "HUMAN_REVIEW_REQUIRED"
+}
