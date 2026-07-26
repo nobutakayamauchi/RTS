@@ -10,6 +10,7 @@ on:
       - "tests/test_proof_engine_learning.py"
       - "tests/test_proof_engine_asset_draft.py"
       - "tests/test_proof_engine_asset_review.py"
+      - "tests/test_proof_engine_public_wording.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -21,6 +22,7 @@ on:
       - "tests/test_proof_engine_learning.py"
       - "tests/test_proof_engine_asset_draft.py"
       - "tests/test_proof_engine_asset_review.py"
+      - "tests/test_proof_engine_public_wording.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -73,6 +75,23 @@ jobs:
           python -B -m proof_engine_pilot.asset_review_cli verify
           python -B -m proof_engine_pilot.asset_review_cli summary
           python -B -m proof_engine_pilot.asset_review_cli effective > /tmp/proof-engine-reviewed-assets.json
+      - name: Verify audience-facing wording draft
+        run: |
+          python -B -m proof_engine_pilot.public_wording_cli verify
+          python -B -m proof_engine_pilot.public_wording_cli summary
+          python -B -m proof_engine_pilot.public_wording_cli review-template > /tmp/proof-engine-publication-review-template.json
+          python -B -m proof_engine_pilot.public_wording_cli generate --output /tmp/proof-engine-public-wording.json
+          python -B -m proof_engine_pilot.public_wording_cli render-markdown --output /tmp/proof-engine-public-wording.md
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from proof_engine_pilot.core import fingerprint
+          draft = json.loads(Path('/tmp/proof-engine-public-wording.json').read_text(encoding='utf-8'))
+          manifest = json.loads(Path('proof_engine_pilot/wording/round_0001/public_wording_manifest.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/proof-engine-public-wording.md').read_text(encoding='utf-8')
+          assert draft['draft_fingerprint'] == manifest['expected_draft_fingerprint']
+          assert fingerprint(markdown) == manifest['expected_markdown_fingerprint']
+          PY
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
@@ -80,5 +99,6 @@ jobs:
           python -B -m unittest discover -s tests -p 'test_proof_engine_learning.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_draft.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_review.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_public_wording.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
