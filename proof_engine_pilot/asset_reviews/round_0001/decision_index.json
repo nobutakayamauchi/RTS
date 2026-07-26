@@ -1,17 +1,1 @@
-{
-  "decision_count": 6,
-  "decision_index_fingerprint": "213b3d9951d88b6cc6cb293666decc1904ab7a48fc3b59e4ef674842f847199a",
-  "last_decision_fingerprint": "052d3b53515b0e62931e7ce39d2a14a22c5a3f412f198c34cbf61f545a063987",
-  "review_round_id": "PROOF-ENGINE-ASSET-REVIEW-ROUND-0001",
-  "schema_version": "PROOF-ENGINE-ASSET-REVIEW-INDEX-V1",
-  "segments": [
-    {
-      "decision_count": 6,
-      "path": "proof_engine_pilot/asset_reviews/round_0001/decisions/segment_001.json",
-      "segment_fingerprint": "af9bd16394d11e747b78261a3bc72bf00776f909ce8194729ca6913f25374225",
-      "segment_id": "PROOF-ENGINE-ASSET-REVIEW-0001-SEGMENT-001"
-    }
-  ],
-  "source_draft_fingerprint": "e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834",
-  "source_draft_id": "PROOF-ENGINE-INTERNAL-ASSET-DRAFT-0001"
-}
+{"decision_count":6,"decision_index_fingerprint":"f7ab3e18fa7fb64c1593400c2f3dfd06326fdc36462af51f9efc150cfb13a78b","last_decision_fingerprint":"8f743005017c1b158320c0767e9cc521b7bbb3bd7e90b1bd7ef6f9608340a446","review_round_id":"PROOF-ENGINE-ASSET-REVIEW-ROUND-0001","schema_version":"PROOF-ENGINE-ASSET-REVIEW-INDEX-V1","segments":[{"decision_count":6,"path":"proof_engine_pilot/asset_reviews/round_0001/decisions/segment_001.json","segment_fingerprint":"1ee65a8109300ccd197e9127c3a96b044cd0978f48af99b0c39d7f89e5bb7abd","segment_id":"PROOF-ENGINE-ASSET-REVIEW-0001-SEGMENT-001"}],"source_draft_fingerprint":"e78133ccf4a285bc4c1ea5ee8d28b8ff10aca17350632388bba8b98067484834","source_draft_id":"PROOF-ENGINE-INTERNAL-ASSET-DRAFT-0001"}
