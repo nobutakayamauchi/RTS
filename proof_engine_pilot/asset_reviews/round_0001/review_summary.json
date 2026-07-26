@@ -17,48 +17,12 @@
   },
   "decision_index_fingerprint": "213b3d9951d88b6cc6cb293666decc1904ab7a48fc3b59e4ef674842f847199a",
   "effective_assets": [
-    {
-      "asset_fingerprint": "177352d5eaf33b361425794625ccd8549a6d691a2a00016b2aa835e722237f70",
-      "asset_id": "ASSET-001",
-      "decision_fingerprint": "13ba995a5bd8c08c01c8332bd77b315ec621a26a0e88655ad75216afcbbe35b5",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D001",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    },
-    {
-      "asset_fingerprint": "26da8160d50681c3bd6fb2724bb5533a54e9b3b14e7c5be428ff379e4be3b82c",
-      "asset_id": "ASSET-002",
-      "decision_fingerprint": "eb9cc6a1e4a42c13bdf129c7c5bd0313e0bf09319f92f9b0d7941f71ba3dcaec",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D002",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    },
-    {
-      "asset_fingerprint": "60f613509f59671a6fb6e9abdbe48307de2529a55071e6815b58f2366ab60375",
-      "asset_id": "ASSET-003",
-      "decision_fingerprint": "3d63fded4602b5183d3566e90fb18a224c5514d6804ec8a48959567399200df8",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D003",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    },
-    {
-      "asset_fingerprint": "9d33afff80879df9919bed860519e5e0cb3d88fa52e0020748786c49d30f0362",
-      "asset_id": "ASSET-004",
-      "decision_fingerprint": "c4992e3285c678013b05f1917a10c63d64a9afefc54254dfbff3749fed7082f5",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D004",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    },
-    {
-      "asset_fingerprint": "4b3160a63b43994c544cd01e868f18da7a320a3e17f021439816601bcba04a3d",
-      "asset_id": "ASSET-005",
-      "decision_fingerprint": "3d9852618137e90f1d57f74bafbb8c5a550d6f00824f90e29705a85285d0326f",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D005",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    },
-    {
-      "asset_fingerprint": "775f1c3b603afcb5bb2a4e47f3e2f3d1f69aeffc497b8808c02150a5741e6b05",
-      "asset_id": "ASSET-006",
-      "decision_fingerprint": "49a90c327a21000b84b5f7c07cb62a32ebf09988780a267d06fc57180fc8004e",
-      "decision_id": "PROOF-ASSET-REVIEW-0001-D006",
-      "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"
-    }
+    {"asset_fingerprint": "177352d5eaf33b361425794625ccd8549a6d691a2a00016b2aa835e722237f70", "asset_id": "ASSET-001", "decision_fingerprint": "b146d57d3b8844824c0ed41c650ea045a71531f0ab578125e5df5dd574f909ab", "decision_id": "PROOF-ASSET-REVIEW-0001-D001", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"},
+    {"asset_fingerprint": "26da8160d50681c3bd6fb2724bb5533a54e9b3b14e7c5be428ff379e4be3b82c", "asset_id": "ASSET-002", "decision_fingerprint": "9def43fb56c4056cf76ac9b06a21f1855c7f8a0d214bcac1c686b774e927c070", "decision_id": "PROOF-ASSET-REVIEW-0001-D002", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"},
+    {"asset_fingerprint": "60f613509f59671a6fb6e9abdbe48307de2529a55071e6815b58f2366ab60375", "asset_id": "ASSET-003", "decision_fingerprint": "b269c8bc0836a8cce9d5606a48ec0e03448c68d864c8b2e9e0f8da6a95174a61", "decision_id": "PROOF-ASSET-REVIEW-0001-D003", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"},
+    {"asset_fingerprint": "9d33afff80879df9919bed860519e5e0cb3d88fa52e0020748786c49d30f0362", "asset_id": "ASSET-004", "decision_fingerprint": "43603ed28c2f932d34fe4baeb74b722e07ac5732588ad2de37f9574a46d9d7ad", "decision_id": "PROOF-ASSET-REVIEW-0001-D004", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"},
+    {"asset_fingerprint": "4b3160a63b43994c544cd01e868f18da7a320a3e17f021439816601bcba04a3d", "asset_id": "ASSET-005", "decision_fingerprint": "e7cd77465084cdc34da5948a577d8ce473f8eb635457af195af2ea0000e499a3", "decision_id": "PROOF-ASSET-REVIEW-0001-D005", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"},
+    {"asset_fingerprint": "775f1c3b603afcb5bb2a4e47f3e2f3d1f69aeffc497b8808c02150a5741e6b05", "asset_id": "ASSET-006", "decision_fingerprint": "052d3b53515b0e62931e7ce39d2a14a22c5a3f412f198c34cbf61f545a063987", "decision_id": "PROOF-ASSET-REVIEW-0001-D006", "effective_status": "APPROVED_AS_INTERNAL_SOURCE_FOR_PUBLIC_WORDING_DRAFT"}
   ],
   "next_action": "Generate six audience-facing wording drafts from the approved internal sources and stop at a separate publication review gate.",
   "publication_status": "NOT_PUBLISHED",
