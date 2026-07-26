@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-PROMOTION-APPLICATION-PREVIEW-V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "preview_id",
+    "preview_fingerprint",
+    "mode",
+    "state",
+    "generated_from",
+    "proposed_change_set",
+    "prerequisites",
+    "blockers",
+    "validation_steps",
+    "stop_conditions",
+    "rollback",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {"const": "RTS-PROMOTION-APPLICATION-PREVIEW-V1"},
+    "preview_id": {"type": "string", "minLength": 1},
+    "preview_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "mode": {"const": "READ_ONLY_NON_APPLYING"},
+    "state": {"const": "BLOCKED"},
+    "generated_from": {"type": "object"},
+    "proposed_change_set": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {"type": "object"}
+    },
+    "prerequisites": {"type": "array", "items": {"type": "string"}},
+    "blockers": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "validation_steps": {"type": "array", "items": {"type": "string"}},
+    "stop_conditions": {"type": "array", "items": {"type": "string"}},
+    "rollback": {
+      "type": "object",
+      "properties": {
+        "human_approval_required": {"const": true},
+        "automatic_rollback_authorized": {"const": false}
+      },
+      "required": [
+        "rollback_id",
+        "rollback_fingerprint",
+        "restore_content_sha256",
+        "human_approval_required",
+        "automatic_rollback_authorized"
+      ],
+      "additionalProperties": false
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approval_status",
+        "application_status",
+        "target_write_authorized",
+        "adjacent_repository_write_authorized",
+        "skill_mutation_authorized",
+        "commit_authorized",
+        "merge_authorized",
+        "external_action_authorized"
+      ],
+      "properties": {
+        "approval_status": {"const": "NOT_APPROVED"},
+        "application_status": {"const": "NOT_APPLIED"},
+        "target_write_authorized": {"const": false},
+        "adjacent_repository_write_authorized": {"const": false},
+        "skill_mutation_authorized": {"const": false},
+        "commit_authorized": {"const": false},
+        "merge_authorized": {"const": false},
+        "external_action_authorized": {"const": false}
+      }
+    }
+  }
+}
