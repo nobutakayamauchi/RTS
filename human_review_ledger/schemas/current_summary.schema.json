@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RTS-HUMAN-REVIEW-LEDGER-SUMMARY-V1",
+  "title": "RTS Human Review Ledger Current Summary v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ledger_id", "state", "record_count", "current_decision_id", "current_decision_type", "current_decision_fingerprint", "current_sequence", "approval_status", "application_status", "stale", "expired", "policy_fingerprint", "reviewer_scope_fingerprint", "summary_fingerprint"],
+  "properties": {
+    "schema_version": {"const": "RTS-HUMAN-REVIEW-LEDGER-SUMMARY-V1"},
+    "ledger_id": {"const": "RTS-HUMAN-REVIEW-LEDGER-000001"},
+    "state": {"enum": ["NO_DECISIONS", "CURRENT_DECISION", "STALE_DECISION", "EXPIRED_DECISION"]},
+    "record_count": {"type": "integer", "minimum": 0},
+    "current_decision_id": {"type": ["string", "null"]},
+    "current_decision_type": {"type": ["string", "null"]},
+    "current_decision_fingerprint": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "current_sequence": {"type": "integer", "minimum": 0},
+    "approval_status": {"enum": ["APPROVED", "NOT_APPROVED"]},
+    "application_status": {"const": "NOT_APPLIED"},
+    "stale": {"type": "boolean"},
+    "expired": {"type": "boolean"},
+    "policy_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviewer_scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "summary_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
