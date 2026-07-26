@@ -9,6 +9,7 @@ on:
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
       - "tests/test_proof_engine_asset_draft.py"
+      - "tests/test_proof_engine_asset_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -19,6 +20,7 @@ on:
       - "tests/test_proof_engine_review.py"
       - "tests/test_proof_engine_learning.py"
       - "tests/test_proof_engine_asset_draft.py"
+      - "tests/test_proof_engine_asset_review.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -66,11 +68,17 @@ jobs:
           manifest = json.loads(Path('proof_engine_pilot/assets/round_0001/internal_asset_manifest.json').read_text(encoding='utf-8'))
           assert draft['draft_fingerprint'] == manifest['expected_draft_fingerprint']
           PY
+      - name: Verify append-only internal asset review
+        run: |
+          python -B -m proof_engine_pilot.asset_review_cli verify
+          python -B -m proof_engine_pilot.asset_review_cli summary
+          python -B -m proof_engine_pilot.asset_review_cli effective > /tmp/proof-engine-reviewed-assets.json
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_learning.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_asset_draft.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_asset_review.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
