@@ -20,7 +20,9 @@ jobs:
       - name: Integrate Human Review Ledger
         id: integrate
         continue-on-error: true
-        run: python .github/scripts/finalize_human_review_ledger_implementation.py > integration-output.txt 2>&1
+        run: |
+          sed -i 's/^    update_workflow()$/    # workflow is updated separately through the GitHub connector/' .github/scripts/finalize_human_review_ledger_implementation.py
+          python .github/scripts/finalize_human_review_ledger_implementation.py > integration-output.txt 2>&1
       - name: Upload integration diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -83,7 +85,6 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add \
-              .github/workflows/freezer-tests.yml \
               governed_loop/README.md \
               governed_loop/generation.py \
               governed_loop/models.py \
