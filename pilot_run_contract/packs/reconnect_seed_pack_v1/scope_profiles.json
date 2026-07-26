@@ -1,0 +1,84 @@
+{
+  "active_profile": "P0_SCOPE_CUT",
+  "profiles": [
+    {
+      "completion_gate": ["全枝が分類されている", "最初の一本と除外範囲が明示されている", "人間が承認・修正・却下できる", "実装を開始せず停止している"],
+      "estimated_effort": "4〜8時間",
+      "excluded": ["コード実装", "公開", "営業", "助成金申請", "外部接続"],
+      "id": "P0_SCOPE_CUT",
+      "inputs": ["Seed Pack全体", "会話由来の決定事項", "既存RTS証拠"],
+      "name": "全体像・矛盾監査・実装範囲の切断",
+      "outputs": ["Master Overview", "Possibility Atlas", "Scope Cut Matrix", "Canonical Records / Authority Map", "Contradiction Audit", "Recommended First Slice", "Human Review Packet"],
+      "purpose": "全構想を可視化し、最初に実装する一本を人間が選べる状態にする。",
+      "status": "ACTIVE_TEST"
+    },
+    {
+      "completion_gate": ["目的・用語・データ所有・モジュール境界が固定", "MVPと将来枝が分離", "矛盾監査完了", "実装契約が一つに限定"],
+      "estimated_effort": "6〜12時間",
+      "excluded": ["全体実装", "自動投稿", "人間の総合ランキング"],
+      "id": "P1_MASTER_SPEC",
+      "inputs": ["承認済みP0成果物"],
+      "name": "Master Product Specification",
+      "outputs": ["Master Product Specification", "Hypothesis Map", "MVP Implementation Contract", "Data Model", "Acceptance Criteria", "Future Branch Unlock Triggers"],
+      "purpose": "全体仕様を完成させ、MVP Implementation Contractを切り出す。",
+      "status": "LOCKED_PENDING_P0"
+    },
+    {
+      "completion_gate": ["事実・仮説・将来像が分離", "センシティブ情報が除外", "GitHub・テスト・成果物で評価可能", "公開は別承認まで未実行"],
+      "estimated_effort": "5〜10時間",
+      "excluded": ["自動投稿", "感情的な支援訴求", "係争相手や勤務先の特定"],
+      "id": "P2_PUBLIC_EVIDENCE_SHELL",
+      "inputs": ["承認済みMaster Spec", "公開範囲の人間承認"],
+      "name": "公開外装・開発証拠ページ",
+      "outputs": ["Project Overview", "Current Build Scope", "Development Evidence Log", "CASE-001 / Developer Transparency", "Contact and Opportunity Entry"],
+      "purpose": "プロジェクトの現在地、証拠、CASE-001、問い合わせ入口を公開可能な形にする。",
+      "status": "FROZEN"
+    },
+    {
+      "completion_gate": ["10件以上の候補", "全候補に証拠", "3件以上が本人未認識の価値", "人間/AI/協力者の貢献を区別", "誇張を却下できる"],
+      "estimated_effort": "20〜35時間",
+      "excluded": ["自動公開", "自動営業", "採用判定", "能力の総合点"],
+      "id": "P3_VALUE_DISCOVERY_MVP",
+      "inputs": ["GitHub履歴", "PR", "Issue", "仕様", "テスト", "補足情報"],
+      "name": "価値発見・証拠化MVP",
+      "outputs": ["Achievement Candidates", "Evidence Claims", "Contribution Map", "Value Assessment", "Human Decision", "Public Asset Draft"],
+      "purpose": "GitHubと開発ログから、埋もれた成果候補を証拠付きで生成する。",
+      "status": "FROZEN"
+    },
+    {
+      "completion_gate": ["一商品・一顧客像・一価格帯", "納品物と非対応範囲が明確", "販売前の法務・個人情報確認", "最初の外部反応をMarket Signalとして記録"],
+      "estimated_effort": "8〜16時間＋市場検証",
+      "excluded": ["大量自動営業", "成果保証", "無制限保守"],
+      "id": "P4_FIRST_CASH_LOOP",
+      "inputs": ["P3成果", "対象顧客仮説", "価格仮説"],
+      "name": "最初のキャッシュポイント",
+      "outputs": ["実績発見レポート商品", "GitHub/開発資産監査商品", "AI協働における人間貢献レポート", "営業用サンプル", "手動問い合わせ導線"],
+      "purpose": "価値発見成果を、一件の有料提供へ変換する。",
+      "status": "FROZEN"
+    },
+    {
+      "completion_gate": ["支援・事業・投資の基準を分離", "同意・退出権・プライバシーを固定", "一事例を一般証明として扱わない", "不適合支援もデータとして記録"],
+      "estimated_effort": "CASEごとの長期検証",
+      "excluded": ["人の所有", "債務拘束", "不透明ランキング", "支援額による支配"],
+      "id": "P5_SUPPORT_FIT_RECONNECTION",
+      "inputs": ["同意済みCASE", "Constraint Record", "Support Event"],
+      "name": "Support Fit & Social Reconnection",
+      "outputs": ["Support Hypothesis", "Observed Change", "Reconnection Outcome", "Mismatch Learning"],
+      "purpose": "不足資源の仮説、提供、行動変化、成果、次の不足をCASE単位で記録する。",
+      "status": "EXPLORATORY_FROZEN"
+    },
+    {
+      "completion_gate": ["20件以上の安定した観測", "単一人物内でも複数時点の証拠", "公平性・異議申立て・削除権", "収益モデルと公益目的の衝突監査"],
+      "estimated_effort": "P0〜P5検証後",
+      "excluded": ["人物の世界共通順位", "未観測=無能力", "センシティブ情報の無断商用化"],
+      "id": "P6_PLATFORM_ENTERPRISE",
+      "inputs": ["複数外部CASE", "安定した評価軸", "同意・法務・運用設計"],
+      "name": "人材・機会・支援接続プラットフォーム",
+      "outputs": ["Talent Evidence DB", "Opportunity Matching", "Enterprise API", "OEM"],
+      "purpose": "複数CASEの証拠・文脈・適合性を扱うAPI/OEM/企業向け基盤へ拡張する。",
+      "status": "FUTURE_BRANCH"
+    }
+  ],
+  "schema_version": "RECONNECT-SCOPE-PROFILES-V1",
+  "selection_rule": "Only one profile may be active. A higher profile may start only after the previous profile's completion gate is verified or a human records an explicit skip with reasons and accepted risks."
+}

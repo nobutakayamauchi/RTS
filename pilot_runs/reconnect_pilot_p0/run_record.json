@@ -1,0 +1,66 @@
+{
+  "completed_artifacts": [
+    "Master Overview v1",
+    "Possibility Atlas v1",
+    "Scope Cut Matrix v1",
+    "Canonical Record, Evidence, Authority, and Privacy Map v1",
+    "Contradiction and Unknowns Audit v1",
+    "Recommended First Implementation Slice v1",
+    "Human Review Packet v1",
+    "Checkpoint and Continuation Handoff v1"
+  ],
+  "human_gate": {
+    "allowed_decisions": [
+      "APPROVE_P1",
+      "APPROVE_P1_P2",
+      "APPROVE_P1_P3",
+      "APPROVE_P1_P4",
+      "RETURN_FOR_REVISION",
+      "FREEZE",
+      "REJECT"
+    ],
+    "decision_file": "pilot_runs/reconnect_pilot_p0/HUMAN_REVIEW_PACKET_V1.md",
+    "decision_required": true
+  },
+  "next_action": "Human selects the maximum approved scope and records a new next-run Seed.",
+  "observed": {
+    "external_execution_authorized": false,
+    "human_gate_required": true,
+    "implementation_performed": false,
+    "manifest_validated": true,
+    "outreach_performed": false,
+    "provider_used": false,
+    "publication_performed": false,
+    "scope_profiles_loaded": 7,
+    "seed_validated": true,
+    "target_repository_write_authorized": false,
+    "wip_limit": 1
+  },
+  "recommendation": {
+    "first_next_scope": "P1_MASTER_SPEC",
+    "reason": "Lock the Master Product Specification and one MVP Implementation Contract before the minimum evidence-backed value-discovery vertical slice.",
+    "recommended_path": [
+      "P1_MASTER_SPEC",
+      "P3_VALUE_DISCOVERY_MVP"
+    ]
+  },
+  "result": "PASS_SCOPE_CUT_READY",
+  "run_fingerprint": "1909fad25f7ff0246be24ea3492fb89b638fa1154db7df02967c701dcd5f4d50",
+  "run_id": "RECONNECT-PILOT-P0-RUN-0001",
+  "schema_version": "RTS-RECONNECT-PILOT-RUN-V1",
+  "source": {
+    "active_scope": "P0_SCOPE_CUT",
+    "pack_manifest_sha256": "bb7b2c512cfa584acf5744c6a382bbb55aad2f4bdd301bc4781bd4340a5a5271",
+    "pack_path": "pilot_run_contract/packs/reconnect_seed_pack_v1",
+    "seed_fingerprint": "c8bab7c96cf19835707b2df9de98ca44d22f59e162d518babf4f3d20e0f1ef7c",
+    "seed_id": "RTS-PILOT-SEED-RECONNECT-SCOPE-CUT-V1",
+    "seed_path": "pilot_run_contract/packs/reconnect_seed_pack_v1/seed_active_scope_cut.json"
+  },
+  "state": "HUMAN_REVIEW_REQUIRED",
+  "test_id": "RECONNECT-PILOT-P0",
+  "unverified": [
+    "Long multi-session autonomous scope-drift resistance has not yet been observed.",
+    "Forced interruption and resume fidelity have not yet been exercised.",
+    "No external achievement candidates or market response have been observed."
+  ]
+}

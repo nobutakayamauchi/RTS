@@ -1,0 +1,99 @@
+{
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "advisory_only": true,
+    "automatic_approval_authorized": false,
+    "external_execution_authorized": false,
+    "mode": "GOVERNED_PILOT",
+    "provider_authorized": false,
+    "publication_authorized": false,
+    "target_write_authorized": false
+  },
+  "constraints": {
+    "forbidden_actions": [
+      "automatic contract acceptance",
+      "automatic external publication",
+      "automatic human ranking",
+      "automatic outreach or application",
+      "automatic support-recipient selection",
+      "credential or private-data persistence",
+      "provider use without a new approval gate",
+      "target or adjacent-repository write without a new approval gate",
+      "implementation before the scope-cut human gate is approved",
+      "public disclosure of sensitive CASE-001 context without exact human approval",
+      "treating one exploratory case as proof of general effectiveness",
+      "equating unobserved ability with lack of ability",
+      "granting control, ownership, ranking privilege, or approval power in exchange for support"
+    ],
+    "human_gate_required": true,
+    "wip_limit": 1
+  },
+  "inputs": {
+    "source_refs": [
+      "README.md",
+      "FULL_CONTEXT.md",
+      "scope_profiles.json",
+      "GitHub repository history, pull requests, tests, specifications, and development logs supplied during the governed run"
+    ]
+  },
+  "objective": {
+    "completion_conditions": [
+      "A Master Overview covers purpose, users, problems, value proposition, product stages, business paths, public structure, data, authority, risks, ethics, and future branches.",
+      "A Possibility Atlas classifies every identified branch as CORE, VALIDATION, FUTURE_BRANCH, PARTNER_BRANCH, or REJECTED.",
+      "A Scope Cut Matrix defines P0 through P6 with exact inputs, outputs, completion gates, exclusions, dependencies, risks, and unlock conditions.",
+      "One recommended first implementation slice is selected with evidence, assumptions, excluded work, and a reason it is the smallest useful test.",
+      "Canonical records, evidence labels, human-only decisions, privacy boundaries, and public/private separation are explicitly mapped.",
+      "All contradictions, uncertainties, and decisions that cannot be inferred are listed without being silently resolved.",
+      "A human review packet and deterministic checkpoint identify the next action, required approval, and exact resume point.",
+      "The run stops without implementation, publication, outreach, application, contract, provider use, or repository mutation."
+    ],
+    "current_goal": "Produce a contradiction-audited, scope-selectable master overview from this Seed Pack, recommend one first implementation slice, and stop for explicit human approval before any implementation.",
+    "final_goal": "Build an evidence-based system that finds overlooked human and project value, explains it without exaggeration, connects it to suitable opportunities and support, records what changes after the connection, and eventually improves social participation, work, business activity, and re-entry."
+  },
+  "outputs": {
+    "required_artifacts": [
+      "Master Overview v1",
+      "Possibility Atlas v1",
+      "Scope Cut Matrix v1",
+      "Canonical Record, Evidence, Authority, and Privacy Map v1",
+      "Contradiction and Unknowns Audit v1",
+      "Recommended First Implementation Slice v1",
+      "Human Review Packet v1",
+      "Checkpoint and Continuation Handoff v1"
+    ]
+  },
+  "project": {
+    "case_id": "CASE-001-SCOPE-CUT",
+    "current_scope": "Internal planning and evidence-grounded specification only. Reconstruct the complete project overview, classify all present and future branches, define selectable scope profiles, recommend the first bounded implementation slice, and stop at a human approval gate. No implementation, publication, outreach, application, contract, provider use, or target-repository write.",
+    "purpose": "Discover overlooked activities, effort, decisions, and outcomes from exact evidence; translate them into externally understandable value; connect that value to suitable people, organizations, opportunities, customers, collaborators, supporters, and resources; and learn which forms of connection or support actually change action and outcomes.",
+    "title": "Evidence-Based Value Discovery and Reconnection"
+  },
+  "readiness": {
+    "known_gaps": [
+      "The practical loop has not yet been tested against this full project pack.",
+      "The final public project name and brand architecture are not approved.",
+      "The first paid offer, target customer, price, and sales channel are not approved.",
+      "Public disclosure boundaries for CASE-001 require separate human approval.",
+      "External market response, customer demand, support fit, and reconnection outcomes are unobserved.",
+      "Current grant, subsidy, funding, and public-program eligibility requires a separate time-sensitive research lane."
+    ],
+    "state": "READY_FOR_PILOT"
+  },
+  "schema_version": "RTS-PILOT-SEED-V1",
+  "seed_fingerprint": "c8bab7c96cf19835707b2df9de98ca44d22f59e162d518babf4f3d20e0f1ef7c",
+  "seed_id": "RTS-PILOT-SEED-RECONNECT-SCOPE-CUT-V1",
+  "work_policy": {
+    "checkpoint": "After each bounded iteration, persist the exact Seed fingerprint, source files used, artifact version, confirmed facts, assumptions, unresolved contradictions, rejected expansions, blockers, next action, and whether human approval is required.",
+    "resume": "Resume only from the latest verified checkpoint using the unchanged Seed fingerprint and Pack manifest. If either differs, stop and request a new scope decision instead of merging contexts.",
+    "selection": "Choose exactly one unfinished planning artifact at a time in this order unless evidence requires a documented reordering: source digest, Master Overview, Possibility Atlas, Scope Cut Matrix, canonical records and authority map, contradiction audit, recommendation, human review packet.",
+    "stop_conditions": [
+      "A decision requires human preference, risk tolerance, public-disclosure consent, or commercial priority not fixed in the Seed Pack.",
+      "A sensitive personal, health, family, employment, legal, financial, credential, or private-repository detail would enter a public artifact.",
+      "The requested work would move from planning into code implementation, publication, outreach, application, contracting, provider use, or repository mutation.",
+      "Evidence is missing, conflicted, stale, or cannot support the proposed claim.",
+      "The same failed action repeats twice without new evidence.",
+      "The recommended first slice and human review packet are complete.",
+      "Any authority boundary would widen."
+    ]
+  }
+}

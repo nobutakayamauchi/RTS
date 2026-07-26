@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "advisory_only": true,
+    "external_execution_authorized": false,
+    "implementation_authorized": false,
+    "provider_authorized": false,
+    "publication_authorized": false,
+    "target_write_authorized": false
+  },
+  "blocker": "Explicit human scope decision required.",
+  "checkpoint_fingerprint": "bb5b8791df74ad277842ad769470ecade894cc0806d85a7da710390561b3879c",
+  "checkpoint_id": "RECONNECT-PILOT-P0-CP-0001",
+  "completed_artifacts": [
+    "Master Overview v1",
+    "Possibility Atlas v1",
+    "Scope Cut Matrix v1",
+    "Canonical Record, Evidence, Authority, and Privacy Map v1",
+    "Contradiction and Unknowns Audit v1",
+    "Recommended First Implementation Slice v1",
+    "Human Review Packet v1",
+    "Checkpoint and Continuation Handoff v1"
+  ],
+  "completed_step": "P0_SCOPE_CUT",
+  "next_action": "Human selects the maximum approved scope and records a new next-run Seed.",
+  "pack_manifest_sha256": "bb7b2c512cfa584acf5744c6a382bbb55aad2f4bdd301bc4781bd4340a5a5271",
+  "resume_requires": [
+    "unchanged seed fingerprint",
+    "unchanged pack manifest digest",
+    "one explicit allowed human decision",
+    "a newly generated next-run Seed"
+  ],
+  "run_id": "RECONNECT-PILOT-P0-RUN-0001",
+  "schema_version": "RTS-RECONNECT-PILOT-CHECKPOINT-V1",
+  "seed_fingerprint": "c8bab7c96cf19835707b2df9de98ca44d22f59e162d518babf4f3d20e0f1ef7c",
+  "state": "HUMAN_REVIEW_REQUIRED"
+}
