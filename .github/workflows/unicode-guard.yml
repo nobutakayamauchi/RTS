@@ -25,18 +25,18 @@ jobs:
           python-version: "3.11"
       - name: Generate governed gate state
         run: |
-          rm -f .tmp/promotion_preview_shell_error.txt
-          python -B scripts/tmp_prepare_promotion_preview.py > .tmp/promotion_preview_shell_error.txt 2>&1 || true
+          rm -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
+          python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
       - name: Commit generated state or diagnostic
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet || git commit -m "Capture Promotion Application Preview gate state"
+          git diff --cached --quiet || git commit -m "Capture Promotion Application Preview diagnostic"
           git push
       - name: Verify generated state
         run: |
-          test ! -s .tmp/promotion_preview_shell_error.txt
+          test ! -s docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
           test ! -f .tmp/promotion_preview_prepare_error.txt
           python -B -m freezer.cli verify
           python -B -m freezer.build_assessment verify
