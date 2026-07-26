@@ -1,0 +1,29 @@
+{
+  "base_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "decision_count": 17,
+  "decision_index_fingerprint": "efcd75558bff03abd881067d66923fd0dc3232d54631410ef509af5a27f8a7ba",
+  "final_decision_fingerprint": "022c05779f434b890c39151b3735a861a05c4169bfe34d126ead5a50ccfaa324",
+  "review_round_id": "PROOF-ENGINE-REVIEW-ROUND-0001",
+  "revisions_fingerprint": "67d96b51e13df9d29b898404f26f85d1a0746573b591280f83818d4e06241606",
+  "schema_version": "PROOF-ENGINE-DECISION-INDEX-V1",
+  "segments": [
+    {
+      "first_sequence": 1,
+      "last_sequence": 7,
+      "path": "decisions/segment_001.json",
+      "segment_fingerprint": "242e5ed88bd4a856728d6a06b49362dbda55298e94d4d871003de33b93bbf4aa"
+    },
+    {
+      "first_sequence": 8,
+      "last_sequence": 12,
+      "path": "decisions/segment_002.json",
+      "segment_fingerprint": "785998414fab713cece3dd469afa64865440ab22b4abd50c2a5d879ddb56cae8"
+    },
+    {
+      "first_sequence": 13,
+      "last_sequence": 17,
+      "path": "decisions/segment_003.json",
+      "segment_fingerprint": "9fe130e9dc5a6939973edf7b420f9757f2aca347ad82ca6965acff700394f53c"
+    }
+  ]
+}
