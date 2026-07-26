@@ -10,65 +10,18 @@ permissions:
   contents: read
 
 jobs:
-  prepare:
-    if: github.event_name == 'pull_request' && github.head_ref == 'feature/prepare-start-promotion-application-preview'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Generate governed gate state
-        run: |
-          rm -f docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
-          PYTHONPATH=. python -B scripts/tmp_prepare_promotion_preview.py > docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt 2>&1 || true
-      - name: Verify generated state
-        run: |
-          test ! -s docs/implementation/PROMOTION_PREVIEW_PREPARE_ERROR.txt
-          test ! -f .tmp/promotion_preview_prepare_error.txt
-          python -B -m freezer.cli verify
-          python -B -m freezer.build_assessment verify
-          python -B -m freezer.preflight verify
-          python -B -m governed_loop.cli verify
-          python -B -m unittest discover -s tests -v
-      - name: List generated changes
-        run: |
-          git diff --name-only > promotion-preview-generated-files.txt
-          git diff > promotion-preview-generated.patch
-          cat promotion-preview-generated-files.txt
-      - name: Upload verified generated state
-        uses: actions/upload-artifact@v4
-        with:
-          name: promotion-preview-verified-gate-state
-          path: |
-            promotion-preview-generated-files.txt
-            promotion-preview-generated.patch
-            freezer/assessments/RTS-FRZ-000010/**
-            freezer/preflights/RTS-FRZ-000010/**
-            freezer/items/RTS-FRZ-000010/**
-            freezer/index/items.json
-            freezer/index/priority.json
-            freezer/index/build_priority.json
-            freezer/manifests/manifest.sha256
-            governed_loop/runs/current.json
-            tests/test_governed_loop.py
-            docs/implementation/PROMOTION_APPLICATION_PREVIEW_V1_TASK.md
-          if-no-files-found: error
-
-  guard:
+  unicode-guard:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Run invisible unicode guard
         run: python3 scripts/check_invisible_unicode.py
