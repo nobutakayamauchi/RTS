@@ -7,6 +7,7 @@ on:
       - "pilot_runs/reconnect_pilot_p3/**"
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
+      - "tests/test_proof_engine_learning.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - "pilot_runs/reconnect_pilot_p3/**"
       - "tests/test_proof_engine_pilot.py"
       - "tests/test_proof_engine_review.py"
+      - "tests/test_proof_engine_learning.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -44,9 +46,15 @@ jobs:
           python -B -m proof_engine_pilot.review_cli verify
           python -B -m proof_engine_pilot.review_cli summary
           python -B -m proof_engine_pilot.review_cli effective > /tmp/proof-engine-effective.json
+      - name: Verify review-derived learning
+        run: |
+          python -B -m proof_engine_pilot.learning_cli verify
+          python -B -m proof_engine_pilot.learning_cli summary
+          python -B -m proof_engine_pilot.learning_cli replay > /tmp/proof-engine-learning-replay.json
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_review.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_learning.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
