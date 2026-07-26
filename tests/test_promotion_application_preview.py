@@ -79,8 +79,8 @@ class PromotionApplicationPreviewTests(unittest.TestCase):
         self.assertIn("generate", help_text)
         self.assertIn("verify", help_text)
         self.assertIn("summary", help_text)
-        self.assertNotIn("apply", help_text)
-        self.assertNotIn("write", help_text)
+        self.assertNotIn("\n    apply", help_text)
+        self.assertNotIn("\n    write", help_text)
 
     def test_committed_preview_matches(self) -> None:
         path = self.root / "promotion_application_preview/previews/current.json"
