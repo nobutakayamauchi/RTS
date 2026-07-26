@@ -1,0 +1,31 @@
+{
+  "pr_range": {"first": 242, "last": 261},
+  "prs": [
+    {"merged": true, "number": 242, "status": "MERGED", "title": "Reassess governed execution and learning loop parent", "url": "https://github.com/nobutakayamauchi/RTS/pull/242"},
+    {"merged": true, "number": 243, "status": "MERGED", "title": "Register read-only governed loop orchestrator child", "url": "https://github.com/nobutakayamauchi/RTS/pull/243"},
+    {"merged": true, "number": 244, "status": "MERGED", "title": "Assess read-only governed loop orchestrator", "url": "https://github.com/nobutakayamauchi/RTS/pull/244"},
+    {"merged": true, "number": 245, "status": "MERGED", "title": "Add PASS preflight for read-only governed loop orchestrator", "url": "https://github.com/nobutakayamauchi/RTS/pull/245"},
+    {"merged": true, "number": 246, "status": "MERGED", "title": "Approve and start read-only governed loop orchestrator", "url": "https://github.com/nobutakayamauchi/RTS/pull/246"},
+    {"merged": true, "number": 247, "status": "MERGED", "title": "Implement read-only governed loop orchestrator v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/247"},
+    {"merged": true, "number": 248, "status": "MERGED", "title": "Complete read-only governed loop orchestrator v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/248"},
+    {"merged": true, "number": 249, "status": "MERGED", "title": "Register Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/249"},
+    {"merged": true, "number": 250, "status": "MERGED", "title": "Assess Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/250"},
+    {"merged": false, "number": 251, "status": "SUPERSEDED", "title": "[Superseded] Assess Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/251"},
+    {"merged": true, "number": 252, "status": "MERGED", "title": "Add PASS preflight for Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/252"},
+    {"merged": true, "number": 253, "status": "MERGED", "title": "Approve and start Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/253"},
+    {"merged": true, "number": 254, "status": "MERGED", "title": "Implement Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/254"},
+    {"merged": true, "number": 255, "status": "MERGED", "title": "Complete Human Review Ledger v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/255"},
+    {"merged": true, "number": 256, "status": "MERGED", "title": "Register Promotion Application Preview v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/256"},
+    {"merged": true, "number": 257, "status": "MERGED", "title": "Prepare and start Promotion Application Preview v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/257"},
+    {"merged": true, "number": 258, "status": "MERGED", "title": "Implement Promotion Application Preview v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/258"},
+    {"merged": true, "number": 259, "status": "MERGED", "title": "Add Adaptive Governance Compiler v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/259"},
+    {"merged": true, "number": 260, "status": "MERGED", "title": "Complete governed loop engine pilot v1", "url": "https://github.com/nobutakayamauchi/RTS/pull/260"},
+    {"merged": true, "number": 261, "status": "MERGED", "title": "Load reconnect Seed Pack and record P0 scope-cut run", "url": "https://github.com/nobutakayamauchi/RTS/pull/261"}
+  ],
+  "repository": "nobutakayamauchi/RTS",
+  "schema_version": "PROOF-ENGINE-SOURCE-SET-V1",
+  "snapshot_ref": "575c9c5ebaef34dfb7e8e1510e2b0efb3a1b73c4",
+  "source_fingerprint": "c8bcba0094ddc26abec3397f2a4b4df7791295f2f406799dd2321eb8ef5cb4c3",
+  "source_set_id": "PROOF-ENGINE-RTS-PRS-242-261",
+  "visibility": "PUBLIC"
+}

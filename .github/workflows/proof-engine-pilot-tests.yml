@@ -1,0 +1,43 @@
+name: Proof Engine Pilot Tests
+
+on:
+  pull_request:
+    paths:
+      - "proof_engine_pilot/**"
+      - "pilot_runs/reconnect_pilot_p3/**"
+      - "tests/test_proof_engine_pilot.py"
+      - ".github/workflows/proof-engine-pilot-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "proof_engine_pilot/**"
+      - "pilot_runs/reconnect_pilot_p3/**"
+      - "tests/test_proof_engine_pilot.py"
+      - ".github/workflows/proof-engine-pilot-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify committed candidate run
+        run: python -B -m proof_engine_pilot.cli verify
+      - name: Verify summary and review template
+        run: |
+          python -B -m proof_engine_pilot.cli summary
+          python -B -m proof_engine_pilot.cli review-template
+      - name: Verify deterministic generation
+        run: |
+          python -B -m proof_engine_pilot.cli generate --output /tmp/proof-engine-run.json
+          diff -u proof_engine_pilot/runs/p3_run_0001.json /tmp/proof-engine-run.json
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
+      - name: Run full repository tests
+        run: python -B -m unittest discover -s tests -v

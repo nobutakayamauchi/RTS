@@ -1,0 +1,402 @@
+{
+  "authority": {
+    "adjacent_repository_write_authorized": false,
+    "automatic_approval_authorized": false,
+    "contract_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "provider_authorized": false,
+    "publication_authorized": false
+  },
+  "candidate_count": 12,
+  "candidates": [
+    {
+      "candidate_fingerprint": "31d2e2f2198486a46d21f4a2325eaf5666ddc0e820041b3cb95c10da338c3b5f",
+      "candidate_id": "ACH-001",
+      "claim": "Decomposed a broad governed execution-and-learning initiative into independently verifiable staged integration boundaries.",
+      "contribution_map": {
+        "ai_tool": [
+          "drafting and implementation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "problem framing",
+          "architecture decomposition",
+          "scope control"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        242,
+        243
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Reduces hidden coupling and makes complex AI systems safer to build incrementally."
+      }
+    },
+    {
+      "candidate_fingerprint": "9bb41c8a1bc7e1d87f91e8c2825054ee1a913659a796ad5c8b6bc9dd187e0494",
+      "candidate_id": "ACH-002",
+      "claim": "Designed and implemented a deterministic repository-local read-only governed loop orchestrator.",
+      "contribution_map": {
+        "ai_tool": [
+          "code and test generation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "architecture",
+          "constraints",
+          "acceptance criteria",
+          "human approval"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        244,
+        245,
+        246,
+        247,
+        248
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Creates a reconstructable control loop without granting unattended execution authority."
+      }
+    },
+    {
+      "candidate_fingerprint": "c6e999358ea8bf32452025244c8bf67af9b0615a62644b2895ba0e817c9d6c02",
+      "candidate_id": "ACH-003",
+      "claim": "Enforced WIP=1 and explicit human gates across selection, implementation, verification, and completion.",
+      "contribution_map": {
+        "ai_tool": [
+          "record generation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "governance policy",
+          "priority decisions",
+          "approval"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        246,
+        248,
+        253,
+        255,
+        257,
+        260
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Prevents parallel scope drift and keeps consequential changes under human control."
+      }
+    },
+    {
+      "candidate_fingerprint": "88d64152c140ae27abc314982cbaf7d4f03073de4696e823030be6b4b5ea506a",
+      "candidate_id": "ACH-004",
+      "claim": "Designed an append-only Human Review Ledger with deterministic verification and non-authorizing semantics.",
+      "contribution_map": {
+        "ai_tool": [
+          "implementation and test assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "data contract",
+          "authority boundary",
+          "review design"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        249,
+        250,
+        252,
+        253,
+        254,
+        255
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Makes human decisions auditable without converting review into automatic application authority."
+      }
+    },
+    {
+      "candidate_fingerprint": "7946c9d5ad60f039da1b7696ab1de03c6dd35502fc47c9db1fcbfde76d8ed3c2",
+      "candidate_id": "ACH-005",
+      "claim": "Hardened human-review handling against stale expiry, proposer mismatch, and unmanifested decision files.",
+      "contribution_map": {
+        "ai_tool": [
+          "code repair and regression-test assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "review interpretation",
+          "risk detection",
+          "acceptance of fixes"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        254,
+        255
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Closes subtle paths where forged or stale review evidence could be treated as current approval."
+      }
+    },
+    {
+      "candidate_fingerprint": "1c61cf7f44150cc2cd783e1c15f44e1f58918a6495c059459b1f044001a211c6",
+      "candidate_id": "ACH-006",
+      "claim": "Designed and implemented a non-applying Promotion Application Preview with exact before/after hashes, blockers, validation, and rollback anchors.",
+      "contribution_map": {
+        "ai_tool": [
+          "implementation and schema assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "scope definition",
+          "safety constraints",
+          "review"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        256,
+        257,
+        258
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Lets operators inspect intended changes before granting any write or application authority."
+      }
+    },
+    {
+      "candidate_fingerprint": "43bcb215a8a217292f78caaff2e27d9b4b233f1d5400955372037bc447a378a3",
+      "candidate_id": "ACH-007",
+      "claim": "Integrated eight deterministic verification stages into one governed loop run while preserving read-only authority.",
+      "contribution_map": {
+        "ai_tool": [
+          "fixture and verifier implementation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "integration architecture",
+          "ordering",
+          "authority control"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        247,
+        254,
+        258,
+        260
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Provides a single reconstructable state view across assets, execution, evidence, review, regression, learning, and preview."
+      }
+    },
+    {
+      "candidate_fingerprint": "b43a812c99d7c7c8f1472ccd6855ed768fc88d76aec28b82a813c486b4cd7291",
+      "candidate_id": "ACH-008",
+      "claim": "Completed the governed loop engine pilot entry with checkpoint, resume, Seed contract, and WIP reset.",
+      "contribution_map": {
+        "ai_tool": [
+          "record and test generation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "completion criteria",
+          "pilot boundary",
+          "lifecycle decision"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        260
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Turns a collection of safety components into an actual project-ingestion entrance."
+      }
+    },
+    {
+      "candidate_fingerprint": "2c8cc1cb6b4a10cd6535e9291615abb4015e7c9b02c9f0f9d28ec90dc8f17799",
+      "candidate_id": "ACH-009",
+      "claim": "Built an Adaptive Governance Compiler that selects deterministic G0-G4 governance profiles based on exact change context.",
+      "contribution_map": {
+        "ai_tool": [
+          "compiler and test implementation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "governance model",
+          "risk classification",
+          "cost-control requirements"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        259
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Reduces unnecessary ceremony for low-risk work while preserving stronger gates for sensitive or irreversible work."
+      }
+    },
+    {
+      "candidate_fingerprint": "8bf814b14a14019c85092f28268bd903e6a9f25075925b73aab82bdcd5dc37d8",
+      "candidate_id": "ACH-010",
+      "claim": "Resolved independent review findings that could have allowed under-governed G0 classification or weaker re-signed plans.",
+      "contribution_map": {
+        "ai_tool": [
+          "code fixes and regression tests"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "review triage",
+          "security judgment",
+          "acceptance criteria"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        259
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Demonstrates the ability to convert external audit findings into enforceable fail-closed behavior."
+      }
+    },
+    {
+      "candidate_fingerprint": "c4f710c49bd66accd9c01cad65637336371cf98e25d1479f2614eba57d0e3af6",
+      "candidate_id": "ACH-011",
+      "claim": "Converted a long project conversation into a verified Seed Pack and executed the first P0 scope-cut run.",
+      "contribution_map": {
+        "ai_tool": [
+          "document structuring and validation assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "product synthesis",
+          "scope selection",
+          "privacy boundary",
+          "human direction"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        261
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Shows that unstructured intent can be transformed into a resumable, machine-verifiable project contract."
+      }
+    },
+    {
+      "candidate_fingerprint": "42ef649cf4e586f7c6309f0725655570f46667451039ce5ef44b06cc504ec2b6",
+      "candidate_id": "ACH-012",
+      "claim": "Established a repeatable pattern of exact fingerprints, stale-state detection, CI verification, review correction, and completion records across multiple governed components.",
+      "contribution_map": {
+        "ai_tool": [
+          "implementation, fixture, and CI assistance"
+        ],
+        "attribution_status": "INFERRED",
+        "collaborator": [],
+        "human": [
+          "system pattern design",
+          "quality threshold",
+          "recovery decisions"
+        ]
+      },
+      "evidence_label": "VERIFIED",
+      "evidence_prs": [
+        247,
+        254,
+        258,
+        259,
+        260,
+        261
+      ],
+      "public_disclosure": "INTERNAL_UNTIL_APPROVED",
+      "status": "REVIEW_REQUIRED",
+      "value_assessment": {
+        "audience": "AI-assisted solo developers, solo founders, collaborators, and small teams",
+        "evidence_label": "INFERRED",
+        "value": "Creates reusable development infrastructure that can preserve context and reduce repeat failures across future projects."
+      }
+    }
+  ],
+  "next_action": "Human reviews the 12 candidates and records approve, revise, reject, redact, or expire decisions.",
+  "output_asset": {
+    "publication_status": "NOT_PUBLISHED",
+    "reason": "No candidate has a human approval decision.",
+    "source_candidate_ids": [],
+    "state": "BLOCKED"
+  },
+  "result": "PASS_CANDIDATES_READY",
+  "review_queue": {
+    "allowed_decisions": [
+      "APPROVE",
+      "REVISE",
+      "REJECT",
+      "REDACT",
+      "EXPIRE"
+    ],
+    "decisions": [],
+    "state": "HUMAN_REVIEW_REQUIRED"
+  },
+  "run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "run_id": "PROOF-ENGINE-P3-RUN-0001",
+  "schema_version": "PROOF-ENGINE-P3-RUN-V1",
+  "source_fingerprint": "c8bcba0094ddc26abec3397f2a4b4df7791295f2f406799dd2321eb8ef5cb4c3",
+  "source_set_id": "PROOF-ENGINE-RTS-PRS-242-261"
+}

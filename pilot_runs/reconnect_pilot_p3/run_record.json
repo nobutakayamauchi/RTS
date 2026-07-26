@@ -1,0 +1,14 @@
+{
+  "candidate_count": 12,
+  "decision_fingerprint": "ceaacd2f36ab9a6d2f39c20de677da3a63c12bcb8a35a4c9046380a124721cfc",
+  "external_actions_performed": false,
+  "implementation_performed": true,
+  "next_action": "Human reviews 12 candidates; no output asset can be approved or published automatically.",
+  "proof_engine_run_fingerprint": "0935b4b594b3d80a0d38fe2cb95dc9a90eed82ba8591a7251cd4ef1dde9d7ee1",
+  "record_fingerprint": "5aeac90aade81f64536d0e3f457571b3cabc905d269e59cb3e072e1a85bfa0b2",
+  "result": "PASS_CANDIDATES_READY",
+  "run_id": "PROOF-ENGINE-P3-RUN-0001",
+  "schema_version": "RTS-RECONNECT-P3-PILOT-RECORD-V1",
+  "source_fingerprint": "c8bcba0094ddc26abec3397f2a4b4df7791295f2f406799dd2321eb8ef5cb4c3",
+  "state": "HUMAN_REVIEW_REQUIRED"
+}
