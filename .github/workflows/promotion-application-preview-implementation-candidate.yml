@@ -11,7 +11,7 @@ on:
       - ".github/workflows/promotion-application-preview-implementation-candidate.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   candidate:
@@ -26,36 +26,20 @@ jobs:
           python-version: "3.11"
       - name: Generate governed-loop integration candidate
         run: PYTHONPATH=. python -B scripts/tmp_integrate_promotion_preview.py
-      - name: Verify integrated candidate and capture diagnostics
+      - name: Verify integrated candidate
         run: |
-          set +e
-          {
-            python -B -m promotion_application_preview.cli verify
-            python -B -m governed_loop.cli verify
-            python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
-            python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
-            python -B -m unittest discover -s tests -v
-          } > promotion-preview-integration-diagnostic.txt 2>&1
-          status=$?
-          echo "$status" > promotion-preview-integration-status.txt
-          exit 0
-      - name: Export candidate
+          python -B -m promotion_application_preview.cli verify
+          python -B -m governed_loop.cli verify
+          python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
+          python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
+          python -B -m unittest discover -s tests -v
+      - name: Commit verified integration and remove candidate machinery
         run: |
-          git diff --name-only > promotion-preview-integration-files.txt
-          git diff > promotion-preview-integration.patch
-      - uses: actions/upload-artifact@v4
-        with:
-          name: promotion-preview-integration-candidate
-          path: |
-            governed_loop/generation.py
-            governed_loop/models.py
-            governed_loop/schemas/loop_run.schema.json
-            governed_loop/runs/current.json
-            tests/test_governed_loop.py
-            promotion-preview-integration-files.txt
-            promotion-preview-integration.patch
-            promotion-preview-integration-diagnostic.txt
-            promotion-preview-integration-status.txt
-          if-no-files-found: error
-      - name: Enforce verification result
-        run: test "$(cat promotion-preview-integration-status.txt)" = "0"
+          rm -f scripts/tmp_integrate_promotion_preview.py
+          rm -f .github/workflows/promotion-application-preview-implementation-candidate.yml
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Integrate Promotion Application Preview into governed loop"
+          git push
