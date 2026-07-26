@@ -116,10 +116,23 @@ Campaign 0001 runs three bounded read-only validation rounds in order:
 
 The campaign produces sixteen review-required candidates and withholds five unsupported claims. Unmerged Seminar Compass PRs remain in the source snapshot but are ineligible as evidence. The private MiniCompany source copies no customer payload. The video-flow round records only the scaffold and freeze state and explicitly withholds end-to-end, accuracy, and production-readiness claims.
 
-All candidates pass the active `SUGGEST_ONLY` learning preflight. This does not yet prove improved approval or revision rates; that comparison remains `HUMAN_REVIEW_REQUIRED` until the next append-only human review round.
+## Round 2 cross-repository review
+
+```bash
+python -m proof_engine_pilot.cross_repo_review_cli verify-round-2
+python -m proof_engine_pilot.cross_repo_review_cli summary-round-2
+python -m proof_engine_pilot.cross_repo_review_cli effective-round-2
+python -m proof_engine_pilot.cross_repo_review_cli round-3-template
+```
+
+The project owner explicitly confirmed the `seminar-compass` review. Five original candidates were approved. `SC-006` was preserved, marked `REVISE`, reclassified from `AUDIT_REMEDIATION_BYPRODUCT` to `PROCESS_BYPRODUCT`, and approved as `SC-006-R1`.
+
+Round 2 records an 83.3% first-pass approval rate and a 16.7% revision rate. The higher first-pass approval rate than the original RTS round is recorded only as `POSITIVE_SIGNAL_NOT_PROOF`, because the repository type and candidate count differ.
+
+The correction reinforces existing artifact-kind rule `REVIEW-RULE-002`; it does not activate a new rule or grant automatic correction or approval authority. Round 3 remains a separate human review.
 
 No target repository is modified. Publication, outreach, provider execution, contracts, automatic rewriting, and automatic approval remain unauthorized.
 
 Original candidates, corrected revisions, internal assets, public-wording drafts, review records, and source snapshots remain preserved. This is not a model-weight update and does not manufacture human authorship for delegated AI judgments.
 
-The current campaign state is `THREE_REPOSITORY_HUMAN_REVIEW_REQUIRED / NOT_PUBLISHED`.
+The current review state is `ROUND_2_COMPLETE_ROUND_3_REVIEW_REQUIRED / NOT_PUBLISHED`.
