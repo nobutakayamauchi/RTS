@@ -1,0 +1,91 @@
+{
+  "assessor": "RTS governed build assessment",
+  "rationale": "The final staged child reuses the completed proposal, regression, rollback, Human Review Ledger, governed-loop, FREEZER, schema, and test contracts. The remaining work is a bounded repository-local preview layer with no target writes.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 24,
+    "integration_hours": 2,
+    "validation_hours": 2,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "promotion application preview",
+      "human review ledger proposal regression rollback",
+      "read-only governed loop change set"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "human_review_ledger/",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 5,
+        "notes": "Reuse exact source-fingerprint, stale-state, expiry, non-authority, path-safety, privacy, and deterministic verification patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "learning_proposals/",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Reuse proposal, pending-review, evidence-linkage, deterministic generator, schema, and CLI patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "skill_regression/",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse target snapshot, regression result, rollback reference, threshold, and fail-closed verification contracts."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "governed_loop/",
+        "ref": "main",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse deterministic component integration, canonical fixture, source fingerprint, authority, and read-only orchestration patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "tests/",
+        "ref": "main",
+        "kind": "test",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse mutation, path escape, stale source, widened authority, determinism, and committed-fixture test patterns."
+      }
+    ],
+    "gaps": [
+      "No current package derives a canonical non-applying change-set preview from proposal and review state.",
+      "No current governed-loop component records preview blockers, intended target paths, validation plan, stop conditions, and rollback anchors together."
+    ]
+  },
+  "risks": [
+    "A preview could be misread as approval or executable authority.",
+    "Target paths or expected fingerprints could drift after preview generation.",
+    "An absent, stale, expired, rejected, or conflicted decision could be incorrectly treated as sufficient.",
+    "Future adapters could bypass the preview and write directly unless the non-authorizing boundary remains explicit."
+  ]
+}
