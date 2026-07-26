@@ -70,6 +70,23 @@ python -m proof_engine_pilot.public_wording_cli review-template
 
 The six approved internal sources are translated into English audience-facing wording with a headline, summary, value explanation, evidence note, human and AI-tool attribution, and explicit limits. Every draft passes the active review-learning preflight and remains `PUBLICATION_REVIEW_REQUIRED / NOT_PUBLISHED`.
 
-Original candidates, corrected revisions, internal assets, and human decisions remain preserved. This is not a model-weight update and does not manufacture approval.
+## Delegated publication wording review commands
 
-There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. Publication requires a separate append-only human decision and remains unauthorized in this stage.
+```bash
+python -m proof_engine_pilot.publication_review_cli verify
+python -m proof_engine_pilot.publication_review_cli summary
+python -m proof_engine_pilot.publication_review_cli effective
+python -m proof_engine_pilot.publication_review_cli release-template
+```
+
+Publication review round 0001 records the distinction between the human project owner's explicit delegation and the AI assistant's wording judgment. Three originals are accepted unchanged. Three originals remain preserved while revised versions tighten scope or reader clarity:
+
+- `WORDING-002-R1` explicitly limits WIP=1 to the governed pilot in the headline;
+- `WORDING-003-R1` replaces unclear stale-expiry phrasing with expired-or-stale decision language;
+- `WORDING-005-R1` describes governance as derived from declared change and authority context rather than exact risk measurement.
+
+All six effective wordings are ready for a separate release-authorization gate. They are not published, and the review does not grant publication, outreach, contract, external-execution, automatic-rewrite, or automatic-approval authority.
+
+Original candidates, corrected revisions, internal assets, public-wording drafts, and review records remain preserved. This is not a model-weight update and does not manufacture human authorship for the delegated AI review.
+
+There is no approve, publish, outreach, contract, provider, merge, model-training, or external-execution command. The current state is `RELEASE_AUTHORIZATION_REQUIRED / NOT_PUBLISHED`.
