@@ -1,0 +1,33 @@
+{
+  "schema_version": "RTS-ADAPTIVE-GOVERNANCE-CONTEXT-V1",
+  "change_id": "RTS-CHANGE-PROMOTION-PREVIEW-001",
+  "summary": "Implement a repository-local read-only promotion application preview without target writes.",
+  "change_kinds": [
+    "CODE",
+    "SCHEMA",
+    "TEST"
+  ],
+  "affected_paths": [
+    "promotion_application_preview/",
+    "tests/test_promotion_application_preview.py"
+  ],
+  "requested_actions": [
+    "READ",
+    "WRITE_LOCAL"
+  ],
+  "impact": {
+    "read_only": true,
+    "repository_scope": "LOCAL",
+    "reversible": true,
+    "touches_approval_flow": true,
+    "handles_personal_data": false,
+    "handles_sensitive_material": false,
+    "financial_or_contractual": false,
+    "production_effect": false,
+    "external_action": false,
+    "historical_failure": true,
+    "emergency": false,
+    "uncertainty": "MEDIUM"
+  },
+  "estimated_implementation_steps": 5
+}
