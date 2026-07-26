@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - "promotion_application_preview/**"
+      - "governed_loop/**"
       - "tests/test_promotion_application_preview.py"
+      - "tests/test_governed_loop.py"
+      - "scripts/tmp_integrate_promotion_preview.py"
       - ".github/workflows/promotion-application-preview-implementation-candidate.yml"
 
 permissions:
@@ -21,34 +24,38 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Generate committed preview candidate
-        run: |
-          mkdir -p promotion_application_preview/previews
-          python -B -m promotion_application_preview.cli generate > promotion_application_preview/previews/current.json
-      - name: Verify candidate and capture diagnostics
+      - name: Generate governed-loop integration candidate
+        run: PYTHONPATH=. python -B scripts/tmp_integrate_promotion_preview.py
+      - name: Verify integrated candidate and capture diagnostics
         run: |
           set +e
           {
             python -B -m promotion_application_preview.cli verify
+            python -B -m governed_loop.cli verify
             python -B -m unittest discover -s tests -p 'test_promotion_application_preview.py' -v
+            python -B -m unittest discover -s tests -p 'test_governed_loop.py' -v
             python -B -m unittest discover -s tests -v
-          } > promotion-preview-implementation-diagnostic.txt 2>&1
+          } > promotion-preview-integration-diagnostic.txt 2>&1
           status=$?
-          echo "$status" > promotion-preview-implementation-status.txt
+          echo "$status" > promotion-preview-integration-status.txt
           exit 0
       - name: Export candidate
         run: |
-          git diff --name-only > promotion-preview-implementation-files.txt
-          git diff > promotion-preview-implementation.patch
+          git diff --name-only > promotion-preview-integration-files.txt
+          git diff > promotion-preview-integration.patch
       - uses: actions/upload-artifact@v4
         with:
-          name: promotion-preview-implementation-candidate
+          name: promotion-preview-integration-candidate
           path: |
-            promotion_application_preview/previews/current.json
-            promotion-preview-implementation-files.txt
-            promotion-preview-implementation.patch
-            promotion-preview-implementation-diagnostic.txt
-            promotion-preview-implementation-status.txt
+            governed_loop/generation.py
+            governed_loop/models.py
+            governed_loop/schemas/loop_run.schema.json
+            governed_loop/runs/current.json
+            tests/test_governed_loop.py
+            promotion-preview-integration-files.txt
+            promotion-preview-integration.patch
+            promotion-preview-integration-diagnostic.txt
+            promotion-preview-integration-status.txt
           if-no-files-found: error
       - name: Enforce verification result
-        run: test "$(cat promotion-preview-implementation-status.txt)" = "0"
+        run: test "$(cat promotion-preview-integration-status.txt)" = "0"
