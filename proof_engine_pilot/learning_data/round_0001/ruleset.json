@@ -1,0 +1,86 @@
+{
+  "activation": {
+    "applies_after_run_id": "PROOF-ENGINE-P3-RUN-0001",
+    "mode": "SUGGEST_ONLY",
+    "retroactive_mutation": false,
+    "state": "ACTIVE_FOR_FUTURE_RUNS"
+  },
+  "allowed_record_kinds": [
+    "PERSONAL_ACHIEVEMENT",
+    "PROJECT_OUTPUT",
+    "PROCESS_BYPRODUCT",
+    "INTEGRATION_BYPRODUCT",
+    "AUDIT_REMEDIATION_BYPRODUCT",
+    "REUSABILITY_SIGNAL"
+  ],
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "model_weight_training_authorized": false,
+    "publication_authorized": false
+  },
+  "dataset_fingerprint": "ae897a05bef32209a81d54ff6da99334a82483bd57964fea07284d6571d82f79",
+  "required_future_candidate_fields": [
+    "candidate_id",
+    "claim",
+    "record_kind",
+    "factuality_note",
+    "contribution_map",
+    "evidence_label",
+    "evidence_prs",
+    "public_disclosure"
+  ],
+  "rules": [
+    {
+      "automatic_application_authorized": false,
+      "category": "AUTHORSHIP_ATTRIBUTION",
+      "instruction": "Separate the observed repository result from direct personal authorship. When AI or tools implemented material parts, describe the project output and list the human's supported decisions, constraints, review, and approval separately.",
+      "rule_id": "REVIEW-RULE-001",
+      "source_candidate_ids": ["ACH-001", "ACH-002", "ACH-007", "ACH-010"],
+      "state": "ACTIVE"
+    },
+    {
+      "automatic_application_authorized": false,
+      "category": "ARTIFACT_KIND",
+      "instruction": "Classify the record as a personal achievement, project output, process byproduct, integration byproduct, audit-remediation byproduct, or reusability signal instead of treating every result as a personal achievement.",
+      "rule_id": "REVIEW-RULE-002",
+      "source_candidate_ids": ["ACH-001", "ACH-002", "ACH-007", "ACH-010", "ACH-012"],
+      "state": "ACTIVE"
+    },
+    {
+      "automatic_application_authorized": false,
+      "category": "CONTRIBUTION_SEPARATION",
+      "instruction": "Keep human, AI-tool, collaborator, and inherited contributions separate. Do not collapse AI-assisted implementation into a direct human implementation claim.",
+      "rule_id": "REVIEW-RULE-003",
+      "source_candidate_ids": ["ACH-001", "ACH-002", "ACH-007", "ACH-010"],
+      "state": "ACTIVE"
+    },
+    {
+      "automatic_application_authorized": false,
+      "category": "GENERALIZATION_SCOPE",
+      "instruction": "Do not generalize beyond the evidence boundary. Repeated use inside RTS is a reusability signal until reuse outside RTS is observed.",
+      "rule_id": "REVIEW-RULE-004",
+      "source_candidate_ids": ["ACH-012"],
+      "state": "ACTIVE"
+    },
+    {
+      "automatic_application_authorized": false,
+      "category": "APPEND_ONLY_CORRECTION",
+      "instruction": "Preserve original candidates and append REVISE decisions plus versioned corrections. Never silently overwrite the reviewed source record.",
+      "rule_id": "REVIEW-RULE-005",
+      "source_candidate_ids": ["ACH-001", "ACH-002", "ACH-007", "ACH-010", "ACH-012"],
+      "state": "ACTIVE"
+    },
+    {
+      "automatic_application_authorized": false,
+      "category": "AUTHORITY_BOUNDARY",
+      "instruction": "Candidate approval authorizes internal draft use only. Publication, outreach, contracts, external execution, and model-weight training require separate human authority.",
+      "rule_id": "REVIEW-RULE-006",
+      "source_candidate_ids": ["ACH-001", "ACH-002", "ACH-003", "ACH-004", "ACH-005", "ACH-006", "ACH-007", "ACH-008", "ACH-009", "ACH-010", "ACH-011", "ACH-012"],
+      "state": "ACTIVE"
+    }
+  ],
+  "ruleset_fingerprint": "fad89c35f06b7891b04023dc68d96e2968876e09b8ac29c8d3633961c03cb657",
+  "ruleset_id": "PROOF-ENGINE-LEARNING-RULESET-0001",
+  "schema_version": "PROOF-ENGINE-REVIEW-LEARNING-RULESET-V1"
+}

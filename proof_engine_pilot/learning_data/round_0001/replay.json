@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "corrections_learned": 5,
+    "positive_examples_preserved": 7,
+    "revisions_accepted": 5,
+    "unresolved_examples": 0
+  },
+  "dataset_fingerprint": "ae897a05bef32209a81d54ff6da99334a82483bd57964fea07284d6571d82f79",
+  "future_policy": {
+    "base_run_mutated": false,
+    "mode": "SUGGEST_ONLY",
+    "state": "ACTIVE_FOR_FUTURE_RUNS"
+  },
+  "replay_fingerprint": "e22d8bed853f44181a6427d79177ab2a6fd35e445f67a650cc4553fc1eaf7202",
+  "replay_id": "PROOF-ENGINE-LEARNING-REPLAY-0001",
+  "result": "PASS_LEARNING_DATA_REFLECTED",
+  "ruleset_fingerprint": "fad89c35f06b7891b04023dc68d96e2968876e09b8ac29c8d3633961c03cb657",
+  "schema_version": "PROOF-ENGINE-REVIEW-LEARNING-REPLAY-V1"
+}
