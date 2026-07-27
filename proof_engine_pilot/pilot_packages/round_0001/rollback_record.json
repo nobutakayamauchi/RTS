@@ -1,0 +1,13 @@
+{
+  "build_decision_fingerprint": "3e242b568004db22d8298fd3470afcd45045a88ca8406953484719546c3e5418",
+  "delete_or_rewrite_prior_records": false,
+  "external_action_performed": false,
+  "preserve": ["reviewed Template v2","productization decision","internal product specification","corrected pre-build review contract","corrected post-build acceptance contract","prior evidence and review records"],
+  "repository_base_commit": "6d2f74027b4ad632cc17b74909cb4621b0592dfc",
+  "rollback_action": "Freeze the pilot package and return to the corrected internal specification gate.",
+  "rollback_fingerprint": "a745a3b87cd5dc3746186f0a452c9129c82ead4ed662f8de82bb45e7f39d5882",
+  "rollback_id": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-ROLLBACK-0001",
+  "rollback_trigger": ["source report fingerprint drift","package manifest mismatch","missing required artifact","authority widening","manufactured human acceptance","non-deterministic regeneration"],
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-ROLLBACK-V1",
+  "source_spec_checkpoint_fingerprint": "216727d62de7dd44d277729c57620e0c3652abc9584106fbe741dcabf6c2fbb1"
+}
