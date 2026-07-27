@@ -68,6 +68,12 @@ jobs:
           assert 'No report in this demonstration has been approved for pricing' in markdown
           PY
       - name: Build reviewed template fingerprints
-        run: python -B -m proof_engine_pilot.report_template_review_cli build-summary
+        run: python -B -m proof_engine_pilot.report_template_review_cli build-summary > /tmp/evidence-report-review-fingerprints.json
+      - name: Upload reviewed template fingerprints
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-report-review-fingerprints
+          path: /tmp/evidence-report-review-fingerprints.json
+          if-no-files-found: error
       - name: Run focused tests
         run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
