@@ -1,0 +1,20 @@
+{
+  "actor": {
+    "identity": "nobutakayamauchi",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "interpreted_scope": "ASSESS_OVERALL_AND_SHORT_TERM_COMPLETION_PERFORM_BOUNDED_PRODUCT_READINESS_ASSESSMENT_AND_ADOPT_INSTRUCTION_NORMALIZATION",
+  "normalization_policy": {
+    "audit_binding": "SHA256_CANONICAL_JSON_FINGERPRINT",
+    "do_not_quote_obvious_input_errors_in_readmes_or_pr_bodies": true,
+    "preserve_intent": true,
+    "retain_raw_text_only_when_legally_or_operationally_required": false
+  },
+  "normalized_instruction": "全体完成度と短期目標の完成度を示し、次のプロダクト・レディネス審査へ進む。今後、誤変換や誤字を含む指示文は、意味を保った正規化文と監査用フィンガープリントで記録する。",
+  "raw_input_fingerprint": "bbae93d6c50c19ca72cd2d3c92c0c99cc3b5a3acb11c1c027645cfe19a7e30aa",
+  "raw_input_retained_in_operator_surfaces": false,
+  "record_fingerprint": "0d74468999f288c2ad245f2d4412c5f785f483d4199a082743ca158b9af855e0",
+  "record_id": "PROOF-ENGINE-INSTRUCTION-NORMALIZATION-RECORD-0001",
+  "schema_version": "PROOF-ENGINE-INSTRUCTION-NORMALIZATION-RECORD-V1"
+}
