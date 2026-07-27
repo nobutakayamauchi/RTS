@@ -1,0 +1,66 @@
+{
+  "acceptance_target": "BUILT_SINGLE_CASE_INTERNAL_PILOT_PACKAGE",
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pilot_package_build_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "completion_rule": {
+    "all_automated_criteria_must_pass": true,
+    "all_human_criteria_require_explicit_record": true,
+    "any_failure_blocks_acceptance": true,
+    "partial_acceptance_allowed": false
+  },
+  "contract_fingerprint": "d8269e54f35946f750bf07a942c0587530cbdb45d9b47f54d15f936ba07755f9",
+  "contract_id": "PROOF-ENGINE-EVIDENCE-REPORT-ACCEPTANCE-CONTRACT-0002",
+  "criteria": [
+    {"category":"SOURCE_BOUNDARY","check":"The package binds one exact repository snapshot and one allowed source mode.","criterion_id":"ACC-001","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"SOURCE_BOUNDARY","check":"Unmerged, unselected, drifted, or unsupported evidence is excluded from completed-achievement support.","criterion_id":"ACC-002","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"},
+    {"category":"REPORT_COMPLETENESS","check":"JSON and Markdown contain all nine required sections in the required order.","criterion_id":"ACC-003","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"REPORT_COMPLETENESS","check":"Every effective achievement record contains the required reader, evidence, contribution, and lineage fields.","criterion_id":"ACC-004","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"FACTUALITY","check":"Every positive claim is bounded by its cited evidence and factuality note.","criterion_id":"ACC-005","required_result":"PASS","verification":"HUMAN"},
+    {"category":"FACTUALITY","check":"Unsupported claims remain withheld with an explicit reason.","criterion_id":"ACC-006","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"},
+    {"category":"CONTRIBUTION","check":"Human, AI-tool, collaborator, and inherited contribution remain separated.","criterion_id":"ACC-007","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"},
+    {"category":"PRIVACY","check":"Private repositories use metadata-only mode and no private payload is copied.","criterion_id":"ACC-008","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"},
+    {"category":"PRIVACY","check":"Credentials and prohibited sensitive or third-party personal data are absent.","criterion_id":"ACC-009","required_result":"PASS","verification":"HUMAN"},
+    {"category":"DETERMINISM","check":"Identical accepted inputs reproduce identical pre-decision JSON and Markdown fingerprints.","criterion_id":"ACC-010","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"HUMAN_AUTHORITY","check":"No approval, pricing, outreach, contract, delivery, publication, or external execution decision is manufactured.","criterion_id":"ACC-011","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"USABILITY","check":"A reviewer can identify verified value, evidence strength, limitations, withheld claims, and the required decision without reading the full repository history.","criterion_id":"ACC-012","required_result":"PASS","verification":"HUMAN"},
+    {"category":"FAIL_CLOSED","check":"Unknown fields, source drift, authority widening, missing sections, and withheld-claim deletion fail closed.","criterion_id":"ACC-013","required_result":"PASS","verification":"AUTOMATED"},
+    {"category":"ROLLBACK","check":"The package can be frozen at the declared rollback anchor without mutating prior approved evidence or review records.","criterion_id":"ACC-014","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"},
+    {"category":"SCOPE","check":"The built package remains an internal single-case package and does not enter pricing, sales, contracting, delivery, publication, or customer intake.","criterion_id":"ACC-015","required_result":"PASS","verification":"AUTOMATED_AND_HUMAN"}
+  ],
+  "decision_contract": {
+    "allowed_decisions": ["ACCEPT_PILOT_PACKAGE","REVISE","REJECT","REDACT","EXPIRE","FREEZE"],
+    "decisions": [],
+    "human_decision_required": true,
+    "required_fields": ["decision","reviewer_identity","reviewed_package_fingerprint","reviewed_report_json_fingerprint","reviewed_report_markdown_fingerprint","criteria_results","privacy_confirmed","authority_boundary_confirmed"],
+    "review_stage": "POST_BUILD_PACKAGE_ACCEPTANCE"
+  },
+  "required_artifacts": ["source-bound input manifest","deterministic report JSON","reader-facing report Markdown","evidence and withheld-claim inventory","human acceptance packet","verification summary","rollback record"],
+  "revision_of_contract_fingerprint": "54f4cd704e760e7bc8b7641e6724ad0f9b8d3ac129107fefdfb379bae3f4a831",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-ACCEPTANCE-CONTRACT-V2",
+  "source": {
+    "product_spec_fingerprint": "2c5132b29b68bfcf3bc9dd9b509cc3176f9ebf828aaa33a8bee3fadd9d817e71",
+    "productization_checkpoint_fingerprint": "5ec1888f85ca802c023a1fce9c68c69c089a6085b5770b011f25139e97d03dd0",
+    "reviewed_pack_fingerprint": "c95360f6ef1376914261eac574757ceb99f7f25c998b7be5752436200375f1bb",
+    "reviewed_template_fingerprint": "579d086788e636317cd61392fc3af97de468ff27c9ba478e962a973bd91ad4f6"
+  },
+  "terminal": {
+    "contract_status": "NOT_STARTED",
+    "delivery_status": "NOT_DELIVERED",
+    "next_action": "After one internal pilot package is built, a human evaluates the completed artifacts against all fifteen acceptance criteria.",
+    "next_gate": "HUMAN_PILOT_PACKAGE_ACCEPTANCE_REVIEW_REQUIRED",
+    "outreach_status": "NOT_STARTED",
+    "pricing_status": "NOT_PRICED",
+    "publication_status": "NOT_PUBLISHED",
+    "state": "POST_BUILD_ACCEPTANCE_CONTRACT_READY"
+  }
+}
