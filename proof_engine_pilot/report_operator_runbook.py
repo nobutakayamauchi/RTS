@@ -81,7 +81,8 @@ def verify_instruction_record(value: dict[str, Any] | None = None) -> dict[str, 
     scope_material = {"normalized_instruction": record.get("normalized_instruction"), "interpreted_scope": record.get("interpreted_scope")}
     if record.get("scope_fingerprint") != fingerprint(scope_material):
         raise ProofEngineError("instruction scope fingerprint mismatch")
-    if "rough-input robustness insight" not in record.get("normalization_actions", []):
+    actions = record.get("normalization_actions", [])
+    if not any(isinstance(action, str) and "rough-input robustness insight" in action for action in actions):
         raise ProofEngineError("rough-input insight missing")
     return record
 
