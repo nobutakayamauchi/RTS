@@ -29,6 +29,16 @@ The review confirms:
 - fail-closed verification and append-only rollback;
 - no credential, customer-payload, or prohibited third-party personal-data material.
 
+## Deterministic bindings
+
+- acceptance decision: `81af71220d7d93b47fd349b3c51912ac27e4d223500632ca86df5358a803b84a`
+- source package checkpoint: `64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70`
+- package index: `9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a`
+- report JSON: `60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41`
+- report Markdown: `5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e`
+- acceptance summary: `2390bc5bf244bccc0cf276953ff8378f1af19c36db92eb22f0ab2649cfa07e81`
+- acceptance checkpoint: `c127b8e718a056671a8fbb1d9776e505e23cd416cd680bdeed0821f47f205611`
+
 ## Review attribution
 
 The project owner authorized the next bounded stage through the current-chat instruction. The AI assistant performed the detailed post-build artifact review. The internal acceptance transition is bound to that explicit project-owner continuation instruction and the fifteen recorded PASS results.
