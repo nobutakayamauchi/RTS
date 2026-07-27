@@ -6,9 +6,14 @@ on:
       - "proof_engine_pilot/report_template.py"
       - "proof_engine_pilot/report_template_v2.py"
       - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/report_template_review.py"
+      - "proof_engine_pilot/report_template_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
+      - "proof_engine_pilot/report_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
       - "tests/test_proof_engine_report_template.py"
+      - "tests/test_proof_engine_report_template_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
   push:
     branches: [main]
@@ -16,9 +21,14 @@ on:
       - "proof_engine_pilot/report_template.py"
       - "proof_engine_pilot/report_template_v2.py"
       - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/report_template_review.py"
+      - "proof_engine_pilot/report_template_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
+      - "proof_engine_pilot/report_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
       - "tests/test_proof_engine_report_template.py"
+      - "tests/test_proof_engine_report_template_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
 
 permissions:
@@ -57,5 +67,7 @@ jobs:
           assert pack['delivery_status'] == 'NOT_DELIVERED'
           assert 'No report in this demonstration has been approved for pricing' in markdown
           PY
+      - name: Build reviewed template fingerprints
+        run: python -B -m proof_engine_pilot.report_template_review_cli build-summary
       - name: Run focused tests
         run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
