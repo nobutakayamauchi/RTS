@@ -1,0 +1,58 @@
+name: Evidence Report Privacy Hardening Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-privacy-hardening-tests.yml"
+      - "docs/status/RTS_CURRENT_POSITION.md"
+      - "docs/status/RTS_CURRENT_POSITION_HARD_005.json"
+      - "proof_engine_pilot/product_readiness/round_0005/**"
+      - "proof_engine_pilot/report_privacy_hardening.py"
+      - "proof_engine_pilot/report_privacy_hardening_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_hardening_complete_checkpoint_0026.json"
+      - "tests/test_proof_engine_report_privacy_hardening.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify HARD-005 privacy and hardening artifacts
+        run: python -B -m proof_engine_pilot.report_privacy_hardening_cli verify
+      - name: Verify completion, metrics, and authority boundary
+        run: |
+          python -B -m proof_engine_pilot.report_privacy_hardening_cli summary > /tmp/privacy-hardening-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/privacy-hardening-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_PRODUCT_HARDENING_COMPLETE'
+          assert value['next_gate'] == 'HUMAN_BOUNDED_CUSTOMER_PILOT_PLANNING_REVIEW_REQUIRED'
+          assert value['rts_overall_planning_estimate_percent'] == 76
+          assert value['short_term_completion_percent'] == 100
+          assert value['product_readiness_score'] == 93
+          assert value['product_readiness_score_change'] == 11
+          assert value['fixture_count'] == 12
+          assert value['first_pass_failures'] == 2
+          assert value['final_pass_failures'] == 0
+          assert value['final_residual_findings'] == 0
+          assert value['final_action_counts'] == {'STOP': 4, 'EXCLUDE': 2, 'MASK': 5, 'ALLOW': 1}
+          assert value['automated_total_scans'] == 24000
+          assert value['automated_elapsed_milliseconds'] == 225.976
+          assert value['manual_steps'] == 5
+          assert value['manual_interventions'] == 2
+          assert value['correction_count'] == 2
+          assert value['customer_pilot_authorized'] is False
+          assert value['production_service_ready'] is False
+          assert value['commercial_readiness_proven'] is False
+          assert value['remaining_hardening_work_items'] == []
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_privacy_hardening.py' -v
