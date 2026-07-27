@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from .core import ProofEngineError
-from .report_pilot_package import build_pilot_package, verify_pilot_package
+from .report_pilot_package_v2 import build_pilot_package, verify_pilot_package
 
 
 def build_parser() -> argparse.ArgumentParser:
