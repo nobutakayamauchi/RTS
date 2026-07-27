@@ -1,0 +1,21 @@
+{
+  "acceptance_contract_complete": true,
+  "acceptance_contract_fingerprint": "54f4cd704e760e7bc8b7641e6724ad0f9b8d3ac129107fefdfb379bae3f4a831",
+  "checkpoint_fingerprint": "a17974e84356ea23a29a957954810710364548637b012bed051e954ba36a4ea2",
+  "checkpoint_id": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-PRODUCT-SPEC-CHECKPOINT-0016",
+  "contract_action_performed": false,
+  "delivery_performed": false,
+  "external_actions_performed": false,
+  "next_action": "A human reviews the internal product specification and acceptance contract and decides whether to authorize one single-case internal pilot package build.",
+  "outreach_performed": false,
+  "pilot_package_build_authorized": false,
+  "pricing_performed": false,
+  "product_spec_fingerprint": "2c5132b29b68bfcf3bc9dd9b509cc3176f9ebf828aaa33a8bee3fadd9d817e71",
+  "publication_performed": false,
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-PRODUCT-SPEC-CHECKPOINT-V1",
+  "source_productization_checkpoint_fingerprint": "5ec1888f85ca802c023a1fce9c68c69c089a6085b5770b011f25139e97d03dd0",
+  "specification_complete": true,
+  "state": "HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED",
+  "summary_fingerprint": "fbf53edb5244a1a126b85ba229e8ac93165510b1625c69cdf7a61856c12efb33",
+  "target_repository_writes_performed": false
+}
