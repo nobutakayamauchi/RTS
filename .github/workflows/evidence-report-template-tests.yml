@@ -8,12 +8,17 @@ on:
       - "proof_engine_pilot/report_template_cli.py"
       - "proof_engine_pilot/report_template_review.py"
       - "proof_engine_pilot/report_template_review_cli.py"
+      - "proof_engine_pilot/report_productization_review.py"
+      - "proof_engine_pilot/report_productization_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
       - "proof_engine_pilot/report_reviews/round_0001/**"
+      - "proof_engine_pilot/productization_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_productization_checkpoint_0015.json"
       - "tests/test_proof_engine_report_template.py"
       - "tests/test_proof_engine_report_template_review.py"
+      - "tests/test_proof_engine_report_productization_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
   push:
     branches: [main]
@@ -23,12 +28,17 @@ on:
       - "proof_engine_pilot/report_template_cli.py"
       - "proof_engine_pilot/report_template_review.py"
       - "proof_engine_pilot/report_template_review_cli.py"
+      - "proof_engine_pilot/report_productization_review.py"
+      - "proof_engine_pilot/report_productization_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
       - "proof_engine_pilot/report_reviews/round_0001/**"
+      - "proof_engine_pilot/productization_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_productization_checkpoint_0015.json"
       - "tests/test_proof_engine_report_template.py"
       - "tests/test_proof_engine_report_template_review.py"
+      - "tests/test_proof_engine_report_productization_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
 
 permissions:
@@ -56,6 +66,13 @@ jobs:
           python -B -m proof_engine_pilot.report_template_review_cli generate --output /tmp/evidence-report-pack-v2.json
           python -B -m proof_engine_pilot.report_template_review_cli render-markdown --output /tmp/evidence-report-pack-v2.md
           python -B -m proof_engine_pilot.report_template_review_cli productization-template > /tmp/evidence-report-productization-template.json
+      - name: Verify productization decision and retained boundaries
+        run: |
+          python -B -m proof_engine_pilot.report_productization_review_cli verify
+          python -B -m proof_engine_pilot.report_productization_review_cli summary > /tmp/evidence-report-productization-summary.json
+          python -B -m proof_engine_pilot.report_productization_review_cli decision > /tmp/evidence-report-productization-decision.json
+          python -B -m proof_engine_pilot.report_productization_review_cli render-markdown --output /tmp/evidence-report-productization-review.md
+          python -B -m proof_engine_pilot.report_productization_review_cli next-stage > /tmp/evidence-report-productization-next-stage.json
       - name: Verify revised counts, complete rendering, and boundaries
         run: |
           python - <<'PY'
@@ -64,6 +81,9 @@ jobs:
           pack = json.loads(Path('/tmp/evidence-report-pack-v2.json').read_text(encoding='utf-8'))
           markdown = Path('/tmp/evidence-report-pack-v2.md').read_text(encoding='utf-8')
           productization = json.loads(Path('/tmp/evidence-report-productization-template.json').read_text(encoding='utf-8'))
+          summary = json.loads(Path('/tmp/evidence-report-productization-summary.json').read_text(encoding='utf-8'))
+          decision = json.loads(Path('/tmp/evidence-report-productization-decision.json').read_text(encoding='utf-8'))
+          next_stage = json.loads(Path('/tmp/evidence-report-productization-next-stage.json').read_text(encoding='utf-8'))
           assert pack['counts'] == {
               'reports': 3,
               'effective_achievement_records': 16,
@@ -88,8 +108,23 @@ jobs:
           assert productization['pricing_authorized'] is False
           assert productization['delivery_authorized'] is False
           assert productization['publication_authorized'] is False
+          assert summary['state'] == 'APPROVED_FOR_INTERNAL_PRODUCTIZATION_SPECIFICATION'
+          assert summary['productization_scope'] == 'INTERNAL_PRODUCTIZATION_SPECIFICATION_ONLY'
+          assert decision['decision'] == 'APPROVE_FOR_PRODUCTIZATION'
+          assert decision['pricing_authorized'] is False
+          assert decision['outreach_authorized'] is False
+          assert decision['contract_authorized'] is False
+          assert decision['delivery_authorized'] is False
+          assert decision['publication_authorized'] is False
+          assert next_stage['state'] == 'APPROVED_FOR_INTERNAL_PRODUCTIZATION_SPECIFICATION'
+          assert next_stage['pricing_authorized'] is False
+          assert next_stage['outreach_authorized'] is False
+          assert next_stage['contract_authorized'] is False
+          assert next_stage['delivery_authorized'] is False
+          assert next_stage['publication_authorized'] is False
           PY
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_report_template_review.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_productization_review.py' -v
