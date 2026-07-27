@@ -27,8 +27,10 @@ jobs:
           python-version: "3.11"
       - name: Verify prior signed execution-authorization history
         run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_prior_execution_authorization_history; print(verify_prior_execution_authorization_history())"
-      - name: Verify discovery contract and public candidate universe
-        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_contract,verify_universe; verify_contract(); verify_universe(); print('contract-universe-ok')"
+      - name: Verify candidate discovery contract
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_contract; verify_contract(); print('contract-ok')"
+      - name: Verify public candidate universe
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_universe; verify_universe(); print('universe-ok')"
       - name: Verify evidence, scoring, and shortlist decision
         run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_evidence,verify_scores,verify_decision; verify_evidence(); verify_scores(); verify_decision(); print('evidence-scores-decision-ok')"
       - name: Verify contact risk, readiness hold, and completion
