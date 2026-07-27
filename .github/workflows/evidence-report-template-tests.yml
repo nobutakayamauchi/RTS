@@ -6,9 +6,14 @@ on:
       - "proof_engine_pilot/report_template.py"
       - "proof_engine_pilot/report_template_v2.py"
       - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/report_template_review.py"
+      - "proof_engine_pilot/report_template_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
+      - "proof_engine_pilot/report_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
       - "tests/test_proof_engine_report_template.py"
+      - "tests/test_proof_engine_report_template_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
   push:
     branches: [main]
@@ -16,9 +21,14 @@ on:
       - "proof_engine_pilot/report_template.py"
       - "proof_engine_pilot/report_template_v2.py"
       - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/report_template_review.py"
+      - "proof_engine_pilot/report_template_review_cli.py"
       - "proof_engine_pilot/reporting/round_0001/**"
+      - "proof_engine_pilot/report_reviews/round_0001/**"
       - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_review_checkpoint_0014.json"
       - "tests/test_proof_engine_report_template.py"
+      - "tests/test_proof_engine_report_template_review.py"
       - ".github/workflows/evidence-report-template-tests.yml"
 
 permissions:
@@ -33,29 +43,53 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Verify report template
+      - name: Verify source report template
         run: |
           python -B -m proof_engine_pilot.report_template_cli verify
           python -B -m proof_engine_pilot.report_template_cli summary
-          python -B -m proof_engine_pilot.report_template_cli generate --output /tmp/evidence-report-pack.json
-          python -B -m proof_engine_pilot.report_template_cli render-markdown --output /tmp/evidence-report-pack.md
-          python -B -m proof_engine_pilot.report_template_cli review-template > /tmp/evidence-report-review-template.json
-      - name: Verify generated counts and boundaries
+          python -B -m proof_engine_pilot.report_template_cli generate --output /tmp/evidence-report-pack-v1.json
+          python -B -m proof_engine_pilot.report_template_cli render-markdown --output /tmp/evidence-report-pack-v1.md
+      - name: Verify reviewed Template v2 and revised reports
+        run: |
+          python -B -m proof_engine_pilot.report_template_review_cli verify
+          python -B -m proof_engine_pilot.report_template_review_cli summary
+          python -B -m proof_engine_pilot.report_template_review_cli generate --output /tmp/evidence-report-pack-v2.json
+          python -B -m proof_engine_pilot.report_template_review_cli render-markdown --output /tmp/evidence-report-pack-v2.md
+          python -B -m proof_engine_pilot.report_template_review_cli productization-template > /tmp/evidence-report-productization-template.json
+      - name: Verify revised counts, complete rendering, and boundaries
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          pack = json.loads(Path('/tmp/evidence-report-pack.json').read_text(encoding='utf-8'))
-          markdown = Path('/tmp/evidence-report-pack.md').read_text(encoding='utf-8')
+          pack = json.loads(Path('/tmp/evidence-report-pack-v2.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/evidence-report-pack-v2.md').read_text(encoding='utf-8')
+          productization = json.loads(Path('/tmp/evidence-report-productization-template.json').read_text(encoding='utf-8'))
           assert pack['counts'] == {
               'reports': 3,
               'effective_achievement_records': 16,
               'withheld_claims': 5,
           }
-          assert pack['state'] == 'HUMAN_REPORT_TEMPLATE_REVIEW_REQUIRED'
+          assert pack['state'] == 'HUMAN_PRODUCTIZATION_REVIEW_REQUIRED'
+          assert pack['pricing_status'] == 'NOT_PRICED'
           assert pack['publication_status'] == 'NOT_PUBLISHED'
           assert pack['delivery_status'] == 'NOT_DELIVERED'
-          assert 'No report in this demonstration has been approved for pricing' in markdown
+          for heading in (
+              '### 1. Executive summary',
+              '### 2. Repository scope',
+              '### 3. Methodology',
+              '### 4. Evidence inventory',
+              '### 5. Effective achievement records',
+              '### 6. Human and AI contribution map',
+              '### 7. Withheld or unsupported claims',
+              '### 8. Limitations',
+              '### 9. Human review decision',
+          ):
+              assert markdown.count(heading) == 3
+          assert productization['pricing_authorized'] is False
+          assert productization['delivery_authorized'] is False
+          assert productization['publication_authorized'] is False
           PY
       - name: Run focused tests
-        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
+        run: |
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_template_review.py' -v

@@ -1,0 +1,100 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "contract_fingerprint": "683ccfb57054b732b9cb8f75f84a43def7f20d90a01ac4503d83ad8dba2d8da0",
+  "contract_id": "PROOF-ENGINE-EVIDENCE-REPORT-TEMPLATE-REVIEW-CONTRACT-0001",
+  "decisions": {
+    "revised_reports": "READY_FOR_HUMAN_PRODUCTIZATION_REVIEW",
+    "revised_template": "READY_FOR_HUMAN_PRODUCTIZATION_REVIEW",
+    "source_reports": [
+      {
+        "decision": "REVISE",
+        "report_id": "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2"
+      },
+      {
+        "decision": "REVISE",
+        "report_id": "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-3"
+      },
+      {
+        "decision": "REVISE",
+        "report_id": "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4"
+      }
+    ],
+    "source_template": "REVISE"
+  },
+  "findings": [
+    {
+      "finding_id": "REPORT-TEMPLATE-REVIEW-F001",
+      "label": "MARKDOWN_SECTION_COVERAGE_INCOMPLETE",
+      "reason": "The JSON report contains nine required sections, but the Markdown demonstration omits repository scope, methodology, evidence inventory, and the human/AI contribution map.",
+      "severity": "REVISE"
+    },
+    {
+      "finding_id": "REPORT-TEMPLATE-REVIEW-F002",
+      "label": "REVIEW_CRITERIA_UNDERSPECIFIED",
+      "reason": "The human review gate lists allowed decisions but does not define the criteria and exact fields needed for a productization decision.",
+      "severity": "REVISE"
+    },
+    {
+      "finding_id": "REPORT-TEMPLATE-REVIEW-F003",
+      "label": "PLAIN_LANGUAGE_VALUE_LAYER_MISSING",
+      "reason": "The evidence records are accurate but remain identifier-heavy and do not provide a concise reader-facing value interpretation.",
+      "severity": "REVISE"
+    }
+  ],
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_NEXT_WORK_INSTRUCTION",
+    "instruction": "次を行う",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "review_criteria": [
+    "FACTUALITY_AND_SCOPE_BOUNDING",
+    "FULL_SECTION_RENDERING",
+    "PLAIN_LANGUAGE_VALUE_CLARITY",
+    "HUMAN_AI_CONTRIBUTION_SEPARATION",
+    "PRIVATE_REPOSITORY_BOUNDARY",
+    "HUMAN_DECISION_AUTHENTICITY",
+    "PRODUCTIZATION_REVIEW_READINESS"
+  ],
+  "reviewer": {
+    "decision_origin": "AI_REVIEW_UNDER_EXPLICIT_HUMAN_NEXT_WORK_AUTHORIZATION",
+    "role": "DELEGATED_REPORT_TEMPLATE_REVIEWER",
+    "type": "AI_ASSISTANT"
+  },
+  "revision_requirements": {
+    "add_explicit_review_criteria_and_required_decision_fields": true,
+    "add_plain_language_value_interpretation": true,
+    "preserve_source_template_and_reports": true,
+    "render_all_required_sections": true,
+    "retain_all_withheld_claims": true,
+    "retain_human_ai_contribution_separation": true,
+    "retain_no_pricing_delivery_or_publication": true,
+    "retain_private_metadata_only_boundary": true
+  },
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-TEMPLATE-REVIEW-CONTRACT-V1",
+  "source": {
+    "effective_candidate_count": 16,
+    "report_count": 3,
+    "template_checkpoint_fingerprint": "3a31c2ff82ee2b173d9ea9035eac87e753d9a85ec864d6563f990bae937f90fd",
+    "template_contract_fingerprint": "483c0e377c415c6be05f218a0f7a3bb06fac720a6f2b12f1c8b3916df3501a69",
+    "template_manifest_fingerprint": "b47f479e19516d51d58f29f94030111f16b9d12f854fca110b86b9ebda257d2c",
+    "withheld_claim_count": 5
+  },
+  "terminal": {
+    "delivery_status": "NOT_DELIVERED",
+    "pricing_status": "NOT_PRICED",
+    "publication_status": "NOT_PUBLISHED",
+    "state": "HUMAN_PRODUCTIZATION_REVIEW_REQUIRED"
+  }
+}
