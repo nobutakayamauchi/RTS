@@ -25,12 +25,28 @@ jobs:
         with:
           python-version: "3.11"
       - name: Generate deterministic package fingerprints
+        id: generate
+        continue-on-error: true
         run: |
-          python -B -m proof_engine_pilot.report_productization_spec_cli verify
-          python -B -m proof_engine_pilot.report_pilot_package_cli build-summary > /tmp/pilot-package-fingerprints.json
-          cat /tmp/pilot-package-fingerprints.json
+          set +e
+          python -B -m proof_engine_pilot.report_productization_spec_cli verify > /tmp/spec-verify.log 2>&1
+          SPEC_STATUS=$?
+          python -B -m proof_engine_pilot.report_pilot_package_cli build-summary > /tmp/pilot-package-fingerprints.json 2> /tmp/package-build-error.log
+          PACKAGE_STATUS=$?
+          printf '{"spec_status":%s,"package_status":%s}\n' "$SPEC_STATUS" "$PACKAGE_STATUS" > /tmp/probe-status.json
+          cat /tmp/spec-verify.log
+          cat /tmp/package-build-error.log
+          test "$SPEC_STATUS" -eq 0 -a "$PACKAGE_STATUS" -eq 0
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: pilot-package-fingerprints
-          path: /tmp/pilot-package-fingerprints.json
-          if-no-files-found: error
+          name: pilot-package-probe
+          path: |
+            /tmp/spec-verify.log
+            /tmp/package-build-error.log
+            /tmp/pilot-package-fingerprints.json
+            /tmp/probe-status.json
+          if-no-files-found: warn
+      - name: Fail if generation failed
+        if: steps.generate.outcome == 'failure'
+        run: exit 1
