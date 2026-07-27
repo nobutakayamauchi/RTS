@@ -1,0 +1,85 @@
+name: Evidence Report Operational Validation Plan Tests
+
+on:
+  pull_request:
+    paths:
+      - "proof_engine_pilot/report_operational_validation_plan.py"
+      - "proof_engine_pilot/report_operational_validation_plan_cli.py"
+      - "proof_engine_pilot/operational_validation_plans/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_operational_validation_plan_checkpoint_0019.json"
+      - "tests/test_proof_engine_report_operational_validation_plan.py"
+      - ".github/workflows/evidence-report-operational-validation-plan-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "proof_engine_pilot/report_operational_validation_plan.py"
+      - "proof_engine_pilot/report_operational_validation_plan_cli.py"
+      - "proof_engine_pilot/operational_validation_plans/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_operational_validation_plan_checkpoint_0019.json"
+      - "tests/test_proof_engine_report_operational_validation_plan.py"
+      - ".github/workflows/evidence-report-operational-validation-plan-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify accepted first case and Round 4 source
+        run: |
+          python - <<'PY'
+          from proof_engine_pilot.report_pilot_acceptance import verify_pilot_acceptance
+          from proof_engine_pilot.cross_repo_campaign_close import verify_campaign_close
+          assert verify_pilot_acceptance()['summary']['state'] == 'INTERNAL_PILOT_PACKAGE_ACCEPTED'
+          round4 = verify_campaign_close()['review']
+          assert round4['source']['repository'] == 'nobutakayamauchi/rts-video-flow'
+          assert round4['counts']['effective_approved'] == 2
+          assert round4['counts']['withheld_claims'] == 3
+          PY
+      - name: Verify operational validation plan artifacts
+        run: |
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli verify
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli summary > /tmp/summary.json
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli selection > /tmp/selection.json
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli plan > /tmp/plan.json
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli review-contract > /tmp/review-contract.json
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli review-template > /tmp/review-template.json
+          python -B -m proof_engine_pilot.report_operational_validation_plan_cli render-markdown --output /tmp/plan.md
+      - name: Verify state, counts, negative control, and closed authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('/tmp/summary.json').read_text(encoding='utf-8'))
+          selection = json.loads(Path('/tmp/selection.json').read_text(encoding='utf-8'))
+          plan = json.loads(Path('/tmp/plan.json').read_text(encoding='utf-8'))
+          contract = json.loads(Path('/tmp/review-contract.json').read_text(encoding='utf-8'))
+          template = json.loads(Path('/tmp/review-template.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/plan.md').read_text(encoding='utf-8')
+          assert summary['state'] == 'INTERNAL_OPERATIONAL_VALIDATION_PLAN_COMPLETE'
+          assert summary['next_gate'] == 'HUMAN_SECOND_CASE_OPERATIONAL_VALIDATION_BUILD_REVIEW_REQUIRED'
+          assert summary['selected_repository'] == 'nobutakayamauchi/rts-video-flow'
+          assert summary['counts']['workflow_steps'] == 10
+          assert summary['counts']['plan_review_criteria'] == 12
+          assert summary['counts']['required_outputs'] == 8
+          assert summary['counts']['expected_effective_records'] == 2
+          assert summary['counts']['required_withheld_topics'] == 3
+          assert summary['second_case_build_authorized'] is False
+          assert selection['selected_case']['selected_pr_numbers'] == [1, 2]
+          assert selection['selected_case']['required_withheld_topics'] == [
+              'END_TO_END_OPERATION', 'TRANSCRIPTION_ACCURACY', 'PRODUCTION_READINESS'
+          ]
+          assert 'generic data-driven' in plan['execution_contract']['implementation_rule']
+          assert contract['decision_contract']['decisions'] == []
+          assert template['decision'] is None
+          assert template['second_case_build_authorized'] is False
+          assert 'Second-case build authorized: false' in markdown
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_operational_validation_plan.py' -v
