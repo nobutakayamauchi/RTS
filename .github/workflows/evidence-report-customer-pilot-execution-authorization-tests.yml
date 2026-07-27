@@ -27,8 +27,10 @@ jobs:
           python-version: "3.11"
       - name: Verify prior signed pilot-plan history
         run: python -B -c "from proof_engine_pilot.report_customer_pilot_execution_authorization import verify_prior_plan_history; print(verify_prior_plan_history())"
-      - name: Verify authorization contract and candidate scorecard
-        run: python -B -c "from proof_engine_pilot.report_customer_pilot_execution_authorization import verify_contract,verify_scorecard; verify_contract(); verify_scorecard(); print('contract-scorecard-ok')"
+      - name: Verify execution authorization contract
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_execution_authorization import verify_contract; verify_contract(); print('contract-ok')"
+      - name: Verify candidate selection scorecard
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_execution_authorization import verify_scorecard; verify_scorecard(); print('scorecard-ok')"
       - name: Verify outreach, consent, and source freeze
         run: python -B -c "from proof_engine_pilot.report_customer_pilot_execution_authorization import verify_outreach,verify_consent,verify_source_freeze; verify_outreach(); verify_consent(); verify_source_freeze(); print('intake-boundary-ok')"
       - name: Verify preflight, withdrawal, and decision
