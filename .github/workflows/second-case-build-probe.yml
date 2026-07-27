@@ -1,9 +1,12 @@
 name: Second Case Build Probe
 
 on:
-  push:
-    branches:
-      - agent/evidence-report-second-case-build-v1
+  pull_request:
+    paths:
+      - ".github/workflows/second-case-build-probe.yml"
+      - "proof_engine_pilot/**"
+      - "pilot_runs/**"
+      - "tests/**"
   workflow_dispatch:
 
 permissions:
