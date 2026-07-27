@@ -21,37 +21,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Export build review inputs
+      - name: Export generated second-case package
         run: |
           python -B - <<'PY'
           import json
           from pathlib import Path
-          from proof_engine_pilot.report_operational_validation_plan import verify_operational_validation_plan
-          from proof_engine_pilot.report_template_review import build_report_template_review
-          from proof_engine_pilot.report_pilot_acceptance import verify_pilot_acceptance
-          from proof_engine_pilot.cross_repo_campaign_close import verify_campaign_close
+          from proof_engine_pilot.report_operational_validation_build import verify_second_case_package
 
-          out = Path('/tmp/second-case-inputs')
+          out = Path('/tmp/second-case-package')
           out.mkdir(parents=True, exist_ok=True)
-          plan = verify_operational_validation_plan()
-          pack = build_report_template_review()['pack']
-          report = next(item for item in pack['reports'] if item['report_id'] == 'PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4')
-          first = verify_pilot_acceptance()
-          campaign = verify_campaign_close()
+          bundle = verify_second_case_package()
           values = {
-              'plan-review-template.json': plan['review_template'],
-              'plan-summary.json': plan['summary'],
-              'round4-report.json': report,
-              'round4-review.json': campaign['review'],
-              'first-case-report.json': first['package']['report_json'],
-              'first-case-package-index.json': first['package']['package_index'],
-              'first-case-acceptance-summary.json': first['summary'],
+              'dynamic-fingerprints.json': bundle['dynamic_fingerprints'],
+              'report.json': bundle['report_json'],
+              'report.md': bundle['report_markdown'],
+              'evidence-inventory.json': bundle['evidence_inventory'],
+              'comparison-matrix.json': bundle['comparison_matrix'],
+              'acceptance-packet.json': bundle['acceptance_packet'],
+              'verification-summary.json': bundle['verification_summary'],
+              'rollback-index.json': bundle['rollback_index'],
+              'package-summary.json': bundle['summary'],
+              'build-checkpoint.json': bundle['build_checkpoint'],
           }
           for name, value in values.items():
-              (out / name).write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + '\n', encoding='utf-8')
+              path = out / name
+              if isinstance(value, str):
+                  path.write_text(value + ('\n' if not value.endswith('\n') else ''), encoding='utf-8')
+              else:
+                  path.write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + '\n', encoding='utf-8')
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: second-case-build-inputs
-          path: /tmp/second-case-inputs
+          name: second-case-generated-package
+          path: /tmp/second-case-package
           if-no-files-found: error
