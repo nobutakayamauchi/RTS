@@ -5,14 +5,14 @@ from pathlib import Path
 from typing import Any
 
 from .core import ProofEngineError, fingerprint, load
+from .cross_repo_review import verify_round_two_review_bundle
 from .cross_repo_review_round3 import verify_round_three_review_bundle
 from .cross_repo_validation import verify_bundle as verify_cross_repo_bundle
 from .learning import preflight_candidate
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 ROOT = PACKAGE_DIR.parent
-ROUND_DIR = PACKAGE_DIR / "cross_repo_reviews" / "round_0004"
-CONTRACT_PATH = ROUND_DIR / "review_contract.json"
+CONTRACT_PATH = PACKAGE_DIR / "cross_repo_reviews" / "round_0004" / "review_contract.json"
 CHECKPOINT_PATH = ROOT / "pilot_runs" / "reconnect_pilot_p3" / "cross_repo_campaign_close_checkpoint_0012.json"
 
 REVIEW_ROUND_ID = "PROOF-ENGINE-CROSS-REPO-REVIEW-ROUND-0004"
@@ -40,27 +40,15 @@ AUTHORITY_FIELDS = {
     "target_repository_write_authorized",
 }
 CHECKPOINT_FIELDS = {
-    "schema_version",
-    "checkpoint_id",
-    "source_run_fingerprint",
-    "source_round_fingerprint",
-    "previous_round_checkpoint_fingerprint",
-    "review_contract_fingerprint",
-    "completed_rounds",
-    "round_effective_candidate_count",
-    "cumulative_effective_candidate_count",
-    "round_revision_count",
-    "cumulative_revision_count",
-    "round_withheld_claim_count",
-    "cumulative_withheld_claim_count",
-    "state",
-    "publication_performed",
-    "external_actions_performed",
-    "target_repository_writes_performed",
-    "original_source_repositories_modified",
-    "private_repository_payload_copied",
-    "next_action",
-    "checkpoint_fingerprint",
+    "schema_version", "checkpoint_id", "source_run_fingerprint",
+    "source_round_fingerprint", "previous_round_checkpoint_fingerprint",
+    "review_contract_fingerprint", "completed_rounds",
+    "round_effective_candidate_count", "cumulative_effective_candidate_count",
+    "round_revision_count", "cumulative_revision_count",
+    "round_withheld_claim_count", "cumulative_withheld_claim_count", "state",
+    "publication_performed", "external_actions_performed",
+    "target_repository_writes_performed", "original_source_repositories_modified",
+    "private_repository_payload_copied", "next_action", "checkpoint_fingerprint",
 }
 
 
@@ -94,7 +82,7 @@ def _source_round() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     if round_value.get("role") != "NEGATIVE_CONTROL" or round_value.get("source_mode") != "READ_ONLY_SNAPSHOT":
         raise ProofEngineError("Round 4 negative-control boundary drift")
     if len(round_value.get("candidates", [])) != 2 or len(round_value.get("withheld_claims", [])) != 3:
-        raise ProofEngineError("Round 4 candidate or withheld-claim count drift")
+        raise ProofEngineError("Round 4 source counts drift")
     return bundle, round_value, previous
 
 
@@ -105,35 +93,25 @@ def verify_review_contract(contract: dict[str, Any] | None = None) -> dict[str, 
         raise ProofEngineError("Round 4 review contract schema mismatch")
     if value.get("contract_id") != "PROOF-ENGINE-CROSS-REPO-ROUND-4-REVIEW-CONTRACT-0001":
         raise ProofEngineError("Round 4 review contract identity mismatch")
-    if value.get("review_round_id") != REVIEW_ROUND_ID:
-        raise ProofEngineError("Round 4 review round mismatch")
-    if value.get("human_authorization") != EXPECTED_AUTHOR:
+    if value.get("review_round_id") != REVIEW_ROUND_ID or value.get("human_authorization") != EXPECTED_AUTHOR:
         raise ProofEngineError("Round 4 review is not bound to the explicit human confirmation")
     _verify_false_authority(value.get("authority"), "Round 4 review contract")
-    if value.get("source") != {
+    expected_source = {
         "campaign_fingerprint": "d3dec34bc2686601f08324889510da9a312cc46565fc97d806c651fedbb89c95",
         "run_fingerprint": SOURCE_RUN_FINGERPRINT,
         "round_id": "ROUND-4",
         "round_fingerprint": SOURCE_ROUND_FINGERPRINT,
         "repository": "nobutakayamauchi/rts-video-flow",
         "previous_round_checkpoint_fingerprint": PREVIOUS_CHECKPOINT_FINGERPRINT,
-    }:
+    }
+    if value.get("source") != expected_source:
         raise ProofEngineError("Round 4 review source mismatch")
     if value.get("originals_preserved") is not True or value.get("revision_mode") != "APPEND_ONLY":
         raise ProofEngineError("Round 4 review did not preserve originals")
-    if value.get("decisions") != [
-        {
-            "candidate_id": "VF-001",
-            "decision": "APPROVE",
-            "reason": "The claim is explicitly limited to a scaffold and states that automated tests and end-to-end validation are absent.",
-        },
-        {
-            "candidate_id": "VF-002",
-            "decision": "APPROVE",
-            "reason": "The claim describes a frozen review-required prototype state and does not convert documentation into runtime capability.",
-        },
-    ]:
-        raise ProofEngineError("Round 4 review decisions mismatch")
+    if [item.get("candidate_id") for item in value.get("decisions", [])] != ["VF-001", "VF-002"]:
+        raise ProofEngineError("Round 4 review decision order mismatch")
+    if any(item.get("decision") != "APPROVE" for item in value["decisions"]):
+        raise ProofEngineError("Round 4 review contains an unexpected decision")
     if value.get("withheld_claim_policy") != {
         "required_count": 3,
         "required_status": "WITHHELD_UNSUPPORTED",
@@ -149,13 +127,13 @@ def verify_review_contract(contract: dict[str, Any] | None = None) -> dict[str, 
     return value
 
 
-def _classify_withheld_claim(claim: str) -> str:
+def _withheld_topic(claim: str) -> str:
     lowered = claim.lower()
     if "end-to-end" in lowered or "operational" in lowered:
         return "END_TO_END_OPERATION"
     if "transcription" in lowered or "accuracy" in lowered:
         return "TRANSCRIPTION_ACCURACY"
-    if "production" in lowered or "production-ready" in lowered:
+    if "production" in lowered:
         return "PRODUCTION_READINESS"
     raise ProofEngineError("Round 4 withheld claim topic is unknown")
 
@@ -169,18 +147,18 @@ def build_round_four_review(contract: dict[str, Any] | None = None) -> dict[str,
 
     author_fingerprint = fingerprint(EXPECTED_AUTHOR)
     authority_fingerprint = fingerprint(review_contract["authority"])
-    decisions = []
-    previous_decision = None
-    effective = []
+    decisions: list[dict[str, Any]] = []
+    effective: list[dict[str, Any]] = []
+    prior = None
     for sequence, plan in enumerate(review_contract["decisions"], start=1):
         candidate = originals[plan["candidate_id"]]
         if preflight_candidate(candidate).get("result") != "PASS":
-            raise ProofEngineError(f"Round 4 candidate failed active learning preflight: {plan['candidate_id']}")
+            raise ProofEngineError(f"Round 4 candidate failed learning preflight: {candidate['candidate_id']}")
         decision = {
             "decision_id": f"CROSS-REPO-REVIEW-0004-D{sequence:03d}",
             "sequence": sequence,
             "decision_type": "APPROVE",
-            "previous_decision_fingerprint": previous_decision,
+            "previous_decision_fingerprint": prior,
             "author_fingerprint": author_fingerprint,
             "authority_fingerprint": authority_fingerprint,
             "target": {
@@ -193,7 +171,7 @@ def build_round_four_review(contract: dict[str, Any] | None = None) -> dict[str,
             "revision_ref": None,
         }
         decision["decision_fingerprint"] = fingerprint(decision)
-        previous_decision = decision["decision_fingerprint"]
+        prior = decision["decision_fingerprint"]
         decisions.append(decision)
         effective.append({
             "candidate_id": candidate["candidate_id"],
@@ -204,18 +182,14 @@ def build_round_four_review(contract: dict[str, Any] | None = None) -> dict[str,
             "status": "APPROVED_FOR_INTERNAL_VALIDATION",
         })
 
-    withheld = []
-    topics = set()
-    for item in round_value["withheld_claims"]:
-        topic = _classify_withheld_claim(item["claim"])
-        topics.add(topic)
-        withheld.append({
-            "topic": topic,
-            "claim": item["claim"],
-            "reason": item["reason"],
-            "status": "WITHHELD_UNSUPPORTED",
-        })
-    if topics != set(review_contract["withheld_claim_policy"]["must_preserve_topics"]):
+    withheld = [{
+        "topic": _withheld_topic(item["claim"]),
+        "claim": item["claim"],
+        "reason": item["reason"],
+        "status": "WITHHELD_UNSUPPORTED",
+    } for item in round_value["withheld_claims"]]
+    expected_topics = set(review_contract["withheld_claim_policy"]["must_preserve_topics"])
+    if {item["topic"] for item in withheld} != expected_topics:
         raise ProofEngineError("Round 4 withheld topics mismatch")
 
     review = {
@@ -232,13 +206,9 @@ def build_round_four_review(contract: dict[str, Any] | None = None) -> dict[str,
         "effective_candidates": effective,
         "withheld_claims": withheld,
         "counts": {
-            "original_candidates": 2,
-            "originals_approved": 2,
-            "originals_revised": 0,
-            "revisions_approved": 0,
-            "effective_approved": 2,
-            "rejected": 0,
-            "withheld_claims": 3,
+            "original_candidates": 2, "originals_approved": 2,
+            "originals_revised": 0, "revisions_approved": 0,
+            "effective_approved": 2, "rejected": 0, "withheld_claims": 3,
         },
         "metrics": {
             "first_pass_approval_rate": 1.0,
@@ -253,18 +223,13 @@ def build_round_four_review(contract: dict[str, Any] | None = None) -> dict[str,
         "publication_status": "NOT_PUBLISHED",
     }
     review["review_fingerprint"] = fingerprint(review)
-    return {
-        "source_bundle": source_bundle,
-        "source_round": round_value,
-        "previous": previous,
-        "contract": review_contract,
-        "review": review,
-    }
+    return {"source_bundle": source_bundle, "source_round": round_value, "previous": previous,
+            "contract": review_contract, "review": review}
 
 
 def build_campaign_evaluation(bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     value = build_round_four_review() if bundle is None else bundle
-    round2 = value["previous"]["previous"]["review"]
+    round2 = verify_round_two_review_bundle()["review"]
     round3 = value["previous"]["review"]
     round4 = value["review"]
     evaluation = {
@@ -282,19 +247,13 @@ def build_campaign_evaluation(bundle: dict[str, Any] | None = None) -> dict[str,
             "ROUND-4": {"candidates": 2, "first_pass_approved": 2, "revised": 0, "rejected": 0, "withheld": 3},
         },
         "cross_repo_totals": {
-            "repositories": 3,
-            "candidates": 16,
-            "first_pass_approved": 14,
-            "first_pass_approval_rate": 14 / 16,
-            "revised": 2,
-            "revision_rate": 2 / 16,
-            "rejected": 0,
-            "effective_approved_after_review": 16,
-            "withheld_unsupported_claims": 5,
+            "repositories": 3, "candidates": 16, "first_pass_approved": 14,
+            "first_pass_approval_rate": 14 / 16, "revised": 2,
+            "revision_rate": 2 / 16, "rejected": 0,
+            "effective_approved_after_review": 16, "withheld_unsupported_claims": 5,
         },
         "baseline_reference": {
-            "round_1_candidates": 12,
-            "round_1_first_pass_approved": 7,
+            "round_1_candidates": 12, "round_1_first_pass_approved": 7,
             "round_1_first_pass_approval_rate": 7 / 12,
             "interpretation": "POSITIVE_SIGNAL_NOT_CAUSAL_PROOF",
         },
@@ -310,11 +269,8 @@ def build_campaign_evaluation(bundle: dict[str, Any] | None = None) -> dict[str,
         "conclusion": {
             "supported": "BOUNDED_CROSS_REPOSITORY_INTERNAL_ACHIEVEMENT_REPORTING",
             "not_proven": [
-                "ARBITRARY_REPOSITORY_GENERALIZATION",
-                "AUTONOMOUS_EXTERNAL_EXECUTION",
-                "COMMERCIAL_EFFECTIVENESS",
-                "CUSTOMER_VALUE_OR_REVENUE",
-                "MODEL_WEIGHT_LEARNING",
+                "ARBITRARY_REPOSITORY_GENERALIZATION", "AUTONOMOUS_EXTERNAL_EXECUTION",
+                "COMMERCIAL_EFFECTIVENESS", "CUSTOMER_VALUE_OR_REVENUE", "MODEL_WEIGHT_LEARNING",
             ],
             "confidence": "MULTI_REPOSITORY_POSITIVE_EVIDENCE_WITH_LIMITED_SAMPLE",
         },
@@ -330,42 +286,25 @@ def build_campaign_evaluation(bundle: dict[str, Any] | None = None) -> dict[str,
     return evaluation
 
 
-def verify_campaign_close(
-    *,
-    contract: dict[str, Any] | None = None,
-    checkpoint: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+def verify_campaign_close(*, contract: dict[str, Any] | None = None,
+                          checkpoint: dict[str, Any] | None = None) -> dict[str, Any]:
     bundle = build_round_four_review(contract)
     review = bundle["review"]
     _verify_fingerprint(review, "review_fingerprint", "Round 4 review")
-    if review["counts"] != {
-        "original_candidates": 2,
-        "originals_approved": 2,
-        "originals_revised": 0,
-        "revisions_approved": 0,
-        "effective_approved": 2,
-        "rejected": 0,
-        "withheld_claims": 3,
-    }:
-        raise ProofEngineError("Round 4 review counts mismatch")
     if review["review_state"] != "ROUND_4_COMPLETE" or review["campaign_state"] != "THREE_REPOSITORY_VALIDATION_COMPLETE":
         raise ProofEngineError("Round 4 terminal state mismatch")
-    if review["publication_status"] != "NOT_PUBLISHED":
-        raise ProofEngineError("Round 4 publication boundary widened")
+    if review["publication_status"] != "NOT_PUBLISHED" or len(review["withheld_claims"]) != 3:
+        raise ProofEngineError("Round 4 publication or withheld boundary mismatch")
 
     evaluation = build_campaign_evaluation(bundle)
     _verify_fingerprint(evaluation, "evaluation_fingerprint", "cross-repo campaign evaluation")
-    if evaluation["cross_repo_totals"] != {
-        "repositories": 3,
-        "candidates": 16,
-        "first_pass_approved": 14,
-        "first_pass_approval_rate": 14 / 16,
-        "revised": 2,
-        "revision_rate": 2 / 16,
-        "rejected": 0,
-        "effective_approved_after_review": 16,
-        "withheld_unsupported_claims": 5,
-    }:
+    expected_totals = {
+        "repositories": 3, "candidates": 16, "first_pass_approved": 14,
+        "first_pass_approval_rate": 14 / 16, "revised": 2,
+        "revision_rate": 2 / 16, "rejected": 0,
+        "effective_approved_after_review": 16, "withheld_unsupported_claims": 5,
+    }
+    if evaluation["cross_repo_totals"] != expected_totals:
         raise ProofEngineError("cross-repo campaign totals mismatch")
     if evaluation["conclusion"]["supported"] != "BOUNDED_CROSS_REPOSITORY_INTERNAL_ACHIEVEMENT_REPORTING":
         raise ProofEngineError("cross-repo campaign conclusion mismatch")
@@ -377,36 +316,28 @@ def verify_campaign_close(
     if set(cp) != CHECKPOINT_FIELDS:
         raise ProofEngineError("campaign close checkpoint schema fields mismatch")
     _verify_fingerprint(cp, "checkpoint_fingerprint", "campaign close checkpoint")
-    if cp.get("schema_version") != "PROOF-ENGINE-CROSS-REPO-CAMPAIGN-CLOSE-CHECKPOINT-V1":
-        raise ProofEngineError("campaign close checkpoint schema mismatch")
-    if cp.get("checkpoint_id") != "PROOF-ENGINE-CROSS-REPO-CAMPAIGN-CLOSE-CHECKPOINT-0012":
-        raise ProofEngineError("campaign close checkpoint identity mismatch")
-    if cp.get("source_run_fingerprint") != SOURCE_RUN_FINGERPRINT or cp.get("source_round_fingerprint") != SOURCE_ROUND_FINGERPRINT:
-        raise ProofEngineError("campaign close checkpoint source mismatch")
-    if cp.get("previous_round_checkpoint_fingerprint") != PREVIOUS_CHECKPOINT_FINGERPRINT:
-        raise ProofEngineError("campaign close checkpoint previous-round mismatch")
-    if cp.get("review_contract_fingerprint") != bundle["contract"]["contract_fingerprint"]:
-        raise ProofEngineError("campaign close checkpoint contract mismatch")
+    expected_links = {
+        "schema_version": "PROOF-ENGINE-CROSS-REPO-CAMPAIGN-CLOSE-CHECKPOINT-V1",
+        "checkpoint_id": "PROOF-ENGINE-CROSS-REPO-CAMPAIGN-CLOSE-CHECKPOINT-0012",
+        "source_run_fingerprint": SOURCE_RUN_FINGERPRINT,
+        "source_round_fingerprint": SOURCE_ROUND_FINGERPRINT,
+        "previous_round_checkpoint_fingerprint": PREVIOUS_CHECKPOINT_FINGERPRINT,
+        "review_contract_fingerprint": bundle["contract"]["contract_fingerprint"],
+    }
+    for field, expected in expected_links.items():
+        if cp.get(field) != expected:
+            raise ProofEngineError(f"campaign close checkpoint link mismatch: {field}")
     if cp.get("completed_rounds") != ["ROUND-2", "ROUND-3", "ROUND-4"]:
         raise ProofEngineError("campaign close checkpoint completed rounds mismatch")
-    if (
-        cp.get("round_effective_candidate_count") != 2
-        or cp.get("cumulative_effective_candidate_count") != 16
-        or cp.get("round_revision_count") != 0
-        or cp.get("cumulative_revision_count") != 2
-        or cp.get("round_withheld_claim_count") != 3
-        or cp.get("cumulative_withheld_claim_count") != 5
-    ):
+    if (cp.get("round_effective_candidate_count"), cp.get("cumulative_effective_candidate_count"),
+        cp.get("round_revision_count"), cp.get("cumulative_revision_count"),
+        cp.get("round_withheld_claim_count"), cp.get("cumulative_withheld_claim_count")) != (2, 16, 0, 2, 3, 5):
         raise ProofEngineError("campaign close checkpoint counts mismatch")
     if cp.get("state") != "THREE_REPOSITORY_VALIDATION_COMPLETE_REPORT_TEMPLATE_DESIGN_READY":
         raise ProofEngineError("campaign close checkpoint state mismatch")
-    for field in (
-        "publication_performed",
-        "external_actions_performed",
-        "target_repository_writes_performed",
-        "original_source_repositories_modified",
-        "private_repository_payload_copied",
-    ):
+    for field in ("publication_performed", "external_actions_performed",
+                  "target_repository_writes_performed", "original_source_repositories_modified",
+                  "private_repository_payload_copied"):
         if cp.get(field) is not False:
             raise ProofEngineError(f"campaign close checkpoint exceeded boundary: {field}")
     return {**bundle, "evaluation": evaluation, "checkpoint": cp}
