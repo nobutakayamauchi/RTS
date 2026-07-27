@@ -1,0 +1,59 @@
+name: Evidence Report Template Tests
+
+on:
+  pull_request:
+    paths:
+      - "proof_engine_pilot/report_template.py"
+      - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/reporting/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "tests/test_proof_engine_report_template.py"
+      - ".github/workflows/evidence-report-template-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "proof_engine_pilot/report_template.py"
+      - "proof_engine_pilot/report_template_cli.py"
+      - "proof_engine_pilot/reporting/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_template_checkpoint_0013.json"
+      - "tests/test_proof_engine_report_template.py"
+      - ".github/workflows/evidence-report-template-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify report template
+        run: |
+          python -B -m proof_engine_pilot.report_template_cli verify
+          python -B -m proof_engine_pilot.report_template_cli summary
+          python -B -m proof_engine_pilot.report_template_cli generate --output /tmp/evidence-report-pack.json
+          python -B -m proof_engine_pilot.report_template_cli render-markdown --output /tmp/evidence-report-pack.md
+          python -B -m proof_engine_pilot.report_template_cli review-template > /tmp/evidence-report-review-template.json
+      - name: Verify generated counts and boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          pack = json.loads(Path('/tmp/evidence-report-pack.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/evidence-report-pack.md').read_text(encoding='utf-8')
+          assert pack['counts'] == {
+              'reports': 3,
+              'effective_achievement_records': 16,
+              'withheld_claims': 5,
+          }
+          assert pack['state'] == 'HUMAN_REPORT_TEMPLATE_REVIEW_REQUIRED'
+          assert pack['publication_status'] == 'NOT_PUBLISHED'
+          assert pack['delivery_status'] == 'NOT_DELIVERED'
+          assert 'No report in this demonstration has been approved for pricing' in markdown
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_template.py' -v
