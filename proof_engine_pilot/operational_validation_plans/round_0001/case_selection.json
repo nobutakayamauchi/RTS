@@ -1,0 +1,107 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "customer_intake_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "second_case_build_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "candidates_considered": [
+    {
+      "achievement_records": 6,
+      "reason": "Already used for the accepted first package and therefore provides low incremental reproduction evidence.",
+      "repository": "nobutakayamauchi/seminar-compass",
+      "selection": "NOT_SELECTED",
+      "status": "ALREADY_USED_AS_ACCEPTED_FIRST_CASE",
+      "validation_role": "POSITIVE_GENERALIZATION_CASE",
+      "visibility": "PUBLIC",
+      "withheld_claims": 0
+    },
+    {
+      "achievement_records": 8,
+      "reason": "The current gate requires a second approved public case.",
+      "repository": "nobutakayamauchi/RTS-minicompany",
+      "selection": "INELIGIBLE_FOR_THIS_PUBLIC_CASE_STAGE",
+      "status": "APPROVED_METADATA_ONLY_REFERENCE",
+      "validation_role": "PRIVATE_BUSINESS_REPOSITORY_CASE",
+      "visibility": "PRIVATE",
+      "withheld_claims": 2
+    },
+    {
+      "achievement_records": 2,
+      "reason": "It maximizes discriminating value by testing sparse evidence, a frozen state, absent automated tests, and strict retention of unsupported runtime claims.",
+      "repository": "nobutakayamauchi/rts-video-flow",
+      "selection": "SELECTED",
+      "status": "APPROVED_NEGATIVE_CONTROL",
+      "validation_role": "FROZEN_UNTESTED_SCAFFOLD_NEGATIVE_CONTROL",
+      "visibility": "PUBLIC",
+      "withheld_claims": 3
+    }
+  ],
+  "decision": "SELECT_RTS_VIDEO_FLOW_FOR_INTERNAL_OPERATIONAL_REPRODUCTION_PLAN",
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_HIGHEST_VALUE_REPRODUCTION_INSTRUCTION",
+    "instruction": "じゃあ、えっと最後の一文で、小人め候補の中から、検証価値の高い意見から、内容再現テストを進めてください。",
+    "interpreted_scope": "SELECT_HIGHEST_VALIDATION_VALUE_APPROVED_CANDIDATE_AND_DEFINE_ONE_INTERNAL_OPERATIONAL_REPRODUCTION_PLAN",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-OPERATIONAL-VALIDATION-CASE-SELECTION-V1",
+  "selected_case": {
+    "approved_candidate_ids": [
+      "VF-001",
+      "VF-002"
+    ],
+    "default_branch": "main",
+    "expected_achievement_record_count": 2,
+    "expected_withheld_claim_count": 3,
+    "readme_blob_sha": "bf1dc0f75da08202c2a07dced5d0885b43fac5b5",
+    "repository": "nobutakayamauchi/rts-video-flow",
+    "required_withheld_topics": [
+      "END_TO_END_OPERATION",
+      "TRANSCRIPTION_ACCURACY",
+      "PRODUCTION_READINESS"
+    ],
+    "selected_pr_numbers": [
+      1,
+      2
+    ],
+    "source_mode": "READ_ONLY_SNAPSHOT",
+    "source_report_fingerprint": "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c",
+    "source_report_id": "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4",
+    "source_round_fingerprint": "d4aa4b703124349227a8eac83923bf12c9a553ea125e9654f6d8f97fd87b43d3",
+    "source_round_id": "ROUND-4",
+    "source_round_review_contract_fingerprint": "4b14c0b0186286eb53b21f28d5b631a236eb81c85519f9907d096398288139e1",
+    "visibility": "PUBLIC"
+  },
+  "selection_fingerprint": "f99bf316ffa5df7f07aab7003f3c574cd4570426e3d0a63252b3e8af0ea16983",
+  "selection_id": "PROOF-ENGINE-EVIDENCE-REPORT-OPERATIONAL-VALIDATION-CASE-SELECTION-0001",
+  "selection_rationale": [
+    "The accepted first case is a positive conventional product case with six records and zero withheld claims.",
+    "The selected case is a negative control with two bounded records and three unsupported claims that must remain visible.",
+    "A successful reproduction on this case is stronger evidence that the workflow resists overclaiming than another positive case would provide.",
+    "The selected source is public and can remain read-only without copying private payload."
+  ],
+  "selector": {
+    "decision_origin": "AI_SELECTION_UNDER_EXPLICIT_HUMAN_REPRODUCTION_INSTRUCTION",
+    "role": "DELEGATED_HIGHEST_VALIDATION_VALUE_CASE_SELECTOR",
+    "type": "AI_ASSISTANT"
+  },
+  "source": {
+    "accepted_first_case_checkpoint_fingerprint": "c127b8e718a056671a8fbb1d9776e505e23cd416cd680bdeed0821f47f205611",
+    "accepted_first_case_decision_fingerprint": "81af71220d7d93b47fd349b3c51912ac27e4d223500632ca86df5358a803b84a",
+    "reviewed_pack_fingerprint": "c95360f6ef1376914261eac574757ceb99f7f25c998b7be5752436200375f1bb",
+    "reviewed_template_fingerprint": "579d086788e636317cd61392fc3af97de468ff27c9ba478e962a973bd91ad4f6"
+  },
+  "terminal": {
+    "next_action": "Define the bounded operational reproduction plan and its build-review contract, then stop before execution or any commercial or external action.",
+    "state": "SECOND_CASE_SELECTED_FOR_OPERATIONAL_VALIDATION_PLAN"
+  }
+}
