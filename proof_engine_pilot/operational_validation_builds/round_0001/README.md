@@ -1,8 +1,6 @@
 # Evidence Report Internal Operational Reproduction — Round 0001
 
-The project owner instructed:
-
-> じゃあ、この次のことをお願いします。
+The project owner authorized the next bounded internal validation stage. Operator-facing records now use an intent-preserving normalized summary rather than quoting raw conversational input.
 
 This stage reviewed the twelve pre-build plan criteria, authorized one repository-local internal build for `nobutakayamauchi/rts-video-flow`, generated the eight required artifacts, compared the result with the accepted `seminar-compass` package, and reviewed the completed reproduction result.
 
