@@ -1,0 +1,82 @@
+name: Evidence Report Productization Spec Tests
+
+on:
+  pull_request:
+    paths:
+      - "proof_engine_pilot/report_productization_spec.py"
+      - "proof_engine_pilot/report_productization_spec_cli.py"
+      - "proof_engine_pilot/productization_specs/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_internal_product_spec_checkpoint_0016.json"
+      - "tests/test_proof_engine_report_productization_spec.py"
+      - ".github/workflows/evidence-report-productization-spec-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "proof_engine_pilot/report_productization_spec.py"
+      - "proof_engine_pilot/report_productization_spec_cli.py"
+      - "proof_engine_pilot/productization_specs/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_internal_product_spec_checkpoint_0016.json"
+      - "tests/test_proof_engine_report_productization_spec.py"
+      - ".github/workflows/evidence-report-productization-spec-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify approved productization source
+        run: python -B -m proof_engine_pilot.report_productization_review_cli verify
+      - name: Verify internal product specification
+        run: |
+          python -B -m proof_engine_pilot.report_productization_spec_cli verify
+          python -B -m proof_engine_pilot.report_productization_spec_cli summary > /tmp/product-spec-summary.json
+          python -B -m proof_engine_pilot.report_productization_spec_cli spec > /tmp/product-spec.json
+          python -B -m proof_engine_pilot.report_productization_spec_cli acceptance > /tmp/acceptance-contract.json
+          python -B -m proof_engine_pilot.report_productization_spec_cli review-template > /tmp/pilot-review-template.json
+          python -B -m proof_engine_pilot.report_productization_spec_cli render-markdown --output /tmp/product-spec.md
+      - name: Verify state, counts, and authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('/tmp/product-spec-summary.json').read_text(encoding='utf-8'))
+          spec = json.loads(Path('/tmp/product-spec.json').read_text(encoding='utf-8'))
+          acceptance = json.loads(Path('/tmp/acceptance-contract.json').read_text(encoding='utf-8'))
+          review = json.loads(Path('/tmp/pilot-review-template.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/product-spec.md').read_text(encoding='utf-8')
+          assert summary['state'] == 'HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED'
+          assert summary['counts'] == {
+              'required_sections': 9,
+              'workflow_steps': 8,
+              'acceptance_criteria': 15,
+              'commercial_unknowns': 7,
+              'effective_achievement_records_in_source_pack': 16,
+              'withheld_claims_in_source_pack': 5,
+          }
+          assert spec['target']['first_delivery_mode'] == 'OPERATOR_ASSISTED_SINGLE_CASE'
+          assert spec['target']['pricing_status'] == 'UNDECIDED'
+          assert len(acceptance['criteria']) == 15
+          assert acceptance['decision_contract']['decisions'] == []
+          assert review['decision'] is None
+          assert review['pilot_package_build_authorized'] is False
+          for field in (
+              'pricing_authorized',
+              'outreach_authorized',
+              'contract_authorized',
+              'delivery_authorized',
+              'publication_authorized',
+          ):
+              assert review[field] is False
+          assert 'Pilot package build authorized: false' in markdown
+          PY
+      - name: Run focused tests
+        run: |
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_productization_review.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_productization_spec.py' -v
