@@ -26,6 +26,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
       - name: Verify second-case package
         run: python -B -m proof_engine_pilot.report_operational_validation_result_cli verify-build
       - name: Verify final two-case result
@@ -60,17 +62,4 @@ jobs:
           assert value['external_actions_performed'] is False
           PY
       - name: Run focused tests
-        id: focused_tests
-        continue-on-error: true
-        run: python -m pytest -q --tb=short tests/test_proof_engine_report_operational_validation_result.py > /tmp/focused-tests.log 2>&1
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: operational-reproduction-focused-test-log
-          path: /tmp/focused-tests.log
-          if-no-files-found: error
-      - name: Enforce focused test result
-        if: steps.focused_tests.outcome != 'success'
-        run: |
-          cat /tmp/focused-tests.log
-          exit 1
+        run: python -m pytest -q tests/test_proof_engine_report_operational_validation_result.py
