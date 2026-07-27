@@ -33,11 +33,23 @@ jobs:
           python-version: "3.11"
       - name: Verify report template
         run: |
-          python -B -m proof_engine_pilot.report_template_cli verify
-          python -B -m proof_engine_pilot.report_template_cli summary
-          python -B -m proof_engine_pilot.report_template_cli generate --output /tmp/evidence-report-pack.json
-          python -B -m proof_engine_pilot.report_template_cli render-markdown --output /tmp/evidence-report-pack.md
-          python -B -m proof_engine_pilot.report_template_cli review-template > /tmp/evidence-report-review-template.json
+          set +e
+          {
+            python -B -m proof_engine_pilot.report_template_cli verify
+            python -B -m proof_engine_pilot.report_template_cli summary
+            python -B -m proof_engine_pilot.report_template_cli generate --output /tmp/evidence-report-pack.json
+            python -B -m proof_engine_pilot.report_template_cli render-markdown --output /tmp/evidence-report-pack.md
+            python -B -m proof_engine_pilot.report_template_cli review-template > /tmp/evidence-report-review-template.json
+          } > /tmp/report-template-debug.txt 2>&1
+          status=$?
+          cat /tmp/report-template-debug.txt
+          exit $status
+      - name: Upload verifier diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-template-debug
+          path: /tmp/report-template-debug.txt
       - name: Verify generated counts and boundaries
         run: |
           python - <<'PY'
