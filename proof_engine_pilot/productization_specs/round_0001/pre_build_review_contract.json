@@ -1,0 +1,41 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pilot_package_build_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "contract_fingerprint": "21b32cdae33b36c44ec289d8aea924918c757b87b309b0658b73d413bb09534d",
+  "contract_id": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-PRE-BUILD-REVIEW-CONTRACT-0001",
+  "criteria": [
+    {"category":"SPECIFICATION","check":"The internal product specification and corrected post-build acceptance contract verify against their exact fingerprints.","criterion_id":"BLD-001","required_result":"PASS"},
+    {"category":"CASE_BOUNDARY","check":"Exactly one internal case is selected by a verified source-report fingerprint and an allowed read-only source mode.","criterion_id":"BLD-002","required_result":"PASS"},
+    {"category":"BUILD_SCOPE","check":"The authorized build is limited to repository-local package artifacts and stops before package acceptance, delivery, or release.","criterion_id":"BLD-003","required_result":"PASS"},
+    {"category":"PRIVACY","check":"The selected case is public or metadata-only, and no prohibited private payload, credential, or third-party personal data is introduced.","criterion_id":"BLD-004","required_result":"PASS"},
+    {"category":"ROLLBACK","check":"WIP is one and a rollback anchor is declared before package generation.","criterion_id":"BLD-005","required_result":"PASS"},
+    {"category":"AUTHORITY","check":"Pricing, outreach, contracting, delivery, publication, external execution, automatic approval, and target-repository writes remain unauthorized.","criterion_id":"BLD-006","required_result":"PASS"}
+  ],
+  "decision_contract": {
+    "allowed_decisions": ["APPROVE_PILOT_PACKAGE_BUILD","REVISE","REJECT","FREEZE"],
+    "decisions": [],
+    "human_decision_required": true,
+    "required_fields": ["decision","reviewer_identity","reviewed_spec_fingerprint","reviewed_pre_build_contract_fingerprint","post_build_acceptance_contract_fingerprint","criteria_results","selected_case_report_fingerprint","privacy_boundary_confirmed","rollback_confirmed","pilot_package_build_authorized"]
+  },
+  "review_stage": "PRE_BUILD_AUTHORIZATION",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-PRE-BUILD-REVIEW-CONTRACT-V1",
+  "source": {
+    "post_build_acceptance_contract_fingerprint": "d8269e54f35946f750bf07a942c0587530cbdb45d9b47f54d15f936ba07755f9",
+    "product_spec_fingerprint": "2c5132b29b68bfcf3bc9dd9b509cc3176f9ebf828aaa33a8bee3fadd9d817e71",
+    "source_productization_checkpoint_fingerprint": "5ec1888f85ca802c023a1fce9c68c69c089a6085b5770b011f25139e97d03dd0"
+  },
+  "terminal": {
+    "next_action": "A human may authorize one repository-local internal package build without asserting that the unbuilt package already satisfies post-build acceptance criteria.",
+    "state": "HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED"
+  }
+}

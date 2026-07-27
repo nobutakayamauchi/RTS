@@ -24,10 +24,7 @@ def resign(value: dict, field: str) -> dict:
 class InternalProductSpecificationTests(unittest.TestCase):
     def test_specification_verifies_and_stops_at_human_gate(self):
         bundle = verify_internal_productization_spec()
-        self.assertEqual(
-            bundle["summary"]["state"],
-            "HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED",
-        )
+        self.assertEqual(bundle["summary"]["state"], "HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED")
         self.assertEqual(bundle["summary"]["counts"], {
             "required_sections": 9,
             "workflow_steps": 8,
@@ -36,10 +33,7 @@ class InternalProductSpecificationTests(unittest.TestCase):
             "effective_achievement_records_in_source_pack": 16,
             "withheld_claims_in_source_pack": 5,
         })
-        self.assertEqual(
-            bundle["spec"]["target"]["first_delivery_mode"],
-            "OPERATOR_ASSISTED_SINGLE_CASE",
-        )
+        self.assertEqual(bundle["spec"]["target"]["first_delivery_mode"], "OPERATOR_ASSISTED_SINGLE_CASE")
         self.assertEqual(bundle["spec"]["target"]["pricing_status"], "UNDECIDED")
         self.assertFalse(bundle["summary"]["pilot_package_build_authorized"])
         self.assertFalse(bundle["summary"]["external_actions_performed"])
@@ -73,17 +67,13 @@ class InternalProductSpecificationTests(unittest.TestCase):
         checkpoint = copy.deepcopy(verify_internal_productization_spec()["checkpoint"])
         checkpoint["unknown"] = False
         with self.assertRaises(ProofEngineError):
-            verify_internal_productization_spec(
-                checkpoint=resign(checkpoint, "checkpoint_fingerprint")
-            )
+            verify_internal_productization_spec(checkpoint=resign(checkpoint, "checkpoint_fingerprint"))
 
     def test_checkpoint_fails_closed_on_external_action(self):
         checkpoint = copy.deepcopy(verify_internal_productization_spec()["checkpoint"])
         checkpoint["publication_performed"] = True
         with self.assertRaises(ProofEngineError):
-            verify_internal_productization_spec(
-                checkpoint=resign(checkpoint, "checkpoint_fingerprint")
-            )
+            verify_internal_productization_spec(checkpoint=resign(checkpoint, "checkpoint_fingerprint"))
 
     def test_review_template_does_not_manufacture_decision(self):
         template = build_pilot_package_review_template()
@@ -97,19 +87,10 @@ class InternalProductSpecificationTests(unittest.TestCase):
     def test_cli_has_no_build_price_publish_or_delivery_command(self):
         parser = build_parser()
         choices = parser._subparsers._group_actions[0].choices
-        self.assertEqual(
-            set(choices),
-            {"verify", "summary", "spec", "acceptance", "review-template", "render-markdown"},
-        )
-        for forbidden in (
-            "build",
-            "approve",
-            "price",
-            "outreach",
-            "contract",
-            "deliver",
-            "publish",
-        ):
+        self.assertEqual(set(choices), {
+            "verify", "summary", "spec", "pre-build", "acceptance", "review-template", "render-markdown"
+        })
+        for forbidden in ("build", "approve", "price", "outreach", "contract", "deliver", "publish"):
             self.assertNotIn(forbidden, choices)
 
 

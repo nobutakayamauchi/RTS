@@ -1,0 +1,18 @@
+{
+  "audience": {"primary":"PORTFOLIO_OR_COLLABORATION_READER","purpose":"Understand verified project outputs, contribution boundaries, unsupported claims, and limitations without reading the full repository history."},
+  "build_decision_fingerprint": "992d33bf450a0fad5fce8548c0da71dcf86380691e732ba8d89130af265b5b7d",
+  "case_id": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-CASE-0001",
+  "intake_fingerprint": "d16beab6d22251459839a6038f6174bc1f3e3d24ee7d600e34a3fb7906c40ce0",
+  "operator": {
+    "may": ["verify the fixed report source","assemble repository-local package artifacts","render internal report JSON and Markdown","prepare post-build acceptance review"],
+    "may_not": ["change source evidence","manufacture acceptance","price, contact, contract, deliver, or publish","copy prohibited private or third-party personal data"],
+    "mode": "OPERATOR_ASSISTED_SINGLE_CASE",
+    "wip_limit": 1
+  },
+  "privacy": {"credentials_allowed":false,"private_payload_allowed":false,"source_visibility_required":"PUBLIC","third_party_personal_data_allowed":false},
+  "required_outputs": ["source-bound input manifest","deterministic report JSON","reader-facing report Markdown","evidence and withheld-claim inventory","human acceptance packet","verification summary","rollback record"],
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-CASE-INTAKE-V1",
+  "source": {"report_fingerprint":"a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc","report_id":"PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2","repository":"nobutakayamauchi/seminar-compass","snapshot_binding":"DERIVE_AND_VERIFY_FROM_SOURCE_REPORT","source_mode":"READ_ONLY_SNAPSHOT","visibility":"PUBLIC"},
+  "subject": {"display_name":"nobutakayamauchi/seminar-compass","personal_identity_required":false,"type":"PROJECT"},
+  "terminal": {"post_build_gate":"HUMAN_PILOT_PACKAGE_ACCEPTANCE_REVIEW_REQUIRED","state":"CASE_INTAKE_READY_FOR_AUTHORIZED_BUILD"}
+}
