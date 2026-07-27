@@ -1,0 +1,54 @@
+name: Second Case Build Probe
+
+on:
+  push:
+    branches:
+      - agent/evidence-report-second-case-build-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Export build review inputs
+        run: |
+          python -B - <<'PY'
+          import json
+          from pathlib import Path
+          from proof_engine_pilot.report_operational_validation_plan import verify_operational_validation_plan
+          from proof_engine_pilot.report_template_review import build_report_template_review
+          from proof_engine_pilot.report_pilot_acceptance import verify_pilot_acceptance
+          from proof_engine_pilot.cross_repo_campaign_close import verify_campaign_close
+
+          out = Path('/tmp/second-case-inputs')
+          out.mkdir(parents=True, exist_ok=True)
+          plan = verify_operational_validation_plan()
+          pack = build_report_template_review()['pack']
+          report = next(item for item in pack['reports'] if item['report_id'] == 'PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4')
+          first = verify_pilot_acceptance()
+          campaign = verify_campaign_close()
+          values = {
+              'plan-review-template.json': plan['review_template'],
+              'plan-summary.json': plan['summary'],
+              'round4-report.json': report,
+              'round4-review.json': campaign['review'],
+              'first-case-report.json': first['package']['report_json'],
+              'first-case-package-index.json': first['package']['package_index'],
+              'first-case-acceptance-summary.json': first['summary'],
+          }
+          for name, value in values.items():
+              (out / name).write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + '\n', encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: second-case-build-inputs
+          path: /tmp/second-case-inputs
+          if-no-files-found: error
