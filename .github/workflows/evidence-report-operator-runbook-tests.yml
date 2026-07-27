@@ -23,7 +23,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Verify HARD-002 artifacts
+      - name: Verify instruction provenance policy
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_instruction_provenance_policy; verify_instruction_provenance_policy()"
+      - name: Verify normalized instruction record
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_instruction_record; verify_instruction_record()"
+      - name: Verify intake contract
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_intake_contract; verify_intake_contract()"
+      - name: Verify operator runbook
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_operator_runbook; verify_operator_runbook()"
+      - name: Verify support escalation matrix
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_support_escalation; verify_support_escalation()"
+      - name: Verify hardening result
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_hardening_result; verify_hardening_result()"
+      - name: Verify checkpoint
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_checkpoint; verify_checkpoint()"
+      - name: Verify HARD-002 bindings
         run: python -B -m proof_engine_pilot.report_operator_runbook_cli verify
       - name: Verify progress and instruction provenance boundary
         run: |
