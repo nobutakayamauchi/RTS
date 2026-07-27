@@ -1,0 +1,26 @@
+{
+  "checkpoint_fingerprint": "5ec1888f85ca802c023a1fce9c68c69c089a6085b5770b011f25139e97d03dd0",
+  "checkpoint_id": "PROOF-ENGINE-EVIDENCE-REPORT-PRODUCTIZATION-CHECKPOINT-0015",
+  "contract_action_performed": false,
+  "decision": "APPROVE_FOR_PRODUCTIZATION",
+  "decision_fingerprint": "010f5a2d39e712b181ed227fe62cdb61680db890898a43994543833e3c27efd9",
+  "delivery_performed": false,
+  "external_actions_performed": false,
+  "next_action": "Build the internal productization specification and acceptance contract, then stop before pricing, outreach, contracting, delivery, or publication.",
+  "outreach_performed": false,
+  "pricing_performed": false,
+  "productization_scope": "INTERNAL_PRODUCTIZATION_SPECIFICATION_ONLY",
+  "publication_performed": false,
+  "reviewed_pack_fingerprint": "c95360f6ef1376914261eac574757ceb99f7f25c998b7be5752436200375f1bb",
+  "reviewed_report_fingerprints": {
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2": "a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc",
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-3": "48ef70f2a24842851fbfd2c19e30b360835a1a5248181090a91694dbd9ac395e",
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4": "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c"
+  },
+  "reviewed_template_fingerprint": "579d086788e636317cd61392fc3af97de468ff27c9ba478e962a973bd91ad4f6",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PRODUCTIZATION-CHECKPOINT-V1",
+  "source_review_checkpoint_fingerprint": "154bad31a6da7bcee696a796085499cddfbceb7ef8839552702c0a5b6f6c019f",
+  "state": "APPROVED_FOR_INTERNAL_PRODUCTIZATION_SPECIFICATION",
+  "summary_fingerprint": "a12da055d6dfab92f5c6fe90ec10c604852282325006eb12b9cfdb75370d0339",
+  "target_repository_writes_performed": false
+}

@@ -1,0 +1,66 @@
+{
+  "automatic_approval_authorized": false,
+  "automatic_rewrite_authorized": false,
+  "contract_authorized": false,
+  "contribution_separation_confirmed": true,
+  "criteria_results": [
+    {
+      "criterion": "FACTUALITY_AND_SCOPE_BOUNDING",
+      "result": "PASS"
+    },
+    {
+      "criterion": "FULL_SECTION_RENDERING",
+      "result": "PASS"
+    },
+    {
+      "criterion": "PLAIN_LANGUAGE_VALUE_CLARITY",
+      "result": "PASS"
+    },
+    {
+      "criterion": "HUMAN_AI_CONTRIBUTION_SEPARATION",
+      "result": "PASS"
+    },
+    {
+      "criterion": "PRIVATE_REPOSITORY_BOUNDARY",
+      "result": "PASS"
+    },
+    {
+      "criterion": "HUMAN_DECISION_AUTHENTICITY",
+      "result": "PASS"
+    },
+    {
+      "criterion": "PRODUCTIZATION_REVIEW_READINESS",
+      "result": "PASS"
+    }
+  ],
+  "decision": "APPROVE_FOR_PRODUCTIZATION",
+  "decision_fingerprint": "010f5a2d39e712b181ed227fe62cdb61680db890898a43994543833e3c27efd9",
+  "decision_id": "PROOF-ENGINE-EVIDENCE-REPORT-PRODUCTIZATION-DECISION-0001",
+  "delivery_authorized": false,
+  "external_execution_authorized": false,
+  "factuality_confirmed": true,
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_RESUME_INSTRUCTION",
+    "instruction": "前回のチャットが長すぎる出て、作業が中断しているため、その中断している作業の続きからお願いします。",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "next_stage": "INTERNAL_PRODUCTIZATION_SPECIFICATION",
+  "outreach_authorized": false,
+  "pricing_authorized": false,
+  "privacy_boundary_confirmed": true,
+  "productization_scope": "INTERNAL_PRODUCTIZATION_SPECIFICATION_ONLY",
+  "publication_authorized": false,
+  "reviewed_pack_fingerprint": "c95360f6ef1376914261eac574757ceb99f7f25c998b7be5752436200375f1bb",
+  "reviewed_report_fingerprints": {
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2": "a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc",
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-3": "48ef70f2a24842851fbfd2c19e30b360835a1a5248181090a91694dbd9ac395e",
+    "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4": "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c"
+  },
+  "reviewed_template_fingerprint": "579d086788e636317cd61392fc3af97de468ff27c9ba478e962a973bd91ad4f6",
+  "reviewer_identity": "nobutakayamauchi",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PRODUCTIZATION-DECISION-V1",
+  "source_review_checkpoint_fingerprint": "154bad31a6da7bcee696a796085499cddfbceb7ef8839552702c0a5b6f6c019f",
+  "target_repository_write_authorized": false
+}
