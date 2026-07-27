@@ -1,0 +1,62 @@
+name: Evidence Report Operator Runbook Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-operator-runbook-tests.yml"
+      - "proof_engine_pilot/product_readiness/round_0002/**"
+      - "proof_engine_pilot/report_operator_runbook.py"
+      - "proof_engine_pilot/report_operator_runbook_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_operator_runbook_checkpoint_0023.json"
+      - "tests/test_proof_engine_report_operator_runbook.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify instruction provenance policy
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_instruction_provenance_policy; verify_instruction_provenance_policy()"
+      - name: Verify normalized instruction record
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_instruction_record; verify_instruction_record()"
+      - name: Verify intake contract
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_intake_contract; verify_intake_contract()"
+      - name: Verify operator runbook
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_operator_runbook; verify_operator_runbook()"
+      - name: Verify support escalation matrix
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_support_escalation; verify_support_escalation()"
+      - name: Verify hardening result
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_hardening_result; verify_hardening_result()"
+      - name: Verify checkpoint
+        run: python -B -c "from proof_engine_pilot.report_operator_runbook import verify_checkpoint; verify_checkpoint()"
+      - name: Verify HARD-002 bindings
+        run: python -B -m proof_engine_pilot.report_operator_runbook_cli verify
+      - name: Verify progress and instruction provenance boundary
+        run: |
+          python -B -m proof_engine_pilot.report_operator_runbook_cli summary > /tmp/operator-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/operator-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_OPERATOR_RUNBOOK_AND_INTAKE_CONTRACT_COMPLETE'
+          assert value['next_gate'] == 'HUMAN_INDEPENDENT_READER_REVIEW_PLAN_REQUIRED'
+          assert value['rts_overall_planning_estimate_percent'] == 73
+          assert value['short_term_internal_product_candidate_percent'] == 95
+          assert value['product_readiness_score'] == 82
+          assert value['runbook_phases'] == 7
+          assert value['intake_required_fields'] == 7
+          assert value['intake_rejection_conditions'] == 6
+          assert value['escalation_levels'] == 4
+          assert value['rough_input_robustness_preserved'] is True
+          assert value['verbatim_raw_instruction_required'] is False
+          assert value['remaining_work_items'] == ['HARD-003', 'HARD-004', 'HARD-005']
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_operator_runbook.py' -v
