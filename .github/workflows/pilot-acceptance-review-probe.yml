@@ -1,0 +1,42 @@
+name: Pilot Acceptance Review Probe
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/pilot-acceptance-review-probe.yml"
+      - "proof_engine_pilot/report_pilot_package.py"
+      - "proof_engine_pilot/report_pilot_package_v2.py"
+      - "proof_engine_pilot/report_pilot_package_cli.py"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Export completed package artifacts
+        run: |
+          python -B -m proof_engine_pilot.report_pilot_package_cli verify
+          python -B -m proof_engine_pilot.report_pilot_package_cli generate --output /tmp/report.json
+          python -B -m proof_engine_pilot.report_pilot_package_cli render-markdown --output /tmp/report.md
+          python -B -m proof_engine_pilot.report_pilot_package_cli evidence-inventory > /tmp/evidence-inventory.json
+          python -B -m proof_engine_pilot.report_pilot_package_cli acceptance-template > /tmp/acceptance-packet.json
+          python -B -m proof_engine_pilot.report_pilot_package_cli verification-summary > /tmp/verification-summary.json
+          python -B -m proof_engine_pilot.report_pilot_package_cli package-index > /tmp/package-index.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot-acceptance-review-inputs
+          path: |
+            /tmp/report.json
+            /tmp/report.md
+            /tmp/evidence-inventory.json
+            /tmp/acceptance-packet.json
+            /tmp/verification-summary.json
+            /tmp/package-index.json
+          if-no-files-found: error
