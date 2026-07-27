@@ -1,0 +1,68 @@
+name: Evidence Report Customer Pilot Candidate Shortlist Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-customer-pilot-candidate-shortlist-tests.yml"
+      - "docs/status/RTS_CURRENT_POSITION.md"
+      - "docs/status/RTS_CURRENT_POSITION_CANDIDATE_SHORTLIST.json"
+      - "proof_engine_pilot/product_readiness/round_0008/**"
+      - "proof_engine_pilot/report_customer_pilot_candidate_shortlist.py"
+      - "proof_engine_pilot/report_customer_pilot_candidate_shortlist_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_customer_pilot_candidate_shortlist_checkpoint_0029.json"
+      - "tests/test_proof_engine_report_customer_pilot_candidate_shortlist.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify prior signed execution-authorization history
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_prior_execution_authorization_history; print(verify_prior_execution_authorization_history())"
+      - name: Verify candidate discovery contract
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_contract; verify_contract(); print('contract-ok')"
+      - name: Verify public candidate universe
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_universe; verify_universe(); print('universe-ok')"
+      - name: Verify evidence, scoring, and shortlist decision
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_evidence,verify_scores,verify_decision; verify_evidence(); verify_scores(); verify_decision(); print('evidence-scores-decision-ok')"
+      - name: Verify contact risk, readiness hold, and completion
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_risk,verify_score_hold,verify_completion; verify_risk(); verify_score_hold(); verify_completion(); print('risk-score-completion-ok')"
+      - name: Verify progress and checkpoint
+        run: python -B -c "from proof_engine_pilot.report_customer_pilot_candidate_shortlist import verify_progress,verify_checkpoint; verify_progress(); verify_checkpoint(); print('position-checkpoint-ok')"
+      - name: Verify complete candidate-shortlist stage
+        run: python -B -m proof_engine_pilot.report_customer_pilot_candidate_shortlist_cli verify
+      - name: Verify score hold and closed external authority
+        run: |
+          python -B -m proof_engine_pilot.report_customer_pilot_candidate_shortlist_cli summary > /tmp/candidate-shortlist-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/candidate-shortlist-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_PUBLIC_CANDIDATE_SHORTLIST_COMPLETE'
+          assert value['next_gate'] == 'HUMAN_RECOMMENDED_CANDIDATE_SELECTION_AND_CONTACT_AUTHORIZATION_REQUIRED'
+          assert value['rts_overall_planning_estimate_percent'] == 79
+          assert value['short_term_internal_hardening_percent'] == 100
+          assert value['product_readiness_score'] == 93
+          assert value['product_readiness_score_change'] == 0
+          assert value['candidate_count'] == 3
+          assert value['shortlist_count'] == 2
+          assert value['recommended_candidate_repository'] == 'jbexta/AgentPilot'
+          assert value['recommended_candidate_score'] == 86
+          assert value['reserve_candidate_repository'] == 'tmseidel/ai-git-bot'
+          assert value['reserve_candidate_score'] == 83
+          assert value['selected_candidate_count'] == 0
+          assert value['participant_contact_authorized'] is False
+          assert value['participant_contact_performed'] is False
+          assert value['customer_intake_authorized'] is False
+          assert value['pilot_execution_authorized'] is False
+          assert value['external_actions_performed'] is False
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_customer_pilot_candidate_shortlist.py' -v
