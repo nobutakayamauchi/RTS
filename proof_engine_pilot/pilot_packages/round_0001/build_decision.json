@@ -11,7 +11,7 @@
     {"criterion_id":"BLD-006","evidence":["2c5132b29b68bfcf3bc9dd9b509cc3176f9ebf828aaa33a8bee3fadd9d817e71"],"note":"","result":"PASS"}
   ],
   "decision": "APPROVE_PILOT_PACKAGE_BUILD",
-  "decision_fingerprint": "3e242b568004db22d8298fd3470afcd45045a88ca8406953484719546c3e5418",
+  "decision_fingerprint": "992d33bf450a0fad5fce8548c0da71dcf86380691e732ba8d89130af265b5b7d",
   "decision_id": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-BUILD-DECISION-0001",
   "delivery_authorized": false,
   "external_execution_authorized": false,
@@ -30,6 +30,6 @@
   "rollback_confirmed": true,
   "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-BUILD-DECISION-V1",
   "scope": "INTERNAL_SINGLE_CASE_PILOT_PACKAGE_BUILD_ONLY",
-  "selected_case": {"repository":"seminar-compass","snapshot_binding":"VERIFIED_SOURCE_REPORT_FINGERPRINT","source_mode":"READ_ONLY_SNAPSHOT","source_report_fingerprint":"a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc","source_report_id":"PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2","visibility":"PUBLIC"},
+  "selected_case": {"repository":"nobutakayamauchi/seminar-compass","snapshot_binding":"VERIFIED_SOURCE_REPORT_FINGERPRINT","source_mode":"READ_ONLY_SNAPSHOT","source_report_fingerprint":"a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc","source_report_id":"PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2","visibility":"PUBLIC"},
   "target_repository_write_authorized": false
 }
