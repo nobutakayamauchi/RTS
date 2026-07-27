@@ -1,0 +1,22 @@
+{
+  "baseline_acceptance_checkpoint_fingerprint": "c127b8e718a056671a8fbb1d9776e505e23cd416cd680bdeed0821f47f205611",
+  "build_decision_fingerprint": "acafa51797b289a79fb33ed19fdb9a1bd53ba8433044906845e643b4da1575ee",
+  "delete_or_rewrite_prior_records": false,
+  "external_actions_allowed": false,
+  "modify_source_repository": false,
+  "modify_target_repository": false,
+  "package_id": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-REPRODUCTION-PACKAGE-0002",
+  "plan_checkpoint_fingerprint": "905b828cc347b5bc55b6d89d109af36f4eedfdbf0cd5f3c6d630768b507720f3",
+  "preserved": [
+    "accepted first-case package and acceptance",
+    "Round 4 source review and report",
+    "case selection and operational plan",
+    "plan review decision",
+    "all evidence and withheld claims"
+  ],
+  "rollback_action": "FREEZE_SECOND_CASE_PACKAGE_AND_RETAIN_ALL_PRIOR_APPEND_ONLY_RECORDS",
+  "rollback_anchor": "77a2efeccd2eb8f12633863b0daa6fb4c3d365f7",
+  "rollback_fingerprint": "6a17bfb7774661ea319949a16aa6aab20e22437a1eee4643704760c0746b0d02",
+  "rollback_id": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-ROLLBACK-0001",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-ROLLBACK-V1"
+}

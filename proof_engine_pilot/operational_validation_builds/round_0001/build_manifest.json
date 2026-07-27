@@ -1,0 +1,70 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "customer_intake_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "second_case_build_authorized": true,
+    "source_repository_write_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "builder_contract": {
+    "double_build_determinism_required": true,
+    "duplicated_first_case_builder_allowed": false,
+    "mode": "GENERIC_DATA_DRIVEN",
+    "repository_name_conditionals_allowed": false
+  },
+  "case": {
+    "expected_effective_record_ids": [
+      "VF-001",
+      "VF-002"
+    ],
+    "readme_blob_sha": "bf1dc0f75da08202c2a07dced5d0885b43fac5b5",
+    "repository": "nobutakayamauchi/rts-video-flow",
+    "required_withheld_topics": [
+      "END_TO_END_OPERATION",
+      "TRANSCRIPTION_ACCURACY",
+      "PRODUCTION_READINESS"
+    ],
+    "selected_pr_numbers": [
+      1,
+      2
+    ],
+    "snapshot_ref": "main",
+    "source_mode": "READ_ONLY_SNAPSHOT",
+    "visibility": "PUBLIC"
+  },
+  "expected_counts": {
+    "comparison_dimensions": 10,
+    "effective_records": 2,
+    "post_build_review_criteria": 12,
+    "required_outputs": 8,
+    "required_report_sections": 9,
+    "withheld_claims": 3
+  },
+  "manifest_fingerprint": "556f39e632a6e8826a48d46edac1235bbbf70ce681c5d3f7cbd7f9364ac9768c",
+  "manifest_id": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-BUILD-MANIFEST-0001",
+  "package_id": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-REPRODUCTION-PACKAGE-0002",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-BUILD-MANIFEST-V1",
+  "source": {
+    "baseline_package_fingerprint": "9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a",
+    "operational_validation_plan_fingerprint": "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+    "plan_checkpoint_fingerprint": "905b828cc347b5bc55b6d89d109af36f4eedfdbf0cd5f3c6d630768b507720f3",
+    "plan_review_decision_fingerprint": "acafa51797b289a79fb33ed19fdb9a1bd53ba8433044906845e643b4da1575ee",
+    "source_report_fingerprint": "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c",
+    "source_report_id": "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4",
+    "source_review_fingerprint": "5185cacd419cf52ea8c4ee5ae228a706423997bd33c7270cac4323e2b37589be"
+  },
+  "terminal": {
+    "delivery_status": "NOT_DELIVERED",
+    "next_gate": "REPOSITORY_LOCAL_SECOND_CASE_BUILD_EXECUTION",
+    "pricing_status": "NOT_PRICED",
+    "publication_status": "NOT_PUBLISHED",
+    "state": "SECOND_CASE_OPERATIONAL_VALIDATION_BUILD_AUTHORIZED"
+  }
+}

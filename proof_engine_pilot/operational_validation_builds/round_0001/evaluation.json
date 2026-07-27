@@ -1,0 +1,69 @@
+{
+  "acceptance_decision_fingerprint": "fa5b8e84c23b4e5244cd5d8c32f5a63bd081aabcad355a8efa60ebb757c075c8",
+  "baseline_package_fingerprint": "9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a",
+  "build_checkpoint_fingerprint": "5396e4ee089378f99f19e3d4e1a2d12a949d656083b4b40a0cfcf09a6c0b819d",
+  "comparison_fingerprint": "c74a86f0ec66e28460fd1fe1845886b0f456481690c17c144f341c7757f663ef",
+  "comparison_result": "PASS_REPRODUCED_WITH_NEGATIVE_CONTROL",
+  "contract_status": "NOT_STARTED",
+  "counts": {
+    "cases": 2,
+    "comparison_dimensions": 10,
+    "comparison_dimensions_passed": 10,
+    "criteria": 12,
+    "criteria_passed": 12,
+    "hypotheses_passed": 5,
+    "second_case_artifacts": 8,
+    "second_case_records": 2,
+    "second_case_withheld_claims": 3,
+    "validation_hypotheses": 5
+  },
+  "delivery_status": "NOT_DELIVERED",
+  "evaluation_fingerprint": "dd23947b37961651a8a9e26051696fc0e1266cd312eaaab3ff5fef8da409b762",
+  "evaluation_id": "PROOF-ENGINE-EVIDENCE-REPORT-OPERATIONAL-REPRODUCTION-EVALUATION-0001",
+  "external_actions_performed": false,
+  "hypothesis_results": [
+    {
+      "hypothesis_id": "OV-H01",
+      "note": "One generic data-driven package builder generated the second case without copied first-case logic or repository-name conditionals.",
+      "result": "PASS"
+    },
+    {
+      "hypothesis_id": "OV-H02",
+      "note": "Two bounded records remain effective while all three unsupported runtime topics remain withheld.",
+      "result": "PASS"
+    },
+    {
+      "hypothesis_id": "OV-H03",
+      "note": "Sparse evidence still produced all nine report sections and all eight package outputs.",
+      "result": "PASS"
+    },
+    {
+      "hypothesis_id": "OV-H04",
+      "note": "Two builds reproduced all pre-decision fingerprints exactly.",
+      "result": "PASS"
+    },
+    {
+      "hypothesis_id": "OV-H05",
+      "note": "All commercial, external, automatic, and repository-write authorities remain false.",
+      "result": "PASS"
+    }
+  ],
+  "next_action": "Review the two-case internal result and decide whether to open a bounded product-readiness assessment; stop before pricing, outreach, contracts, customer intake, delivery, or publication.",
+  "next_gate": "HUMAN_PRODUCT_READINESS_REVIEW_REQUIRED",
+  "not_proven": [
+    "ARBITRARY_REPOSITORY_GENERALIZATION",
+    "COMMERCIAL_EFFECTIVENESS",
+    "CUSTOMER_VALUE_OR_REVENUE",
+    "AUTONOMOUS_EXTERNAL_EXECUTION",
+    "PRODUCTION_SERVICE_READINESS"
+  ],
+  "outreach_status": "NOT_STARTED",
+  "pricing_status": "NOT_PRICED",
+  "product_readiness_interpretation": "INTERNAL_REPRODUCTION_VALIDATED_NOT_COMMERCIAL_READINESS",
+  "publication_status": "NOT_PUBLISHED",
+  "reproduction_result": "PASS",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-OPERATIONAL-REPRODUCTION-EVALUATION-V1",
+  "second_case_package_summary_fingerprint": "165c364b59e8ea3e6e54e0eb4da3426c1b98454589df2001ca852ce6d6329390",
+  "state": "INTERNAL_TWO_CASE_OPERATIONAL_REPRODUCTION_VALIDATED",
+  "supported_conclusion": "BOUNDED_INTERNAL_TWO_CASE_OPERATIONAL_REPRODUCTION"
+}

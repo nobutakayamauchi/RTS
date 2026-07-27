@@ -1,0 +1,63 @@
+# Final workflow; the temporary build probe is not part of the final diff.
+name: Evidence Report Operational Reproduction Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-operational-reproduction-tests.yml"
+      - "proof_engine_pilot/operational_validation_builds/**"
+      - "proof_engine_pilot/report_operational_validation_build.py"
+      - "proof_engine_pilot/report_operational_validation_build_v2.py"
+      - "proof_engine_pilot/report_operational_validation_result.py"
+      - "proof_engine_pilot/report_operational_validation_result_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_operational_reproduction_checkpoint_0021.json"
+      - "tests/test_proof_engine_report_operational_validation_result.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify second-case package
+        run: python -B -m proof_engine_pilot.report_operational_validation_result_cli verify-build
+      - name: Verify final two-case result
+        run: python -B -m proof_engine_pilot.report_operational_validation_result_cli verify
+      - name: Verify negative-control counts and authority
+        run: |
+          python -B -m proof_engine_pilot.report_operational_validation_result_cli final-summary > /tmp/final-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/final-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_TWO_CASE_OPERATIONAL_REPRODUCTION_VALIDATED'
+          assert value['next_gate'] == 'HUMAN_PRODUCT_READINESS_REVIEW_REQUIRED'
+          assert value['reproduction_result'] == 'PASS'
+          assert value['comparison_result'] == 'PASS_REPRODUCED_WITH_NEGATIVE_CONTROL'
+          assert value['counts'] == {
+              'cases': 2,
+              'criteria': 12,
+              'criteria_passed': 12,
+              'validation_hypotheses': 5,
+              'hypotheses_passed': 5,
+              'comparison_dimensions': 10,
+              'comparison_dimensions_passed': 10,
+              'second_case_artifacts': 8,
+              'second_case_records': 2,
+              'second_case_withheld_claims': 3,
+          }
+          assert value['pricing_status'] == 'NOT_PRICED'
+          assert value['outreach_status'] == 'NOT_STARTED'
+          assert value['contract_status'] == 'NOT_STARTED'
+          assert value['delivery_status'] == 'NOT_DELIVERED'
+          assert value['publication_status'] == 'NOT_PUBLISHED'
+          assert value['external_actions_performed'] is False
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_operational_validation_result.py' -v

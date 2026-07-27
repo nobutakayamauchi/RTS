@@ -1,0 +1,154 @@
+{
+  "automatic_approval_authorized": false,
+  "automatic_rewrite_authorized": false,
+  "authority_boundary_confirmed": true,
+  "contract_authorized": false,
+  "criteria_results": [
+    {
+      "criterion_id": "OVP-001",
+      "evidence": [
+        "81af71220d7d93b47fd349b3c51912ac27e4d223500632ca86df5358a803b84a",
+        "c127b8e718a056671a8fbb1d9776e505e23cd416cd680bdeed0821f47f205611"
+      ],
+      "note": "The accepted first package and checkpoint verify successfully and expose the required operational-plan gate.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-002",
+      "evidence": [
+        "f99bf316ffa5df7f07aab7003f3c574cd4570426e3d0a63252b3e8af0ea16983",
+        "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c"
+      ],
+      "note": "The selected case is the approved public rts-video-flow Round 4 report and differs from the accepted seminar-compass first case.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-003",
+      "evidence": [
+        "f99bf316ffa5df7f07aab7003f3c574cd4570426e3d0a63252b3e8af0ea16983",
+        "5185cacd419cf52ea8c4ee5ae228a706423997bd33c7270cac4323e2b37589be"
+      ],
+      "note": "The frozen untested scaffold adds stronger incremental evidence about underclaiming, sparse evidence, and withheld-claim retention than repeating the positive case.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-004",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+        "d4aa4b703124349227a8eac83923bf12c9a553ea125e9654f6d8f97fd87b43d3"
+      ],
+      "note": "Repository identity, public visibility, read-only mode, report, round, README blob, and PRs #1 and #2 are fixed exactly.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-005",
+      "evidence": [
+        "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c",
+        "5185cacd419cf52ea8c4ee5ae228a706423997bd33c7270cac4323e2b37589be"
+      ],
+      "note": "The source contains exactly two bounded effective records and the three mandatory withheld runtime topics.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-006",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4"
+      ],
+      "note": "The plan requires one generic data-driven builder and forbids repository-name conditional code paths.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-007",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4"
+      ],
+      "note": "The plan fixes all nine report sections and exactly eight internal package outputs.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-008",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4"
+      ],
+      "note": "Two independent builds with identical inputs must produce identical pre-decision fingerprints.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-009",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+        "9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a"
+      ],
+      "note": "The first and second cases are compared across all ten declared operational dimensions.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-010",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+        "f14cb048dad8ea4bf731236573c1a2f56b8e08f74bdffadcfd069fc623f03766"
+      ],
+      "note": "Source drift, withheld-claim loss, overclaiming, non-determinism, missing outputs, and authority widening all stop the run.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-011",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+        "c127b8e718a056671a8fbb1d9776e505e23cd416cd680bdeed0821f47f205611"
+      ],
+      "note": "Rollback freezes the second case while preserving the accepted first package and all prior append-only records.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "OVP-012",
+      "evidence": [
+        "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+        "f14cb048dad8ea4bf731236573c1a2f56b8e08f74bdffadcfd069fc623f03766"
+      ],
+      "note": "Only one repository-local internal build is authorized; pricing, outreach, contracts, intake, delivery, publication, execution, and repository writes remain closed.",
+      "result": "PASS"
+    }
+  ],
+  "customer_intake_authorized": false,
+  "decision": "APPROVE_SECOND_CASE_OPERATIONAL_VALIDATION_BUILD",
+  "decision_fingerprint": "acafa51797b289a79fb33ed19fdb9a1bd53ba8433044906845e643b4da1575ee",
+  "decision_id": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-BUILD-DECISION-0001",
+  "delegated_review": {
+    "decision_origin": "AI_REVIEW_UNDER_EXPLICIT_HUMAN_NEXT_STAGE_AUTHORIZATION",
+    "role": "DELEGATED_OPERATIONAL_VALIDATION_PLAN_REVIEWER",
+    "type": "AI_ASSISTANT"
+  },
+  "delivery_authorized": false,
+  "external_execution_authorized": false,
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_NEXT_STAGE_INSTRUCTION",
+    "instruction": "じゃあ、この次のことをお願いします。",
+    "interpreted_scope": "REVIEW_TWELVE_PLAN_CRITERIA_AUTHORIZE_ONE_INTERNAL_SECOND_CASE_BUILD_GENERATE_EIGHT_ARTIFACTS_COMPARE_WITH_FIRST_CASE_AND_DETERMINE_REPRODUCTION_RESULT",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "outreach_authorized": false,
+  "pricing_authorized": false,
+  "privacy_boundary_confirmed": true,
+  "publication_authorized": false,
+  "reviewed_contract_fingerprint": "f14cb048dad8ea4bf731236573c1a2f56b8e08f74bdffadcfd069fc623f03766",
+  "reviewed_plan_fingerprint": "7b351185cef61a6f2afbcc3534f42b92cb093b7f2a72fc42d4a3ea23c4d1ccc4",
+  "reviewed_selection_fingerprint": "f99bf316ffa5df7f07aab7003f3c574cd4570426e3d0a63252b3e8af0ea16983",
+  "reviewer_identity": "nobutakayamauchi",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-SECOND-CASE-BUILD-DECISION-V1",
+  "second_case_build_authorized": true,
+  "source_repository_write_authorized": false,
+  "target_repository_write_authorized": false,
+  "terminal": {
+    "contract_status": "NOT_STARTED",
+    "delivery_status": "NOT_DELIVERED",
+    "next_action": "Build exactly one repository-local internal rts-video-flow reproduction package, compare it with the accepted first case, and stop before external or commercial action.",
+    "next_gate": "REPOSITORY_LOCAL_SECOND_CASE_BUILD_EXECUTION",
+    "outreach_status": "NOT_STARTED",
+    "pricing_status": "NOT_PRICED",
+    "publication_status": "NOT_PUBLISHED",
+    "state": "SECOND_CASE_OPERATIONAL_VALIDATION_BUILD_AUTHORIZED"
+  }
+}
