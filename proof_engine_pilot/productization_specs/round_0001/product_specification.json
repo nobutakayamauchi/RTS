@@ -1,0 +1,209 @@
+{
+  "authority": {
+    "automatic_approval_authorized": false,
+    "automatic_rewrite_authorized": false,
+    "contract_authorized": false,
+    "delivery_authorized": false,
+    "external_execution_authorized": false,
+    "outreach_authorized": false,
+    "pricing_authorized": false,
+    "publication_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "commercial_unknowns": [
+    "first paying buyer",
+    "price and billing model",
+    "sales channel",
+    "service-level commitment",
+    "customer data intake policy",
+    "legal terms",
+    "external delivery format"
+  ],
+  "deliverable_contract": {
+    "delivery_status": "NOT_DELIVERED",
+    "draft_state": "HUMAN_DELIVERY_REVIEW_REQUIRED",
+    "format": [
+      "DETERMINISTIC_JSON",
+      "READER_FACING_MARKDOWN"
+    ],
+    "publication_status": "NOT_PUBLISHED",
+    "required_record_fields": [
+      "candidate_id",
+      "reader_summary",
+      "record_kind",
+      "value_interpretation",
+      "evidence_strength",
+      "evidence_prs",
+      "evidence_boundary",
+      "contribution_map",
+      "lineage"
+    ],
+    "required_sections": [
+      "executive_summary",
+      "repository_scope",
+      "methodology",
+      "evidence_inventory",
+      "effective_achievement_records",
+      "human_and_ai_contribution_map",
+      "withheld_or_unsupported_claims",
+      "limitations",
+      "human_review_decision"
+    ]
+  },
+  "failure_and_rollback": {
+    "fail_closed_conditions": [
+      "source fingerprint drift",
+      "unknown schema field",
+      "missing required section",
+      "duplicate candidate identity",
+      "unsupported authority widening",
+      "manufactured human approval",
+      "withheld claim deletion",
+      "private source mode widening",
+      "non-deterministic regeneration"
+    ],
+    "rollback_anchor": "83fe498c618b18b82f88d020879e6c5e55fa3bc0",
+    "rollback_effect": "Freeze this specification stage without changing the reviewed Template v2, productization decision, or prior evidence records."
+  },
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_ACTION_INSTRUCTION",
+    "instruction": "動きを行う。",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "identity": {
+    "product_family": "Proof Engine",
+    "product_type": "HUMAN_REVIEWED_INTERNAL_REPORT_SERVICE_SPECIFICATION",
+    "specification_status": "INTERNAL_ONLY",
+    "working_name": "Evidence-Backed Achievement Discovery Report"
+  },
+  "input_contract": {
+    "allowed_source_modes": [
+      "READ_ONLY_SNAPSHOT",
+      "READ_ONLY_METADATA_SNAPSHOT"
+    ],
+    "automatic_multi_repository_ingestion": false,
+    "private_payload_copying": false,
+    "required": [
+      "one explicitly selected repository snapshot",
+      "repository identity and visibility",
+      "fixed source reference",
+      "eligible merged evidence references",
+      "reviewed achievement records",
+      "withheld or unsupported claims",
+      "human and AI contribution records"
+    ]
+  },
+  "non_goals": [
+    "pricing or sales execution",
+    "automatic outreach",
+    "automatic publication",
+    "contract acceptance",
+    "customer-data ingestion",
+    "arbitrary-repository generalization",
+    "human ranking",
+    "outcome or revenue guarantee"
+  ],
+  "operator_model": {
+    "operator_may": [
+      "select an approved fixed source boundary",
+      "run deterministic generation and verification",
+      "prepare internal drafts",
+      "request human review"
+    ],
+    "operator_may_not": [
+      "manufacture a human decision",
+      "change evidence eligibility to improve the story",
+      "copy excluded private payload",
+      "price, contact, contract, deliver, or publish without a later explicit gate"
+    ],
+    "wip_limit": 1
+  },
+  "privacy_and_security": {
+    "credentials_prohibited": true,
+    "default_visibility": "SOURCE_BOUND",
+    "health_legal_financial_location_data_prohibited_without_separate_review": true,
+    "metadata_only_mode_required_for_private_repositories": true,
+    "third_party_personal_data_copying_prohibited": true
+  },
+  "quality_policy": {
+    "contribution": "Human, AI-tool, collaborator, and inherited contribution must remain separately represented.",
+    "determinism": "Accepted identical inputs reproduce identical pre-decision JSON and Markdown fingerprints.",
+    "evidence": "Missing, unmerged, drifted, private-payload, or unsupported material cannot support a completed-achievement claim.",
+    "factuality": "Every positive claim must remain within the exact selected evidence boundary.",
+    "usability": "A reader must understand verified value, evidence strength, limitations, and required human action without reading the full repository history.",
+    "withheld_claims": "Unsupported claims remain visible with reasons and cannot be silently dropped."
+  },
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-PRODUCT-SPEC-V1",
+  "source": {
+    "build_contract_fingerprint": "deeb524430c9cc905c55e31fc0321da1bedd665dc0d55e0cf459913622122f26",
+    "effective_achievement_record_count": 16,
+    "productization_checkpoint_fingerprint": "5ec1888f85ca802c023a1fce9c68c69c089a6085b5770b011f25139e97d03dd0",
+    "productization_decision_fingerprint": "010f5a2d39e712b181ed227fe62cdb61680db890898a43994543833e3c27efd9",
+    "reviewed_pack_fingerprint": "c95360f6ef1376914261eac574757ceb99f7f25c998b7be5752436200375f1bb",
+    "reviewed_report_fingerprints": {
+      "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-2": "a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc",
+      "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-3": "48ef70f2a24842851fbfd2c19e30b360835a1a5248181090a91694dbd9ac395e",
+      "PROOF-ENGINE-EVIDENCE-REPORT-DEMO-ROUND-4": "d9b2b656fff3961ea249519776604d316a58b90d8f7f7dd29151ef969a63496c"
+    },
+    "reviewed_template_fingerprint": "579d086788e636317cd61392fc3af97de468ff27c9ba478e962a973bd91ad4f6",
+    "withheld_claim_count": 5
+  },
+  "spec_fingerprint": "2c5132b29b68bfcf3bc9dd9b509cc3176f9ebf828aaa33a8bee3fadd9d817e71",
+  "spec_id": "PROOF-ENGINE-EVIDENCE-REPORT-INTERNAL-PRODUCT-SPEC-0001",
+  "target": {
+    "buyer_and_channel_status": "UNDECIDED",
+    "first_delivery_mode": "OPERATOR_ASSISTED_SINGLE_CASE",
+    "pricing_status": "UNDECIDED",
+    "primary_job": "Turn one bounded repository evidence set into a reader-facing report that explains verified outputs, contribution boundaries, unsupported claims, and limitations.",
+    "primary_user": "AI-assisted solo developer or solo founder with repository evidence and weak external value translation."
+  },
+  "terminal": {
+    "next_action": "Review this specification and acceptance contract before authorizing a single-case internal pilot package build.",
+    "next_gate": "HUMAN_PILOT_PACKAGE_BUILD_REVIEW_REQUIRED",
+    "state": "INTERNAL_PRODUCTIZATION_SPECIFICATION_COMPLETE"
+  },
+  "workflow": [
+    {
+      "human_gate": true,
+      "name": "SOURCE_BOUNDARY_CONFIRMATION",
+      "step": 1
+    },
+    {
+      "human_gate": false,
+      "name": "EVIDENCE_ELIGIBILITY_VERIFICATION",
+      "step": 2
+    },
+    {
+      "human_gate": false,
+      "name": "ACHIEVEMENT_RECORD_ASSEMBLY",
+      "step": 3
+    },
+    {
+      "human_gate": false,
+      "name": "CONTRIBUTION_SEPARATION",
+      "step": 4
+    },
+    {
+      "human_gate": false,
+      "name": "WITHHELD_CLAIM_RETENTION",
+      "step": 5
+    },
+    {
+      "human_gate": false,
+      "name": "NINE_SECTION_REPORT_RENDERING",
+      "step": 6
+    },
+    {
+      "human_gate": true,
+      "name": "FACTUALITY_AND_PRIVACY_REVIEW",
+      "step": 7
+    },
+    {
+      "human_gate": true,
+      "name": "DELIVERY_RELEASE_DECISION",
+      "step": 8
+    }
+  ]
+}
