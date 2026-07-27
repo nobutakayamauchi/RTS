@@ -17,6 +17,7 @@ on:
       - "tests/test_proof_engine_cross_repo_validation.py"
       - "tests/test_proof_engine_cross_repo_review.py"
       - "tests/test_proof_engine_cross_repo_review_round3.py"
+      - "tests/test_proof_engine_cross_repo_campaign_close.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
   push:
     branches: [main]
@@ -35,6 +36,7 @@ on:
       - "tests/test_proof_engine_cross_repo_validation.py"
       - "tests/test_proof_engine_cross_repo_review.py"
       - "tests/test_proof_engine_cross_repo_review_round3.py"
+      - "tests/test_proof_engine_cross_repo_campaign_close.py"
       - ".github/workflows/proof-engine-pilot-tests.yml"
 
 permissions:
@@ -131,6 +133,12 @@ jobs:
           python -B -m proof_engine_pilot.cross_repo_review_round3_cli summary
           python -B -m proof_engine_pilot.cross_repo_review_round3_cli effective > /tmp/proof-engine-cross-repo-effective-round-3.json
           python -B -m proof_engine_pilot.cross_repo_review_round3_cli round-4-template > /tmp/proof-engine-cross-repo-round-4-template.json
+      - name: Verify Round 4 and campaign close
+        run: |
+          python -B -m proof_engine_pilot.cross_repo_campaign_close_cli verify
+          python -B -m proof_engine_pilot.cross_repo_campaign_close_cli summary
+          python -B -m proof_engine_pilot.cross_repo_campaign_close_cli evaluation > /tmp/proof-engine-cross-repo-evaluation.json
+          python -B -m proof_engine_pilot.cross_repo_campaign_close_cli report-template-design > /tmp/proof-engine-report-template-design.json
       - name: Run focused tests
         run: |
           python -B -m unittest discover -s tests -p 'test_proof_engine_pilot.py' -v
@@ -144,5 +152,6 @@ jobs:
           python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_validation.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_review.py' -v
           python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_review_round3.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_cross_repo_campaign_close.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
