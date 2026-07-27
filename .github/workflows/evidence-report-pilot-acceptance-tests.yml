@@ -1,0 +1,74 @@
+name: Evidence Report Pilot Acceptance Tests
+
+on:
+  pull_request:
+    paths:
+      - "proof_engine_pilot/report_pilot_acceptance.py"
+      - "proof_engine_pilot/report_pilot_acceptance_cli.py"
+      - "proof_engine_pilot/pilot_acceptance_reviews/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_pilot_acceptance_checkpoint_0018.json"
+      - "tests/test_proof_engine_report_pilot_acceptance.py"
+      - ".github/workflows/evidence-report-pilot-acceptance-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "proof_engine_pilot/report_pilot_acceptance.py"
+      - "proof_engine_pilot/report_pilot_acceptance_cli.py"
+      - "proof_engine_pilot/pilot_acceptance_reviews/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_pilot_acceptance_checkpoint_0018.json"
+      - "tests/test_proof_engine_report_pilot_acceptance.py"
+      - ".github/workflows/evidence-report-pilot-acceptance-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify source pilot package
+        run: python -B -m proof_engine_pilot.report_pilot_package_cli verify
+      - name: Verify internal package acceptance
+        run: |
+          python -B -m proof_engine_pilot.report_pilot_acceptance_cli verify
+          python -B -m proof_engine_pilot.report_pilot_acceptance_cli decision > /tmp/acceptance-decision.json
+          python -B -m proof_engine_pilot.report_pilot_acceptance_cli summary > /tmp/acceptance-summary.json
+          python -B -m proof_engine_pilot.report_pilot_acceptance_cli render-markdown --output /tmp/acceptance-review.md
+      - name: Verify accepted state and closed authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          decision = json.loads(Path('/tmp/acceptance-decision.json').read_text(encoding='utf-8'))
+          summary = json.loads(Path('/tmp/acceptance-summary.json').read_text(encoding='utf-8'))
+          markdown = Path('/tmp/acceptance-review.md').read_text(encoding='utf-8')
+          assert decision['decision'] == 'ACCEPT_PILOT_PACKAGE'
+          assert decision['package_accepted'] is True
+          assert len(decision['criteria_results']) == 15
+          assert all(item['result'] == 'PASS' for item in decision['criteria_results'])
+          assert summary['state'] == 'INTERNAL_PILOT_PACKAGE_ACCEPTED'
+          assert summary['next_gate'] == 'HUMAN_INTERNAL_OPERATIONAL_VALIDATION_PLAN_REVIEW_REQUIRED'
+          assert summary['counts']['criteria_passed'] == 15
+          for field in (
+              'pricing_authorized',
+              'outreach_authorized',
+              'contract_authorized',
+              'delivery_authorized',
+              'publication_authorized',
+              'external_execution_authorized',
+              'automatic_approval_authorized',
+              'automatic_rewrite_authorized',
+              'target_repository_write_authorized',
+          ):
+              assert decision[field] is False
+          assert 'Package accepted for internal single-case use: true' in markdown
+          PY
+      - name: Run focused tests
+        run: |
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_pilot_package.py' -v
+          python -B -m unittest discover -s tests -p 'test_proof_engine_report_pilot_acceptance.py' -v

@@ -1,0 +1,189 @@
+{
+  "acceptance_scope": "INTERNAL_SINGLE_CASE_PACKAGE_ONLY",
+  "authority_boundary_confirmed": true,
+  "automatic_approval_authorized": false,
+  "automatic_rewrite_authorized": false,
+  "contract_authorized": false,
+  "criteria_results": [
+    {
+      "criterion_id": "ACC-001",
+      "evidence": [
+        "d16beab6d22251459839a6038f6174bc1f3e3d24ee7d600e34a3fb7906c40ce0",
+        "a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc",
+        "e30a88388bfeae449e753df624d6b699404a687bae06fec54d619ab73dd5af2e"
+      ],
+      "note": "The package binds the canonical public repository, fixed source report fingerprint, and read-only source mode.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-002",
+      "evidence": [
+        "4ee9f727bbc20627dbe18221b43445defff169b285b3514db5e8f5da999ca1d1",
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41"
+      ],
+      "note": "All six achievement records cite only the seven eligible merged PRs; excluded PRs #17 and #18 support no completed-achievement claim.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-003",
+      "evidence": [
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+        "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e"
+      ],
+      "note": "The deterministic JSON and reader-facing Markdown render all nine required sections in order.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-004",
+      "evidence": [
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+        "4ee9f727bbc20627dbe18221b43445defff169b285b3514db5e8f5da999ca1d1"
+      ],
+      "note": "Each effective achievement record contains reader, evidence, contribution, and lineage fields required by the product contract.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-005",
+      "evidence": [
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+        "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e"
+      ],
+      "note": "All positive claims are paired with exact PR references and factuality boundaries that state what is not established.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-006",
+      "evidence": [
+        "4ee9f727bbc20627dbe18221b43445defff169b285b3514db5e8f5da999ca1d1",
+        "a644d21ccf98cbdadf810c2e5294776d22376995a69c5abd76b29e4066e864dc"
+      ],
+      "note": "The selected source report contains zero withheld claims, and the package preserves that exact zero-count inventory without silent deletion.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-007",
+      "evidence": [
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+        "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e"
+      ],
+      "note": "Human goals and approvals remain separate from AI-tool implementation and verification support for every achievement record.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-008",
+      "evidence": [
+        "d16beab6d22251459839a6038f6174bc1f3e3d24ee7d600e34a3fb7906c40ce0",
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41"
+      ],
+      "note": "The selected source is public and read-only; no private-repository payload or widened source mode is present.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-009",
+      "evidence": [
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+        "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e"
+      ],
+      "note": "The reviewed artifacts contain no credentials, customer payload, or prohibited third-party personal data.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-010",
+      "evidence": [
+        "d751596c9ff0d70b8bd07536be09191dd3cb274e24e7c6ec1885df3f3c135a42",
+        "9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a"
+      ],
+      "note": "Independent regeneration produces the bound JSON, Markdown, inventory, packet, verification, index, and summary fingerprints.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-011",
+      "evidence": [
+        "e30a88388bfeae449e753df624d6b699404a687bae06fec54d619ab73dd5af2e",
+        "64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70"
+      ],
+      "note": "The package and this acceptance decision do not manufacture pricing, outreach, contracting, delivery, publication, or external execution authority.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-012",
+      "evidence": [
+        "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e",
+        "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41"
+      ],
+      "note": "The Markdown exposes verified value, evidence strength, limitations, contribution boundaries, unsupported-claim status, and the human decision gate without repository-history reading.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-013",
+      "evidence": [
+        "d751596c9ff0d70b8bd07536be09191dd3cb274e24e7c6ec1885df3f3c135a42",
+        "64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70"
+      ],
+      "note": "Unknown fields, source substitution, missing criteria, authority widening, manufactured acceptance, and external-action checkpoints are covered by fail-closed verification tests.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-014",
+      "evidence": [
+        "9bb6c0505a6eb39aa0f03ff15077b230576d99e87359c7423d9875f752583cc2",
+        "64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70"
+      ],
+      "note": "The rollback record freezes the package while preserving prior template, specification, evidence, and review records without mutation.",
+      "result": "PASS"
+    },
+    {
+      "criterion_id": "ACC-015",
+      "evidence": [
+        "e30a88388bfeae449e753df624d6b699404a687bae06fec54d619ab73dd5af2e",
+        "64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70"
+      ],
+      "note": "Acceptance is limited to one internal package; pricing, sales, contracting, delivery, publication, customer intake, and target-repository writes remain outside scope.",
+      "result": "PASS"
+    }
+  ],
+  "decision": "ACCEPT_PILOT_PACKAGE",
+  "decision_fingerprint": "81af71220d7d93b47fd349b3c51912ac27e4d223500632ca86df5358a803b84a",
+  "decision_id": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-ACCEPTANCE-DECISION-0001",
+  "delegated_review": {
+    "decision_origin": "AI_REVIEW_UNDER_EXPLICIT_HUMAN_CONTINUE_AUTHORIZATION",
+    "role": "DELEGATED_POST_BUILD_PACKAGE_REVIEWER",
+    "type": "AI_ASSISTANT"
+  },
+  "delivery_authorized": false,
+  "external_execution_authorized": false,
+  "human_authorization": {
+    "identity": "nobutakayamauchi",
+    "identity_source": "CURRENT_CHAT_EXPLICIT_CONTINUE_INSTRUCTION",
+    "instruction": "続ける",
+    "role": "PROJECT_OWNER",
+    "type": "HUMAN"
+  },
+  "outreach_authorized": false,
+  "package_accepted": true,
+  "pricing_authorized": false,
+  "privacy_confirmed": true,
+  "publication_authorized": false,
+  "reviewed_acceptance_contract_fingerprint": "d8269e54f35946f750bf07a942c0587530cbdb45d9b47f54d15f936ba07755f9",
+  "reviewed_acceptance_packet_fingerprint": "f1a4e4024d831f4fa22ccd12a70244c87641fba2fe4e0ab29914b3aa96d71895",
+  "reviewed_evidence_inventory_fingerprint": "4ee9f727bbc20627dbe18221b43445defff169b285b3514db5e8f5da999ca1d1",
+  "reviewed_package_checkpoint_fingerprint": "64906aceb1c40a363438696709ee02ba658d278bfb2ee45112c201f10f569a70",
+  "reviewed_package_fingerprint": "9eced7c395949cb96b20092b2b9ce7a9a25ae70352c0f09e782aa6d8cfdef20a",
+  "reviewed_package_manifest_fingerprint": "e30a88388bfeae449e753df624d6b699404a687bae06fec54d619ab73dd5af2e",
+  "reviewed_report_json_fingerprint": "60c4760c446f90277a4db49e99cedbbc51ef5d1889c3c458cdf0e624bf22bc41",
+  "reviewed_report_markdown_fingerprint": "5130e58f79d271a6d6172acf853273f206ec0882dd9a16c599b1651f4dda7c5e",
+  "reviewed_verification_summary_fingerprint": "d751596c9ff0d70b8bd07536be09191dd3cb274e24e7c6ec1885df3f3c135a42",
+  "reviewer_identity": "nobutakayamauchi",
+  "schema_version": "PROOF-ENGINE-EVIDENCE-REPORT-PILOT-PACKAGE-ACCEPTANCE-DECISION-V1",
+  "target_repository_write_authorized": false,
+  "terminal": {
+    "contract_status": "NOT_STARTED",
+    "delivery_status": "NOT_DELIVERED",
+    "next_action": "Define one bounded internal operational validation plan for a second approved public case, then stop before pricing, outreach, contracting, delivery, or publication.",
+    "next_gate": "HUMAN_INTERNAL_OPERATIONAL_VALIDATION_PLAN_REVIEW_REQUIRED",
+    "outreach_status": "NOT_STARTED",
+    "pricing_status": "NOT_PRICED",
+    "publication_status": "NOT_PUBLISHED",
+    "state": "INTERNAL_PILOT_PACKAGE_ACCEPTED"
+  }
+}
