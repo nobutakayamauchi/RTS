@@ -5,17 +5,18 @@ import json
 from pathlib import Path
 
 from .core import ProofEngineError
-from .report_productization_spec import verify_internal_productization_spec
+from .report_productization_spec_v2 import verify_internal_productization_spec
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Verify the internal evidence-report product specification"
+        description="Verify the corrected internal evidence-report product specification"
     )
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("verify")
     sub.add_parser("summary")
     sub.add_parser("spec")
+    sub.add_parser("pre-build")
     sub.add_parser("acceptance")
     sub.add_parser("review-template")
     render = sub.add_parser("render-markdown")
@@ -35,11 +36,13 @@ def main(argv=None) -> int:
     try:
         bundle = verify_internal_productization_spec()
         if args.command == "verify":
-            print("Evidence report internal product specification passed")
+            print("Corrected evidence report internal product specification passed")
         elif args.command == "summary":
             print(json.dumps(bundle["summary"], ensure_ascii=False, sort_keys=True, indent=2))
         elif args.command == "spec":
             print(json.dumps(bundle["spec"], ensure_ascii=False, sort_keys=True, indent=2))
+        elif args.command == "pre-build":
+            print(json.dumps(bundle["pre_build"], ensure_ascii=False, sort_keys=True, indent=2))
         elif args.command == "acceptance":
             print(json.dumps(bundle["acceptance"], ensure_ascii=False, sort_keys=True, indent=2))
         elif args.command == "review-template":
@@ -47,7 +50,7 @@ def main(argv=None) -> int:
         else:
             _write_or_print(bundle["markdown"] + "\n", args.output)
     except ProofEngineError as exc:
-        print(f"evidence report internal product specification failed closed: {exc}")
+        print(f"corrected evidence report internal product specification failed closed: {exc}")
         return 1
     return 0
 
