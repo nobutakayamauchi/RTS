@@ -1,0 +1,36 @@
+name: Pilot Package Fingerprint Probe
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/pilot-package-fingerprint-probe.yml"
+      - "proof_engine_pilot/report_productization_spec_v2.py"
+      - "proof_engine_pilot/report_productization_spec_cli.py"
+      - "proof_engine_pilot/report_pilot_package.py"
+      - "proof_engine_pilot/report_pilot_package_cli.py"
+      - "proof_engine_pilot/productization_specs/round_0001/**"
+      - "proof_engine_pilot/pilot_packages/round_0001/**"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_internal_product_spec_checkpoint_0016_r1.json"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate deterministic package fingerprints
+        run: |
+          python -B -m proof_engine_pilot.report_productization_spec_cli verify
+          python -B -m proof_engine_pilot.report_pilot_package_cli build-summary > /tmp/pilot-package-fingerprints.json
+          cat /tmp/pilot-package-fingerprints.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot-package-fingerprints
+          path: /tmp/pilot-package-fingerprints.json
+          if-no-files-found: error
