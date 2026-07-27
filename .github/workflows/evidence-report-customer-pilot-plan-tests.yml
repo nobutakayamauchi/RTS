@@ -1,0 +1,58 @@
+name: Evidence Report Customer Pilot Plan Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-customer-pilot-plan-tests.yml"
+      - "docs/status/RTS_CURRENT_POSITION.md"
+      - "docs/status/RTS_CURRENT_POSITION_PILOT_PLAN.json"
+      - "proof_engine_pilot/product_readiness/round_0006/**"
+      - "proof_engine_pilot/report_customer_pilot_plan.py"
+      - "proof_engine_pilot/report_customer_pilot_plan_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/evidence_report_customer_pilot_plan_checkpoint_0027.json"
+      - "tests/test_proof_engine_report_customer_pilot_plan.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify bounded customer-pilot plan
+        run: python -B -m proof_engine_pilot.report_customer_pilot_plan_cli verify
+      - name: Verify position and authority boundary
+        run: |
+          python -B -m proof_engine_pilot.report_customer_pilot_plan_cli summary > /tmp/pilot-plan-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/pilot-plan-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_BOUNDED_CUSTOMER_PILOT_PLAN_REVIEW_COMPLETE'
+          assert value['next_gate'] == 'HUMAN_BOUNDED_CUSTOMER_PILOT_EXECUTION_AUTHORIZATION_REQUIRED'
+          assert value['rts_overall_planning_estimate_percent'] == 77
+          assert value['short_term_internal_hardening_percent'] == 100
+          assert value['product_readiness_score'] == 93
+          assert value['product_readiness_score_change'] == 0
+          assert value['participant_limit'] == 1
+          assert value['repository_limit'] == 1
+          assert value['cycle_limit'] == 1
+          assert value['public_repository_only'] is True
+          assert value['real_participant_selected'] is False
+          assert value['participant_contact_performed'] is False
+          assert value['customer_intake_performed'] is False
+          assert value['customer_pilot_performed'] is False
+          assert value['customer_pilot_execution_authorized'] is False
+          assert value['pricing_authorized'] is False
+          assert value['outreach_authorized'] is False
+          assert value['contract_authorized'] is False
+          assert value['delivery_authorized'] is False
+          assert value['publication_authorized'] is False
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_customer_pilot_plan.py' -v
