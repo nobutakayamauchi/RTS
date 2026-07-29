@@ -1,0 +1,66 @@
+name: Evidence Report P2 Public Evidence Shell Unlock Tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/evidence-report-p2-public-evidence-shell-unlock-tests.yml"
+      - "docs/status/RTS_CURRENT_POSITION.md"
+      - "docs/status/RTS_CURRENT_POSITION_P2_PUBLIC_SHELL_PLAN.json"
+      - "proof_engine_pilot/product_readiness/round_0011/**"
+      - "proof_engine_pilot/report_p2_public_evidence_shell_unlock.py"
+      - "proof_engine_pilot/report_p2_public_evidence_shell_unlock_cli.py"
+      - "pilot_runs/reconnect_pilot_p3/p2_public_evidence_shell_unlock_checkpoint_0032.json"
+      - "tests/test_proof_engine_report_p2_public_evidence_shell_unlock.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify bound source surfaces and prior response wait
+        run: |
+          python -B -c "from proof_engine_pilot.report_p2_public_evidence_shell_unlock import verify_bound_sources,verify_prior_wait_state; print(verify_bound_sources()); print(verify_prior_wait_state())"
+      - name: Verify P2 unlock contract and approved P3 output
+        run: |
+          python -B -c "from proof_engine_pilot.report_p2_public_evidence_shell_unlock import verify_contract,verify_binding; verify_contract(); verify_binding(); print('contract-binding-ok')"
+      - name: Verify surface inventory and disclosure policy
+        run: |
+          python -B -c "from proof_engine_pilot.report_p2_public_evidence_shell_unlock import verify_inventory,verify_policy; verify_inventory(); verify_policy(); print('inventory-policy-ok')"
+      - name: Verify architecture, unlock decision, and score hold
+        run: |
+          python -B -c "from proof_engine_pilot.report_p2_public_evidence_shell_unlock import verify_architecture,verify_decision,verify_score_hold; verify_architecture(); verify_decision(); verify_score_hold(); print('architecture-decision-score-ok')"
+      - name: Verify completion, current position, and checkpoint
+        run: |
+          python -B -c "from proof_engine_pilot.report_p2_public_evidence_shell_unlock import verify_completion,verify_progress,verify_checkpoint; verify_completion(); verify_progress(); verify_checkpoint(); print('completion-position-checkpoint-ok')"
+      - name: Verify complete P2 unlock stage
+        run: python -B -m proof_engine_pilot.report_p2_public_evidence_shell_unlock_cli verify
+      - name: Verify closed public and commercial authority
+        run: |
+          python -B -m proof_engine_pilot.report_p2_public_evidence_shell_unlock_cli summary > /tmp/p2-summary.json
+          python - <<'PY'
+          import json
+          value = json.load(open('/tmp/p2-summary.json', encoding='utf-8'))
+          assert value['state'] == 'INTERNAL_P2_PUBLIC_EVIDENCE_SHELL_UNLOCK_AND_PLAN_COMPLETE'
+          assert value['next_gate'] == 'HUMAN_P2_PUBLIC_SHELL_BUILD_AUTHORIZATION_REQUIRED'
+          assert value['rts_overall_planning_estimate_percent'] == 82
+          assert value['short_term_internal_hardening_percent'] == 100
+          assert value['product_readiness_score'] == 93
+          assert value['p2_state'] == 'UNLOCKED_NOT_STARTED'
+          assert value['approved_p3_output_count'] == 6
+          assert value['planned_section_count'] == 5
+          assert value['new_public_document_created'] is False
+          assert value['publication_performed'] is False
+          assert value['root_readme_promotion_performed'] is False
+          assert value['active_contact_entry_performed'] is False
+          assert value['external_wait_state'] == 'HUMAN_ATTESTED_ONE_TIME_OUTREACH_RECORDED'
+          PY
+      - name: Run focused tests
+        run: python -B -m unittest discover -s tests -p 'test_proof_engine_report_p2_public_evidence_shell_unlock.py' -v
