@@ -1,6 +1,12 @@
 name: RTS Shape-Up Inventory Probe
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/maintenance/measure_repository.py
+      - .github/workflows/rts-shapeup-inventory-probe.yml
   push:
     branches:
       - agent/rts-shapeup-inventory-v1
