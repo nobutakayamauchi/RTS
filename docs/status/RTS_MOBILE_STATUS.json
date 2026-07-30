@@ -1,0 +1,53 @@
+{
+  "schema_version": "RTS-MOBILE-STATUS-V1",
+  "projection_id": "RTS-MOBILE-STATUS-0001",
+  "projection_authoritative": false,
+  "source_of_truth": {
+    "path": "docs/status/RTS_CURRENT_POSITION_OUTREACH_WAITING.json",
+    "schema_version": "RTS-CURRENT-POSITION-OUTREACH-WAITING-V1",
+    "map_id": "RTS-CURRENT-POSITION-OUTREACH-WAITING-0001",
+    "map_fingerprint": "3104e170b73c647845b9790ce3e81415cdfd5f86b864784da3d3052af3059108"
+  },
+  "current_position": {
+    "rts_overall_planning_estimate_percent": 81,
+    "short_term_internal_hardening_percent": 100,
+    "product_readiness_score": 93,
+    "current_state": "HUMAN_ATTESTED_ONE_TIME_OUTREACH_RECORDED",
+    "current_step": "WAIT_FOR_HUMAN_REPORTED_RESPONSE_WITHOUT_FOLLOW_UP",
+    "next_gate": "HUMAN_RESPONSE_EVENT_OR_NO_RESPONSE_WINDOW_EXPIRY_REQUIRED",
+    "wait_window_expiry_local": "2026-08-12T15:48:19+09:00",
+    "wip_limit": 1
+  },
+  "operator_view": {
+    "allowed_now": [
+      "READ_ONLY_INSPECTION",
+      "WAIT_WITHOUT_FOLLOW_UP"
+    ],
+    "conditional_human_action": [
+      "REPORT_A_RESPONSE_EVENT_IF_ONE_ACTUALLY_OCCURS",
+      "REVIEW_THE_NO_RESPONSE_WINDOW_AFTER_EXPIRY"
+    ],
+    "prohibited_now": [
+      "ADDITIONAL_OUTREACH",
+      "FOLLOW_UP_CONTACT",
+      "AUTOMATIC_REPLY_MONITORING",
+      "READ_RECEIPT_INFERENCE",
+      "AUTOMATIC_CONSENT",
+      "CUSTOMER_INTAKE",
+      "ANALYSIS_START",
+      "CUSTOMER_PILOT_EXECUTION",
+      "PRICING",
+      "CONTRACTING",
+      "DELIVERY",
+      "PUBLICATION",
+      "EXTERNAL_EXECUTION",
+      "SOURCE_REPOSITORY_WRITE",
+      "TARGET_REPOSITORY_WRITE"
+    ]
+  },
+  "refresh_policy": {
+    "regenerate_when_source_of_truth_changes": true,
+    "fail_closed_on_schema_mismatch": true,
+    "obsidian_copy_is_cache_only": true
+  }
+}
