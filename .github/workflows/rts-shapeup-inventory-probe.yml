@@ -21,6 +21,8 @@ permissions:
 jobs:
   inventory:
     runs-on: ubuntu-latest
+    env:
+      BASELINE_COMMIT: ${{ github.event.pull_request.base.sha || github.sha }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
             --root . \
             --json /tmp/rts-shapeup/RTS_REPOSITORY_INVENTORY_V1.json \
             --markdown /tmp/rts-shapeup/RTS_REPOSITORY_INVENTORY_V1.md \
-            --commit "${GITHUB_SHA}" \
+            --commit "${BASELINE_COMMIT}" \
             --exclude scripts/maintenance/measure_repository.py \
             --exclude .github/workflows/rts-shapeup-inventory-probe.yml
 
