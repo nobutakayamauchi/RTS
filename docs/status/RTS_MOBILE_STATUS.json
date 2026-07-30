@@ -1,0 +1,79 @@
+{
+  "schema_version": "RTS-MOBILE-STATUS-V1",
+  "status_id": "RTS-MOBILE-STATUS-0001",
+  "snapshot_mode": "MANUAL_COMMIT_BOUND",
+  "updated_at": "2026-07-30T11:39:00+09:00",
+  "source": {
+    "path": "docs/status/RTS_CURRENT_POSITION_OUTREACH_WAITING.json",
+    "schema_version": "RTS-CURRENT-POSITION-OUTREACH-WAITING-V1",
+    "map_fingerprint": "3104e170b73c647845b9790ce3e81415cdfd5f86b864784da3d3052af3059108",
+    "current_state": "HUMAN_ATTESTED_ONE_TIME_OUTREACH_RECORDED"
+  },
+  "display": {
+    "rts_overall_planning_estimate_percent": 81,
+    "short_term_internal_hardening_percent": 100,
+    "product_readiness_score": 93,
+    "current_state": "HUMAN_ATTESTED_ONE_TIME_OUTREACH_RECORDED",
+    "current_step": "WAIT_FOR_HUMAN_REPORTED_RESPONSE_WITHOUT_FOLLOW_UP",
+    "next_gate": "HUMAN_RESPONSE_EVENT_OR_NO_RESPONSE_WINDOW_EXPIRY_REQUIRED",
+    "selected_repository": "jbexta/AgentPilot",
+    "outreach_route": "DISCORD_DM",
+    "message_send_event_count": 1,
+    "follow_up_event_count": 0,
+    "response_event_count": 0,
+    "wait_window_expiry_local": "2026-08-12T15:48:19+09:00"
+  },
+  "next_human_action": {
+    "action": "WAIT_FOR_REPORTED_RESPONSE_OR_WINDOW_EXPIRY",
+    "due_at": "2026-08-12T15:48:19+09:00",
+    "allowed_now": [
+      "READ_CURRENT_STATUS",
+      "REPORT_A_RESPONSE_EVENT_TO_A_HUMAN_REVIEW_STEP",
+      "KEEP_UNRELATED_PRIVATE_NOTES_IN_OBSIDIAN"
+    ],
+    "blocked": [
+      "SEND_FOLLOW_UP",
+      "AUTO_MONITOR_DISCORD",
+      "ASSUME_READ_RECEIPT",
+      "ASSUME_CONSENT",
+      "START_CUSTOMER_INTAKE",
+      "START_ANALYSIS",
+      "START_PILOT_EXECUTION",
+      "PRICE_OR_CONTRACT",
+      "DELIVER_OR_PUBLISH",
+      "WRITE_TO_SOURCE_OR_TARGET_REPOSITORIES"
+    ]
+  },
+  "authority": {
+    "additional_outreach_authorized": false,
+    "follow_up_authorized": false,
+    "automatic_monitoring_authorized": false,
+    "customer_intake_authorized": false,
+    "analysis_authorized": false,
+    "customer_pilot_execution_authorized": false,
+    "pricing_authorized": false,
+    "contract_authorized": false,
+    "delivery_authorized": false,
+    "publication_authorized": false,
+    "external_execution_authorized": false,
+    "source_repository_write_authorized": false,
+    "target_repository_write_authorized": false
+  },
+  "refresh_policy": {
+    "background_refresh": false,
+    "refresh_required_on": [
+      "GOVERNED_STATE_CHANGE",
+      "HUMAN_REPORTED_RESPONSE",
+      "WAIT_WINDOW_EXPIRY",
+      "AUTHORITY_CHANGE",
+      "SOURCE_FINGERPRINT_CHANGE"
+    ],
+    "fail_closed_when": [
+      "SOURCE_FILE_UNAVAILABLE",
+      "SOURCE_FINGERPRINT_MISSING",
+      "SOURCE_STATE_MISMATCH",
+      "WAIT_WINDOW_EXPIRED_WITHOUT_REFRESH"
+    ]
+  },
+  "interpretation": "MOBILE_READ_ONLY_RESUME_SNAPSHOT_ONLY_NOT_EXECUTION_APPROVAL_CONSENT_CUSTOMER_INTAKE_ANALYSIS_DELIVERY_OR_PUBLICATION_AUTHORITY"
+}
