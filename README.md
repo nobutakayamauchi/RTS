@@ -87,6 +87,24 @@ The system guarantees reconstructability of structure.
 
 ---
 
+## Mandatory Pre-Execution Boundary
+
+For untrusted input, paid resources, external mutation, publication, or other consequential execution, RTS records and implementations must preserve this order:
+
+```text
+Security Gate
+→ Cost / Consequence Gate
+→ Explicit Single-Use Approval
+→ Scoped Execution
+→ Outcome Verification + Audit
+```
+
+Security inspection comes first. Cost is not calculated and execution is not authorized until the exact input has passed the implemented security controls. Approval is bound to the inspected content hash, parameters, provider, ceiling, and one execution only.
+
+See [Security → Cost → Approval → Execution Gate](docs/rulebook/SECURITY_COST_APPROVAL_GATES.md).
+
+---
+
 ## Extensions (Optional Layers)
 
 The following components extend the core.
@@ -142,6 +160,7 @@ RTS is a **structural ledger**.
 - Technical Overview → `docs/technical_overview.md`
 - Genesis / History → `docs/genesis/`
 - Rulebook → `docs/rulebook/`
+- Pre-execution gates → `docs/rulebook/SECURITY_COST_APPROVAL_GATES.md`
 
 ---
 
