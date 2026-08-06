@@ -62,24 +62,48 @@ def parse_frontmatter(text: str) -> tuple[dict[str, Any], str, bool]:
     return data, text[end + 5 :], True
 
 
+def _contains_any(text: str, words: tuple[str, ...]) -> bool:
+    lowered = text.lower()
+    return any(word.lower() in lowered for word in words)
+
+
 def _type(frontmatter: dict[str, Any], source_path: str, body: str) -> tuple[str, float]:
     explicit = str(frontmatter.get("knowledge_type", frontmatter.get("type", ""))).lower()
     allowed = {"problem", "decision", "spec", "test", "pattern", "project_context", "evidence", "idea", "archive"}
     if explicit in allowed:
         return explicit, 1.0
-    hint = f"{source_path}\n{body[:1000]}".lower()
-    rules = (
-        ("test", ("test", "acceptance criteria", "検証", "テスト")),
-        ("spec", ("spec", "仕様", "要件")),
-        ("decision", ("decision", "採用", "決定")),
-        ("problem", ("problem", "課題", "不具合", "bug")),
-        ("evidence", ("evidence", "証拠", "log", "ログ")),
-        ("pattern", ("pattern", "共通", "再利用")),
-        ("project_context", ("project", "プロジェクト", "進捗")),
+
+    # Content is evidence. Folder names are only weak hints and must never
+    # override a clear statement in the note itself.
+    body_rules = (
+        ("decision", ("decision", "採用", "決定", "選定", "却下")),
+        ("test", ("test", "acceptance criteria", "検証", "テスト", "合格条件")),
+        ("spec", ("spec", "仕様", "要件", "shall", "must")),
+        ("problem", ("problem", "課題", "不具合", "bug", "困っている")),
+        ("evidence", ("evidence", "証拠", "log", "ログ", "実行結果")),
+        ("pattern", ("pattern", "共通", "再利用", "傾向")),
+        ("project_context", ("project", "プロジェクト", "進捗", "現在地")),
     )
-    for kind, words in rules:
-        if any(word in hint for word in words):
-            return kind, 0.72
+    body_sample = body[:4000]
+    for kind, words in body_rules:
+        if _contains_any(body_sample, words):
+            return kind, 0.78
+
+    # Path is deliberately lower-confidence fallback information.
+    path = source_path.lower()
+    path_rules = (
+        ("test", ("/tests/", "test", "検証")),
+        ("spec", ("/specs/", "spec", "仕様")),
+        ("decision", ("/decisions/", "decision", "決定")),
+        ("problem", ("/problems/", "problem", "課題")),
+        ("evidence", ("/evidence/", "evidence", "証拠")),
+        ("pattern", ("/patterns/", "pattern", "共通")),
+        ("project_context", ("/projects/", "project", "進捗")),
+    )
+    padded_path = f"/{path.lstrip('/')}"
+    for kind, words in path_rules:
+        if _contains_any(padded_path, words):
+            return kind, 0.5
     return "idea", 0.4
 
 
