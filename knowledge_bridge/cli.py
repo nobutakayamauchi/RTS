@@ -6,7 +6,9 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .capture_store import CaptureStore
+from .challenge import challenge_record
 from .config import BridgeConfig, load_config
+from .connect import connect_record
 from .intake import iter_notes
 from .normalize import normalize_capture
 
@@ -51,22 +53,48 @@ def normalize(args: argparse.Namespace) -> int:
     return 0
 
 
+def connect(args: argparse.Namespace) -> int:
+    config = _config(args)
+    records = connect_record(config.state_path, args.knowledge)
+    print(json.dumps([asdict(item) for item in records], ensure_ascii=False, indent=2))
+    return 0
+
+
+def challenge(args: argparse.Namespace) -> int:
+    config = _config(args)
+    result = challenge_record(config.state_path, args.knowledge)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0 if result.promotion_ready else 2
+
+
+def _common(command: argparse.ArgumentParser) -> None:
+    command.add_argument("--vault")
+    command.add_argument("--state", default=".rts/knowledge_bridge")
+    command.add_argument("--config")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="RTS Obsidian knowledge bridge")
     sub = parser.add_subparsers(dest="command", required=True)
     for name, handler in (("scan", scan), ("verify", verify)):
         command = sub.add_parser(name)
-        command.add_argument("--vault")
-        command.add_argument("--state", default=".rts/knowledge_bridge")
-        command.add_argument("--config")
+        _common(command)
         command.set_defaults(handler=handler)
 
     command = sub.add_parser("normalize")
     command.add_argument("--capture", required=True)
-    command.add_argument("--vault")
-    command.add_argument("--state", default=".rts/knowledge_bridge")
-    command.add_argument("--config")
+    _common(command)
     command.set_defaults(handler=normalize)
+
+    command = sub.add_parser("connect")
+    command.add_argument("--knowledge", required=True)
+    _common(command)
+    command.set_defaults(handler=connect)
+
+    command = sub.add_parser("challenge")
+    command.add_argument("--knowledge", required=True)
+    _common(command)
+    command.set_defaults(handler=challenge)
     return parser
 
 
