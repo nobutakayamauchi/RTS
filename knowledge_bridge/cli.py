@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import asdict
 from pathlib import Path
 
 from .capture_store import CaptureStore
 from .config import BridgeConfig, load_config
 from .intake import iter_notes
+from .normalize import normalize_capture
 
 
 def _config(args: argparse.Namespace) -> BridgeConfig:
@@ -42,6 +44,13 @@ def verify(args: argparse.Namespace) -> int:
     return 1 if errors else 0
 
 
+def normalize(args: argparse.Namespace) -> int:
+    config = _config(args)
+    record = normalize_capture(config.state_path, args.capture)
+    print(json.dumps(asdict(record), ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="RTS Obsidian knowledge bridge")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -51,6 +60,13 @@ def build_parser() -> argparse.ArgumentParser:
         command.add_argument("--state", default=".rts/knowledge_bridge")
         command.add_argument("--config")
         command.set_defaults(handler=handler)
+
+    command = sub.add_parser("normalize")
+    command.add_argument("--capture", required=True)
+    command.add_argument("--vault")
+    command.add_argument("--state", default=".rts/knowledge_bridge")
+    command.add_argument("--config")
+    command.set_defaults(handler=normalize)
     return parser
 
 
