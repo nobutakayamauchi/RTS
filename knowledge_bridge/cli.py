@@ -9,6 +9,7 @@ from .capture_store import CaptureStore
 from .challenge import challenge_record
 from .config import BridgeConfig, load_config
 from .connect import connect_record
+from .freezer_export import export_freezer_draft
 from .intake import iter_notes
 from .normalize import normalize_capture
 from .recall import SUPPORTED_EVENTS, recall_event
@@ -83,6 +84,13 @@ def recall(args: argparse.Namespace) -> int:
     return 0
 
 
+def export_freezer(args: argparse.Namespace) -> int:
+    config = _config(args)
+    result = export_freezer_draft(config.state_path, args.knowledge, args.output)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -114,6 +122,12 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--threshold", type=float, default=0.45)
     _common(command)
     command.set_defaults(handler=recall)
+
+    command = sub.add_parser("export-freezer")
+    command.add_argument("--knowledge", required=True)
+    command.add_argument("--output", required=True)
+    _common(command)
+    command.set_defaults(handler=export_freezer)
     return parser
 
 
