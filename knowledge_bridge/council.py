@@ -6,6 +6,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from .candidate_compare import compare_candidates
+
 
 @dataclass(frozen=True)
 class MissingPart:
@@ -19,9 +21,11 @@ class CouncilReport:
     knowledge_id: str
     recommendation: str
     confidence: float
+    implementation_strategy: str
     codebase_files_considered: int
     freezer_items_considered: int
     insertion_candidates: tuple[str, ...]
+    candidate_comparison: tuple[str, ...]
     test_candidates: tuple[str, ...]
     reference_candidates: tuple[str, ...]
     related_freezer_items: tuple[str, ...]
@@ -102,7 +106,6 @@ def _symbols(path: Path, content: str) -> list[str]:
 
 
 def _candidate_role(path: Path, relative: str) -> str:
-    lowered = relative.lower()
     parts = {part.lower() for part in path.parts}
     if path.suffix.lower() in {".md", ".json", ".yaml", ".yml", ".toml"}:
         return "reference"
@@ -235,6 +238,9 @@ def analyze_implementation_council(
     if insertion and not tests:
         missing.append(MissingPart("recommended", "regression_target", "An implementation boundary was found, but no matching regression-test location was identified."))
 
+    blocking_names = [part.name for part in missing if part.category == "blocking"]
+    implementation_strategy, candidate_comparison = compare_candidates(insertion, tests, blocking_names)
+
     if blocking:
         recommendation = "APPROVE_AFTER_FOUNDATION"
         confidence = 0.9
@@ -251,6 +257,7 @@ def analyze_implementation_council(
         f"{len(tests)} regression-test candidate(s) were found.",
         f"{len(references)} design/reference candidate(s) were separated from executable boundaries.",
         f"{len(related)} related FREEZER item(s) were found.",
+        f"Implementation strategy: {implementation_strategy}.",
     ]
     if dependencies:
         reasons_for.append(f"Declared dependencies: {', '.join(str(item) for item in dependencies)}")
@@ -271,15 +278,18 @@ def analyze_implementation_council(
         "Should this be implemented alone, bundled, or held until its foundation exists?",
         "Does the highest-ranked executable boundary preserve current module responsibilities?",
         "Do the proposed regression targets cover the expected side effects?",
+        "Is reusing the primary boundary cleaner than creating a new module?",
     ]
 
     result = CouncilReport(
         knowledge_id=knowledge_id,
         recommendation=recommendation,
         confidence=confidence,
+        implementation_strategy=implementation_strategy,
         codebase_files_considered=len(files),
         freezer_items_considered=len(freezer),
         insertion_candidates=tuple(insertion),
+        candidate_comparison=tuple(candidate_comparison),
         test_candidates=tuple(tests),
         reference_candidates=tuple(references),
         related_freezer_items=tuple(related),
@@ -300,10 +310,11 @@ def analyze_implementation_council(
 def _markdown(report: CouncilReport) -> str:
     missing = "\n".join(f"- **{item.category} / {item.name}**: {item.reason}" for item in report.missing_parts) or "- None detected"
     insertion = "\n".join(f"- `{item}`" for item in report.insertion_candidates) or "- No executable candidate"
+    comparison = "\n".join(f"- `{item}`" for item in report.candidate_comparison) or "- No executable candidates to compare"
     tests = "\n".join(f"- `{item}`" for item in report.test_candidates) or "- No matching regression target"
     references = "\n".join(f"- `{item}`" for item in report.reference_candidates) or "- None detected"
     related = "\n".join(f"- `{item}`" for item in report.related_freezer_items) or "- None detected"
     reasons = "\n".join(f"- {item}" for item in report.reasons_for)
     opposing = "\n".join(f"- {item}" for item in report.opposing_view)
     questions = "\n".join(f"- {item}" for item in report.human_questions)
-    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Executable insertion candidates\n\n{insertion}\n\n## Regression-test candidates\n\n{tests}\n\n## Design and reference evidence\n\n{references}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
+    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nImplementation strategy: **{report.implementation_strategy}**\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Executable insertion candidates\n\n{insertion}\n\n## Candidate comparison\n\n{comparison}\n\n## Regression-test candidates\n\n{tests}\n\n## Design and reference evidence\n\n{references}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
