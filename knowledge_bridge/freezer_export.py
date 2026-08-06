@@ -142,12 +142,16 @@ def export_freezer_draft(
     record = _load_record(root, knowledge_id)
     metadata = record.get("frontmatter", {})
 
-    route = route_record(root, knowledge_id)
-    if route.destination != "freezer":
-        raise PermissionError(f"record is routed to {route.destination}, not freezer")
+    # Challenge must run before routing. Routing depends on the persisted
+    # promotion_ready result; routing first incorrectly sends otherwise valid
+    # records to recall because no challenge result exists yet.
     challenge = challenge_record(root, knowledge_id)
     if not challenge.promotion_ready:
         raise PermissionError("record has not passed the Devil's Advocate gate")
+
+    route = route_record(root, knowledge_id)
+    if route.destination != "freezer":
+        raise PermissionError(f"record is routed to {route.destination}, not freezer")
     if record.get("sensitivity") in {"personal", "restricted"}:
         raise PermissionError("sensitive records cannot be exported to FREEZER")
 
