@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -37,8 +38,8 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _repo_files(repo_root: Path) -> list[Path]:
-    allowed = {".py", ".json", ".yaml", ".yml", ".toml", ".md"}
-    ignored = {".git", ".venv", "venv", "node_modules", "__pycache__"}
+    allowed = {".py", ".js", ".ts", ".tsx", ".jsx", ".json", ".yaml", ".yml", ".toml", ".md"}
+    ignored = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
     return [
         path
         for path in repo_root.rglob("*")
@@ -69,7 +70,69 @@ def _freezer_items(repo_root: Path) -> list[dict[str, Any]]:
 def _terms(record: dict[str, Any]) -> set[str]:
     values = [record.get("title", ""), record.get("body", ""), *record.get("tags", [])]
     text = " ".join(str(value).lower() for value in values)
-    return {term for term in text.replace("/", " ").replace("_", " ").split() if len(term) >= 3}
+    terms = set(re.findall(r"[a-z0-9][a-z0-9_\-]{2,}|[一-龥ぁ-んァ-ヶー]{2,}", text))
+    for chunk in re.findall(r"[一-龥ぁ-んァ-ヶー]{3,}", text):
+        compact = re.sub(r"[はがをにへとでのだけするしたため方式実装]", "", chunk)
+        for size in (2, 3, 4):
+            terms.update(compact[index : index + size] for index in range(max(0, len(compact) - size + 1)))
+    stop = {"データ", "機能", "実装", "方式", "保存", "する", "ため", "the", "and", "with"}
+    return {term for term in terms if term and term not in stop}
+
+
+def _safe_read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")[:250_000]
+    except OSError:
+        return ""
+
+
+def _symbols(path: Path, content: str) -> list[str]:
+    symbols: list[str] = []
+    if path.suffix == ".py":
+        symbols.extend(re.findall(r"^(?:async\s+)?def\s+([A-Za-z_][A-Za-z0-9_]*)", content, re.MULTILINE))
+        symbols.extend(re.findall(r"^class\s+([A-Za-z_][A-Za-z0-9_]*)", content, re.MULTILINE))
+    elif path.suffix in {".js", ".ts", ".tsx", ".jsx"}:
+        symbols.extend(re.findall(r"(?:function|class)\s+([A-Za-z_$][A-Za-z0-9_$]*)", content))
+        symbols.extend(re.findall(r"(?:const|let)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=", content))
+    elif path.suffix == ".md":
+        symbols.extend(re.findall(r"^#{1,4}\s+(.+)$", content, re.MULTILINE))
+    return symbols[:80]
+
+
+def _insertion_candidates(files: list[Path], repo: Path, record: dict[str, Any], terms: set[str]) -> list[str]:
+    tags = {str(tag).lower() for tag in record.get("tags", []) if str(tag).strip()}
+    ranked: list[tuple[float, str]] = []
+    for path in files:
+        relative = str(path.relative_to(repo))
+        lowered_path = relative.lower()
+        content = _safe_read(path)
+        lowered_content = content.lower()
+        symbols = _symbols(path, content)
+        symbol_text = " ".join(symbols).lower()
+
+        path_hits = sorted(term for term in terms | tags if term in lowered_path)
+        symbol_hits = sorted(term for term in terms | tags if term in symbol_text)
+        content_hits = sorted(term for term in terms | tags if term in lowered_content)
+        if not (path_hits or symbol_hits or content_hits):
+            continue
+
+        score = min(0.45, len(path_hits) * 0.18) + min(0.35, len(symbol_hits) * 0.14) + min(0.30, len(content_hits) * 0.04)
+        if path.name in {"cli.py", "route.py", "challenge.py", "freezer_export.py", "council.py"}:
+            score += 0.05
+        matched_symbols = [symbol for symbol in symbols if any(term in symbol.lower() for term in terms | tags)][:3]
+        boundary = ",".join(matched_symbols) if matched_symbols else "module"
+        reasons = []
+        if path_hits:
+            reasons.append("path=" + ",".join(path_hits[:4]))
+        if symbol_hits:
+            reasons.append("symbol=" + ",".join(symbol_hits[:4]))
+        if content_hits:
+            reasons.append("content=" + ",".join(content_hits[:4]))
+        rendered = f"{relative}::{boundary} [score={min(score, 1.0):.2f}; {'; '.join(reasons)}]"
+        ranked.append((score, rendered))
+
+    ranked.sort(key=lambda item: (-item[0], item[1]))
+    return [rendered for _, rendered in ranked[:8]]
 
 
 def analyze_implementation_council(
@@ -93,14 +156,7 @@ def analyze_implementation_council(
     files = _repo_files(repo)
     freezer = _freezer_items(repo)
     terms = _terms(record)
-
-    insertion: list[str] = []
-    for path in files:
-        relative = str(path.relative_to(repo))
-        lowered = relative.lower()
-        if any(term in lowered for term in terms) or any(tag.lower() in lowered for tag in record.get("tags", [])):
-            insertion.append(relative)
-    insertion = sorted(dict.fromkeys(insertion))[:8]
+    insertion = _insertion_candidates(files, repo, record, terms)
 
     related: list[str] = []
     for item in freezer:
@@ -126,23 +182,23 @@ def analyze_implementation_council(
         dependencies = [dependencies]
     blocking = any(part.category == "blocking" for part in missing)
 
+    if not insertion:
+        missing.append(MissingPart("blocking", "insertion_boundary", "No code boundary could be justified from paths, symbols, or source content; architecture clarification is required."))
+        blocking = True
+
     if blocking:
         recommendation = "APPROVE_AFTER_FOUNDATION"
         confidence = 0.9
     elif related:
         recommendation = "BUNDLE_WITH_OTHER_ITEMS"
-        confidence = 0.78
-    elif insertion:
-        recommendation = "APPROVE_NOW"
-        confidence = 0.76
+        confidence = 0.8
     else:
-        recommendation = "APPROVE_AFTER_FOUNDATION"
-        confidence = 0.66
-        missing.append(MissingPart("recommended", "insertion_point", "No clear insertion point was found in the current codebase."))
+        recommendation = "APPROVE_NOW"
+        confidence = 0.78
 
     reasons_for = [
         "The Devil's Advocate gate is promotion-ready.",
-        f"{len(insertion)} code insertion candidate(s) were found.",
+        f"{len(insertion)} ranked code insertion candidate(s) were found from paths, symbols, and source content.",
         f"{len(related)} related FREEZER item(s) were found.",
     ]
     if dependencies:
@@ -154,11 +210,13 @@ def analyze_implementation_council(
     ]
     if related:
         opposing.append("Existing FREEZER items may represent a better implementation order or bundle boundary.")
+    if insertion:
+        opposing.append("A high-scoring insertion candidate is evidence, not authority; module ownership must still be confirmed by a human.")
 
     questions = [
         "Is the requested timing more important than avoiding future migration cost?",
         "Should this be implemented alone, bundled, or held until its foundation exists?",
-        "Does the proposed insertion boundary preserve current module responsibilities?",
+        "Does the highest-ranked insertion boundary preserve current module responsibilities?",
     ]
 
     result = CouncilReport(
@@ -191,4 +249,4 @@ def _markdown(report: CouncilReport) -> str:
     reasons = "\n".join(f"- {item}" for item in report.reasons_for)
     opposing = "\n".join(f"- {item}" for item in report.opposing_view)
     questions = "\n".join(f"- {item}" for item in report.human_questions)
-    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Insertion candidates\n\n{insertion}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
+    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Ranked insertion candidates\n\n{insertion}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
