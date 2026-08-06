@@ -8,13 +8,13 @@ from knowledge_bridge.connect import connect_record
 from knowledge_bridge.normalize import normalize_capture
 
 
-def _write_record(root: Path, knowledge_id: str, *, body: str, kind: str = "decision", project: str | None = "P1", tags: list[str] | None = None, status: str = "captured", sensitivity: str = "internal", confidence: float = 1.0, frontmatter: dict | None = None) -> None:
+def _write_record(root: Path, knowledge_id: str, *, body: str, kind: str = "decision", project: str | None = "P1", tags: list[str] | None = None, status: str = "captured", sensitivity: str = "internal", confidence: float = 1.0, frontmatter: dict | None = None, source_path: str | None = None, capture_id: str | None = None) -> None:
     folder = root / "normalized"
     folder.mkdir(parents=True, exist_ok=True)
     record = {
         "knowledge_id": knowledge_id,
-        "capture_id": "CAP-" + knowledge_id,
-        "source_path": knowledge_id + ".md",
+        "capture_id": capture_id or "CAP-" + knowledge_id,
+        "source_path": source_path or knowledge_id + ".md",
         "source_hash": (knowledge_id.lower() * 64)[:64],
         "title": body.split("。", 1)[0],
         "knowledge_type": kind,
@@ -47,6 +47,40 @@ def test_possible_contradiction_remains_visible(tmp_path: Path) -> None:
     _write_record(tmp_path, "KBR-B", body="データはクラウドだけに保存する。")
     results = connect_record(tmp_path, "KBR-A")
     assert any(item.relation == "possible_contradiction" for item in results)
+
+
+def test_newer_capture_supersedes_same_source_without_blocking(tmp_path: Path) -> None:
+    frontmatter = {
+        "purpose": "保存方式を決める",
+        "constraints": ["read-only source"],
+        "acceptance_criteria": ["保存先が一意に決まる"],
+        "test_plan": ["fixture test"],
+        "rollback": "disable bridge",
+        "alternatives": ["cloud storage"],
+    }
+    _write_record(
+        tmp_path,
+        "KBR-OLD",
+        body="データはクラウドだけに保存する。",
+        status="challenged",
+        frontmatter=frontmatter,
+        source_path="decision.md",
+        capture_id="KBC-source-V0002",
+    )
+    _write_record(
+        tmp_path,
+        "KBR-NEW",
+        body="データは端末内だけに保存する。正式な保存方式の決定です。",
+        status="challenged",
+        frontmatter=frontmatter,
+        source_path="decision.md",
+        capture_id="KBC-source-V0004",
+    )
+    connections = connect_record(tmp_path, "KBR-NEW")
+    assert any(item.relation == "supersedes" and item.other_knowledge_id == "KBR-OLD" for item in connections)
+    assert not any(item.relation in {"duplicate", "possible_contradiction"} for item in connections)
+    result = challenge_record(tmp_path, "KBR-NEW")
+    assert result.promotion_ready is True
 
 
 def test_challenge_blocks_flat_spec_without_completion_evidence(tmp_path: Path) -> None:
