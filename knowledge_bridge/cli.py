@@ -11,6 +11,8 @@ from .config import BridgeConfig, load_config
 from .connect import connect_record
 from .intake import iter_notes
 from .normalize import normalize_capture
+from .recall import SUPPORTED_EVENTS, recall_event
+from .route import route_record
 
 
 def _config(args: argparse.Namespace) -> BridgeConfig:
@@ -67,6 +69,20 @@ def challenge(args: argparse.Namespace) -> int:
     return 0 if result.promotion_ready else 2
 
 
+def route(args: argparse.Namespace) -> int:
+    config = _config(args)
+    result = route_record(config.state_path, args.knowledge)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
+def recall(args: argparse.Namespace) -> int:
+    config = _config(args)
+    results = recall_event(config.state_path, args.event, project_id=args.project, threshold=args.threshold)
+    print(json.dumps([asdict(item) for item in results], ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -86,15 +102,18 @@ def build_parser() -> argparse.ArgumentParser:
     _common(command)
     command.set_defaults(handler=normalize)
 
-    command = sub.add_parser("connect")
-    command.add_argument("--knowledge", required=True)
-    _common(command)
-    command.set_defaults(handler=connect)
+    for name, handler in (("connect", connect), ("challenge", challenge), ("route", route)):
+        command = sub.add_parser(name)
+        command.add_argument("--knowledge", required=True)
+        _common(command)
+        command.set_defaults(handler=handler)
 
-    command = sub.add_parser("challenge")
-    command.add_argument("--knowledge", required=True)
+    command = sub.add_parser("recall")
+    command.add_argument("--event", required=True, choices=sorted(SUPPORTED_EVENTS))
+    command.add_argument("--project")
+    command.add_argument("--threshold", type=float, default=0.45)
     _common(command)
-    command.set_defaults(handler=challenge)
+    command.set_defaults(handler=recall)
     return parser
 
 
