@@ -59,6 +59,7 @@ def challenge_record(state_root: str | Path, knowledge_id: str) -> ChallengeResu
     result = ChallengeResult(knowledge_id, not blocking, tuple(findings), len(connections))
     output = root / "challenges" / f"{knowledge_id}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
-    if not output.exists():
-        output.write_text(json.dumps(asdict(result), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # Challenge files are derived state, not immutable evidence. Always refresh
+    # them so routing never consumes a stale pre-fix or pre-edit verdict.
+    output.write_text(json.dumps(asdict(result), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return result
