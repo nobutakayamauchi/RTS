@@ -32,6 +32,10 @@ def _state(root: Path, *, promotion_ready: bool = True, metadata: dict | None = 
 def _repo(root: Path) -> None:
     (root / "knowledge_bridge").mkdir(parents=True)
     (root / "knowledge_bridge" / "storage.py").write_text("def save_storage_record():\n    pass\n", encoding="utf-8")
+    (root / "tests" / "knowledge_bridge").mkdir(parents=True)
+    (root / "tests" / "knowledge_bridge" / "test_storage.py").write_text("def test_storage_record():\n    pass\n", encoding="utf-8")
+    (root / "docs").mkdir(parents=True)
+    (root / "docs" / "storage.md").write_text("# Storage design\n", encoding="utf-8")
     (root / "freezer" / "items").mkdir(parents=True)
     item = {"item_id": "RTS-FRZ-000001", "title": "storage foundation", "tags": ["storage"]}
     (root / "freezer" / "items" / "one.json").write_text(json.dumps(item), encoding="utf-8")
@@ -48,7 +52,11 @@ def test_council_stops_before_human_decision(tmp_path: Path) -> None:
     assert report.recommendation == "BUNDLE_WITH_OTHER_ITEMS"
     assert report.insertion_candidates
     assert "storage.py" in report.insertion_candidates[0]
-    assert "score=" in report.insertion_candidates[0]
+    assert "role=implementation" in report.insertion_candidates[0]
+    assert report.test_candidates
+    assert "test_storage.py" in report.test_candidates[0]
+    assert report.reference_candidates
+    assert "storage.md" in report.reference_candidates[0]
     assert (tmp_path / "report.md").exists()
 
 
@@ -102,3 +110,28 @@ def test_council_treats_missing_insertion_boundary_as_blocking(tmp_path: Path) -
     report = analyze_implementation_council(state, "KBR-A", repo, tmp_path / "report.json")
     assert report.recommendation == "APPROVE_AFTER_FOUNDATION"
     assert any(item.name == "insertion_boundary" and item.category == "blocking" for item in report.missing_parts)
+
+
+def test_reference_only_match_cannot_authorize_implementation(tmp_path: Path) -> None:
+    state = tmp_path / "state"
+    repo = tmp_path / "repo"
+    _state(state)
+    (repo / "docs").mkdir(parents=True)
+    (repo / "docs" / "storage.md").write_text("# Storage implementation design\n", encoding="utf-8")
+    report = analyze_implementation_council(state, "KBR-A", repo, tmp_path / "report.json")
+    assert not report.insertion_candidates
+    assert report.reference_candidates
+    assert report.recommendation == "APPROVE_AFTER_FOUNDATION"
+    assert any(item.name == "insertion_boundary" for item in report.missing_parts)
+
+
+def test_candidate_reports_responsibility_and_side_effect(tmp_path: Path) -> None:
+    state = tmp_path / "state"
+    repo = tmp_path / "repo"
+    _state(state)
+    (repo / "core").mkdir(parents=True)
+    (repo / "core" / "storage_state.py").write_text("def save_storage():\n    pass\n", encoding="utf-8")
+    report = analyze_implementation_council(state, "KBR-A", repo, tmp_path / "report.json")
+    candidate = next(item for item in report.insertion_candidates if "storage_state.py" in item)
+    assert "responsibility=state persistence responsibility" in candidate
+    assert "side_effect=migration, durability, and rollback risk" in candidate
