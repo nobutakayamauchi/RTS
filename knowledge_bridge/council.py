@@ -22,6 +22,8 @@ class CouncilReport:
     codebase_files_considered: int
     freezer_items_considered: int
     insertion_candidates: tuple[str, ...]
+    test_candidates: tuple[str, ...]
+    reference_candidates: tuple[str, ...]
     related_freezer_items: tuple[str, ...]
     missing_parts: tuple[MissingPart, ...]
     reasons_for: tuple[str, ...]
@@ -99,9 +101,36 @@ def _symbols(path: Path, content: str) -> list[str]:
     return symbols[:80]
 
 
-def _insertion_candidates(files: list[Path], repo: Path, record: dict[str, Any], terms: set[str]) -> list[str]:
+def _candidate_role(path: Path, relative: str) -> str:
+    lowered = relative.lower()
+    parts = {part.lower() for part in path.parts}
+    if path.suffix.lower() in {".md", ".json", ".yaml", ".yml", ".toml"}:
+        return "reference"
+    if "test" in parts or "tests" in parts or path.name.lower().startswith("test_") or path.name.lower().endswith(".test.js"):
+        return "test"
+    return "implementation"
+
+
+def _candidate_effects(role: str, relative: str) -> tuple[str, str]:
+    lowered = relative.lower()
+    if role == "test":
+        return "regression coverage", "test maintenance and fixture updates"
+    if role == "reference":
+        return "design evidence only", "must not be mistaken for an executable insertion boundary"
+    if "cli" in lowered:
+        return "command surface and operator workflow", "argument compatibility and command regression"
+    if any(token in lowered for token in ("route", "dispatch", "event")):
+        return "routing or orchestration responsibility", "event-order and destination regression"
+    if any(token in lowered for token in ("store", "state", "storage", "repository")):
+        return "state persistence responsibility", "migration, durability, and rollback risk"
+    if any(token in lowered for token in ("ui", "web", "view", "screen")):
+        return "user interaction responsibility", "navigation and presentation regression"
+    return "module-local implementation responsibility", "ownership and integration regression"
+
+
+def _rank_candidates(files: list[Path], repo: Path, record: dict[str, Any], terms: set[str]) -> dict[str, list[str]]:
     tags = {str(tag).lower() for tag in record.get("tags", []) if str(tag).strip()}
-    ranked: list[tuple[float, str]] = []
+    ranked: dict[str, list[tuple[float, str]]] = {"implementation": [], "test": [], "reference": []}
     for path in files:
         relative = str(path.relative_to(repo))
         lowered_path = relative.lower()
@@ -116,11 +145,20 @@ def _insertion_candidates(files: list[Path], repo: Path, record: dict[str, Any],
         if not (path_hits or symbol_hits or content_hits):
             continue
 
+        role = _candidate_role(path, relative)
         score = min(0.45, len(path_hits) * 0.18) + min(0.35, len(symbol_hits) * 0.14) + min(0.30, len(content_hits) * 0.04)
+        if role == "implementation":
+            score += 0.12
+        elif role == "test":
+            score += 0.04
+        else:
+            score -= 0.12
         if path.name in {"cli.py", "route.py", "challenge.py", "freezer_export.py", "council.py"}:
             score += 0.05
+
         matched_symbols = [symbol for symbol in symbols if any(term in symbol.lower() for term in terms | tags)][:3]
         boundary = ",".join(matched_symbols) if matched_symbols else "module"
+        responsibility, side_effect = _candidate_effects(role, relative)
         reasons = []
         if path_hits:
             reasons.append("path=" + ",".join(path_hits[:4]))
@@ -128,11 +166,17 @@ def _insertion_candidates(files: list[Path], repo: Path, record: dict[str, Any],
             reasons.append("symbol=" + ",".join(symbol_hits[:4]))
         if content_hits:
             reasons.append("content=" + ",".join(content_hits[:4]))
-        rendered = f"{relative}::{boundary} [score={min(score, 1.0):.2f}; {'; '.join(reasons)}]"
-        ranked.append((score, rendered))
+        rendered = (
+            f"{relative}::{boundary} [role={role}; score={max(0.0, min(score, 1.0)):.2f}; "
+            f"responsibility={responsibility}; side_effect={side_effect}; {'; '.join(reasons)}]"
+        )
+        ranked[role].append((score, rendered))
 
-    ranked.sort(key=lambda item: (-item[0], item[1]))
-    return [rendered for _, rendered in ranked[:8]]
+    result: dict[str, list[str]] = {}
+    for role, items in ranked.items():
+        items.sort(key=lambda item: (-item[0], item[1]))
+        result[role] = [rendered for _, rendered in items[:8]]
+    return result
 
 
 def analyze_implementation_council(
@@ -156,7 +200,10 @@ def analyze_implementation_council(
     files = _repo_files(repo)
     freezer = _freezer_items(repo)
     terms = _terms(record)
-    insertion = _insertion_candidates(files, repo, record, terms)
+    candidates = _rank_candidates(files, repo, record, terms)
+    insertion = candidates["implementation"]
+    tests = candidates["test"]
+    references = candidates["reference"]
 
     related: list[str] = []
     for item in freezer:
@@ -183,8 +230,10 @@ def analyze_implementation_council(
     blocking = any(part.category == "blocking" for part in missing)
 
     if not insertion:
-        missing.append(MissingPart("blocking", "insertion_boundary", "No code boundary could be justified from paths, symbols, or source content; architecture clarification is required."))
+        missing.append(MissingPart("blocking", "insertion_boundary", "Only tests or reference documents matched, or no executable code boundary could be justified; architecture clarification is required."))
         blocking = True
+    if insertion and not tests:
+        missing.append(MissingPart("recommended", "regression_target", "An implementation boundary was found, but no matching regression-test location was identified."))
 
     if blocking:
         recommendation = "APPROVE_AFTER_FOUNDATION"
@@ -198,7 +247,9 @@ def analyze_implementation_council(
 
     reasons_for = [
         "The Devil's Advocate gate is promotion-ready.",
-        f"{len(insertion)} ranked code insertion candidate(s) were found from paths, symbols, and source content.",
+        f"{len(insertion)} executable implementation candidate(s) were found.",
+        f"{len(tests)} regression-test candidate(s) were found.",
+        f"{len(references)} design/reference candidate(s) were separated from executable boundaries.",
         f"{len(related)} related FREEZER item(s) were found.",
     ]
     if dependencies:
@@ -211,12 +262,15 @@ def analyze_implementation_council(
     if related:
         opposing.append("Existing FREEZER items may represent a better implementation order or bundle boundary.")
     if insertion:
-        opposing.append("A high-scoring insertion candidate is evidence, not authority; module ownership must still be confirmed by a human.")
+        opposing.append("A high-scoring executable candidate is evidence, not authority; module ownership must still be confirmed by a human.")
+    if references:
+        opposing.append("Reference documents can explain intent but cannot justify an implementation boundary by themselves.")
 
     questions = [
         "Is the requested timing more important than avoiding future migration cost?",
         "Should this be implemented alone, bundled, or held until its foundation exists?",
-        "Does the highest-ranked insertion boundary preserve current module responsibilities?",
+        "Does the highest-ranked executable boundary preserve current module responsibilities?",
+        "Do the proposed regression targets cover the expected side effects?",
     ]
 
     result = CouncilReport(
@@ -226,6 +280,8 @@ def analyze_implementation_council(
         codebase_files_considered=len(files),
         freezer_items_considered=len(freezer),
         insertion_candidates=tuple(insertion),
+        test_candidates=tuple(tests),
+        reference_candidates=tuple(references),
         related_freezer_items=tuple(related),
         missing_parts=tuple(missing),
         reasons_for=tuple(reasons_for),
@@ -237,16 +293,17 @@ def analyze_implementation_council(
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(asdict(result), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    markdown = output.with_suffix(".md")
-    markdown.write_text(_markdown(result), encoding="utf-8")
+    output.with_suffix(".md").write_text(_markdown(result), encoding="utf-8")
     return result
 
 
 def _markdown(report: CouncilReport) -> str:
     missing = "\n".join(f"- **{item.category} / {item.name}**: {item.reason}" for item in report.missing_parts) or "- None detected"
-    insertion = "\n".join(f"- `{item}`" for item in report.insertion_candidates) or "- No clear candidate"
+    insertion = "\n".join(f"- `{item}`" for item in report.insertion_candidates) or "- No executable candidate"
+    tests = "\n".join(f"- `{item}`" for item in report.test_candidates) or "- No matching regression target"
+    references = "\n".join(f"- `{item}`" for item in report.reference_candidates) or "- None detected"
     related = "\n".join(f"- `{item}`" for item in report.related_freezer_items) or "- None detected"
     reasons = "\n".join(f"- {item}" for item in report.reasons_for)
     opposing = "\n".join(f"- {item}" for item in report.opposing_view)
     questions = "\n".join(f"- {item}" for item in report.human_questions)
-    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Ranked insertion candidates\n\n{insertion}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
+    return f"""# Implementation Council Report\n\n## Recommendation\n\n**{report.recommendation}** (confidence: {report.confidence:.2f})\n\nStatus: `{report.status}`\n\n## Reasons\n\n{reasons}\n\n## Missing Parts\n\n{missing}\n\n## Executable insertion candidates\n\n{insertion}\n\n## Regression-test candidates\n\n{tests}\n\n## Design and reference evidence\n\n{references}\n\n## Related FREEZER items\n\n{related}\n\n## Opposing view\n\n{opposing}\n\n## Human discussion questions\n\n{questions}\n\nNo approval or implementation was executed.\n"""
