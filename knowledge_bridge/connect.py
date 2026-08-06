@@ -76,6 +76,29 @@ def _contradiction_reason(left: str, right: str, *, context_shared: bool) -> str
     return None
 
 
+def _capture_version(capture_id: object) -> int | None:
+    match = re.search(r"-V(\d+)$", str(capture_id or ""))
+    return int(match.group(1)) if match else None
+
+
+def _same_source_version_relation(target: dict, other: dict) -> tuple[str, str] | None:
+    """Classify historical captures of the same source without blocking promotion.
+
+    Immutable captures intentionally preserve every edit. A newer capture of the
+    same source file supersedes an older capture; it is not a duplicate or a
+    contradiction requiring manual resolution.
+    """
+    if not target.get("source_path") or target.get("source_path") != other.get("source_path"):
+        return None
+    target_version = _capture_version(target.get("capture_id"))
+    other_version = _capture_version(other.get("capture_id"))
+    if target_version is None or other_version is None or target_version == other_version:
+        return None
+    if target_version > other_version:
+        return "supersedes", f"same_source_newer_capture:V{target_version:04d}>V{other_version:04d}"
+    return "superseded_by", f"same_source_older_capture:V{target_version:04d}<V{other_version:04d}"
+
+
 def _load_records(root: Path) -> list[dict]:
     folder = root / "normalized"
     if not folder.exists():
@@ -96,6 +119,13 @@ def connect_record(state_root: str | Path, knowledge_id: str) -> tuple[Connectio
     for other in _load_records(root):
         if other["knowledge_id"] == knowledge_id:
             continue
+
+        version_relation = _same_source_version_relation(target, other)
+        if version_relation:
+            relation, reason = version_relation
+            connections.append(Connection(other["knowledge_id"], relation, 1.0, (reason,)))
+            continue
+
         reasons: list[str] = []
         score = 0.0
         same_project = bool(target.get("project_id") and target.get("project_id") == other.get("project_id"))
@@ -139,6 +169,5 @@ def connect_record(state_root: str | Path, knowledge_id: str) -> tuple[Connectio
     connections.sort(key=lambda item: (-item.score, item.other_knowledge_id))
     output = root / "connections" / f"{knowledge_id}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
-    if not output.exists():
-        output.write_text(json.dumps([asdict(item) for item in connections], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output.write_text(json.dumps([asdict(item) for item in connections], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return tuple(connections)
