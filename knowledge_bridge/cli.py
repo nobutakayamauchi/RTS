@@ -9,6 +9,7 @@ from .capture_store import CaptureStore
 from .challenge import challenge_record
 from .config import BridgeConfig, load_config
 from .connect import connect_record
+from .council import analyze_implementation_council
 from .freezer_export import export_freezer_draft
 from .intake import iter_notes
 from .normalize import normalize_capture
@@ -91,6 +92,18 @@ def export_freezer(args: argparse.Namespace) -> int:
     return 0
 
 
+def council(args: argparse.Namespace) -> int:
+    config = _config(args)
+    result = analyze_implementation_council(
+        config.state_path,
+        args.knowledge,
+        args.repo,
+        args.output,
+    )
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -128,6 +141,13 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--output", required=True)
     _common(command)
     command.set_defaults(handler=export_freezer)
+
+    command = sub.add_parser("council")
+    command.add_argument("--knowledge", required=True)
+    command.add_argument("--repo", required=True)
+    command.add_argument("--output", required=True)
+    _common(command)
+    command.set_defaults(handler=council)
     return parser
 
 
