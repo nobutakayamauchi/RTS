@@ -37,6 +37,51 @@ def _strings(value: Any) -> list[str]:
     return [str(value).strip()] if str(value).strip() else []
 
 
+def _feature_objects(value: Any) -> list[dict[str, Any]]:
+    if value is None:
+        return []
+    items = value if isinstance(value, (list, tuple)) else [value]
+    normalized: list[dict[str, Any]] = []
+    for item in items:
+        if isinstance(item, dict):
+            feature = str(item.get("feature", "")).strip()
+            if not feature:
+                continue
+            record: dict[str, Any] = {"feature": feature}
+            decision = item.get("decision")
+            if decision in {"KEEP", "SIMPLIFY", "DEFER", "REMOVE", "CLARIFY"}:
+                record["decision"] = decision
+            reason = str(item.get("reason", "")).strip()
+            if reason:
+                record["reason"] = reason
+            normalized.append(record)
+            continue
+        feature = str(item).strip()
+        if feature:
+            normalized.append({"feature": feature, "decision": "KEEP", "reason": "Supplied by V1.1 raw idea context."})
+    return normalized
+
+
+def _reference_objects(value: Any) -> list[dict[str, Any]]:
+    if value is None:
+        return []
+    items = value if isinstance(value, (list, tuple)) else [value]
+    normalized: list[dict[str, Any]] = []
+    for index, item in enumerate(items, start=1):
+        if isinstance(item, dict):
+            reference_id = str(item.get("reference_id", "")).strip()
+            if not reference_id:
+                continue
+            record = dict(item)
+            record["reference_id"] = reference_id
+            normalized.append(record)
+            continue
+        reference_id = str(item).strip()
+        if reference_id:
+            normalized.append({"reference_id": reference_id, "reaction": "neutral", "notes": ["Supplied by V1.1 raw idea context."]})
+    return normalized
+
+
 def _stable_idea_id(idea: str, supplied: Any = None) -> str:
     if supplied:
         return str(supplied)
@@ -137,8 +182,8 @@ def _v1_payload(payload: dict[str, Any], idea_id: str, project: str, component: 
         "goals": _strings(payload.get("goals")),
         "constraints": _strings(payload.get("constraints")),
         "unresolved_questions": questions,
-        "references": payload.get("references", []),
-        "features": payload.get("features", []),
+        "references": _reference_objects(payload.get("references")),
+        "features": _feature_objects(payload.get("features")),
         "sensory_profile": payload.get("sensory_profile", {}),
         "source": {"type": "idea-router-v1.1", "idea_id": idea_id, "classification": classification},
     }
