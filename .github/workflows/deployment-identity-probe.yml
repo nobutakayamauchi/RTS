@@ -1,0 +1,53 @@
+name: Deployment Identity Probe
+
+on:
+  pull_request:
+    paths:
+      - "deployment_identity/**"
+      - "tests/test_deployment_identity.py"
+      - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
+      - ".github/workflows/deployment-identity-probe.yml"
+  push:
+    branches: [main]
+    paths:
+      - "deployment_identity/**"
+      - "tests/test_deployment_identity.py"
+      - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
+      - ".github/workflows/deployment-identity-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile probe
+        run: python -m compileall -q deployment_identity tests/test_deployment_identity.py
+      - name: Run focused tests
+        run: python -B -m unittest tests.test_deployment_identity -v
+      - name: Probe fail-closed without deployment revision
+        run: |
+          set +e
+          python -m deployment_identity.cli probe --service-unit ci.service --entrypoint app.py --require-established > /tmp/identity.json
+          code=$?
+          test "$code" -eq 2
+          python - <<'PY'
+          import json
+          data = json.load(open('/tmp/identity.json', encoding='utf-8'))
+          assert data['status'] == 'PARTIAL'
+          assert data['runtime_classification_allowed'] is False
+          assert data['code_existence_is_runtime_evidence'] is False
+          PY
+      - name: Probe established with bounded explicit identity
+        run: |
+          python -m deployment_identity.cli probe \
+            --service-unit ci.service \
+            --deployed-revision 0123456789012345678901234567890123456789 \
+            --entrypoint app.py \
+            --require-established > /tmp/identity-established.json
+          python -m deployment_identity.cli verify /tmp/identity-established.json --require-established
