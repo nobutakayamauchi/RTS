@@ -5,8 +5,10 @@ on:
     paths:
       - "deployment_identity/**"
       - "runtime_debug_gate/**"
+      - "runtime_evidence_correlation/**"
       - "tests/test_deployment_identity.py"
       - "tests/test_runtime_debug_gate.py"
+      - "tests/test_runtime_evidence_correlation.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
   push:
@@ -14,8 +16,10 @@ on:
     paths:
       - "deployment_identity/**"
       - "runtime_debug_gate/**"
+      - "runtime_evidence_correlation/**"
       - "tests/test_deployment_identity.py"
       - "tests/test_runtime_debug_gate.py"
+      - "tests/test_runtime_evidence_correlation.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
 
@@ -30,10 +34,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Compile probe and debug gate
-        run: python -m compileall -q deployment_identity runtime_debug_gate tests/test_deployment_identity.py tests/test_runtime_debug_gate.py
+      - name: Compile runtime debugging gates
+        run: python -m compileall -q deployment_identity runtime_debug_gate runtime_evidence_correlation tests/test_deployment_identity.py tests/test_runtime_debug_gate.py tests/test_runtime_evidence_correlation.py
       - name: Run focused tests
-        run: python -B -m unittest tests.test_deployment_identity tests.test_runtime_debug_gate -v
+        run: python -B -m unittest tests.test_deployment_identity tests.test_runtime_debug_gate tests.test_runtime_evidence_correlation -v
       - name: Probe fail-closed without deployment revision
         run: |
           mkdir -p /tmp/no-deployment-git
@@ -79,4 +83,23 @@ jobs:
           assert result['state'] == 'BLOCKED_IDENTITY_MISSING'
           assert result['runtime_implementation'] == 'UNKNOWN'
           assert result['runtime_classification_allowed'] is False
+          PY
+      - name: Verify stale revision cannot enter code mapping
+        run: |
+          python - <<'PY'
+          import json
+          from runtime_evidence_correlation.core import correlate_candidates
+          identity = json.load(open('/tmp/identity-established.json', encoding='utf-8'))
+          result = correlate_candidates(
+              deployment_identity=identity,
+              candidates=[{
+                  'candidate_id': 'stale',
+                  'source_ref': 'app.py',
+                  'revision': 'f' * 40,
+                  'runtime_evidence_refs': ['trace:ci'],
+              }],
+          )
+          assert result['state'] == 'BLOCKED_NO_CORRELATED_CANDIDATE'
+          assert result['code_mapping_allowed'] is False
+          assert result['root_cause_claim_allowed'] is False
           PY
