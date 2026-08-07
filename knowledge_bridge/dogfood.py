@@ -6,6 +6,7 @@ import shutil
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from .common_ui import build_common_view_model
 from .obsidian_adapter import run_obsidian_design
@@ -44,7 +45,12 @@ def start_dogfood(
         raise FileExistsError(f"refusing to overwrite dogfood run: {output}")
     output.mkdir(parents=True)
 
-    review = run_obsidian_design(vault_path, note_relative_path, repo_root)
+    # Dogfood runs must not collide with normal Obsidian design reviews or
+    # earlier retries of the same note. Keep each run's review evidence in an
+    # isolated Vault subdirectory while preserving the adapter's no-overwrite
+    # guarantee.
+    review_dir = f"_RTS/Dogfood Reviews/{output.name}-{uuid4().hex[:8]}"
+    review = run_obsidian_design(vault_path, note_relative_path, repo_root, review_dir)
     source_bundle = Path(review.bundle_path)
     bundle = output / "bundle"
     shutil.copytree(source_bundle, bundle)
@@ -82,6 +88,8 @@ def start_dogfood(
         "request_id": translation["request_id"],
         "project_id": translation["project_id"],
         "source_note": review.source_note,
+        "review_note": review.review_note,
+        "review_dir": review_dir,
         "bundle": "bundle",
         "common_ui": "common-ui.json",
         "common_ui_html": "common-ui.html",
