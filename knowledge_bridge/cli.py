@@ -12,6 +12,7 @@ from .connect import connect_record
 from .council import analyze_implementation_council
 from .freezer_export import export_freezer_draft
 from .intake import iter_notes
+from .intent_translator import translate_intent
 from .normalize import normalize_capture
 from .recall import SUPPORTED_EVENTS, recall_event
 from .route import route_record
@@ -104,6 +105,12 @@ def council(args: argparse.Namespace) -> int:
     return 0
 
 
+def translate(args: argparse.Namespace) -> int:
+    result = translate_intent(args.input, args.output)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -148,6 +155,11 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--output", required=True)
     _common(command)
     command.set_defaults(handler=council)
+
+    command = sub.add_parser("translate-intent")
+    command.add_argument("--input", required=True)
+    command.add_argument("--output", required=True)
+    command.set_defaults(handler=translate)
     return parser
 
 
