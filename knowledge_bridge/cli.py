@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .capture_store import CaptureStore
 from .challenge import challenge_record
+from .city_release import audit_city_release
 from .common_ui import build_common_view_model
 from .config import BridgeConfig, load_config
 from .connect import connect_record
@@ -101,6 +102,10 @@ def debug_link(args: argparse.Namespace) -> int:
     print(json.dumps(asdict(link_debug_observations(args.bundle, args.observations, args.output)), ensure_ascii=False, indent=2)); return 0
 
 
+def city_release(args: argparse.Namespace) -> int:
+    print(json.dumps(asdict(audit_city_release(args.bundle, args.lifecycle, args.output)), ensure_ascii=False, indent=2)); return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -123,6 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
     command = sub.add_parser("obsidian-design"); command.add_argument("--vault", required=True); command.add_argument("--note", required=True); command.add_argument("--repo", required=True); command.add_argument("--review-dir", default="_RTS/Design Reviews"); command.set_defaults(handler=obsidian_design)
     command = sub.add_parser("common-ui"); command.add_argument("--bundle", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=common_ui)
     command = sub.add_parser("debug-link"); command.add_argument("--bundle", required=True); command.add_argument("--observations", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=debug_link)
+    command = sub.add_parser("city-release"); command.add_argument("--bundle", required=True); command.add_argument("--lifecycle", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=city_release)
     return parser
 
 
