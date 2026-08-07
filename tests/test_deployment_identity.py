@@ -12,8 +12,30 @@ from deployment_identity.core import (
     validate_snapshot,
 )
 
+DEPLOYMENT_ENV = {
+    "DEPLOYED_REVISION": "",
+    "GIT_COMMIT": "",
+    "SOURCE_VERSION": "",
+    "RENDER_GIT_COMMIT": "",
+    "VERCEL_GIT_COMMIT_SHA": "",
+    "GITHUB_SHA": "",
+    "SYSTEMD_UNIT": "",
+    "SERVICE_UNIT": "",
+    "K_SERVICE": "",
+    "ACTIVE_ROUTE": "",
+    "SERVICE_URL": "",
+    "RENDER_EXTERNAL_URL": "",
+}
+
 
 class DeploymentIdentityProbeTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.environment = mock.patch.dict(os.environ, DEPLOYMENT_ENV, clear=False)
+        self.environment.start()
+
+    def tearDown(self) -> None:
+        self.environment.stop()
+
     def test_established_requires_runtime_anchor_and_revision(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             snapshot = build_snapshot(
@@ -70,7 +92,7 @@ class DeploymentIdentityProbeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp, mock.patch.dict(
             os.environ,
             {"GIT_COMMIT": "d" * 40, "SOURCE_VERSION": "e" * 40},
-            clear=True,
+            clear=False,
         ):
             snapshot = build_snapshot(
                 root=Path(temp),
