@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .capture_store import CaptureStore
 from .challenge import challenge_record
+from .common_ui import build_common_view_model
 from .config import BridgeConfig, load_config
 from .connect import connect_record
 from .council import analyze_implementation_council
@@ -97,12 +98,7 @@ def export_freezer(args: argparse.Namespace) -> int:
 
 def council(args: argparse.Namespace) -> int:
     config = _config(args)
-    result = analyze_implementation_council(
-        config.state_path,
-        args.knowledge,
-        args.repo,
-        args.output,
-    )
+    result = analyze_implementation_council(config.state_path, args.knowledge, args.repo, args.output)
     print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
     return 0
 
@@ -121,6 +117,12 @@ def design_e2e(args: argparse.Namespace) -> int:
 
 def obsidian_design(args: argparse.Namespace) -> int:
     result = run_obsidian_design(args.vault, args.note, args.repo, args.review_dir)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
+def common_ui(args: argparse.Namespace) -> int:
+    result = build_common_view_model(args.bundle, args.output)
     print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
     return 0
 
@@ -187,6 +189,11 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--repo", required=True)
     command.add_argument("--review-dir", default="_RTS/Design Reviews")
     command.set_defaults(handler=obsidian_design)
+
+    command = sub.add_parser("common-ui")
+    command.add_argument("--bundle", required=True)
+    command.add_argument("--output", required=True)
+    command.set_defaults(handler=common_ui)
     return parser
 
 
