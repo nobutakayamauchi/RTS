@@ -9,6 +9,7 @@ _ALLOWED_STATUSES = {"AWAITING_HUMAN_DECISION"}
 _ALLOWED_FEATURE_DECISIONS = {"KEEP", "SIMPLIFY", "DEFER", "REMOVE", "CLARIFY"}
 _ALLOWED_NODE_TYPES = {"request", "goal", "feature", "reference", "missing_part", "implementation_target", "approval"}
 _ALLOWED_EDGE_TYPES = {"clarifies", "implements", "depends_on", "inserts_into", "references", "blocks", "requires_approval"}
+_ARRAY_TYPES = (list, tuple)
 
 
 @dataclass(frozen=True)
@@ -81,7 +82,7 @@ def validate_output_contract(payload: dict[str, Any]) -> tuple[ContractError, ..
         errors.append(ContractError("human_decision_required", "must be true"))
 
     for key in ("inferred_goals", "design_constraints", "unresolved_questions", "missing_parts"):
-        if not isinstance(payload.get(key), list):
+        if not isinstance(payload.get(key), _ARRAY_TYPES):
             errors.append(ContractError(key, "must be an array"))
 
     planned = payload.get("planned_structure")
@@ -90,10 +91,10 @@ def validate_output_contract(payload: dict[str, Any]) -> tuple[ContractError, ..
     else:
         nodes = planned.get("nodes", [])
         edges = planned.get("edges", [])
-        if not isinstance(nodes, list):
+        ids: set[str] = set()
+        if not isinstance(nodes, _ARRAY_TYPES):
             errors.append(ContractError("planned_structure.nodes", "must be an array"))
         else:
-            ids: set[str] = set()
             for index, node in enumerate(nodes):
                 if not isinstance(node, dict):
                     errors.append(ContractError(f"planned_structure.nodes[{index}]", "must be an object"))
@@ -107,7 +108,7 @@ def validate_output_contract(payload: dict[str, Any]) -> tuple[ContractError, ..
                     ids.add(node_id)
                 if node.get("type") not in _ALLOWED_NODE_TYPES:
                     errors.append(ContractError(f"planned_structure.nodes[{index}].type", "unsupported node type"))
-        if not isinstance(edges, list):
+        if not isinstance(edges, _ARRAY_TYPES):
             errors.append(ContractError("planned_structure.edges", "must be an array"))
         else:
             for index, edge in enumerate(edges):
@@ -117,8 +118,11 @@ def validate_output_contract(payload: dict[str, Any]) -> tuple[ContractError, ..
                 if edge.get("type") not in _ALLOWED_EDGE_TYPES:
                     errors.append(ContractError(f"planned_structure.edges[{index}].type", "unsupported edge type"))
                 for endpoint in ("from", "to"):
-                    if not _is_non_empty_string(edge.get(endpoint)):
+                    value = edge.get(endpoint)
+                    if not _is_non_empty_string(value):
                         errors.append(ContractError(f"planned_structure.edges[{index}].{endpoint}", "is required"))
+                    elif ids and value not in ids:
+                        errors.append(ContractError(f"planned_structure.edges[{index}].{endpoint}", "must reference an existing node"))
     return tuple(errors)
 
 
