@@ -16,6 +16,7 @@ from .debug_link import link_debug_observations
 from .design_e2e import run_design_e2e
 from .dogfood import start_dogfood
 from .freezer_export import export_freezer_draft
+from .idea_router import route_idea
 from .intake import iter_notes
 from .intent_translator import translate_intent
 from .normalize import normalize_capture
@@ -83,6 +84,10 @@ def council(args: argparse.Namespace) -> int:
     print(json.dumps(asdict(analyze_implementation_council(_config(args).state_path, args.knowledge, args.repo, args.output)), ensure_ascii=False, indent=2)); return 0
 
 
+def idea_route(args: argparse.Namespace) -> int:
+    print(json.dumps(asdict(route_idea(args.input, args.output)), ensure_ascii=False, indent=2)); return 0
+
+
 def translate(args: argparse.Namespace) -> int:
     print(json.dumps(asdict(translate_intent(args.input, args.output)), ensure_ascii=False, indent=2)); return 0
 
@@ -130,6 +135,7 @@ def build_parser() -> argparse.ArgumentParser:
     command = sub.add_parser("recall"); command.add_argument("--event", required=True, choices=sorted(SUPPORTED_EVENTS)); command.add_argument("--project"); command.add_argument("--threshold", type=float, default=0.45); _common(command); command.set_defaults(handler=recall)
     command = sub.add_parser("export-freezer"); command.add_argument("--knowledge", required=True); command.add_argument("--output", required=True); _common(command); command.set_defaults(handler=export_freezer)
     command = sub.add_parser("council"); command.add_argument("--knowledge", required=True); command.add_argument("--repo", required=True); command.add_argument("--output", required=True); _common(command); command.set_defaults(handler=council)
+    command = sub.add_parser("idea-route"); command.add_argument("--input", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=idea_route)
     command = sub.add_parser("translate-intent"); command.add_argument("--input", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=translate)
     command = sub.add_parser("design-e2e"); command.add_argument("--input", required=True); command.add_argument("--repo", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=design_e2e)
     command = sub.add_parser("obsidian-design"); command.add_argument("--vault", required=True); command.add_argument("--note", required=True); command.add_argument("--repo", required=True); command.add_argument("--review-dir", default="_RTS/Design Reviews"); command.set_defaults(handler=obsidian_design)
