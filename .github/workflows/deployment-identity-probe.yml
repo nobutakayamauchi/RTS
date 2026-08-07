@@ -4,14 +4,18 @@ on:
   pull_request:
     paths:
       - "deployment_identity/**"
+      - "runtime_debug_gate/**"
       - "tests/test_deployment_identity.py"
+      - "tests/test_runtime_debug_gate.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
   push:
     branches: [main]
     paths:
       - "deployment_identity/**"
+      - "runtime_debug_gate/**"
       - "tests/test_deployment_identity.py"
+      - "tests/test_runtime_debug_gate.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
 
@@ -26,10 +30,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Compile probe
-        run: python -m compileall -q deployment_identity tests/test_deployment_identity.py
+      - name: Compile probe and debug gate
+        run: python -m compileall -q deployment_identity runtime_debug_gate tests/test_deployment_identity.py tests/test_runtime_debug_gate.py
       - name: Run focused tests
-        run: python -B -m unittest tests.test_deployment_identity -v
+        run: python -B -m unittest tests.test_deployment_identity tests.test_runtime_debug_gate -v
       - name: Probe fail-closed without deployment revision
         run: |
           mkdir -p /tmp/no-deployment-git
@@ -64,3 +68,15 @@ jobs:
             --entrypoint app.py \
             --require-established > /tmp/identity-established.json
           python -m deployment_identity.cli verify /tmp/identity-established.json --require-established
+      - name: Verify runtime debug gate stays blocked without established identity
+        run: |
+          python - <<'PY'
+          from runtime_debug_gate.core import evaluate_debug_gate
+          result = evaluate_debug_gate(
+              observation={'event': 'HTTP 500', 'surface': '/health'},
+              deployment_identity=None,
+          )
+          assert result['state'] == 'BLOCKED_IDENTITY_MISSING'
+          assert result['runtime_implementation'] == 'UNKNOWN'
+          assert result['runtime_classification_allowed'] is False
+          PY
