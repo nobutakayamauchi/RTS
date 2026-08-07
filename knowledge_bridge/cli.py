@@ -14,6 +14,7 @@ from .connect import connect_record
 from .council import analyze_implementation_council
 from .debug_link import link_debug_observations
 from .design_e2e import run_design_e2e
+from .dogfood import start_dogfood
 from .freezer_export import export_freezer_draft
 from .intake import iter_notes
 from .intent_translator import translate_intent
@@ -98,6 +99,12 @@ def common_ui(args: argparse.Namespace) -> int:
     print(json.dumps(asdict(build_common_view_model(args.bundle, args.output)), ensure_ascii=False, indent=2)); return 0
 
 
+def dogfood_start(args: argparse.Namespace) -> int:
+    result = start_dogfood(args.vault, args.note, args.repo, args.output)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def debug_link(args: argparse.Namespace) -> int:
     print(json.dumps(asdict(link_debug_observations(args.bundle, args.observations, args.output)), ensure_ascii=False, indent=2)); return 0
 
@@ -127,6 +134,7 @@ def build_parser() -> argparse.ArgumentParser:
     command = sub.add_parser("design-e2e"); command.add_argument("--input", required=True); command.add_argument("--repo", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=design_e2e)
     command = sub.add_parser("obsidian-design"); command.add_argument("--vault", required=True); command.add_argument("--note", required=True); command.add_argument("--repo", required=True); command.add_argument("--review-dir", default="_RTS/Design Reviews"); command.set_defaults(handler=obsidian_design)
     command = sub.add_parser("common-ui"); command.add_argument("--bundle", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=common_ui)
+    command = sub.add_parser("dogfood-start"); command.add_argument("--vault", required=True); command.add_argument("--note", required=True); command.add_argument("--repo", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=dogfood_start)
     command = sub.add_parser("debug-link"); command.add_argument("--bundle", required=True); command.add_argument("--observations", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=debug_link)
     command = sub.add_parser("city-release"); command.add_argument("--bundle", required=True); command.add_argument("--lifecycle", required=True); command.add_argument("--output", required=True); command.set_defaults(handler=city_release)
     return parser
