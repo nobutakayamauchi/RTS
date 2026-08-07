@@ -39,8 +39,13 @@ jobs:
           VERCEL_GIT_COMMIT_SHA: ""
           GITHUB_SHA: ""
         run: |
+          mkdir -p /tmp/no-deployment-git
           set +e
-          python -m deployment_identity.cli probe --service-unit ci.service --entrypoint app.py --require-established > /tmp/identity.json
+          python -m deployment_identity.cli probe \
+            --root /tmp/no-deployment-git \
+            --service-unit ci.service \
+            --entrypoint app.py \
+            --require-established > /tmp/identity.json
           code=$?
           test "$code" -eq 2
           python - <<'PY'
@@ -49,6 +54,7 @@ jobs:
           assert data['status'] == 'PARTIAL'
           assert data['runtime_classification_allowed'] is False
           assert data['code_existence_is_runtime_evidence'] is False
+          assert 'deployed_revision' in data['missing_required_fields']
           PY
       - name: Probe established with bounded explicit identity
         run: |
