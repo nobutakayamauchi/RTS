@@ -65,10 +65,23 @@ def start_dogfood(
         if isinstance(node, dict) and node.get("type") in _TRACKED_TYPES and node.get("id")
     ]
     observations = {
-        "schema_version": "1.0",
+        "schema_version": "1.2",
         "request_id": translation["request_id"],
         "project_id": translation["project_id"],
-        "instructions": "Fill observations with AS_BUILT, BROKEN, or STALE evidence from the real dogfood run. Do not invent evidence.",
+        "instructions": (
+            "Verify deployment_identity before classifying runtime implementation. "
+            "Then fill observations with AS_BUILT, BROKEN, or STALE evidence from the real dogfood run. "
+            "Do not invent evidence. Code existence alone is not runtime evidence."
+        ),
+        "deployment_identity": {
+            "verified": False,
+            "service": "",
+            "working_directory": "",
+            "entrypoint": "",
+            "revision": "",
+            "active_surface": "",
+            "evidence": [],
+        },
         "planned_nodes": [
             {
                 "node_id": node["id"],
@@ -83,8 +96,8 @@ def start_dogfood(
     observations_path.write_text(json.dumps(observations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     manifest = {
-        "schema_version": "1.0",
-        "mode": "rts-dogfood-v1",
+        "schema_version": "1.2",
+        "mode": "rts-dogfood-v1.2",
         "request_id": translation["request_id"],
         "project_id": translation["project_id"],
         "source_note": review.source_note,
@@ -95,10 +108,13 @@ def start_dogfood(
         "common_ui_html": "common-ui.html",
         "observations": "observations.json",
         "planned_count": len(tracked),
-        "status": "AWAITING_REAL_OBSERVATIONS",
+        "status": "AWAITING_DEPLOYMENT_IDENTITY",
         "human_decision_required": True,
         "implementation_executed": False,
-        "next_action": "Use the real project, record evidence in observations.json, then run debug-link and city-release.",
+        "next_action": (
+            "Verify the real deployment identity in observations.json, record real evidence, "
+            "then run debug-link and city-release."
+        ),
     }
     (output / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -110,7 +126,7 @@ def start_dogfood(
         request_id=translation["request_id"],
         project_id=translation["project_id"],
         planned_count=len(tracked),
-        status="AWAITING_REAL_OBSERVATIONS",
+        status="AWAITING_DEPLOYMENT_IDENTITY",
         human_decision_required=True,
     )
 
