@@ -42,14 +42,20 @@ def test_starts_one_run_across_three_surfaces(tmp_path: Path, monkeypatch: pytes
     monkeypatch.setattr(dogfood, "build_common_view_model", fake_common_ui)
 
     result = dogfood.start_dogfood(tmp_path / "vault", "player.md", tmp_path / "repo", tmp_path / "run")
-    assert result.status == "AWAITING_REAL_OBSERVATIONS"
+    assert result.status == "AWAITING_DEPLOYMENT_IDENTITY"
     assert result.planned_count == 2
     observations = json.loads((tmp_path / "run" / "observations.json").read_text())
+    assert observations["schema_version"] == "1.2"
     assert observations["request_id"] == "REQ-1"
     assert observations["project_id"] == "PRJ-1"
     assert observations["observations"] == []
+    assert observations["deployment_identity"]["verified"] is False
+    assert observations["deployment_identity"]["evidence"] == []
     assert len(observations["planned_nodes"]) == 2
     manifest = json.loads((tmp_path / "run" / "manifest.json").read_text())
+    assert manifest["schema_version"] == "1.2"
+    assert manifest["mode"] == "rts-dogfood-v1.2"
+    assert manifest["status"] == "AWAITING_DEPLOYMENT_IDENTITY"
     assert manifest["implementation_executed"] is False
     assert manifest["review_note"] == "_RTS/Dogfood Reviews/run-test/player--REQ-1.md"
     assert manifest["review_dir"].startswith("_RTS/Dogfood Reviews/run-")
