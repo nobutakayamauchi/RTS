@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 from dataclasses import asdict, dataclass
@@ -104,3 +105,19 @@ def start_dogfood(
         status="AWAITING_REAL_OBSERVATIONS",
         human_decision_required=True,
     )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Start one RTS dogfood run across Obsidian, common UI, and debug evidence")
+    parser.add_argument("--vault", required=True)
+    parser.add_argument("--note", required=True)
+    parser.add_argument("--repo", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = start_dogfood(args.vault, args.note, args.repo, args.output)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
