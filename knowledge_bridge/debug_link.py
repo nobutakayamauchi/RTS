@@ -122,6 +122,8 @@ def link_debug_observations(
     model = {
         "schema_version": "1.0",
         "view": "rts-planned-observed-lifecycle",
+        "request_id": request_id,
+        "project_id": project_id,
         "identity": {"request_id": request_id, "project_id": project_id, "title": translation.get("title", "Untitled")},
         "counts": {"planned": len(planned), "as_built": counts["AS_BUILT"], "broken": counts["BROKEN"], "stale": counts["STALE"], "unobserved": counts["UNOBSERVED"], "orphan": len(orphans)},
         "items": lifecycle_items,
