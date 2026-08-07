@@ -10,6 +10,7 @@ from .challenge import challenge_record
 from .config import BridgeConfig, load_config
 from .connect import connect_record
 from .council import analyze_implementation_council
+from .design_e2e import run_design_e2e
 from .freezer_export import export_freezer_draft
 from .intake import iter_notes
 from .intent_translator import translate_intent
@@ -111,6 +112,12 @@ def translate(args: argparse.Namespace) -> int:
     return 0
 
 
+def design_e2e(args: argparse.Namespace) -> int:
+    result = run_design_e2e(args.input, args.repo, args.output)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -160,6 +167,12 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--input", required=True)
     command.add_argument("--output", required=True)
     command.set_defaults(handler=translate)
+
+    command = sub.add_parser("design-e2e")
+    command.add_argument("--input", required=True)
+    command.add_argument("--repo", required=True)
+    command.add_argument("--output", required=True)
+    command.set_defaults(handler=design_e2e)
     return parser
 
 
