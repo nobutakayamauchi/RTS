@@ -27,6 +27,16 @@ def _load(path: Path) -> dict[str, Any]:
     return value
 
 
+def _identity(value: dict[str, Any]) -> tuple[Any, Any]:
+    nested = value.get("identity", {})
+    if not isinstance(nested, dict):
+        nested = {}
+    return (
+        value.get("request_id", nested.get("request_id")),
+        value.get("project_id", nested.get("project_id")),
+    )
+
+
 def audit_city_release(bundle_path: str | Path, lifecycle_path: str | Path, output_path: str | Path) -> CityReleaseResult:
     bundle = Path(bundle_path).expanduser().resolve()
     lifecycle_file = Path(lifecycle_path).expanduser().resolve()
@@ -40,9 +50,10 @@ def audit_city_release(bundle_path: str | Path, lifecycle_path: str | Path, outp
     lifecycle = _load(lifecycle_file)
     request_id = translation["request_id"]
     project_id = translation["project_id"]
-    if summary.get("request_id") != request_id or lifecycle.get("request_id") != request_id:
+    lifecycle_request_id, lifecycle_project_id = _identity(lifecycle)
+    if summary.get("request_id") != request_id or lifecycle_request_id != request_id:
         raise ValueError("request identity does not match across release evidence")
-    if summary.get("project_id") != project_id or lifecycle.get("project_id") != project_id:
+    if summary.get("project_id") != project_id or lifecycle_project_id != project_id:
         raise ValueError("project identity does not match across release evidence")
     if summary.get("implementation_executed") is not False:
         raise PermissionError("release audit requires a non-executing design bundle")
