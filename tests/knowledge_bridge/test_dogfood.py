@@ -28,7 +28,11 @@ def test_starts_one_run_across_three_surfaces(tmp_path: Path, monkeypatch: pytes
     _write(source_bundle / "summary.json", {"request_id": "REQ-1", "project_id": "PRJ-1"})
 
     monkeypatch.setattr(dogfood, "run_obsidian_design", lambda *args, **kwargs: SimpleNamespace(
-        bundle_path=str(source_bundle), source_note="player.md", request_id="REQ-1", project_id="PRJ-1"
+        bundle_path=str(source_bundle),
+        source_note="player.md",
+        review_note="_RTS/Dogfood Reviews/run-test/player--REQ-1.md",
+        request_id="REQ-1",
+        project_id="PRJ-1",
     ))
 
     def fake_common_ui(bundle: Path, output: Path) -> None:
@@ -47,6 +51,8 @@ def test_starts_one_run_across_three_surfaces(tmp_path: Path, monkeypatch: pytes
     assert len(observations["planned_nodes"]) == 2
     manifest = json.loads((tmp_path / "run" / "manifest.json").read_text())
     assert manifest["implementation_executed"] is False
+    assert manifest["review_note"] == "_RTS/Dogfood Reviews/run-test/player--REQ-1.md"
+    assert manifest["review_dir"].startswith("_RTS/Dogfood Reviews/run-")
     assert (tmp_path / "run" / "common-ui.html").exists()
 
 
