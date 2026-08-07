@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rts.local/schemas/design_function_translation_input_v1.schema.json",
+  "title": "RTS Design & Function Translation Input v1",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {"type": "string", "minLength": 1},
+    "project_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string"},
+    "domain": {"type": "string"},
+    "role": {"type": "string"},
+    "target_user": {"type": "string"},
+    "feedback": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+    "goals": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+    "constraints": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["feature"],
+        "properties": {
+          "feature": {"type": "string", "minLength": 1},
+          "decision": {"enum": ["KEEP", "SIMPLIFY", "DEFER", "REMOVE", "CLARIFY"]},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reference_id"],
+        "properties": {
+          "reference_id": {"type": "string", "minLength": 1},
+          "reaction": {"enum": ["like", "dislike", "neutral", "confusing"]},
+          "adopted": {"type": "array", "items": {"type": "string"}},
+          "rejected": {"type": "array", "items": {"type": "string"}},
+          "notes": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "sensory_profile": {"type": "object", "additionalProperties": {"type": "number"}},
+    "unresolved_questions": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]}
+  }
+}
