@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 from dataclasses import asdict, dataclass
@@ -91,3 +92,19 @@ def handoff_approved_idea(
         human_decision_recorded=True,
         implementation_executed=False,
     )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Record explicit human approval and hand a V1.1 routing proposal to the existing V1.0 design pipeline")
+    parser.add_argument("--routing", required=True)
+    parser.add_argument("--repo", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--decision", required=True, choices=["APPROVE"])
+    args = parser.parse_args()
+    result = handoff_approved_idea(args.routing, args.repo, args.output, args.decision)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
