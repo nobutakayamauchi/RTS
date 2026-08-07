@@ -1,7 +1,7 @@
 # RTS Idea Intake / Routing Layer
 ## V1.1 Scope Frozen — Emergency Activation Completion
 
-**Status:** V1.0 FROZEN / V1.1 IMPLEMENTATION IN PROGRESS  
+**Status:** V1.0 FROZEN / V1.1 FROZEN / E2E VERIFIED  
 **Parent:** RTS Design Knowledge Bridge / Dogfood Pipeline V1.0  
 **Reason:** First real dogfood showed that V1.0 can complete a prepared request, but raw ideas still require a human to decide project, timing, missing prerequisites, and the correct V1.0 entry shape before the pipeline can start.
 
@@ -150,3 +150,64 @@ The following are out of V1.1 scope:
 - automatic approval
 
 If useful, record these as Future Scope. Do not expand V1.1 DoD.
+
+## 9. Real-project E2E verification
+
+V1.1 was verified against the real Vlog Save / Export idea that triggered the missing activation-boundary discovery.
+
+Observed route:
+
+```text
+Raw Idea
+  ↓
+classification = BUG
+  ↓
+target_project = vlog
+  ↓
+target_component = save-export
+  ↓
+timing = NOW
+  ↓
+routing_action = ROUTE_TO_V1
+  ↓
+status = AWAITING_HUMAN_ROUTING_DECISION
+  ↓
+Human APPROVE
+  ↓
+V1.0 Design E2E bundle generated
+  ↓
+status = HANDED_OFF_TO_V1_AWAITING_HUMAN_DECISION
+```
+
+Safety evidence:
+
+```text
+human_decision_recorded = true
+implementation_executed = false
+```
+
+Regression result at freeze time:
+
+```text
+71 passed
+```
+
+The original operational failure — a raw idea not being able to activate V1.0 without manual Obsidian preparation and routing — is therefore considered closed for V1.1.
+
+## 10. Future Scope discovered during V1.1 dogfood
+
+The Vlog case contained both defect and design-change semantics. V1.1 intentionally keeps the frozen single-classification model.
+
+Future versions may support multi-label classification such as:
+
+```text
+BUG + DESIGN_CHANGE
+```
+
+This is not required for V1.1 completion and must not reopen the frozen scope.
+
+## 11. Freeze declaration
+
+V1.1 is frozen after satisfying its ten-item Definition of Done, passing the full Knowledge Bridge regression suite, and completing the real-project Raw Idea → Routing → Human Approval → V1.0 handoff flow.
+
+No additional feature is required to declare V1.1 complete.
