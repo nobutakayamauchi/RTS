@@ -31,6 +31,13 @@ jobs:
       - name: Run focused tests
         run: python -B -m unittest tests.test_deployment_identity -v
       - name: Probe fail-closed without deployment revision
+        env:
+          DEPLOYED_REVISION: ""
+          GIT_COMMIT: ""
+          SOURCE_VERSION: ""
+          RENDER_GIT_COMMIT: ""
+          VERCEL_GIT_COMMIT_SHA: ""
+          GITHUB_SHA: ""
         run: |
           set +e
           python -m deployment_identity.cli probe --service-unit ci.service --entrypoint app.py --require-established > /tmp/identity.json
