@@ -1,17 +1,40 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from deployment_identity.core import build_snapshot
 from runtime_debug_gate.core import DebugGateError, evaluate_debug_gate, validate_gate_result
 
 
 OBSERVATION = {"event": "HTTP 500", "surface": "/health"}
+DEPLOYMENT_ENV = {
+    "DEPLOYED_REVISION": "",
+    "GIT_COMMIT": "",
+    "SOURCE_VERSION": "",
+    "RENDER_GIT_COMMIT": "",
+    "VERCEL_GIT_COMMIT_SHA": "",
+    "GITHUB_SHA": "",
+    "SYSTEMD_UNIT": "",
+    "SERVICE_UNIT": "",
+    "K_SERVICE": "",
+    "ACTIVE_ROUTE": "",
+    "SERVICE_URL": "",
+    "RENDER_EXTERNAL_URL": "",
+}
 
 
 class RuntimeDebugGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.environment = mock.patch.dict(os.environ, DEPLOYMENT_ENV, clear=False)
+        self.environment.start()
+
+    def tearDown(self) -> None:
+        self.environment.stop()
+
     def test_missing_identity_blocks_runtime_classification(self) -> None:
         result = evaluate_debug_gate(observation=OBSERVATION, deployment_identity=None)
         self.assertEqual(result["state"], "BLOCKED_IDENTITY_MISSING")
