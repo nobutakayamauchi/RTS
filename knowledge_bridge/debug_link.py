@@ -8,6 +8,7 @@ from typing import Any
 
 _ALLOWED = {"AS_BUILT", "BROKEN", "STALE"}
 _TRACKED_TYPES = {"feature", "implementation_target", "missing_part"}
+_DEPLOYMENT_ID_FIELDS = ("service", "working_directory", "entrypoint", "revision", "active_surface")
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,38 @@ def _load(path: Path) -> dict[str, Any]:
     return value
 
 
+def _validated_deployment_identity(observations: dict[str, Any], has_runtime_observations: bool) -> dict[str, Any]:
+    identity = observations.get("deployment_identity")
+    if not isinstance(identity, dict):
+        if has_runtime_observations:
+            raise PermissionError(
+                "runtime classification requires deployment_identity; code existence is not runtime evidence"
+            )
+        return {"verified": False}
+
+    verified = identity.get("verified") is True
+    normalized = {
+        "verified": verified,
+        **{field: str(identity.get(field, "")).strip() for field in _DEPLOYMENT_ID_FIELDS},
+        "evidence": identity.get("evidence", []),
+    }
+    if not isinstance(normalized["evidence"], list):
+        raise ValueError("deployment_identity.evidence must be an array")
+
+    if has_runtime_observations:
+        if not verified:
+            raise PermissionError("runtime classification requires verified deployment_identity")
+        if not any(normalized[field] for field in _DEPLOYMENT_ID_FIELDS):
+            raise ValueError(
+                "verified deployment_identity requires at least one concrete identifier: "
+                + ", ".join(_DEPLOYMENT_ID_FIELDS)
+            )
+        if not normalized["evidence"]:
+            raise ValueError("verified deployment_identity requires evidence")
+
+    return normalized
+
+
 def link_debug_observations(
     bundle_path: str | Path,
     observations_path: str | Path,
@@ -60,6 +93,11 @@ def link_debug_observations(
     if summary.get("status") != "AWAITING_HUMAN_DECISION":
         raise PermissionError("debug linking requires a human-decision-gated bundle")
 
+    raw_observations = observations.get("observations", [])
+    if not isinstance(raw_observations, list):
+        raise ValueError("observations must be an array")
+    deployment_identity = _validated_deployment_identity(observations, bool(raw_observations))
+
     nodes = translation.get("planned_structure", {}).get("nodes", [])
     planned = {
         str(node["id"]): node
@@ -69,9 +107,6 @@ def link_debug_observations(
     observed_by_node: dict[str, list[dict[str, Any]]] = {node_id: [] for node_id in planned}
     orphans: list[dict[str, Any]] = []
 
-    raw_observations = observations.get("observations", [])
-    if not isinstance(raw_observations, list):
-        raise ValueError("observations must be an array")
     for index, item in enumerate(raw_observations):
         if not isinstance(item, dict):
             raise ValueError(f"observations[{index}] must be an object")
@@ -120,11 +155,12 @@ def link_debug_observations(
         )
 
     model = {
-        "schema_version": "1.0",
+        "schema_version": "1.2",
         "view": "rts-planned-observed-lifecycle",
         "request_id": request_id,
         "project_id": project_id,
         "identity": {"request_id": request_id, "project_id": project_id, "title": translation.get("title", "Untitled")},
+        "deployment_identity": deployment_identity,
         "counts": {"planned": len(planned), "as_built": counts["AS_BUILT"], "broken": counts["BROKEN"], "stale": counts["STALE"], "unobserved": counts["UNOBSERVED"], "orphan": len(orphans)},
         "items": lifecycle_items,
         "orphan_observations": orphans,
@@ -154,6 +190,11 @@ def _render(model: dict[str, Any]) -> str:
         )
     orphan = "".join(f"<li>{html.escape(o['node_id'])}: {html.escape(o['status'])}</li>" for o in model["orphan_observations"]) or "<li>なし</li>"
     c = model["counts"]
+    deployment = model.get("deployment_identity", {})
+    deployment_bits = [
+        f"verified={str(bool(deployment.get('verified'))).lower()}",
+        *[f"{field}={deployment.get(field)}" for field in _DEPLOYMENT_ID_FIELDS if deployment.get(field)],
+    ]
     return f"""<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>{html.escape(str(model['identity']['title']))} — Planned / Observed</title><style>
 :root{{font-family:system-ui,sans-serif;background:#101522;color:#edf2f8}}body{{margin:0;padding:20px;max-width:1100px;margin-inline:auto}}
@@ -162,6 +203,7 @@ def _render(model: dict[str, Any]) -> str:
 .card h2{{font-size:1rem;margin:0 0 8px}}.broken{{border-color:#d85b5b}}.stale{{border-color:#d89a3a}}.as_built{{border-color:#50a879}}.unobserved{{border-color:#68758b}}
 code,li{{overflow-wrap:anywhere}}.safe{{margin-top:16px;padding:12px;background:#202a3d;border-radius:10px}}</style></head><body>
 <h1>Planned / As Built / Broken / Stale</h1><p>{html.escape(model['identity']['request_id'])} · {html.escape(model['identity']['project_id'])}</p>
+<p><strong>Deployment Identity:</strong> {html.escape(' · '.join(deployment_bits))}</p>
 <div class='summary'><span>Planned {c['planned']}</span><span>As Built {c['as_built']}</span><span>Broken {c['broken']}</span><span>Stale {c['stale']}</span><span>Unobserved {c['unobserved']}</span></div>
 <main class='grid'>{''.join(cards)}</main><h2>計画外の観測</h2><ul>{orphan}</ul>
-<div class='safe'>観測結果は判断材料です。承認・コード変更・修復は自動実行されていません。</div></body></html>"""
+<div class='safe'>観測結果は判断材料です。承認・コード変更・修復は自動実行されていません。Code existence alone is not runtime evidence.</div></body></html>"""
