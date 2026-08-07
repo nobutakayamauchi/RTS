@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rts.local/schemas/design_function_translation_output_v1.schema.json",
+  "title": "RTS Design & Function Translation Output v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "request_id",
+    "project_id",
+    "title",
+    "inferred_goals",
+    "design_constraints",
+    "feature_decisions",
+    "reference_ledger",
+    "missing_parts",
+    "planned_structure",
+    "human_decision_required",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {"type": "string", "minLength": 1},
+    "project_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "domain": {"type": "string"},
+    "role": {"type": "string"},
+    "target_user": {"type": "string"},
+    "inferred_goals": {"type": "array", "items": {"type": "string"}},
+    "design_constraints": {"type": "array", "items": {"type": "string"}},
+    "feature_decisions": {"type": "array"},
+    "sensory_profile": {"type": "object"},
+    "reference_ledger": {"type": "array"},
+    "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+    "missing_parts": {"type": "array", "items": {"type": "string"}},
+    "planned_structure": {
+      "type": "object",
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "label", "status"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "type": {"enum": ["request", "goal", "feature", "reference", "missing_part", "implementation_target", "approval"]},
+              "label": {"type": "string"},
+              "status": {"type": "string"}
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "type", "reason"],
+            "properties": {
+              "from": {"type": "string", "minLength": 1},
+              "to": {"type": "string", "minLength": 1},
+              "type": {"enum": ["clarifies", "implements", "depends_on", "inserts_into", "references", "blocks", "requires_approval"]},
+              "reason": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "human_decision_required": {"const": true},
+    "status": {"const": "AWAITING_HUMAN_DECISION"}
+  }
+}

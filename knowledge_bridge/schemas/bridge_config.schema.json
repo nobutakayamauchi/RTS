@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nobutakayamauchi/RTS/knowledge_bridge/schemas/bridge_config.schema.json",
+  "title": "RTS Knowledge Bridge Config",
+  "type": "object",
+  "required": ["vault_path"],
+  "properties": {
+    "vault_path": {"type": "string", "minLength": 1},
+    "state_path": {"type": "string", "minLength": 1},
+    "include_globs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "exclude_dirs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": false
+}

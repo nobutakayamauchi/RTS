@@ -1,0 +1,68 @@
+{
+  "title": "初心者向けスマホ音楽プレイヤー",
+  "domain": "music player",
+  "role": "listener",
+  "target_user": "スマートフォンを片手で使う初心者",
+  "feedback": [
+    "設定が多すぎて複雑なのは嫌",
+    "プレイリストへ一発でアクセスしたい",
+    "意味がわからないアイコンは使いたくない"
+  ],
+  "goals": [
+    "再生中の曲と主要操作を迷わず把握できる",
+    "初心者が説明なしで再生・停止・曲送りを使える"
+  ],
+  "constraints": [
+    "スマートフォン優先",
+    "片手操作を優先",
+    "主要操作は一画面内に収める"
+  ],
+  "features": [
+    {
+      "feature": "再生・停止・曲送り",
+      "decision": "KEEP",
+      "reason": "音楽プレイヤーの主要操作であり常時見える必要がある"
+    },
+    {
+      "feature": "プレイリスト固定導線",
+      "decision": "KEEP",
+      "reason": "高頻度アクセス要求を満たす"
+    },
+    {
+      "feature": "詳細イコライザー",
+      "decision": "DEFER",
+      "reason": "初心者向け初期版では認知負荷が高い"
+    },
+    {
+      "feature": "意味の不明確なアイコンのみの操作",
+      "decision": "REMOVE",
+      "reason": "ラベルなしでは操作結果を予測できない"
+    }
+  ],
+  "sensory_profile": {
+    "calm": 0.7,
+    "gloss": 0.2,
+    "motion": -0.4,
+    "spacing": 0.8
+  },
+  "references": [
+    {
+      "reference_id": "REF-A",
+      "reaction": "like",
+      "adopted": ["大きなジャケット画像", "下部にまとまった主要操作"],
+      "rejected": ["機能過多の常時表示"],
+      "notes": ["視線移動が少なく初心者にも理解しやすい"]
+    },
+    {
+      "reference_id": "REF-B",
+      "reaction": "confusing",
+      "adopted": ["余白"],
+      "rejected": ["説明のない小型アイコン群"],
+      "notes": ["操作の意味が見ただけでは分からない"]
+    }
+  ],
+  "unresolved_questions": [
+    "プレイリスト固定導線は下部ナビとホームショートカットのどちらがよいか",
+    "ジャケット画像をどこまで大きくするか"
+  ]
+}
