@@ -15,6 +15,7 @@ from .freezer_export import export_freezer_draft
 from .intake import iter_notes
 from .intent_translator import translate_intent
 from .normalize import normalize_capture
+from .obsidian_adapter import run_obsidian_design
 from .recall import SUPPORTED_EVENTS, recall_event
 from .route import route_record
 
@@ -118,6 +119,12 @@ def design_e2e(args: argparse.Namespace) -> int:
     return 0
 
 
+def obsidian_design(args: argparse.Namespace) -> int:
+    result = run_obsidian_design(args.vault, args.note, args.repo, args.review_dir)
+    print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+    return 0
+
+
 def _common(command: argparse.ArgumentParser) -> None:
     command.add_argument("--vault")
     command.add_argument("--state", default=".rts/knowledge_bridge")
@@ -173,6 +180,13 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--repo", required=True)
     command.add_argument("--output", required=True)
     command.set_defaults(handler=design_e2e)
+
+    command = sub.add_parser("obsidian-design")
+    command.add_argument("--vault", required=True)
+    command.add_argument("--note", required=True)
+    command.add_argument("--repo", required=True)
+    command.add_argument("--review-dir", default="_RTS/Design Reviews")
+    command.set_defaults(handler=obsidian_design)
     return parser
 
 
