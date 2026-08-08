@@ -6,9 +6,15 @@ on:
       - "deployment_identity/**"
       - "runtime_debug_gate/**"
       - "runtime_evidence_correlation/**"
+      - "runtime_code_mapping/**"
+      - "root_cause_claim_gate/**"
+      - "retest_reidentity_gate/**"
       - "tests/test_deployment_identity.py"
       - "tests/test_runtime_debug_gate.py"
       - "tests/test_runtime_evidence_correlation.py"
+      - "tests/test_runtime_code_mapping.py"
+      - "tests/test_root_cause_claim_gate.py"
+      - "tests/test_retest_reidentity_gate.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
   push:
@@ -17,9 +23,15 @@ on:
       - "deployment_identity/**"
       - "runtime_debug_gate/**"
       - "runtime_evidence_correlation/**"
+      - "runtime_code_mapping/**"
+      - "root_cause_claim_gate/**"
+      - "retest_reidentity_gate/**"
       - "tests/test_deployment_identity.py"
       - "tests/test_runtime_debug_gate.py"
       - "tests/test_runtime_evidence_correlation.py"
+      - "tests/test_runtime_code_mapping.py"
+      - "tests/test_root_cause_claim_gate.py"
+      - "tests/test_retest_reidentity_gate.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_PROBE_V1.md"
       - ".github/workflows/deployment-identity-probe.yml"
 
@@ -35,9 +47,30 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile runtime debugging gates
-        run: python -m compileall -q deployment_identity runtime_debug_gate runtime_evidence_correlation tests/test_deployment_identity.py tests/test_runtime_debug_gate.py tests/test_runtime_evidence_correlation.py
+        run: >-
+          python -m compileall -q
+          deployment_identity
+          runtime_debug_gate
+          runtime_evidence_correlation
+          runtime_code_mapping
+          root_cause_claim_gate
+          retest_reidentity_gate
+          tests/test_deployment_identity.py
+          tests/test_runtime_debug_gate.py
+          tests/test_runtime_evidence_correlation.py
+          tests/test_runtime_code_mapping.py
+          tests/test_root_cause_claim_gate.py
+          tests/test_retest_reidentity_gate.py
       - name: Run focused tests
-        run: python -B -m unittest tests.test_deployment_identity tests.test_runtime_debug_gate tests.test_runtime_evidence_correlation -v
+        run: >-
+          python -B -m unittest
+          tests.test_deployment_identity
+          tests.test_runtime_debug_gate
+          tests.test_runtime_evidence_correlation
+          tests.test_runtime_code_mapping
+          tests.test_root_cause_claim_gate
+          tests.test_retest_reidentity_gate
+          -v
       - name: Probe fail-closed without deployment revision
         run: |
           mkdir -p /tmp/no-deployment-git
@@ -102,4 +135,79 @@ jobs:
           assert result['state'] == 'BLOCKED_NO_CORRELATED_CANDIDATE'
           assert result['code_mapping_allowed'] is False
           assert result['root_cause_claim_allowed'] is False
+          PY
+      - name: Verify end-to-end root cause and reidentity retest gates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from deployment_identity.core import build_snapshot
+          from runtime_evidence_correlation.core import correlate_candidates
+          from runtime_code_mapping.core import establish_code_mapping
+          from root_cause_claim_gate.core import evaluate_root_cause_claims
+          from retest_reidentity_gate.core import evaluate_retest
+
+          with tempfile.TemporaryDirectory() as before_dir, tempfile.TemporaryDirectory() as after_dir:
+              before = build_snapshot(
+                  root=Path(before_dir),
+                  service_unit='ci.service',
+                  deployed_revision='a' * 40,
+                  entrypoint='app.py',
+                  observed_at='2026-08-08T00:00:00Z',
+              )
+              correlation = correlate_candidates(
+                  deployment_identity=before,
+                  candidates=[{
+                      'candidate_id': 'c1',
+                      'source_ref': 'app.py',
+                      'revision': 'a' * 40,
+                      'runtime_evidence_refs': ['trace:ci'],
+                  }],
+              )
+              mapping = establish_code_mapping(
+                  correlation_result=correlation,
+                  mapping={
+                      'candidate_id': 'c1',
+                      'source_ref': 'app.py',
+                      'symbols': ['handle_request'],
+                      'mapping_evidence_refs': ['stack:ci'],
+                  },
+              )
+              root = evaluate_root_cause_claims(
+                  code_mapping_result=mapping,
+                  claims=[{
+                      'claim_id': 'rc1',
+                      'candidate_id': 'c1',
+                      'hypothesis': 'synthetic CI root-cause hypothesis',
+                      'supporting_evidence_refs': ['trace:ci'],
+                      'reproduction_refs': ['repro:ci'],
+                      'falsification_refs': ['negative:ci'],
+                      'unresolved_counterevidence_refs': [],
+                  }],
+              )
+              assert root['root_cause_claim_allowed'] is True
+              assert root['fix_validated'] is False
+
+              after = build_snapshot(
+                  root=Path(after_dir),
+                  service_unit='ci.service',
+                  deployed_revision='b' * 40,
+                  entrypoint='app.py',
+                  observed_at='2026-08-08T00:10:00Z',
+              )
+              retest = evaluate_retest(
+                  pre_patch_identity=before,
+                  post_patch_identity=after,
+                  root_cause_result=root,
+                  retest={
+                      'claim_id': 'rc1',
+                      'deployed_revision': 'b' * 40,
+                      'verification_refs': ['retest:ci'],
+                      'regression_refs': ['suite:ci'],
+                      'outcome': 'PASS',
+                  },
+              )
+              assert retest['state'] == 'FIX_VALIDATED'
+              assert retest['deployment_identity_reestablished'] is True
+              assert retest['fix_validated'] is True
           PY
