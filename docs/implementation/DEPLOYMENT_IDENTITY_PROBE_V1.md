@@ -1,168 +1,155 @@
-# RTS Deployment Identity Probe v1
+# RTS Runtime Debugging Identity and Evidence Gates v1
 
 ## Purpose
 
-Prevent the debugger from classifying repository code as the implementation that is actually serving the observed runtime unless deployment identity has first been established.
+Prevent RTS debugging from classifying repository code as runtime reality, promoting a mapped code location into a root-cause claim, or declaring a fix validated without deployment-bound evidence.
 
-## Canonical invariant
+## Canonical invariants
 
 > Deployment Identity MUST be established before runtime implementation classification.
 
-Corollary:
-
 > Code existence != runtime evidence.
 
-The probe is read-only and advisory. It grants no deployment, mutation, rollback, restart, or implementation authority.
+> Runtime-to-code mapping is not a root-cause claim.
 
-## Problem
+> Root-cause claims require support, reproduction, falsification, and no unresolved counterevidence.
 
-A debugger can observe a failure, find matching-looking source code, and incorrectly classify that source as runtime reality even when the observed service is running a stale checkout, another working directory, another process, another route, another artifact, or another deployed revision.
+> A fix is not validated until post-patch deployment identity is established and the retest is evidence-bound to it.
 
-This is a provenance failure before it is a code-analysis failure.
+All components are read-only decision gates. They grant no deployment, restart, rollback, source mutation, FREEZER mutation, or build authority.
 
-## Identity fields
+## Pipeline
 
-Each field is recorded as an evidence record containing `value`, `source`, and `observed_at`.
+```text
+Observation
+→ Deployment Identity Probe
+→ Runtime Debug Gate
+→ Runtime Evidence Correlation
+→ Runtime Code Mapping Gate
+→ Root Cause Claim Gate
+→ Patch proposal / external implementation step
+→ Deployment Re-Identity
+→ Retest / Regression Gate
+→ FIX_VALIDATED or return to analysis
+```
 
-- host
-- pid
-- service/unit
-- working directory
-- executable
-- entrypoint/module
-- active route
-- deployed commit/revision
-- artifact SHA-256 and artifact path when supplied
+## 1. Deployment Identity Probe
 
-## States
+Collects evidence-bound identity fields:
 
-### ESTABLISHED
+- host and pid;
+- service/unit;
+- working directory;
+- executable;
+- entrypoint/module;
+- active route;
+- deployed commit/revision;
+- optional artifact SHA-256.
 
-Required identity fields are present and at least one runtime anchor (`service_unit` or `active_route`) is present. Runtime implementation classification may proceed.
+States are `ESTABLISHED`, `PARTIAL`, `UNKNOWN`, and `CONFLICT`.
 
-### PARTIAL
+`ESTABLISHED` requires working directory, executable, entrypoint, deployed revision, and at least one runtime anchor (`service_unit` or `active_route`). All other states fail closed for runtime classification.
 
-Some identity evidence exists, but the required identity cannot be established. Runtime implementation classification is forbidden.
+## 2. Runtime Debug Gate
 
-### UNKNOWN
+Consumes an observation plus deployment identity.
 
-No meaningful identity can be established. Runtime implementation classification is forbidden.
+- missing identity → `BLOCKED_IDENTITY_MISSING`;
+- non-established identity → `BLOCKED_IDENTITY_NOT_ESTABLISHED`;
+- established identity → `READY_FOR_EVIDENCE_CORRELATION`.
 
-### CONFLICT
+Even the ready state keeps runtime implementation `UNCLASSIFIED`. Identity alone never identifies source code.
 
-Two or more deployment-identity sources conflict. Runtime implementation classification is forbidden until the conflict is resolved.
+## 3. Runtime Evidence Correlation
 
-## Required establishment boundary
+Candidate source records must contain candidate ID, source reference, revision, and runtime evidence references.
 
-For v1, `ESTABLISHED` requires:
+- revision mismatch → `REJECTED_REVISION_MISMATCH`;
+- revision match without runtime evidence → `BLOCKED_MISSING_RUNTIME_EVIDENCE`;
+- revision match plus evidence → candidate becomes eligible for code mapping.
 
-1. working directory;
-2. executable;
-3. entrypoint;
-4. deployed revision; and
-5. at least one of service/unit or active route.
+Exactly one eligible candidate is required. Zero candidates or multiple candidates fail closed.
 
-Artifact SHA-256 strengthens identity evidence but does not replace a deployed revision in v1.
+## 4. Runtime Code Mapping Gate
+
+The single correlated candidate must match the proposed source reference and provide:
+
+- one or more mapped symbols; and
+- one or more mapping evidence references.
+
+Success produces `READY_FOR_ROOT_CAUSE_ANALYSIS` while keeping `root_cause_claim_allowed=false`.
+
+## 5. Root Cause Claim Gate
+
+Each hypothesis must provide:
+
+- supporting evidence;
+- reproduction evidence;
+- falsification-attempt evidence; and
+- zero unresolved counterevidence.
+
+A hypothesis pointing to another candidate fails closed. Missing reproduction, missing falsification, missing support, or unresolved counterevidence blocks promotion.
+
+Exactly one eligible hypothesis produces `ROOT_CAUSE_CLAIM_SUPPORTED`. Multiple supported hypotheses remain ambiguous. This gate never validates a fix.
+
+## 6. Retest and Deployment Re-Identity Gate
+
+After a patch or deployment change, the post-patch deployment identity MUST be collected and reach `ESTABLISHED` again.
+
+The retest must:
+
+- refer to the selected root-cause claim;
+- name the exact post-patch deployed revision;
+- match the re-established identity revision;
+- contain verification evidence;
+- contain regression evidence; and
+- report `PASS` or `FAIL`.
+
+Only `PASS` with both verification and regression evidence produces `FIX_VALIDATED`. A failed retest returns to root-cause analysis. A nominal pass with incomplete evidence remains blocked.
 
 ## Fail-closed rules
 
-- Repository file existence MUST NOT set runtime classification authority.
-- `runtime_classification_allowed` MUST be true only when status is `ESTABLISHED`.
-- `PARTIAL`, `UNKNOWN`, and `CONFLICT` MUST block runtime implementation classification.
-- Conflicting revision environment values MUST produce `CONFLICT`.
-- Missing or unreadable requested artifacts MUST fail the probe.
-- Snapshot validation MUST reject manufactured runtime authority.
-- Snapshot validation MUST reject any representation that treats code existence as runtime evidence.
+- Repository file existence never creates runtime authority.
+- Stale or non-deployed revisions cannot enter code mapping.
+- Similar-looking source code without runtime evidence cannot enter code mapping.
+- Multiple correlated candidates cannot be silently selected.
+- Code mapping cannot manufacture root-cause authority.
+- Root-cause authority cannot be manufactured without reproduction and falsification evidence.
+- Unresolved counterevidence blocks root-cause promotion.
+- Root-cause support cannot manufacture fix validation.
+- A retest bound to a revision different from the re-established deployed revision is rejected.
+- A passing retest without verification and regression evidence does not validate the fix.
 
-## Read-only collection
-
-The probe may read:
-
-- process working directory;
-- Python executable and argv entrypoint;
-- hostname and pid;
-- explicitly supplied service/unit and route;
-- bounded deployment-related environment variables;
-- `.git/HEAD` or packed refs when available;
-- a specifically supplied artifact for SHA-256 measurement.
-
-The probe MUST NOT:
-
-- modify source files;
-- write deployment state;
-- restart services;
-- select or kill processes;
-- change routes;
-- change FREEZER state;
-- grant build authority;
-- claim that GitHub `main` is deployed merely because it exists.
-
-## CLI
-
-Collect a snapshot:
+## CLI for deployment identity
 
 ```bash
 python -m deployment_identity.cli probe \
   --service-unit rts.service \
   --active-route https://example.invalid/health \
   --deployed-revision <commit> \
-  --entrypoint app.py
-```
-
-Require a usable identity before continuing a debugger pipeline:
-
-```bash
-python -m deployment_identity.cli probe \
-  --service-unit rts.service \
-  --deployed-revision <commit> \
   --entrypoint app.py \
   --require-established
 ```
 
-Validate a stored snapshot:
+Validation:
 
 ```bash
 python -m deployment_identity.cli verify deployment_identity.json --require-established
 ```
 
-Exit codes:
+Exit codes: `0` gate passed, `1` invalid input/snapshot, `2` valid identity snapshot but not `ESTABLISHED` when establishment is required.
 
-- `0`: valid snapshot and requested gate passed;
-- `1`: invalid input or invalid snapshot;
-- `2`: valid snapshot, but identity is not `ESTABLISHED` while `--require-established` was requested.
+## Implemented modules
 
-## Debugger integration contract
+- `deployment_identity/`
+- `runtime_debug_gate/`
+- `runtime_evidence_correlation/`
+- `runtime_code_mapping/`
+- `root_cause_claim_gate/`
+- `retest_reidentity_gate/`
 
-The required order is:
+## CI acceptance boundary
 
-```text
-Observation
-→ Deployment Identity Probe
-→ ESTABLISHED?
-    ├─ no  → runtime implementation = UNKNOWN; stop classification
-    └─ yes → evidence correlation
-            → code mapping
-            → root-cause analysis
-            → patch proposal
-            → retest against the same or newly established deployment identity
-```
+The dedicated workflow compiles all six modules, executes all focused success and fail-closed tests, verifies missing-revision failure, verifies established identity, verifies missing-identity blocking, verifies stale-revision rejection, and executes one synthetic end-to-end path through root-cause support and post-patch re-identity to `FIX_VALIDATED`.
 
-A retest MUST establish deployment identity again when service, route, working directory, executable, artifact, or revision may have changed.
-
-## Acceptance tests
-
-The v1 implementation must prove:
-
-1. an explicit runtime anchor plus revision can establish identity;
-2. repository code existence without deployed revision remains `PARTIAL`;
-3. deployed revision without service/unit or route remains `PARTIAL`;
-4. active route may serve as the runtime anchor;
-5. conflicting revision environment values produce `CONFLICT`;
-6. artifact hashing does not substitute for revision identity;
-7. manufactured runtime-classification permission is rejected;
-8. code existence cannot be promoted into runtime evidence;
-9. a missing requested artifact fails closed.
-
-## Future integration
-
-A later bounded change may connect this probe to the RTS debugger/flight-recorder pipeline and require an `ESTABLISHED` snapshot before any runtime-to-source implementation classification. That integration is intentionally separate from this v1 probe so the probe can first be validated as an independent read-only component.
+The workflow is read-only and does not deploy or patch a runtime.
