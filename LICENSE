@@ -1,0 +1,49 @@
+RTS RESPONSIBLE OPEN USE LICENSE v1.0
+
+Copyright (c) 2026 Nobutaka Yamauchi
+
+Permission is granted, free of charge, to any person obtaining a copy of RTS and associated documentation (the "Software"), to use, copy, study, modify, merge, publish, distribute, sublicense, and sell copies of the Software, including for commercial purposes, subject to the conditions below.
+
+1. ATTRIBUTION AND ORIGIN
+
+The above copyright notice, this license, and a reasonable notice that the work is derived from or incorporates RTS must be preserved in copies or substantial portions of the Software.
+
+You must not knowingly or materially misrepresent RTS-derived work as having been created entirely independently of RTS when RTS code, documentation, architecture, or other substantial project material was used as a basis.
+
+Good-faith independent development is not restricted by this clause.
+
+2. PROHIBITED MALICIOUS USE
+
+Permission is not granted to use the Software with the intent to cause harm, facilitate unlawful access, fraud, malware deployment, harassment, stalking, coercion, deliberate privacy invasion, credential theft, destructive interference, or other intentionally harmful or abusive conduct.
+
+3. PROHIBITED BAD-FAITH DEPLOYMENT
+
+Permission is not granted where the Software is knowingly deployed, modified, or distributed for a purpose whose primary intended effect is to enable or materially assist harmful or abusive conduct described in Section 2.
+
+4. COMMERCIAL USE
+
+Commercial use is expressly permitted when the conditions of this license are followed. Selling services, integrations, modified versions, support, hosting, or other commercial offerings based on RTS is permitted.
+
+5. CONTRIBUTIONS AND FORKS
+
+Forks, research, experimentation, interoperability work, and collaborative development are welcome. Contributions submitted to the RTS repository are offered under this license unless a contribution explicitly states otherwise and is accepted by the maintainer.
+
+6. NO TRADEMARK OR ENDORSEMENT GRANT
+
+This license does not grant permission to use the RTS name, project identity, or creator identity to imply endorsement, sponsorship, or official status where none exists.
+
+7. TERMINATION
+
+Rights granted under this license terminate automatically for a party that materially violates Sections 1, 2, or 3. Rights may be restored by written permission from the copyright holder or by curing the violation where cure is reasonably possible and the copyright holder accepts the cure.
+
+8. DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+9. LICENSE CLASSIFICATION NOTICE
+
+Because this license contains use restrictions, it is not represented as an OSI-approved open-source license. RTS remains publicly inspectable and developed in the open, but licensing claims should use the terms "source-available" or "open development" unless and until an OSI-approved license is adopted.
+
+10. PRIOR VERSIONS
+
+This license governs versions and contributions released under it from the commit that first adds this LICENSE file onward. Earlier releases may remain governed by any terms that applied to them at the time of release. This license does not retroactively revoke rights already granted under an earlier license.
