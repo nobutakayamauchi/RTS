@@ -1,5 +1,7 @@
 package external_challenger.closure
 
+import rego.v1
+
 # This policy deliberately contains no RTS runtime code and no persistent state.
 # Cryptographic verification, workload attestation, runtime discovery, tracing,
 # WORM retention and human approval are delegated to external tools. Rego only
@@ -46,7 +48,7 @@ allow_outcome if {
 	input.outcome.runtime_fingerprint == input.runtime.fingerprint
 	input.outcome.within_execution_window
 	input.outcome.retained_worm
-	input.outcome.classification == "SUCCESS" or input.outcome.classification == "FAILURE" or input.outcome.classification == "ESCALATION" or input.outcome.classification == "RECOVERY" or input.outcome.classification == "REJECTED" or input.outcome.classification == "WITHHELD"
+	input.outcome.classification in {"SUCCESS", "FAILURE", "ESCALATION", "RECOVERY", "REJECTED", "WITHHELD"}
 }
 
 allow_promotion if {
