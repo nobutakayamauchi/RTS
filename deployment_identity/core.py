@@ -127,6 +127,7 @@ def _not_established(reason: str, observation: Mapping[str, Any], **details: Any
         "status": NOT_ESTABLISHED,
         "reason": reason,
         "runtime_classification_authorized": False,
+        "material_match_verified": False,
         "observation_fingerprint": fingerprint_observation(observation),
         **details,
     }
@@ -140,14 +141,12 @@ def establish_deployment_identity(
     reference_time: str,
     max_age_seconds: int = 300,
 ) -> dict[str, Any]:
-    """Fail-closed deployment identity establishment.
+    """Validate runtime material against an external expectation.
 
-    v3 separates externally expected deployment material from observed runtime
-    material. A matching revision alone is insufficient: source cleanliness,
-    artifact/config/environment identity, and every instance reachable from the
-    active route must agree with the expectation.
-
-    This remains an attestation boundary, not cryptographic host truth.
+    This lower-level v4 material proof is deliberately non-authorizing. Matching
+    revision, artifact, config, environment and routed instances are necessary
+    but not sufficient for runtime classification. A separate signed attestation
+    quorum must elevate the proof to authorization.
     """
     if not isinstance(observation, Mapping):
         raise DeploymentIdentityError("observation must be an object")
@@ -214,8 +213,9 @@ def establish_deployment_identity(
     expectation_fp = fingerprint_expectation(expected_deployment)
     return {
         "status": ESTABLISHED,
-        "reason": "TRUSTED_FRESH_RUNTIME_MATERIAL_MATCH",
-        "runtime_classification_authorized": True,
+        "reason": "RUNTIME_MATERIAL_MATCH_ATTESTATION_REQUIRED",
+        "runtime_classification_authorized": False,
+        "material_match_verified": True,
         "identity": {
             "service_unit": values["service_unit"],
             "working_directory": values["working_directory"],
@@ -242,11 +242,11 @@ def bind_runtime_observation(
     *,
     max_skew_seconds: int = 30,
 ) -> dict[str, Any]:
-    """Bind a runtime observation to an established Deployment Identity proof."""
+    """Bind a runtime observation only to a fully authorized deployment proof."""
     if not isinstance(deployment_proof, Mapping) or not isinstance(runtime_observation, Mapping):
         raise DeploymentIdentityError("deployment proof and runtime observation must be objects")
     if deployment_proof.get("status") != ESTABLISHED or not deployment_proof.get("runtime_classification_authorized"):
-        return {"status": NOT_BOUND, "reason": "DEPLOYMENT_IDENTITY_NOT_ESTABLISHED", "runtime_classification_authorized": False}
+        return {"status": NOT_BOUND, "reason": "DEPLOYMENT_IDENTITY_NOT_FULLY_AUTHORIZED", "runtime_classification_authorized": False}
     if not isinstance(max_skew_seconds, int) or max_skew_seconds < 0:
         raise DeploymentIdentityError("max_skew_seconds must be a non-negative integer")
 
