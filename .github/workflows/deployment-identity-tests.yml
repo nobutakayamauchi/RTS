@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - "deployment_identity/**"
-      - "tests/test_deployment_identity.py"
+      - "tests/test_deployment_identity*.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_V1_TASK.md"
       - ".github/workflows/deployment-identity-tests.yml"
   push:
@@ -12,7 +12,7 @@ on:
       - main
     paths:
       - "deployment_identity/**"
-      - "tests/test_deployment_identity.py"
+      - "tests/test_deployment_identity*.py"
       - "docs/implementation/DEPLOYMENT_IDENTITY_V1_TASK.md"
       - ".github/workflows/deployment-identity-tests.yml"
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run Deployment Identity tests
-        run: python -B -m unittest discover -s tests -p 'test_deployment_identity.py' -v
+      - name: Run Deployment Identity and Outcome Closure tests
+        run: python -B -m unittest discover -s tests -p 'test_deployment_identity*.py' -v
       - name: Run full repository tests
         run: python -B -m unittest discover -s tests -v
