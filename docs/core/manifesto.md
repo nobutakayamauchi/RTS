@@ -5,22 +5,15 @@ RTS turns AI execution into verifiable operational memory.
 RTS is execution-memory infrastructure for AI operators.
 
 It preserves reasoning continuity.
-
 It audits agent execution structure.
-
 It reconstructs operational provenance from public evidence.
 All claims remain traceable to public execution evidence.
 
-RTS (Real Time Trust System) is an execution-memory infrastructure
-designed for long-running AI collaboration, GPT workflows,
-and research operations.
+RTS (Real Time Trust System) is an execution-memory infrastructure designed for long-running AI collaboration, GPT workflows, and research operations.
 
 Modern AI sessions restart. Reasoning fragments. Execution history disappears.
 
-
-
 RTS does not control agents. RTS observes execution.
-
 Execution history becomes infrastructure.
 
 **Core capabilities**
@@ -47,12 +40,10 @@ Reasoning fragments.
 Execution history disappears.
 
 RTS converts execution itself into verifiable operational memory.
-
 Execution history becomes infrastructure.
 
 RTS observes execution.  
 It never replaces human judgement.
-
 Human authority remains final.
 
 RTS is execution memory infrastructure for AI operators.
@@ -64,7 +55,6 @@ RTS is execution memory infrastructure for AI operators.
 RTS (Real Time Trust System) is an execution-memory operating framework designed to preserve reasoning continuity inside AI workflows.
 
 RTS is not an agent controller.
-
 RTS is an observability and reconstruction layer.
 
 Agent behavior may be chaotic.  
@@ -103,9 +93,7 @@ Nothing uploads without explicit GitHub push.
 CAPTURE → EVALUATE → DECIDE → EXECUTE → AUDIT → EVOLVE → RECORD → RESET
 
 Human authority remains final.
-
 RTS observes execution.
-
 It never replaces human judgement.
 
 ---
@@ -171,7 +159,6 @@ Operators lose:
 RTS preserves thinking.
 
 Execution becomes memory.
-
 Memory becomes identity.
 
 ---
@@ -199,7 +186,6 @@ RTS functions as a continuously auditable operational record.
 Real Time Trust System (RTS), Yamauchi N. (2026).
 
 Repository execution history serves as provenance evidence.
-
 RTS is released as a public operational research artifact.
 
 ---
@@ -213,15 +199,37 @@ Removal or falsification of:
 
 is considered repository integrity violation.
 
-Forks permitted.
+Forks are welcome.
+Commercial use is welcome.
+Joint development, sponsorship, and funding are welcome.
 
 Misrepresentation is not.
+Malicious use is not.
+Bad-faith deployment primarily intended to enable abuse is not.
+
+Independent development is not restricted merely because another project reaches a similar idea or architecture.
+
+---
+
+## **Open Development / Use Boundary**
+
+RTS is developed publicly and remains source-available.
+
+The project deliberately permits broad legitimate use while preserving three non-negotiable boundaries:
+
+1. do not knowingly falsify material RTS origin;
+2. do not use RTS with malicious intent to cause or materially facilitate harm;
+3. do not deploy or distribute RTS in bad faith primarily to enable such abuse.
+
+See `LICENSE`, `docs/legal/USE_POLICY.md`, and `docs/genesis/ORIGIN_LEDGER.md`.
+
+Because these use restrictions exceed OSI open-source criteria, RTS does not claim OSI-approved open-source status under the current license. The accurate public description is **source-available / open development**.
 
 ---
 
 ## **License**
 
-MIT License
+RTS Responsible Open Use License v1.0
 
 Copyright (c) 2026 Nobutaka Yamauchi
 
@@ -233,8 +241,9 @@ RTS exists to prevent loss of thinking.
 
 Ideas should survive execution.  
 History should survive iteration.
-
 Continuity creates trust.
+
+RTS is not intended to be locked away. Use it, improve it, integrate it, and build businesses around legitimate use if useful. Preserve material provenance and do not weaponize the project against others.
 
 ---
 
@@ -244,6 +253,9 @@ RTS evolved through live operational execution.
 
 ### **Operational evolution record**
 docs/genesis/GENESIS_TO_ZERO.md
+
+### **Public origin ledger**
+docs/genesis/ORIGIN_LEDGER.md
 
 ### **Agent execution structural audit**
 analysis/agent_index.md
@@ -260,20 +272,15 @@ Evidence is publicly reproducible through:
 - immutable snapshot hashes
 
 Execution history itself becomes audit material.
-
 Genesis reconstruction is evidence-derived.
-
 All claims are traceable to public execution evidence.
 
 No retrospective narrative rewriting was performed.
-
 Human operator judgement remains final.
-
 RTS observes execution.
 
 Execution became memory.  
 Memory became identity.
-
 History remains verifiable.
 
 END.
