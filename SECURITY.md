@@ -16,6 +16,7 @@ It is a structural integrity and traceability system.
 - Humans provide final judgment.
 - Do not publish secrets or personal data.
 - When uncertain, stop and request review.
+- Do not use RTS with intent to cause harm or materially enable abuse.
 
 ---
 
@@ -29,6 +30,23 @@ The following must never be committed publicly:
 - Data without explicit disclosure rights
 - Internal infrastructure credentials
 - Personal data (GDPR-protected or similar)
+
+---
+
+## Prohibited Security-Abusive Use
+
+The RTS license does not grant permission for intentional harmful or abusive use, including use intended to facilitate:
+
+- unauthorized access;
+- credential theft;
+- malware deployment;
+- fraud;
+- stalking, harassment, or coercion;
+- deliberate privacy invasion;
+- destructive interference with systems or data;
+- comparable bad-faith abuse.
+
+Security research, defensive testing, audit, red-team work, and vulnerability analysis are not prohibited merely because they study harmful techniques; intent, authorization, scope, and actual use matter.
 
 ---
 
@@ -49,6 +67,13 @@ High-impact issues should not be discussed in public threads.
 - Public Issues and PRs must reference evidence links only.
 - High-impact structural changes require Pull Request review.
 - Maintainers may remove violating content without notice.
+- Provenance and authorship records must not be intentionally falsified.
+
+---
+
+## License / Use Boundary
+
+See `LICENSE` and `docs/legal/USE_POLICY.md` for the controlling grant and project-level acceptable-use policy.
 
 ---
 
