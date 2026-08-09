@@ -227,6 +227,10 @@ jobs:
           set -euo pipefail
           mkdir -p offline
           (cd offline && gh attestation download ../outcome-v1.json -R "$GITHUB_REPOSITORY")
+          for bundle in offline/sha256:*.jsonl; do
+            [ -e "$bundle" ] || continue
+            mv "$bundle" "${bundle/sha256:/sha256-}"
+          done
           gh attestation trusted-root > offline/trusted-root.jsonl
 
       - uses: actions/upload-artifact@v4
