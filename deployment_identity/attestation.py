@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
-from .core import DeploymentIdentityError, establish_deployment_identity
+from .core import DeploymentIdentityError, ESTABLISHED, establish_deployment_identity
 
 
 class AttestationError(ValueError):
@@ -132,11 +132,11 @@ def establish_attested_deployment_identity(
     max_age_seconds: int = 300,
     min_attestors: int = 2,
 ) -> dict[str, Any]:
-    """Establish deployment material, then require independent signed quorum.
+    """Establish runtime material, then require independent signed quorum.
 
-    The lower-level material proof is necessary but insufficient. Final runtime
-    classification authority is granted only after the signed quorum binds the
-    same observation, expectation and observation session.
+    The lower-level material proof is deliberately non-authorizing. Final
+    runtime classification authority is granted only after the signed quorum
+    binds the exact observation, external expectation and observation session.
     """
     proof = establish_deployment_identity(
         observation,
@@ -145,12 +145,12 @@ def establish_attested_deployment_identity(
         reference_time=reference_time,
         max_age_seconds=max_age_seconds,
     )
-    if not proof.get("runtime_classification_authorized"):
+    if proof.get("status") != ESTABLISHED or not proof.get("material_match_verified"):
         return proof
 
     identity = proof.get("identity")
     if not isinstance(identity, Mapping):
-        raise DeploymentIdentityError("established proof is missing identity")
+        raise DeploymentIdentityError("established material proof is missing identity")
 
     quorum = verify_attestation_quorum(
         attestations,
@@ -164,5 +164,6 @@ def establish_attested_deployment_identity(
     )
     result = dict(proof)
     result["reason"] = "SIGNED_MULTI_ATTESTOR_RUNTIME_MATERIAL_MATCH"
+    result["runtime_classification_authorized"] = True
     result["attestation_quorum"] = quorum
     return result
