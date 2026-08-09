@@ -7,14 +7,14 @@ good_input := {
 	"claim": {"supported_by_evidence": true},
 	"authority": {
 		"requested_surface": "deploy:agent-capability",
-		"allowed_surfaces": ["deploy:agent-capability"]
+		"allowed_surfaces": ["deploy:agent-capability"],
 	},
 	"expected": {
 		"source_revision": "abc123",
 		"artifact_digest": "sha256:artifact",
 		"config_digest": "sha256:config",
 		"environment_digest": "sha256:env",
-		"fingerprint": "expected-fp"
+		"fingerprint": "expected-fp",
 	},
 	"deployment": {
 		"source_revision": "abc123",
@@ -30,7 +30,7 @@ good_input := {
 		"collector_independence_verified": true,
 		"fresh": true,
 		"material_match_verified": true,
-		"authorization_granted": true
+		"authorization_granted": true,
 	},
 	"runtime": {
 		"deployment_fingerprint": "deployment-fp",
@@ -38,7 +38,7 @@ good_input := {
 		"fingerprint": "runtime-fp",
 		"session_id": "session-001",
 		"execution_id": "exec-001",
-		"trace_id": "trace-001"
+		"trace_id": "trace-001",
 	},
 	"outcome": {
 		"signature_verified": true,
@@ -52,11 +52,11 @@ good_input := {
 		"runtime_fingerprint": "runtime-fp",
 		"within_execution_window": true,
 		"retained_worm": true,
-		"classification": "SUCCESS"
+		"classification": "SUCCESS",
 	},
 	"retention": {
 		"all_terminal_paths_captured": true,
-		"worm_policy_enforced": true
+		"worm_policy_enforced": true,
 	},
 	"learning": {
 		"proposal_present": true,
@@ -65,14 +65,14 @@ good_input := {
 		"rollback_material_present": true,
 		"independent_promotion_approved": true,
 		"approver_is_proposer": false,
-		"capability_digest": "sha256:capability-v2"
+		"capability_digest": "sha256:capability-v2",
 	},
 	"promotion": {
 		"entrypoint": "proof-closure",
 		"authorized_capability_digest": "sha256:capability-v2",
 		"protected_environment": true,
 		"no_admin_bypass": true,
-		"changed_capability_reenters_proof_chain": true
+		"changed_capability_reenters_proof_chain": true,
 	},
 	"governance": {
 		"entrypoint": "proof-closure",
@@ -82,8 +82,8 @@ good_input := {
 		"independent_review": true,
 		"self_exempt": false,
 		"signed_policy_artifact": true,
-		"new_policy_reenters_same_gate": true
-	}
+		"new_policy_reenters_same_gate": true,
+	},
 }
 
 patch_section(section, patch) := object.union(good_input, {section: object.union(good_input[section], patch)})
