@@ -1,0 +1,196 @@
+name: External Challenger Provider Binding
+
+on:
+  pull_request:
+    paths:
+      - "external_challenger/**"
+      - ".github/workflows/external-challenger-provider-binding.yml"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  provider-binding-2a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      KIND_VERSION: v0.32.0
+      KIND_NODE: kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.17.0
+
+      - name: Build exact challenger policy artifact
+        id: bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf challenger-bundle.tgz external_challenger/policy
+          SHA="$(sha256sum challenger-bundle.tgz | awk '{print $1}')"
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Generate real GitHub provenance attestation
+        id: attest
+        uses: actions/attest@v4
+        with:
+          subject-path: challenger-bundle.tgz
+
+      - name: Cryptographically verify GitHub provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh attestation verify challenger-bundle.tgz \
+            --repo "$GITHUB_REPOSITORY" \
+            --source-digest "$GITHUB_SHA" \
+            --format json > github-attestation.json
+          test "$(jq 'length' github-attestation.json)" -gt 0
+
+      - name: Install kind
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x kind
+          sudo mv kind /usr/local/bin/kind
+          kind version
+
+      - name: Create ephemeral Kubernetes runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          kind create cluster --name challenger --image "$KIND_NODE" --wait 120s
+
+      - name: Deploy the attested artifact into the live runtime
+        env:
+          BUNDLE_SHA: ${{ steps.bundle.outputs.sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl create configmap challenger-bundle \
+            --from-file=challenger-bundle.tgz \
+            --from-literal=source_revision="$GITHUB_SHA" \
+            --dry-run=client -o json \
+            | jq --arg sha "$BUNDLE_SHA" '.immutable=true | .metadata.annotations={"challenger.rts/bundle-sha256":$sha}' \
+            | kubectl apply -f -
+
+          cat > /tmp/challenger.yaml <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: challenger
+            annotations:
+              challenger.rts/source-revision: "$GITHUB_SHA"
+              challenger.rts/bundle-sha256: "$BUNDLE_SHA"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: challenger
+            template:
+              metadata:
+                labels:
+                  app: challenger
+                annotations:
+                  challenger.rts/source-revision: "$GITHUB_SHA"
+                  challenger.rts/bundle-sha256: "$BUNDLE_SHA"
+              spec:
+                containers:
+                  - name: web
+                    image: nginx:1.27-alpine
+                    ports:
+                      - containerPort: 80
+                    volumeMounts:
+                      - name: challenger-bundle
+                        mountPath: /proof
+                        readOnly: true
+                volumes:
+                  - name: challenger-bundle
+                    configMap:
+                      name: challenger-bundle
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: challenger
+          spec:
+            selector:
+              app: challenger
+            ports:
+              - port: 80
+                targetPort: 80
+          EOF
+          kubectl apply -f /tmp/challenger.yaml
+          kubectl rollout status deployment/challenger --timeout=120s
+          kubectl wait --for=jsonpath='{.endpoints[0].conditions.ready}'=true \
+            endpointslice -l kubernetes.io/service-name=challenger --timeout=120s
+
+      - name: Collect raw external provider evidence
+        env:
+          BUNDLE_SHA: ${{ steps.bundle.outputs.sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl get configmap challenger-bundle -o json > k8s-configmap.json
+          kubectl get deployment challenger -o json > k8s-deployment.json
+          kubectl get pods -l app=challenger -o json > k8s-pods.json
+          kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json > k8s-endpointslices.json
+
+          jq -n \
+            --slurpfile att github-attestation.json \
+            --slurpfile cm k8s-configmap.json \
+            --slurpfile dep k8s-deployment.json \
+            --slurpfile pods k8s-pods.json \
+            --slurpfile eps k8s-endpointslices.json \
+            --arg source "$GITHUB_SHA" \
+            --arg bundle "$BUNDLE_SHA" \
+            '{
+              verification:{github_cli_exit_verified:true},
+              expected:{source_revision:$source,bundle_sha256:$bundle,service_name:"challenger",app_label:"challenger"},
+              github_attestations:$att[0],
+              kubernetes:{config_map:$cm[0],deployment:$dep[0],pods:$pods[0],endpoint_slices:$eps[0]}
+            }' > provider-input.json
+
+      - name: Bind real provider evidence with thin Rego
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESULT="$(opa eval --format raw --input provider-input.json --data external_challenger/policy/provider_binding.rego 'data.external_challenger.provider_binding.allow')"
+          test "$RESULT" = "true"
+
+      - name: Adversarially mutate live evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          assert_denied() {
+            local file="$1"
+            local result
+            result="$(opa eval --format raw --input "$file" --data external_challenger/policy/provider_binding.rego 'data.external_challenger.provider_binding.allow')"
+            test "$result" = "false"
+          }
+
+          jq '.kubernetes.config_map.data.source_revision="forged"' provider-input.json > /tmp/forged-source.json
+          assert_denied /tmp/forged-source.json
+
+          jq '.kubernetes.endpoint_slices.items[0].endpoints[0].conditions.ready=false' provider-input.json > /tmp/unready-route.json
+          assert_denied /tmp/unready-route.json
+
+          jq '.kubernetes.pods.items[0].metadata.annotations["challenger.rts/bundle-sha256"]="forged"' provider-input.json > /tmp/forged-runtime.json
+          assert_denied /tmp/forged-runtime.json
+
+          jq '.github_attestations=[]' provider-input.json > /tmp/no-attestation.json
+          assert_denied /tmp/no-attestation.json
+
+      - name: Report glue size
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "provider_binding_rego_lines=$(wc -l < external_challenger/policy/provider_binding.rego)"
+          echo "workflow_lines=$(wc -l < .github/workflows/external-challenger-provider-binding.yml)"
