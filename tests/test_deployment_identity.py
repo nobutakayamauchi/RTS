@@ -33,9 +33,10 @@ class DeploymentIdentityTests(unittest.TestCase):
     def provenance(self, observation=None, expectation=None, same_domain=False):
         observation=observation or self.observation(); expectation=expectation or self.expectation(); records=[]
         domains=("host-plane","network-plane") if not same_domain else ("shared-plane","shared-plane")
+        route_value=",".join(sorted(observation["active_route_instance_ids"]))
         for collector,domain in zip(("collector-a","collector-b"),domains):
             for stage,subject,value in (
-                ("route","POST /render","worker-1"),("process","svc","python -m app"),("instance","worker-1","worker-1"),("artifact","worker-1","sha256:artifact-good"),
+                ("route",observation["active_route_surface"],route_value),("process","svc",observation["executable_or_module"]),("instance","worker-1","worker-1"),("artifact","worker-1","sha256:artifact-good"),
             ):
                 m={"record_id":f"{collector}-{stage}","collector_id":collector,"trust_domain":domain,"source_locator":f"{domain}:{stage}","measurement_stage":stage,"subject_id":subject,"observed_value":value,"observation_fingerprint":fingerprint_observation(observation),"expectation_fingerprint":fingerprint_expectation(expectation),"observation_session_id":observation["observation_session_id"],"issued_at":"2026-08-09T17:00:06+09:00"}
                 records.append({**m,"signature":compute_provenance_signature(m,self.collector_keys()[collector])})
@@ -45,6 +46,9 @@ class DeploymentIdentityTests(unittest.TestCase):
         o=kwargs.get("observation",self.observation()); e=kwargs.get("expectation",self.expectation())
         return establish_attested_deployment_identity(o,expected_deployment=e,trusted_observer_ids=["observer-prod-01"],reference_time="2026-08-09T17:00:10+09:00",attestations=kwargs.get("attestations",self.attestations(o,e)),trusted_attestation_keys=self.attestor_keys(),collector_provenance=kwargs.get("collector_provenance",self.provenance(o,e)),trusted_collector_keys=self.collector_keys(),max_age_seconds=300,min_attestors=2,min_independent_domains=2)
 
+    def resign(self, record):
+        material={k:v for k,v in record.items() if k!="signature"}; record["signature"]=compute_provenance_signature(material,self.collector_keys()[record["collector_id"]])
+
     def test_independent_provenance_authorizes(self):
         proof=self.establish(); self.assertTrue(proof["runtime_classification_authorized"]); self.assertEqual(proof["collector_provenance"]["verified_trust_domains"],["host-plane","network-plane"])
 
@@ -53,6 +57,14 @@ class DeploymentIdentityTests(unittest.TestCase):
 
     def test_same_trust_domain_cannot_fake_independence(self):
         with self.assertRaisesRegex(ProvenanceError,"domain quorum not met"): self.establish(collector_provenance=self.provenance(same_domain=True))
+
+    def test_same_collector_cannot_claim_multiple_domains(self):
+        p=self.provenance(); target=next(r for r in p if r["collector_id"]=="collector-b"); target["collector_id"]="collector-a"; self.resign(target)
+        with self.assertRaisesRegex(ProvenanceError,"multiple trust domains"): self.establish(collector_provenance=p)
+
+    def test_shared_source_locator_cannot_fake_independence(self):
+        p=self.provenance(); a=next(r for r in p if r["collector_id"]=="collector-a" and r["measurement_stage"]=="route"); b=next(r for r in p if r["collector_id"]=="collector-b" and r["measurement_stage"]=="route"); b["source_locator"]=a["source_locator"]; self.resign(b)
+        with self.assertRaisesRegex(ProvenanceError,"shared across trust domains"): self.establish(collector_provenance=p)
 
     def test_missing_stage_in_one_domain_fails_closed(self):
         p=[r for r in self.provenance() if not (r["trust_domain"]=="network-plane" and r["measurement_stage"]=="process")]
@@ -64,15 +76,20 @@ class DeploymentIdentityTests(unittest.TestCase):
         with self.assertRaisesRegex(ProvenanceError,"every routed instance"): self.establish(observation=o,collector_provenance=p,attestations=self.attestations(o,self.expectation()))
 
     def test_artifact_measurement_mismatch_fails(self):
-        p=self.provenance(); target=next(r for r in p if r["collector_id"]=="collector-b" and r["measurement_stage"]=="artifact"); target["observed_value"]="sha256:evil"; m={k:v for k,v in target.items() if k!="signature"}; target["signature"]=compute_provenance_signature(m,self.collector_keys()["collector-b"])
+        p=self.provenance(); target=next(r for r in p if r["collector_id"]=="collector-b" and r["measurement_stage"]=="artifact"); target["observed_value"]="sha256:evil"; self.resign(target)
         with self.assertRaisesRegex(ProvenanceError,"artifact measurement mismatch"): self.establish(collector_provenance=p)
+
+    def test_route_and_process_values_are_measured_not_stage_labels(self):
+        for stage,bad,pattern in (("route","wrong-worker","route measurement mismatch"),("process","wrong-process","process measurement mismatch")):
+            p=self.provenance(); target=next(r for r in p if r["collector_id"]=="collector-b" and r["measurement_stage"]==stage); target["observed_value"]=bad; self.resign(target)
+            with self.assertRaisesRegex(ProvenanceError,pattern): self.establish(collector_provenance=p)
 
     def test_forged_provenance_signature_fails(self):
         p=self.provenance(); p[0]["signature"]="0"*64
         with self.assertRaisesRegex(ProvenanceError,"invalid provenance signature"): self.establish(collector_provenance=p)
 
     def test_provenance_from_different_session_fails(self):
-        p=self.provenance(); p[0]["observation_session_id"]="other"; m={k:v for k,v in p[0].items() if k!="signature"}; p[0]["signature"]=compute_provenance_signature(m,self.collector_keys()[p[0]["collector_id"]])
+        p=self.provenance(); p[0]["observation_session_id"]="other"; self.resign(p[0])
         with self.assertRaisesRegex(ProvenanceError,"different session"): self.establish(collector_provenance=p)
 
     def test_attestor_quorum_still_required(self):
