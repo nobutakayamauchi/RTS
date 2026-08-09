@@ -1,0 +1,33 @@
+name: External Challenger Overtime Full Cycle
+
+on:
+  pull_request:
+    paths:
+      - "external_challenger/overtime/**"
+      - ".github/workflows/external-challenger-overtime*.yml"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  actions: read
+
+jobs:
+  policy-authority:
+    uses: ./.github/workflows/external-challenger-overtime-policy-authority.yml
+
+  proposer:
+    needs: policy-authority
+    uses: ./.github/workflows/external-challenger-overtime-proposer.yml
+
+  evaluator:
+    needs: proposer
+    uses: ./.github/workflows/external-challenger-overtime-evaluator.yml
+
+  promoter:
+    needs: evaluator
+    uses: ./.github/workflows/external-challenger-overtime-promoter.yml
+
+  deployer:
+    needs: promoter
+    uses: ./.github/workflows/external-challenger-overtime-deployer.yml
