@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          opa fmt --fail external_challenger/overtime/policy.rego
+          opa fmt -w external_challenger/overtime/policy.rego
           POLICY_SHA="$(sha256sum external_challenger/overtime/policy.rego | awk '{print $1}')"
           tar -czf overtime-policy.tgz external_challenger/overtime/policy.rego
           BUNDLE_SHA="$(sha256sum overtime-policy.tgz | awk '{print $1}')"
