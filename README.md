@@ -1,5 +1,13 @@
 # RTS
 
+> **Project status: FROZEN / DEVELOPMENT ENDED — 2026-08-09**  
+> Formal abolition-test verdict: **EVIDENCE_INSUFFICIENT / REVISE**  
+> Engineering continuation decision: **NO**
+>
+> RTS is preserved as a research prototype, evidence corpus, and historical implementation record. Further RTS-specific Runtime / Controller / Governance Kernel expansion is not authorized under the final engineering decision.
+>
+> Final records: [`RTS Development Freeze`](docs/audit/RTS_DEVELOPMENT_FREEZE_2026-08-09.md) · [`Final Abolition Gate`](docs/audit/RTS_FINAL_ABOLITION_GATE_2026-08.md)
+
 Decision Reconstructability Protocol for AI-accelerated systems.
 
 Acceleration without reconstructability leads to structural collapse.
@@ -134,7 +142,7 @@ RTS is a **structural ledger**.
 
 ## Open Development and Use
 
-RTS is developed publicly and its source remains inspectable.
+RTS was developed publicly and its source remains inspectable. Development is now frozen; the text below describes the project's use posture, not an active development roadmap.
 
 Legitimate use is intentionally broad. Personal use, research, modification, forks, integrations, commercial products and services, collaboration, sponsorship, and funding are welcome.
 
@@ -158,6 +166,8 @@ Because the current RTS license includes use restrictions, RTS does **not** clai
 
 ## Documentation
 
+- Final Development Freeze → `docs/audit/RTS_DEVELOPMENT_FREEZE_2026-08-09.md`
+- Final Abolition Gate → `docs/audit/RTS_FINAL_ABOLITION_GATE_2026-08.md`
 - Manifest → `docs/manifest.md`
 - Technical Overview → `docs/technical_overview.md`
 - Genesis / History → `docs/genesis/`
