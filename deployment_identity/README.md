@@ -1,6 +1,6 @@
-# Deployment Identity v4
+# Deployment Identity v5
 
-Deployment Identity establishes which runtime material and route set were active before RTS classifies runtime behavior, then requires independent signed attestations before that classification authority is granted.
+Deployment Identity v5 adds independently sourced collector provenance before runtime classification can be authorized.
 
 ## Invariants
 
@@ -9,52 +9,31 @@ Code existence != runtime evidence.
 Revision equality != runtime reality.
 Material match != authorization.
 Single-observer trust != proof quorum.
+Attestor count != independent observation.
+Shared observation path != independent provenance.
 ```
 
-A matching Git revision is insufficient. Runtime identity also depends on artifact, configuration, environment, source-tree cleanliness, and the instances reachable from the active route. Even when all of those match, the lower-level material proof is deliberately non-authorizing until a signed attestation quorum is verified.
+A signed quorum over one observation is necessary but no longer sufficient. RTS now requires independent measured provenance for the route, process, routed instance set, and artifact.
 
-## External expectation
+## Provenance requirement
 
-The verifier requires a caller-supplied deployment expectation containing:
-
-- `source_revision`
-- `artifact_digest`
-- `config_fingerprint`
-- `environment_fingerprint`
-
-Expected truth is not accepted from the runtime observation itself.
-
-## Signed attestation quorum
-
-Final runtime classification authority requires at least two distinct trusted attestors by default. Each attestation signs the exact:
-
-- deployment observation fingerprint;
-- external expectation fingerprint;
-- observation session id;
-- attestation issue time.
-
-The current deterministic implementation uses HMAC-SHA256. The attestation keyring is supplied externally; no attestation secret is stored in this repository.
-
-A single attestor, duplicated attestor id, forged signature, unknown attestor, stale/future attestation, different observation, different expectation, or different session fails closed.
-
-## Authorization split
-
-`establish_deployment_identity(...)` performs the material proof only. A successful material match returns:
+At least two independent `trust_domain` paths are required by default. Every domain must independently cover:
 
 ```text
-material_match_verified: true
-runtime_classification_authorized: false
-reason: RUNTIME_MATERIAL_MATCH_ATTESTATION_REQUIRED
+route -> process -> instance -> artifact
 ```
 
-`establish_attested_deployment_identity(...)` verifies the independent signed quorum over that exact material proof. Only then may it emit:
+Every provenance record is signed by an externally trusted collector key and binds the exact deployment observation fingerprint, expectation fingerprint, observation session and issue time. Every trust domain must cover every routed instance. Artifact measurements must agree with the authorized deployment material.
 
-```text
-runtime_classification_authorized: true
-reason: SIGNED_MULTI_ATTESTOR_RUNTIME_MATERIAL_MATCH
-```
+The following fail closed:
 
-A Runtime Observation refuses to bind to a raw material proof that has not crossed the attestation boundary.
+- two collectors in the same trust domain pretending to be independent;
+- missing route/process/instance/artifact stages;
+- failure to cover every routed worker;
+- provenance for another observation, expectation, or session;
+- stale/future records;
+- unknown collectors or forged signatures;
+- artifact measurement drift.
 
 ## Proof chain
 
@@ -63,30 +42,17 @@ Expected Source / Material
   -> Fresh Deployment Material Observation
   -> Active Route Instance Set
   -> Non-authorizing Material Proof
-  -> Independent Signed Attestation Quorum
+  -> Signed Attestation Quorum
+  -> Independent Collector Provenance
+       route -> process -> instance -> artifact
+       across >= 2 trust domains
   -> Authorized Deployment Identity
   -> fingerprint/session/time-bound Runtime Observation
   -> Outcome Evidence
 ```
 
-## CLI
-
-```bash
-python -m deployment_identity.cli verify \
-  --observation path/to/observation.json \
-  --expectation path/to/expected-deployment.json \
-  --attestations path/to/attestations.json \
-  --attestation-keyring path/to/keyring.json \
-  --trusted-observer-id observer-prod-01 \
-  --reference-time 2026-08-09T17:00:10+09:00 \
-  --min-attestors 2 \
-  --max-age-seconds 300
-```
-
 ## Security boundary
 
-v4 proves authenticated agreement by independent policy-recognized attestors over one exact deployment claim. It does **not** prove physical host truth against colluding or jointly compromised collectors.
-
-The next hardening layer is independently collected route/process provenance and stronger measured attestation such as container/image platform evidence or hardware-backed mechanisms where available. Privileged collection, key lifecycle management, Kubernetes/service-mesh discovery, secret-safe environment measurement, and hardware roots of trust remain separately governed work.
+v5 proves authenticated provenance diversity and consistency. It still does not prove physical truth against a substrate capable of deceiving every independent collector. Hardware-backed attestation, platform-native measured identity, privileged discovery, key lifecycle management and secret-safe environment measurement remain separately governed extensions.
 
 The verifier itself remains deterministic and performs no network, shell, provider, deployment, or repository mutation.
