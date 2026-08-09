@@ -1,0 +1,85 @@
+name: External Challenger Overtime Policy Authority
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  actions: read
+
+jobs:
+  authorize-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.17.0
+
+      - name: Validate and package fixed policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          opa fmt --fail external_challenger/overtime/policy.rego
+          POLICY_SHA="$(sha256sum external_challenger/overtime/policy.rego | awk '{print $1}')"
+          tar -czf overtime-policy.tgz external_challenger/overtime/policy.rego
+          BUNDLE_SHA="$(sha256sum overtime-policy.tgz | awk '{print $1}')"
+          jq -n \
+            --arg version "OVERTIME-POLICY-V1" \
+            --arg policy_sha "$POLICY_SHA" \
+            --arg bundle_sha "$BUNDLE_SHA" \
+            --arg source "$GITHUB_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg authority "$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-policy-authority.yml" \
+            '{policy_version:$version,policy_sha256:$policy_sha,bundle_sha256:$bundle_sha,source_revision:$source,run_id:$run,authority_identity:$authority,status:"ACTIVE"}' \
+            > policy-activation.json
+
+      - name: Attest policy bundle provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: overtime-policy.tgz
+
+      - name: Attest policy activation decision
+        uses: actions/attest@v4
+        with:
+          subject-path: policy-activation.json
+          predicate-type: https://example.org/external-challenger/policy-activation/v1
+          predicate-path: policy-activation.json
+
+      - name: Verify exact policy authority identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-policy-authority.yml"
+          gh attestation verify overtime-policy.tgz --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" >/dev/null
+          gh attestation verify policy-activation.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" \
+            --predicate-type https://example.org/external-challenger/policy-activation/v1 >/dev/null
+
+      - name: Unauthorized policy replacement must fail verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp overtime-policy.tgz /tmp/tampered-policy.tgz
+          printf 'tamper' >> /tmp/tampered-policy.tgz
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-policy-authority.yml"
+          if gh attestation verify /tmp/tampered-policy.tgz --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" >/dev/null 2>&1; then
+            echo 'tampered policy unexpectedly verified'
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overtime-policy-authority
+          path: |
+            overtime-policy.tgz
+            policy-activation.json
+          if-no-files-found: error
+          retention-days: 30
