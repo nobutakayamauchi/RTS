@@ -1,6 +1,6 @@
-# Deployment Identity v5
+# Deployment Identity v6
 
-Deployment Identity v5 adds independently sourced collector provenance before runtime classification can be authorized.
+Deployment Identity v6 closes the live proof chain from authorized deployment and runtime observation into signed outcome evidence.
 
 ## Invariants
 
@@ -13,30 +13,27 @@ Attestor count != independent observation.
 Collector-declared domain != trusted independence.
 Shared observation path != independent provenance.
 Partial artifact coverage != runtime proof.
+Runtime proof != outcome proof.
+Matching execution label != proof closure.
+Unsigned outcome != authorized evidence.
+Replayed outcome != new evidence.
 ```
 
-A signed quorum over one observation is necessary but no longer sufficient. RTS requires independent measured provenance for route, process, every routed instance, and every routed artifact.
+## Live Outcome Closure
 
-## Externally bound independence
+A runtime result becomes eligible as live Outcome Evidence only after the runtime observation has already been bound to an authorized Deployment Identity.
 
-Collector independence is policy data, not collector self-description. The caller must provide both:
+The Outcome Closure verifier then requires the exact same:
 
-- an external collector keyring; and
-- an external `collector_id -> trust_domain` map.
+- deployment observation fingerprint;
+- external expectation fingerprint;
+- observation session id;
+- runtime observation fingerprint; and
+- execution id.
 
-A signed record whose claimed `trust_domain` disagrees with that external map fails closed. Reusing one `source_locator` across separate trust domains also fails closed.
+The supplied runtime observation is hashed again and must match the fingerprint already preserved by the Runtime Binding result. This prevents an outcome from being attached to a runtime record that was changed after authorization.
 
-## Provenance requirement
-
-At least two policy-bound trust domains are required by default. Every domain must independently cover:
-
-```text
-route -> process -> instance -> artifact
-```
-
-Route measurements must identify the active route and complete routed-worker set. Process measurements must match the active executable/module. Every trust domain must measure every routed instance and the artifact digest for every routed instance.
-
-Every record also binds the exact deployment observation fingerprint, expectation fingerprint, observation session and issue time.
+Outcome Evidence also requires an externally trusted `outcome_source_id` signature, an unused `evidence_id` relative to the caller-supplied evidence ledger, and an outcome timestamp within the governed execution window. Different run/session/deployment/runtime fingerprints, forged or unknown sources, replayed evidence ids, and temporally impossible outcomes fail closed.
 
 ## Proof chain
 
@@ -51,11 +48,17 @@ Expected Source / Material
        across >= 2 policy trust domains
   -> Authorized Deployment Identity
   -> fingerprint/session/time-bound Runtime Observation
-  -> Outcome Evidence
+  -> execution-bound Runtime Observation fingerprint
+  -> signed, replay-checked Outcome Evidence
+  -> Proof-Closed Outcome
 ```
+
+## Existing Outcome Evidence Corpus boundary
+
+The existing `outcome_evidence/` package remains a `SIMULATED_ONLY` research corpus and remains permanently non-promoting. v6 does not reinterpret those fixtures as external or production success. The live Outcome Closure is a separate verification layer and does not weaken the corpus boundary.
 
 ## Security boundary
 
-v5 proves authenticated provenance diversity, externally anchored independence, and complete routed-instance/artifact coverage. It still does not prove physical truth against a lower substrate capable of deceiving every independent collector. Hardware-backed attestation, platform-native measured identity, privileged discovery, key lifecycle management and secret-safe environment measurement remain separately governed extensions.
+v6 proves cryptographic origin from a policy-trusted outcome source and deterministic binding to one already-authorized runtime execution. It does **not** prove physical truth if the trusted outcome source itself or a lower substrate is compromised. Hardware-backed/platform-native measurement and external real-world success verification remain separately governed concerns.
 
-The verifier itself remains deterministic and performs no network, shell, provider, deployment, or repository mutation.
+Replay rejection depends on the caller supplying the current accepted evidence-id ledger. The verifier is deterministic and read-only; it does not mutate that ledger itself.
