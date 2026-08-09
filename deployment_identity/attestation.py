@@ -87,7 +87,7 @@ def verify_attestation_quorum(attestations: Sequence[Mapping[str, Any]], *, trus
     return {"status": "ATTESTATION_QUORUM_VERIFIED", "verified_attestors": sorted(verified), "attestor_count": len(verified), "min_attestors": min_attestors}
 
 
-def establish_attested_deployment_identity(observation: Mapping[str, Any], *, expected_deployment: Mapping[str, Any], trusted_observer_ids: Sequence[str], reference_time: str, attestations: Sequence[Mapping[str, Any]], trusted_attestation_keys: Mapping[str, str], collector_provenance: Sequence[Mapping[str, Any]], trusted_collector_keys: Mapping[str, str], max_age_seconds: int = 300, min_attestors: int = 2, min_independent_domains: int = 2) -> dict[str, Any]:
+def establish_attested_deployment_identity(observation: Mapping[str, Any], *, expected_deployment: Mapping[str, Any], trusted_observer_ids: Sequence[str], reference_time: str, attestations: Sequence[Mapping[str, Any]], trusted_attestation_keys: Mapping[str, str], collector_provenance: Sequence[Mapping[str, Any]], trusted_collector_keys: Mapping[str, str], trusted_collector_domains: Mapping[str, str], max_age_seconds: int = 300, min_attestors: int = 2, min_independent_domains: int = 2) -> dict[str, Any]:
     proof = establish_deployment_identity(observation, expected_deployment=expected_deployment, trusted_observer_ids=trusted_observer_ids, reference_time=reference_time, max_age_seconds=max_age_seconds)
     if proof.get("status") != ESTABLISHED or not proof.get("material_match_verified"):
         return proof
@@ -98,6 +98,7 @@ def establish_attested_deployment_identity(observation: Mapping[str, Any], *, ex
     provenance = verify_collector_provenance(
         collector_provenance,
         trusted_collector_keys=trusted_collector_keys,
+        trusted_collector_domains=trusted_collector_domains,
         observation_fingerprint=str(proof["observation_fingerprint"]),
         expectation_fingerprint=str(proof["expectation_fingerprint"]),
         observation_session_id=str(identity["observation_session_id"]),
