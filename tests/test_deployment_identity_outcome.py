@@ -70,10 +70,6 @@ class OutcomeClosureTests(unittest.TestCase):
             max_outcome_delay_seconds=max_delay,
         )
 
-    def resign(self, outcome):
-        material = {k: v for k, v in outcome.items() if k != "signature"}
-        outcome["signature"] = compute_outcome_signature(material, self.outcome_keys()["outcome-collector-01"])
-
     def test_signed_outcome_binds_to_exact_runtime_execution(self):
         result = self.bind()
         self.assertEqual(result["status"], OUTCOME_BOUND)
@@ -116,10 +112,14 @@ class OutcomeClosureTests(unittest.TestCase):
         result = self.bind(outcome=outcome)
         self.assertEqual(result["reason"], "OUTCOME_DEPLOYMENT_FINGERPRINT_MISMATCH")
 
+    def test_outcome_from_different_expectation_fails(self):
+        outcome = self.outcome(deployment_expectation_fingerprint="other-expectation")
+        result = self.bind(outcome=outcome)
+        self.assertEqual(result["reason"], "OUTCOME_EXPECTATION_FINGERPRINT_MISMATCH")
+
     def test_untrusted_outcome_source_fails(self):
         outcome = self.outcome()
         outcome["outcome_source_id"] = "attacker"
-        material = {k: v for k, v in outcome.items() if k != "signature"}
         outcome["signature"] = "0" * 64
         result = self.bind(outcome=outcome)
         self.assertEqual(result["reason"], "UNTRUSTED_OUTCOME_SOURCE")
