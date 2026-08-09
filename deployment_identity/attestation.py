@@ -6,6 +6,8 @@ import json
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
+from .core import DeploymentIdentityError, establish_deployment_identity
+
 
 class AttestationError(ValueError):
     """Raised when collector attestations cannot establish a trusted quorum."""
@@ -117,3 +119,50 @@ def verify_attestation_quorum(
         "attestor_count": len(verified),
         "min_attestors": min_attestors,
     }
+
+
+def establish_attested_deployment_identity(
+    observation: Mapping[str, Any],
+    *,
+    expected_deployment: Mapping[str, Any],
+    trusted_observer_ids: Sequence[str],
+    reference_time: str,
+    attestations: Sequence[Mapping[str, Any]],
+    trusted_attestation_keys: Mapping[str, str],
+    max_age_seconds: int = 300,
+    min_attestors: int = 2,
+) -> dict[str, Any]:
+    """Establish deployment material, then require independent signed quorum.
+
+    The lower-level material proof is necessary but insufficient. Final runtime
+    classification authority is granted only after the signed quorum binds the
+    same observation, expectation and observation session.
+    """
+    proof = establish_deployment_identity(
+        observation,
+        expected_deployment=expected_deployment,
+        trusted_observer_ids=trusted_observer_ids,
+        reference_time=reference_time,
+        max_age_seconds=max_age_seconds,
+    )
+    if not proof.get("runtime_classification_authorized"):
+        return proof
+
+    identity = proof.get("identity")
+    if not isinstance(identity, Mapping):
+        raise DeploymentIdentityError("established proof is missing identity")
+
+    quorum = verify_attestation_quorum(
+        attestations,
+        trusted_keys=trusted_attestation_keys,
+        observation_fingerprint=str(proof["observation_fingerprint"]),
+        expectation_fingerprint=str(proof["expectation_fingerprint"]),
+        observation_session_id=str(identity["observation_session_id"]),
+        reference_time=reference_time,
+        max_age_seconds=max_age_seconds,
+        min_attestors=min_attestors,
+    )
+    result = dict(proof)
+    result["reason"] = "SIGNED_MULTI_ATTESTOR_RUNTIME_MATERIAL_MATCH"
+    result["attestation_quorum"] = quorum
+    return result
