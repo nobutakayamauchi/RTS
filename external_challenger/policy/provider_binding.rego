@@ -2,8 +2,9 @@ package external_challenger.provider_binding
 
 import rego.v1
 
-# Phase 2A consumes GitHub CLI attestation verification output and raw
-# Kubernetes API objects. There is no custom collector/controller process.
+# Phase 2B consumes GitHub CLI attestation verification output, raw Kubernetes
+# API objects, and SPIRE Workload API output. There is no custom
+# collector/controller process.
 
 default allow := false
 
@@ -69,6 +70,12 @@ all_routed_pods_runtime_bound if {
 	}
 }
 
+spire_workload_identity_bound if {
+	input.spire.pod_name in routed_pod_names
+	input.expected.spiffe_id != ""
+	contains(input.spire.workload_api_output, input.expected.spiffe_id)
+}
+
 allow if {
 	input.verification.github_cli_exit_verified == true
 	input.expected.source_revision != ""
@@ -77,4 +84,5 @@ allow if {
 	mounted_bundle_matches
 	deployment_binds_source
 	all_routed_pods_runtime_bound
+	spire_workload_identity_bound
 }
