@@ -30,6 +30,8 @@ jobs:
         with:
           version: 1.17.0
       - name: Check challenger policy formatting
-        run: opa fmt --fail external_challenger/policy/closure.rego external_challenger/policy/closure_test.rego
+        run: |
+          opa fmt -w external_challenger/policy/closure.rego external_challenger/policy/closure_test.rego
+          git diff --exit-code -- external_challenger/policy/closure.rego external_challenger/policy/closure_test.rego
       - name: Run abolition adversary tests
         run: opa test external_challenger/policy -v
