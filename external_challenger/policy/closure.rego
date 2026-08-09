@@ -8,9 +8,13 @@ import rego.v1
 # binds their verified outputs into fail-closed lifecycle decisions.
 
 default allow_execution := false
+
 default allow_outcome := false
+
 default allow_promotion := false
+
 default allow_governance_change := false
+
 default allow_full_cycle := false
 
 scope_authorized if {
