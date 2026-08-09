@@ -90,7 +90,7 @@ jobs:
           test -n "$SOCKET_DIR" && test "$SOCKET_DIR" != "null"
           echo "SPIRE_SOCKET_DIR=$SOCKET_DIR" >> "$GITHUB_ENV"
 
-      - name: Deploy attested artifact with SPIRE identity probe
+      - name: Deploy attested artifact with SPIRE identity sidecar
         env:
           BUNDLE_SHA: ${{ steps.bundle.outputs.sha256 }}
         shell: bash
@@ -124,15 +124,6 @@ jobs:
                   challenger.rts/source-revision: "$GITHUB_SHA"
                   challenger.rts/bundle-sha256: "$BUNDLE_SHA"
               spec:
-                initContainers:
-                  - name: identity-probe
-                    image: ghcr.io/spiffe/spire-agent:1.15.2
-                    command: ["/opt/spire/bin/spire-agent"]
-                    args: ["api", "fetch", "-socketPath", "/run/spire/sockets/agent.sock"]
-                    volumeMounts:
-                      - name: spire-agent-socket
-                        mountPath: /run/spire/sockets
-                        readOnly: true
                 containers:
                   - name: web
                     image: nginx:1.27-alpine
@@ -141,6 +132,14 @@ jobs:
                     volumeMounts:
                       - name: challenger-bundle
                         mountPath: /proof
+                        readOnly: true
+                  - name: identity-probe
+                    image: ghcr.io/spiffe/spire-agent:1.15.2
+                    command: ["/opt/spire/bin/spire-agent"]
+                    args: ["api", "fetch", "-socketPath", "/run/spire/sockets/agent.sock"]
+                    volumeMounts:
+                      - name: spire-agent-socket
+                        mountPath: /run/spire/sockets
                         readOnly: true
                 volumes:
                   - name: challenger-bundle
@@ -173,7 +172,13 @@ jobs:
           set -euo pipefail
           POD="$(kubectl get pods -l app=challenger -o jsonpath='{.items[0].metadata.name}')"
           test -n "$POD"
-          kubectl logs "$POD" -c identity-probe > spire-identity.txt
+          for _ in $(seq 1 30); do
+            kubectl logs "$POD" -c identity-probe > spire-identity.txt 2>&1 || true
+            if grep -Fq "$SPIFFE_ID" spire-identity.txt; then
+              break
+            fi
+            sleep 2
+          done
           grep -F "$SPIFFE_ID" spire-identity.txt
           echo "CHALLENGER_POD=$POD" >> "$GITHUB_ENV"
 
@@ -244,3 +249,19 @@ jobs:
           set -euo pipefail
           echo "provider_binding_rego_lines=$(wc -l < external_challenger/policy/provider_binding.rego)"
           echo "workflow_lines=$(wc -l < .github/workflows/external-challenger-provider-binding.yml)"
+
+      - name: Provider binding diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          echo '=== SPIRE workloads ==='
+          kubectl get pods -n spire -o wide
+          echo '=== Challenger pods ==='
+          kubectl get pods -l app=challenger -o wide
+          kubectl describe pods -l app=challenger
+          POD="$(kubectl get pods -l app=challenger -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)"
+          if [ -n "$POD" ]; then
+            echo '=== identity probe logs ==='
+            kubectl logs "$POD" -c identity-probe --tail=200
+          fi
