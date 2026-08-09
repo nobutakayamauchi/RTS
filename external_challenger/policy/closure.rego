@@ -13,8 +13,15 @@ default allow_promotion := false
 default allow_governance_change := false
 default allow_full_cycle := false
 
+scope_authorized if {
+	some i
+	input.authority.allowed_surfaces[i] == input.authority.requested_surface
+}
+
 allow_execution if {
+	input.entrypoint == "proof-closure"
 	input.claim.supported_by_evidence
+	scope_authorized
 	input.deployment.source_revision == input.expected.source_revision
 	input.deployment.artifact_digest == input.expected.artifact_digest
 	input.deployment.config_digest == input.expected.config_digest
@@ -48,11 +55,14 @@ allow_outcome if {
 	input.outcome.runtime_fingerprint == input.runtime.fingerprint
 	input.outcome.within_execution_window
 	input.outcome.retained_worm
+	input.retention.all_terminal_paths_captured
+	input.retention.worm_policy_enforced
 	input.outcome.classification in {"SUCCESS", "FAILURE", "ESCALATION", "RECOVERY", "REJECTED", "WITHHELD"}
 }
 
 allow_promotion if {
 	allow_outcome
+	input.promotion.entrypoint == "proof-closure"
 	input.learning.proposal_present
 	input.learning.regression_passed
 	input.learning.counter_evidence_checked
@@ -67,6 +77,7 @@ allow_promotion if {
 }
 
 allow_governance_change if {
+	input.governance.entrypoint == "proof-closure"
 	input.governance.change_requested
 	input.governance.policy_source_protected
 	input.governance.required_checks_passed
