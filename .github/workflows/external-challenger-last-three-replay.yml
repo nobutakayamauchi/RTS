@@ -73,7 +73,6 @@ jobs:
           echo "marker_sha=$MARKER_SHA" >> "$GITHUB_OUTPUT"
           echo "marker_ref=$MARKER_REF" >> "$GITHUB_OUTPUT"
 
-          # Provider availability is required. Unknown => fail closed.
           if ! rekor-cli loginfo --rekor_server https://rekor.sigstore.dev >/tmp/rekor-loginfo.txt 2>/tmp/rekor-loginfo.err; then
             echo "Rekor unavailable: refusing transition"
             echo "consumed=true" >> "$GITHUB_OUTPUT"
@@ -150,8 +149,8 @@ jobs:
         run: |
           set -euo pipefail
           find results -name status -print -exec cat {} \;
-          CREATED="$(grep -Rxc '201' results/*/status 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')"
-          BLOCKED="$(grep -Rxc 'BLOCKED_PREEXISTING' results/*/status 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')"
+          CREATED="$(find results -name status -exec grep -l '^201$' {} \; | wc -l)"
+          BLOCKED="$(find results -name status -exec grep -l '^BLOCKED_PREEXISTING$' {} \; | wc -l)"
           if [ "$PRECONSUMED" = false ]; then
             test "$CREATED" -eq 1
           else
@@ -162,8 +161,8 @@ jobs:
           jq -cn --arg approval "$APPROVAL_SHA" --arg candidate "$CANDIDATE_SHA" \
             '{kind:"consumed-promotion",approval_sha256:$approval,candidate_sha256:$candidate,transition:"promotion-to-deploy-v1"}' > marker.json
           test "$(sha256sum marker.json | awk '{print $1}')" = "$MARKER_SHA"
-      - name: Attest durable consumed marker on first legitimate use
-        if: needs.prepare.outputs.consumed == 'false'
+      - name: Attest durable consumed marker when WORM marker is absent
+        if: needs.prepare.outputs.rekor_seen == 'false'
         uses: actions/attest@v4
         with:
           subject-path: marker.json
@@ -192,7 +191,7 @@ jobs:
           test -n "$FOUND"
           echo "$FOUND" > rekor-marker-uuid.txt
       - name: Simulate replay-registry rollback by deleting mutable CAS ref
-        if: needs.prepare.outputs.consumed == 'false'
+        if: needs.prepare.outputs.rekor_seen == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
           APPROVAL_SHA: ${{ needs.prepare.outputs.approval_sha }}
