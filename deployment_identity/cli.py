@@ -7,6 +7,7 @@ from typing import Sequence
 
 from .attestation import AttestationError, establish_attested_deployment_identity
 from .core import DeploymentIdentityError, fingerprint_observation
+from .provenance import ProvenanceError
 
 
 def _read_object(path: Path, label: str) -> dict:
@@ -30,19 +31,20 @@ def _read_array(path: Path, label: str) -> list[dict]:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="RTS Deployment Identity v4")
+    parser = argparse.ArgumentParser(description="RTS Deployment Identity v5")
     sub = parser.add_subparsers(dest="command", required=True)
-
-    verify = sub.add_parser("verify", help="establish attested deployment identity")
+    verify = sub.add_parser("verify", help="establish provenance-backed deployment identity")
     verify.add_argument("--observation", required=True, type=Path)
     verify.add_argument("--expectation", required=True, type=Path)
     verify.add_argument("--attestations", required=True, type=Path)
     verify.add_argument("--attestation-keyring", required=True, type=Path)
+    verify.add_argument("--collector-provenance", required=True, type=Path)
+    verify.add_argument("--collector-keyring", required=True, type=Path)
     verify.add_argument("--trusted-observer-id", required=True, action="append")
     verify.add_argument("--reference-time", required=True)
     verify.add_argument("--max-age-seconds", type=int, default=300)
     verify.add_argument("--min-attestors", type=int, default=2)
-
+    verify.add_argument("--min-independent-domains", type=int, default=2)
     fingerprint = sub.add_parser("fingerprint", help="fingerprint a deployment observation")
     fingerprint.add_argument("--observation", required=True, type=Path)
     return parser
@@ -55,31 +57,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "fingerprint":
             print(fingerprint_observation(observation))
             return 0
-
-        expectation = _read_object(args.expectation, "expectation")
-        attestations = _read_array(args.attestations, "attestations")
-        keyring = _read_object(args.attestation_keyring, "attestation keyring")
-        if any(not isinstance(k, str) or not isinstance(v, str) for k, v in keyring.items()):
-            raise DeploymentIdentityError("attestation keyring must map string ids to string secrets")
-
         result = establish_attested_deployment_identity(
             observation,
-            expected_deployment=expectation,
+            expected_deployment=_read_object(args.expectation, "expectation"),
             trusted_observer_ids=args.trusted_observer_id,
             reference_time=args.reference_time,
-            attestations=attestations,
-            trusted_attestation_keys=keyring,
+            attestations=_read_array(args.attestations, "attestations"),
+            trusted_attestation_keys=_read_object(args.attestation_keyring, "attestation keyring"),
+            collector_provenance=_read_array(args.collector_provenance, "collector provenance"),
+            trusted_collector_keys=_read_object(args.collector_keyring, "collector keyring"),
             max_age_seconds=args.max_age_seconds,
             min_attestors=args.min_attestors,
+            min_independent_domains=args.min_independent_domains,
         )
         print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
         return 0 if result["runtime_classification_authorized"] else 2
-    except (DeploymentIdentityError, AttestationError) as exc:
-        print(json.dumps({
-            "status": "DEPLOYMENT_IDENTITY_NOT_ESTABLISHED",
-            "runtime_classification_authorized": False,
-            "error": str(exc),
-        }, sort_keys=True))
+    except (DeploymentIdentityError, AttestationError, ProvenanceError) as exc:
+        print(json.dumps({"status": "DEPLOYMENT_IDENTITY_NOT_ESTABLISHED", "runtime_classification_authorized": False, "error": str(exc)}, sort_keys=True))
         return 2
 
 
