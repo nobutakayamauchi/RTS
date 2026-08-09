@@ -7,6 +7,7 @@ default allow_regression := false
 default allow_promotion := false
 default allow_deploy := false
 default allow_runtime := false
+default allow_new_outcome := false
 default allow_recovery := false
 default allow_policy_activation := false
 default allow_policy_rollback := false
@@ -122,6 +123,18 @@ allow_runtime if {
   input.runtime.all_routed_pods_match_digest
   input.runtime.old_digest_routed == false
   input.runtime.active_route_digest == input.expected.candidate_digest
+}
+
+allow_new_outcome if {
+  input.kind == "new_outcome"
+  input.policy_verified
+  input.outcome.verified
+  input.outcome.classification == "SUCCESS"
+  input.outcome.run_id == input.expected.run_id
+  input.outcome.execution_id == input.expected.execution_id
+  input.outcome.capability_digest == input.expected.candidate_digest
+  input.outcome.runtime_route_fingerprint == input.expected.runtime_route_fingerprint
+  input.outcome.promotion_digest == input.expected.promotion_digest
 }
 
 allow_recovery if {
