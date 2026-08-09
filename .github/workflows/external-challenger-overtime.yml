@@ -31,3 +31,7 @@ jobs:
   finalizer:
     needs: promoter
     uses: ./.github/workflows/external-challenger-overtime-finalizer.yml
+
+  closure-audit:
+    needs: finalizer
+    uses: ./.github/workflows/external-challenger-overtime-closure-audit.yml
