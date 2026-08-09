@@ -1,0 +1,168 @@
+name: External Challenger Last Three - WORM Evidence
+
+on:
+  pull_request:
+    paths:
+      - "external_challenger/last_three/**"
+      - ".github/workflows/external-challenger-last-three-*.yml"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  worm-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PREDICATE: https://example.org/external-challenger/last-three/worm-evidence/v1
+      REKOR_VERSION: v1.5.1
+      REKOR_SHA256: 0b4964af85477892c37039fb80793b151864970d19838873eaa1a777ca2fb813
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create real decision evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          HEAD_SHA='${{ github.event.pull_request.head.sha }}'
+          jq -n \
+            --arg kind "promotion-decision-evidence" \
+            --arg decision "APPROVED" \
+            --arg signer "$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-worm.yml" \
+            --arg source "$HEAD_SHA" \
+            --arg authority "sigstore-public-good-backed-workflow-identity" \
+            --arg observed "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{kind:$kind,decision:$decision,signer_identity:$signer,source_revision:$source,authority_identity:$authority,observed_at:$observed,retention_requirement:"transparency-log-long-term"}' > worm-evidence.json
+          SHA="$(sha256sum worm-evidence.json | awk '{print $1}')"
+          echo "EVIDENCE_SHA=$SHA" >> "$GITHUB_ENV"
+
+      - name: Attest evidence into public Sigstore transparency log
+        uses: actions/attest@v4
+        with:
+          subject-path: worm-evidence.json
+          predicate-type: https://example.org/external-challenger/last-three/worm-evidence/v1
+          predicate-path: worm-evidence.json
+
+      - name: Verify signer, timestamped attestation, and exact source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-worm.yml"
+          gh attestation verify worm-evidence.json --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$SIGNER" --predicate-type "$PREDICATE" --format json > verified-online.json
+          test "$(jq 'length' verified-online.json)" -gt 0
+          jq -e '.[0].verificationResult.verifiedTimestamps | length > 0' verified-online.json >/dev/null
+          jq -e --arg sha '${{ github.event.pull_request.head.sha }}' '.[0].verificationResult.statement.predicate.source_revision == $sha' verified-online.json >/dev/null
+
+      - name: Download offline bundle and trusted root
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh attestation download worm-evidence.json --repo "$GITHUB_REPOSITORY" --predicate-type "$PREDICATE"
+          BUNDLE="sha256:${EVIDENCE_SHA}.jsonl"
+          test -s "$BUNDLE"
+          gh attestation trusted-root > trusted_root.jsonl
+          test -s trusted_root.jsonl
+          echo "BUNDLE=$BUNDLE" >> "$GITHUB_ENV"
+          LOG_INDEX="$(jq -r '.. | objects | .logIndex? // empty' "$BUNDLE" | head -1)"
+          test -n "$LOG_INDEX"
+          echo "LOG_INDEX=$LOG_INDEX" >> "$GITHUB_ENV"
+
+      - name: Verify evidence fully offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-worm.yml"
+          env -u GH_TOKEN gh attestation verify worm-evidence.json --repo "$GITHUB_REPOSITORY" \
+            --bundle "$BUNDLE" --custom-trusted-root trusted_root.jsonl \
+            --signer-workflow "$SIGNER" --predicate-type "$PREDICATE" --format json > verified-offline.json
+          test "$(jq 'length' verified-offline.json)" -gt 0
+
+      - name: Install pinned Rekor CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo rekor-cli "https://github.com/sigstore/rekor/releases/download/${REKOR_VERSION}/rekor-cli-linux-amd64"
+          echo "$REKOR_SHA256  rekor-cli" | sha256sum -c -
+          chmod +x rekor-cli
+          sudo mv rekor-cli /usr/local/bin/rekor-cli
+
+      - name: Read same record directly from independent transparency provider
+        shell: bash
+        run: |
+          set -euo pipefail
+          rekor-cli get --rekor_server https://rekor.sigstore.dev --log-index "$LOG_INDEX" > rekor-before.txt
+          test -s rekor-before.txt
+          BEFORE_SHA="$(sha256sum rekor-before.txt | awk '{print $1}')"
+          echo "REKOR_BEFORE_SHA=$BEFORE_SHA" >> "$GITHUB_ENV"
+
+      - name: Attempt user-side overwrite replacement and history rewrite
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp worm-evidence.json /tmp/original-evidence.json
+          jq '.decision="FORGED"' worm-evidence.json > /tmp/tampered-evidence.json
+          if env -u GH_TOKEN gh attestation verify /tmp/tampered-evidence.json --repo "$GITHUB_REPOSITORY" \
+              --bundle "$BUNDLE" --custom-trusted-root trusted_root.jsonl \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-worm.yml" \
+              --predicate-type "$PREDICATE" >/dev/null 2>&1; then
+            echo 'tampered evidence unexpectedly verified'
+            exit 1
+          fi
+          DELETE_CODE="$(curl -sS -o /tmp/rekor-delete.txt -w '%{http_code}' -X DELETE "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=${LOG_INDEX}" || true)"
+          PUT_CODE="$(curl -sS -o /tmp/rekor-put.txt -w '%{http_code}' -X PUT -H 'Content-Type: application/json' -d '{}' "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=${LOG_INDEX}" || true)"
+          case "$DELETE_CODE" in 2*) echo "public Rekor delete unexpectedly succeeded: $DELETE_CODE"; exit 1;; esac
+          case "$PUT_CODE" in 2*) echo "public Rekor overwrite unexpectedly succeeded: $PUT_CODE"; exit 1;; esac
+
+      - name: Delete GitHub-hosted attestation copy if workflow token is permitted
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          CODE="$(curl -sS -o github-delete-response.txt -w '%{http_code}' -X DELETE \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/users/${OWNER}/attestations/digest/sha256:${EVIDENCE_SHA}" || true)"
+          echo "$CODE" > github-delete-status.txt
+          case "$CODE" in
+            200|204|403|404) ;;
+            *) echo "unexpected GitHub attestation deletion status: $CODE"; exit 1;;
+          esac
+
+      - name: Prove transparency record still exists after mutation and deletion attempts
+        shell: bash
+        run: |
+          set -euo pipefail
+          rekor-cli get --rekor_server https://rekor.sigstore.dev --log-index "$LOG_INDEX" > rekor-after.txt
+          test -s rekor-after.txt
+          AFTER_SHA="$(sha256sum rekor-after.txt | awk '{print $1}')"
+          test "$AFTER_SHA" = "$REKOR_BEFORE_SHA"
+          env -u GH_TOKEN gh attestation verify /tmp/original-evidence.json --repo "$GITHUB_REPOSITORY" \
+            --bundle "$BUNDLE" --custom-trusted-root trusted_root.jsonl \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-worm.yml" \
+            --predicate-type "$PREDICATE" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: last-three-worm-evidence
+          path: |
+            worm-evidence.json
+            verified-online.json
+            verified-offline.json
+            sha256:*.jsonl
+            trusted_root.jsonl
+            rekor-before.txt
+            rekor-after.txt
+            github-delete-status.txt
+            github-delete-response.txt
+          retention-days: 30
+          if-no-files-found: error
