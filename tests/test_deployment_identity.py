@@ -63,7 +63,13 @@ class DeploymentIdentityTests(unittest.TestCase):
     def keyring(self) -> dict[str, str]:
         return {"attestor-a": "secret-a", "attestor-b": "secret-b", "attestor-c": "secret-c"}
 
-    def make_attestation(self, attestor_id: str, observation: dict | None = None, expectation: dict | None = None) -> dict:
+    def make_attestation(
+        self,
+        attestor_id: str,
+        observation: dict | None = None,
+        expectation: dict | None = None,
+        issued_at: str = "2026-08-09T17:00:05+09:00",
+    ) -> dict:
         observation = observation or self.observation()
         expectation = expectation or self.expectation()
         material = {
@@ -71,7 +77,7 @@ class DeploymentIdentityTests(unittest.TestCase):
             "observation_fingerprint": fingerprint_observation(observation),
             "expectation_fingerprint": fingerprint_expectation(expectation),
             "observation_session_id": observation["observation_session_id"],
-            "issued_at": "2026-08-09T17:00:05+09:00",
+            "issued_at": issued_at,
         }
         return {**material, "signature": compute_hmac_signature(material, self.keyring()[attestor_id])}
 
@@ -171,8 +177,12 @@ class DeploymentIdentityTests(unittest.TestCase):
             self.establish(attestations=[self.make_attestation("attestor-a"), bad])
 
     def test_stale_attestation_replay_fails_closed(self) -> None:
+        stale = [
+            self.make_attestation("attestor-a", issued_at="2026-08-09T16:50:00+09:00"),
+            self.make_attestation("attestor-b", issued_at="2026-08-09T16:50:00+09:00"),
+        ]
         with self.assertRaisesRegex(AttestationError, "stale or future-dated"):
-            self.establish(reference_time="2026-08-09T17:10:01+09:00", max_age_seconds=300)
+            self.establish(attestations=stale)
 
     def test_untrusted_primary_observer_cannot_self_authorize(self) -> None:
         observation = self.observation()
