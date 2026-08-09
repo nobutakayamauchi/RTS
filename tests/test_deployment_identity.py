@@ -41,6 +41,14 @@ class DeploymentIdentityTests(unittest.TestCase):
         self.assertFalse(result["runtime_classification_authorized"])
         self.assertEqual(result["reason"], "DEPLOYED_REVISION_MISMATCH")
 
+    def test_revision_whitespace_is_rejected_not_normalized(self) -> None:
+        for field in ("deployed_revision", "source_revision"):
+            with self.subTest(field=field):
+                observation = self.observation()
+                observation[field] = "abc123 "
+                with self.assertRaisesRegex(DeploymentIdentityError, "whitespace"):
+                    establish_deployment_identity(observation)
+
     def test_missing_runtime_surface_is_rejected(self) -> None:
         observation = self.observation()
         del observation["active_route_surface"]
