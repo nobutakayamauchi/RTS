@@ -1,0 +1,405 @@
+name: External Challenger Overtime Finalizer
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  actions: read
+
+jobs:
+  finalize-live-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KIND_VERSION: v0.32.0
+      KIND_NODE: kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+      POLICY_PREDICATE: https://example.org/external-challenger/policy-activation/v1
+      PROPOSAL_PREDICATE: https://example.org/external-challenger/learning-proposal/v1
+      REGRESSION_PREDICATE: https://example.org/external-challenger/regression/v1
+      CAPABILITY_PREDICATE: https://example.org/external-challenger/capability/v1
+      PROMOTION_PREDICATE: https://example.org/external-challenger/promotion/v1
+      OUTCOME_PREDICATE: https://example.org/external-challenger/outcome/v1
+      RECOVERY_PREDICATE: https://example.org/external-challenger/recovery/v1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.17.0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: overtime-policy-authority
+          path: policy-authority
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: overtime-proposer
+          path: proposer
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: overtime-evaluator
+          path: evaluator
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: overtime-promoter
+          path: promoter
+
+      - name: Verify exact frozen upstream identities and policy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          POLICY_SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-policy-authority.yml"
+          PROPOSER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-proposer.yml"
+          EVALUATOR="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-evaluator.yml"
+          PROMOTER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-promoter.yml"
+          gh attestation verify policy-authority/overtime-policy.tgz --repo "$GITHUB_REPOSITORY" --signer-workflow "$POLICY_SIGNER" >/dev/null
+          gh attestation verify policy-authority/policy-activation.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$POLICY_SIGNER" --predicate-type "$POLICY_PREDICATE" >/dev/null
+          gh attestation verify proposer/outcome-v1.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROPOSER" --predicate-type "$OUTCOME_PREDICATE" >/dev/null
+          gh attestation verify proposer/learning-proposal.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROPOSER" --predicate-type "$PROPOSAL_PREDICATE" >/dev/null
+          gh attestation verify evaluator/regression.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$EVALUATOR" --predicate-type "$REGRESSION_PREDICATE" >/dev/null
+          gh attestation verify evaluator/candidate-v2.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$EVALUATOR" --predicate-type "$CAPABILITY_PREDICATE" >/dev/null
+          gh attestation verify promoter/promotion-approval.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROMOTER" --predicate-type "$PROMOTION_PREDICATE" >/dev/null
+          mkdir -p policy-runtime
+          tar -xzf policy-authority/overtime-policy.tgz -C policy-runtime
+          POLICY_FILE="$PWD/policy-runtime/external_challenger/overtime/policy.rego"
+          test -f "$POLICY_FILE"
+          test "$(sha256sum "$POLICY_FILE" | awk '{print $1}')" = "$(jq -r '.policy_sha256' policy-authority/policy-activation.json)"
+          echo "POLICY_FILE=$POLICY_FILE" >> "$GITHUB_ENV"
+          echo "CANDIDATE_SHA=$(sha256sum evaluator/candidate-v2.json | awk '{print $1}')" >> "$GITHUB_ENV"
+          echo "ROLLBACK_SHA=$(sha256sum proposer/capability-v1.json | awk '{print $1}')" >> "$GITHUB_ENV"
+          echo "PROMOTION_SHA=$(sha256sum promoter/promotion-approval.json | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Enforce promotion-to-artifact binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq -r '.decision' promoter/promotion-approval.json)" = APPROVED
+          test "$(jq -r '.authorized_capability_digest' promoter/promotion-approval.json)" = "$CANDIDATE_SHA"
+          test "$(jq -r '.rollback_capability_digest' promoter/promotion-approval.json)" = "$ROLLBACK_SHA"
+          CANDIDATE_SOURCE="$(jq -r '.source_revision' evaluator/candidate-v2.json)"
+          test -n "$CANDIDATE_SOURCE"
+          jq -n --arg candidate "$CANDIDATE_SHA" --arg source "$CANDIDATE_SOURCE" --arg approved "$(jq -r '.authorized_capability_digest' promoter/promotion-approval.json)" '{kind:"deploy",policy_verified:true,promotion_verified:true,promotion:{decision:"APPROVED",authority_identity:"nobutakayamauchi/RTS/.github/workflows/external-challenger-overtime-promoter.yml",run_id:env.GITHUB_RUN_ID,authorized_capability_digest:$approved,proposal_digest:"bound",regression_digest:"bound"},candidate_verified:true,candidate_digest:$candidate,candidate_source_revision:$source,expected:{promoter_identity:"nobutakayamauchi/RTS/.github/workflows/external-challenger-overtime-promoter.yml",run_id:env.GITHUB_RUN_ID,candidate_digest:$candidate,proposal_digest:"bound",regression_digest:"bound",source_revision:$source}}' > /tmp/deploy-shape.json
+          jq --arg forged "forged" '.candidate_digest=$forged' /tmp/deploy-shape.json > /tmp/wrong-digest.json
+          test "$(opa eval --format raw --input /tmp/wrong-digest.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_deploy')" = false
+
+      - name: Install kind and create live runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x kind
+          sudo mv kind /usr/local/bin/kind
+          kind create cluster --name overtime-final --image "$KIND_NODE" --wait 120s
+
+      - name: Deploy rollback baseline and capture stale endpoint evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl create configmap capability-v1 --from-file=capability-v1.json=proposer/capability-v1.json --dry-run=client -o json \
+            | jq --arg sha "$ROLLBACK_SHA" '.immutable=true | .metadata.annotations={"external-challenger/capability-sha256":$sha}' | kubectl apply -f -
+          cat > /tmp/v1.yaml <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: challenger-old
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: challenger-old
+            template:
+              metadata:
+                labels:
+                  app: challenger-old
+                annotations:
+                  external-challenger/capability-sha256: "$ROLLBACK_SHA"
+              spec:
+                containers:
+                  - name: web
+                    image: nginx:1.27-alpine
+                    volumeMounts:
+                      - name: capability
+                        mountPath: /usr/share/nginx/html/capability.json
+                        subPath: capability-v1.json
+                        readOnly: true
+                volumes:
+                  - name: capability
+                    configMap:
+                      name: capability-v1
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: challenger
+          spec:
+            selector:
+              app: challenger-old
+            ports:
+              - port: 80
+                targetPort: 80
+          EOF
+          kubectl apply -f /tmp/v1.yaml
+          kubectl rollout status deployment/challenger-old --timeout=120s
+          kubectl wait --for=jsonpath='{.endpoints[0].conditions.ready}'=true endpointslice -l kubernetes.io/service-name=challenger --timeout=120s
+          kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json > endpoint-before-promotion.json
+
+      - name: Deploy promoted artifact while keeping old route active
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl create configmap capability-v2 --from-file=candidate-v2.json=evaluator/candidate-v2.json --dry-run=client -o json \
+            | jq --arg sha "$CANDIDATE_SHA" '.immutable=true | .metadata.annotations={"external-challenger/capability-sha256":$sha}' | kubectl apply -f -
+          cat > /tmp/v2.yaml <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: challenger-next
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: challenger-next
+            template:
+              metadata:
+                labels:
+                  app: challenger-next
+                annotations:
+                  external-challenger/capability-sha256: "$CANDIDATE_SHA"
+              spec:
+                containers:
+                  - name: web
+                    image: nginx:1.27-alpine
+                    volumeMounts:
+                      - name: capability
+                        mountPath: /usr/share/nginx/html/capability.json
+                        subPath: candidate-v2.json
+                        readOnly: true
+                volumes:
+                  - name: capability
+                    configMap:
+                      name: capability-v2
+          EOF
+          kubectl apply -f /tmp/v2.yaml
+          kubectl rollout status deployment/challenger-next --timeout=120s
+          ACTIVE_POD="$(kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json | jq -r '[.items[].endpoints[]? | select(.conditions.ready==true) | .targetRef.name][0]')"
+          ACTIVE_DIGEST="$(kubectl get pod "$ACTIVE_POD" -o json | jq -r '.metadata.annotations["external-challenger/capability-sha256"]')"
+          test "$ACTIVE_DIGEST" = "$ROLLBACK_SHA"
+          jq -n --arg expected "$CANDIDATE_SHA" --arg active "$ACTIVE_DIGEST" '{kind:"runtime",policy_verified:true,runtime:{evidence_available:true,endpoint_fresh:true,expected_digest:$expected,config_digest:$expected,routed_pod_count:1,expected_pod_count:1,all_routed_pods_ready:true,all_routed_pods_match_digest:false,old_digest_routed:true,active_route_digest:$active},expected:{candidate_digest:$expected}}' > /tmp/inactive-new.json
+          test "$(opa eval --format raw --input /tmp/inactive-new.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_runtime')" = false
+
+      - name: Inject real old-plus-new mixed route and require deny
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD_POD="$(kubectl get pods -l app=challenger-old -o jsonpath='{.items[0].metadata.name}')"
+          NEW_POD="$(kubectl get pods -l app=challenger-next -o jsonpath='{.items[0].metadata.name}')"
+          kubectl label pod "$OLD_POD" serve=overtime-mixed --overwrite
+          kubectl label pod "$NEW_POD" serve=overtime-mixed --overwrite
+          kubectl patch service challenger --type=json -p='[{"op":"replace","path":"/spec/selector","value":{"serve":"overtime-mixed"}}]'
+          for _ in $(seq 1 60); do
+            MIXED="$(kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json | jq '[.items[].endpoints[]? | select(.conditions.ready==true)] | length')"
+            [ "$MIXED" -ge 2 ] && break
+            sleep 1
+          done
+          test "$MIXED" -ge 2
+          kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json > endpoint-mixed.json
+          jq -n --arg expected "$CANDIDATE_SHA" '{kind:"runtime",policy_verified:true,runtime:{evidence_available:true,endpoint_fresh:true,expected_digest:$expected,config_digest:$expected,routed_pod_count:2,expected_pod_count:1,all_routed_pods_ready:true,all_routed_pods_match_digest:false,old_digest_routed:true,active_route_digest:"mixed"},expected:{candidate_digest:$expected}}' > /tmp/mixed-runtime.json
+          test "$(opa eval --format raw --input /tmp/mixed-runtime.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_runtime')" = false
+
+      - name: Activate only promoted capability and prove runtime reality
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl patch service challenger --type=json -p='[{"op":"replace","path":"/spec/selector","value":{"app":"challenger-next"}}]'
+          for _ in $(seq 1 60); do
+            POD="$(kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json | jq -r '[.items[].endpoints[]? | select(.conditions.ready==true) | .targetRef.name][0] // empty')"
+            if [ -n "$POD" ]; then
+              DIGEST="$(kubectl get pod "$POD" -o json | jq -r '.metadata.annotations["external-challenger/capability-sha256"]')"
+              if [ "$DIGEST" = "$CANDIDATE_SHA" ]; then break; fi
+            fi
+            sleep 1
+          done
+          test "$DIGEST" = "$CANDIDATE_SHA"
+          kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json > endpoint-v2.json
+          CURRENT_RV="$(jq -r '.items[0].metadata.resourceVersion' endpoint-v2.json)"
+          OLD_RV="$(jq -r '.items[0].metadata.resourceVersion' endpoint-before-promotion.json)"
+          test "$CURRENT_RV" != "$OLD_RV"
+          CONFIG_SHA="$(kubectl get configmap capability-v2 -o json | jq -j '.data["candidate-v2.json"]' | sha256sum | awk '{print $1}')"
+          test "$CONFIG_SHA" = "$CANDIDATE_SHA"
+          jq -n --arg expected "$CANDIDATE_SHA" '{kind:"runtime",policy_verified:true,runtime:{evidence_available:true,endpoint_fresh:true,expected_digest:$expected,config_digest:$expected,routed_pod_count:1,expected_pod_count:1,all_routed_pods_ready:true,all_routed_pods_match_digest:true,old_digest_routed:false,active_route_digest:$expected},expected:{candidate_digest:$expected}}' > runtime-v2.json
+          test "$(opa eval --format raw --input runtime-v2.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_runtime')" = true
+          jq '.runtime.endpoint_fresh=false' runtime-v2.json > /tmp/stale-endpoint.json
+          test "$(opa eval --format raw --input /tmp/stale-endpoint.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_runtime')" = false
+          ROUTE_SHA="$(jq -S . endpoint-v2.json | sha256sum | awk '{print $1}')"
+          echo "ROUTE_SHA=$ROUTE_SHA" >> "$GITHUB_ENV"
+
+      - name: Post-promotion artifact swap must not become valid
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq '.value="post-promotion-swap"' evaluator/candidate-v2.json > /tmp/swapped-v2.json
+          SWAP_SHA="$(sha256sum /tmp/swapped-v2.json | awk '{print $1}')"
+          test "$SWAP_SHA" != "$CANDIDATE_SHA"
+          if kubectl create configmap capability-v2 --from-file=candidate-v2.json=/tmp/swapped-v2.json --dry-run=client -o yaml | kubectl replace -f - >/dev/null 2>&1; then
+            echo 'immutable promoted artifact unexpectedly replaced'
+            exit 1
+          fi
+          jq --arg swap "$SWAP_SHA" '.runtime.config_digest=$swap' runtime-v2.json > /tmp/swapped-runtime.json
+          test "$(opa eval --format raw --input /tmp/swapped-runtime.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_runtime')" = false
+
+      - name: Execute promoted capability and capture new live outcome
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl port-forward service/challenger 18081:80 >/tmp/final-pf.log 2>&1 &
+          PF_PID=$!
+          trap 'kill $PF_PID 2>/dev/null || true' EXIT
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18081/capability.json > execution-v2-response.json; then break; fi
+            sleep 1
+          done
+          jq -e '.result == "SUCCESS" and .capability_version == "v2"' execution-v2-response.json >/dev/null
+          EXECUTION_ID="execution-v2-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          RESPONSE_SHA="$(sha256sum execution-v2-response.json | awk '{print $1}')"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          jq -n --arg execution "$EXECUTION_ID" --arg run "$GITHUB_RUN_ID" --arg cap "$CANDIDATE_SHA" --arg response "$RESPONSE_SHA" --arg route "$ROUTE_SHA" --arg promotion "$PROMOTION_SHA" --arg now "$NOW" '{schema:"external-outcome-v1",execution_id:$execution,run_id:$run,capability_digest:$cap,response_sha256:$response,runtime_route_fingerprint:$route,promotion_digest:$promotion,classification:"SUCCESS",observed_at:$now}' > outcome-v2.json
+          echo "EXECUTION_ID=$EXECUTION_ID" >> "$GITHUB_ENV"
+          echo "OUTCOME_V2_SHA=$(sha256sum outcome-v2.json | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Attest promoted outcome
+        uses: actions/attest@v4
+        with:
+          subject-path: outcome-v2.json
+          predicate-type: https://example.org/external-challenger/outcome/v1
+          predicate-path: outcome-v2.json
+
+      - name: Verify new outcome lineage and attack replay/tamper/missing evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINALIZER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-finalizer.yml"
+          gh attestation verify outcome-v2.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$FINALIZER" --predicate-type "$OUTCOME_PREDICATE" >/dev/null
+          jq -n --arg run "$GITHUB_RUN_ID" --arg execution "$EXECUTION_ID" --arg candidate "$CANDIDATE_SHA" --arg route "$ROUTE_SHA" --arg promotion "$PROMOTION_SHA" '{kind:"new_outcome",policy_verified:true,outcome:{verified:true,classification:"SUCCESS",run_id:$run,execution_id:$execution,capability_digest:$candidate,runtime_route_fingerprint:$route,promotion_digest:$promotion},expected:{run_id:$run,execution_id:$execution,candidate_digest:$candidate,runtime_route_fingerprint:$route,promotion_digest:$promotion}}' > new-outcome-input.json
+          test "$(opa eval --format raw --input new-outcome-input.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_new_outcome')" = true
+          jq '.outcome.verified=false' new-outcome-input.json > /tmp/missing-outcome.json
+          test "$(opa eval --format raw --input /tmp/missing-outcome.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_new_outcome')" = false
+          jq '.outcome.execution_id="execution-v1-replay"' new-outcome-input.json > /tmp/stale-outcome-replay.json
+          test "$(opa eval --format raw --input /tmp/stale-outcome-replay.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_new_outcome')" = false
+          jq '.classification="FAILURE"' outcome-v2.json > /tmp/tampered-outcome.json
+          if gh attestation verify /tmp/tampered-outcome.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$FINALIZER" --predicate-type "$OUTCOME_PREDICATE" >/dev/null 2>&1; then exit 1; fi
+          OLD_OUTCOME_SHA="$(sha256sum proposer/outcome-v1.json | awk '{print $1}')"
+          test "$OLD_OUTCOME_SHA" != "$OUTCOME_V2_SHA"
+
+      - name: Execute authorized rollback and preserve recovery lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq -r '.rollback_capability_digest' promoter/promotion-approval.json)" = "$ROLLBACK_SHA"
+          kubectl patch service challenger --type=json -p='[{"op":"replace","path":"/spec/selector","value":{"app":"challenger-old"}}]'
+          for _ in $(seq 1 60); do
+            POD="$(kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json | jq -r '[.items[].endpoints[]? | select(.conditions.ready==true) | .targetRef.name][0] // empty')"
+            if [ -n "$POD" ]; then
+              DIGEST="$(kubectl get pod "$POD" -o json | jq -r '.metadata.annotations["external-challenger/capability-sha256"]')"
+              if [ "$DIGEST" = "$ROLLBACK_SHA" ]; then break; fi
+            fi
+            sleep 1
+          done
+          test "$DIGEST" = "$ROLLBACK_SHA"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          jq -n --arg run "$GITHUB_RUN_ID" --arg promotion "$PROMOTION_SHA" --arg from "$CANDIDATE_SHA" --arg rollback "$ROLLBACK_SHA" --arg outcome "$OUTCOME_V2_SHA" --arg now "$NOW" '{schema:"external-recovery-v1",run_id:$run,promotion_digest:$promotion,from_capability_digest:$from,rollback_digest:$rollback,source_outcome_digest:$outcome,active_route_digest:$rollback,authority_bound:true,recovered_at:$now}' > recovery.json
+
+      - name: Attest recovery evidence
+        uses: actions/attest@v4
+        with:
+          subject-path: recovery.json
+          predicate-type: https://example.org/external-challenger/recovery/v1
+          predicate-path: recovery.json
+
+      - name: Verify recovery closure and authority mismatch denial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINALIZER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-finalizer.yml"
+          gh attestation verify recovery.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$FINALIZER" --predicate-type "$RECOVERY_PREDICATE" >/dev/null
+          jq -n --arg run "$GITHUB_RUN_ID" --arg promotion "$PROMOTION_SHA" --arg candidate "$CANDIDATE_SHA" --arg rollback "$ROLLBACK_SHA" '{kind:"recovery",policy_verified:true,promotion_verified:true,recovery:{evidence_available:true,authority_bound:true,promotion_digest:$promotion,from_capability_digest:$candidate,rollback_digest:$rollback,active_route_digest:$rollback,run_id:$run},expected:{promotion_digest:$promotion,candidate_digest:$candidate,rollback_digest:$rollback,run_id:$run}}' > recovery-input.json
+          test "$(opa eval --format raw --input recovery-input.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_recovery')" = true
+          jq '.recovery.authority_bound=false' recovery-input.json > /tmp/recovery-authority-mismatch.json
+          test "$(opa eval --format raw --input /tmp/recovery-authority-mismatch.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_recovery')" = false
+          jq '.recovery.evidence_available=false' recovery-input.json > /tmp/recovery-missing.json
+          test "$(opa eval --format raw --input /tmp/recovery-missing.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_recovery')" = false
+
+      - name: Provider outage and credential-loss fail-closed tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n '{kind:"provider_transition",providers:{evidence_api_available:true,retention_available:true,approval_available:true,policy_available:true,runtime_credentials_available:true}}' > provider-input.json
+          test "$(opa eval --format raw --input provider-input.json --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_provider_transition')" = true
+          for field in evidence_api_available retention_available approval_available policy_available runtime_credentials_available; do
+            jq --arg f "$field" '.providers[$f]=false' provider-input.json > "/tmp/provider-$field.json"
+            test "$(opa eval --format raw --input "/tmp/provider-$field.json" --data "$POLICY_FILE" 'data.external_challenger.overtime.allow_provider_transition')" = false
+          done
+          EVALUATOR="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-evaluator.yml"
+          if HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 NO_PROXY= GH_TOKEN="$GH_TOKEN" gh attestation verify evaluator/candidate-v2.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$EVALUATOR" --predicate-type "$CAPABILITY_PREDICATE" >/dev/null 2>&1; then
+            echo 'online evidence verification unexpectedly succeeded during outage injection'
+            exit 1
+          fi
+          CANDIDATE_BUNDLE="evaluator/offline/sha256-${CANDIDATE_SHA}.jsonl"
+          test -f "$CANDIDATE_BUNDLE"
+          HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 NO_PROXY= GH_TOKEN= gh attestation verify evaluator/candidate-v2.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$EVALUATOR" --predicate-type "$CAPABILITY_PREDICATE" --bundle "$CANDIDATE_BUNDLE" --custom-trusted-root evaluator/offline/trusted-root.jsonl >/dev/null
+          opa run --server --addr=127.0.0.1:8181 "$POLICY_FILE" >/tmp/opa-server.log 2>&1 &
+          OPA_PID=$!
+          for _ in $(seq 1 20); do curl -fsS http://127.0.0.1:8181/health >/dev/null 2>&1 && break; sleep 1; done
+          kill "$OPA_PID"
+          wait "$OPA_PID" 2>/dev/null || true
+          if curl -fsS --max-time 2 http://127.0.0.1:8181/v1/data/external_challenger/overtime/allow_provider_transition >/dev/null 2>&1; then exit 1; fi
+          cp "$HOME/.kube/config" /tmp/kubeconfig.saved
+          export KUBECONFIG=/tmp/missing-kubeconfig
+          if kubectl get namespace >/dev/null 2>&1; then exit 1; fi
+          export KUBECONFIG=/tmp/kubeconfig.saved
+
+      - name: Preserve offline-verifiable final evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p offline-final
+          (cd offline-final && gh attestation download ../outcome-v2.json -R "$GITHUB_REPOSITORY")
+          (cd offline-final && gh attestation download ../recovery.json -R "$GITHUB_REPOSITORY")
+          for bundle in offline-final/sha256:*.jsonl; do
+            [ -e "$bundle" ] || continue
+            mv "$bundle" "${bundle/sha256:/sha256-}"
+          done
+          gh attestation trusted-root > offline-final/trusted-root.jsonl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overtime-final-evidence
+          path: |
+            endpoint-before-promotion.json
+            endpoint-mixed.json
+            endpoint-v2.json
+            runtime-v2.json
+            execution-v2-response.json
+            outcome-v2.json
+            new-outcome-input.json
+            recovery.json
+            recovery-input.json
+            provider-input.json
+            offline-final/**
+          if-no-files-found: error
+          retention-days: 30
