@@ -1,7 +1,9 @@
 # RTS Final Devil's Advocate — Abolition Gate
 
-Status: ACTIVE / FAIL-CLOSED
+Status: **CLOSED / PROJECT FROZEN**
 Date: 2026-08
+Final formal verdict: **EVIDENCE_INSUFFICIENT / REVISE**
+Engineering continuation decision: **NO**
 
 ## The question
 
@@ -89,8 +91,88 @@ The external stack wins only after these attacks are attempted:
 - ABOLISH_RTS: external tools satisfy all invariants with equal-or-lower complexity/cost; RTS adds no irreducible value.
 - REDUCE_RTS: external tools provide the mechanisms; only RTS's small integration/policy semantics remain justified.
 - RETAIN_RTS: an enforceable material gap remains that cannot be reproduced without rebuilding a substantively equivalent RTS layer.
-- REVISE: evidence is incomplete or an attack succeeds. No survival claim is permitted.
+- EVIDENCE_INSUFFICIENT / REVISE: the question remains valid but evidence is insufficient for a terminal survival/abolition claim.
+- TEST_INVALID_OR_OVERCONSTRAINED: the comparison itself is contradictory, unattainable, or unreasonably constrained.
 
-## Current status
+## Final result
 
-REVISE — the abolition test has been defined but the external replacement has not yet been implemented and adversarially exercised end-to-end. RTS is therefore not yet permitted to claim survival under this gate.
+**EVIDENCE_INSUFFICIENT / REVISE**
+
+External Challenger testing demonstrated that the major technical responsibilities previously implemented by RTS can be reproduced or replaced through existing external systems and composition.
+
+The demonstrated replacement surface includes the principal responsibilities around:
+
+- WORM / durable evidence;
+- persistent replay resistance;
+- Runtime Reality and deployment binding;
+- Outcome evidence;
+- Learning proposals;
+- Regression evidence;
+- Promotion and changed capability;
+- re-entry into execution/runtime proof;
+- Recovery and Rollback.
+
+No evidence from the final test established that an RTS-specific Runtime, Controller, or Governance Kernel is indispensable for those responsibilities.
+
+The remaining unresolved item is **Administratively Independent Authority**.
+
+### Why the final item is unresolved
+
+This project is operated by one individual. GitHub, databases, credentials, external services, and their administrative recovery paths ultimately remain controllable by the same person.
+
+Under those conditions, a genuinely independent second authority cannot be demonstrated. Such an authority requires a separate person, organization, or trust domain whose administrative power is not reducible to the same operator.
+
+The correct classification is therefore:
+
+> **Not verifiable under the current individual-operation conditions.**
+
+This is not evidence that an RTS-specific mechanism is required.
+
+Administratively independent authority is fundamentally an operational trust-boundary problem. Adding more RTS code under the same ultimate administrator does not create the missing independence and therefore does not resolve the proof gap.
+
+## Separation of formal verdict and engineering decision
+
+The unresolved authority experiment prevents a fully terminal **ABOLISH_RTS** verdict under the stated test standard.
+
+It does **not** provide a technical reason to continue developing RTS.
+
+Therefore the two decisions are intentionally separated:
+
+> **Formal / academic survival verdict: EVIDENCE_INSUFFICIENT / REVISE**
+>
+> **Engineering continuation decision: NO**
+
+The remaining uncertainty is insufficient grounds to build another RTS-specific system merely to continue the survival test.
+
+The External Challenger removed the technical basis for continued expansion of RTS-specific Runtime, Controller, and Governance Kernel implementations. No irreducible RTS-owned responsibility was proven by the evidence available at project close.
+
+## Development decision
+
+RTS development ends here.
+
+Future value is preserved in the evidence and specification assets rather than by extending the current implementation:
+
+- Proof-Governance requirements and invariants;
+- Evidence Schema and binding rules;
+- adversarial tests and fail-closed scenarios;
+- runtime/deployment identity distinctions;
+- Outcome / Learning / Regression / Promotion / Recovery separation;
+- external-replacement methodology;
+- final audit and challenger evidence.
+
+The repository is retained as a research prototype and historical evidence corpus.
+
+Any future reuse of RTS code must be separately justified against contemporary external alternatives. Historical existence, sunk cost, authorship, or attachment to the architecture are not sufficient reasons for reuse.
+
+See `RTS_DEVELOPMENT_FREEZE_2026-08-09.md` for the project freeze and reopening rule.
+
+## Final statement
+
+The final test does not prove that every possible RTS responsibility is unnecessary in every possible environment.
+
+It does establish that the one remaining unresolved question cannot be verified under this project's individual operating conditions, does not establish the need for an RTS-specific implementation, and does not justify further RTS development.
+
+**Academic survival status: unresolved.**  
+**Engineering continuation status: terminated.**
+
+RTS is frozen as of 2026-08-09.
