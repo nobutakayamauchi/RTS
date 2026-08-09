@@ -1,0 +1,245 @@
+name: External Challenger Overtime Proposer
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  actions: read
+
+jobs:
+  execute-and-propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      KIND_VERSION: v0.32.0
+      KIND_NODE: kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+      POLICY_PREDICATE: https://example.org/external-challenger/policy-activation/v1
+      OUTCOME_PREDICATE: https://example.org/external-challenger/outcome/v1
+      PROPOSAL_PREDICATE: https://example.org/external-challenger/learning-proposal/v1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.17.0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: overtime-policy-authority
+          path: policy-authority
+
+      - name: Verify policy authority before execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-policy-authority.yml"
+          gh attestation verify policy-authority/overtime-policy.tgz --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" >/dev/null
+          gh attestation verify policy-authority/policy-activation.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" --predicate-type "$POLICY_PREDICATE" >/dev/null
+          test "$(jq -r '.status' policy-authority/policy-activation.json)" = ACTIVE
+
+      - name: Build baseline capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg source "$GITHUB_SHA" \
+            '{schema:"external-capability-v1",capability_version:"v1",source_revision:$source,result:"FAILURE",value:"baseline-defect"}' \
+            > capability-v1.json
+          echo "CAP_V1_SHA=$(sha256sum capability-v1.json | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Attest baseline capability provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: capability-v1.json
+
+      - name: Install kind
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x kind
+          sudo mv kind /usr/local/bin/kind
+          kind create cluster --name overtime-proposer --image "$KIND_NODE" --wait 120s
+
+      - name: Deploy baseline capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl create configmap capability-v1 --from-file=capability-v1.json --dry-run=client -o json \
+            | jq --arg sha "$CAP_V1_SHA" '.immutable=true | .metadata.annotations={"external-challenger/capability-sha256":$sha}' \
+            | kubectl apply -f -
+          cat > /tmp/baseline.yaml <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: challenger
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: challenger
+            template:
+              metadata:
+                labels:
+                  app: challenger
+                annotations:
+                  external-challenger/capability-sha256: "$CAP_V1_SHA"
+              spec:
+                containers:
+                  - name: web
+                    image: nginx:1.27-alpine
+                    ports:
+                      - containerPort: 80
+                    volumeMounts:
+                      - name: capability
+                        mountPath: /usr/share/nginx/html/capability.json
+                        subPath: capability-v1.json
+                        readOnly: true
+                volumes:
+                  - name: capability
+                    configMap:
+                      name: capability-v1
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: challenger
+          spec:
+            selector:
+              app: challenger
+            ports:
+              - port: 80
+                targetPort: 80
+          EOF
+          kubectl apply -f /tmp/baseline.yaml
+          kubectl rollout status deployment/challenger --timeout=120s
+          kubectl wait --for=jsonpath='{.endpoints[0].conditions.ready}'=true endpointslice -l kubernetes.io/service-name=challenger --timeout=120s
+
+      - name: Execute baseline and collect live outcome
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl get pods -l app=challenger -o json > baseline-pods.json
+          kubectl get endpointslices -l kubernetes.io/service-name=challenger -o json > baseline-endpoints.json
+          ROUTE_SHA="$(jq -S -n --slurpfile p baseline-pods.json --slurpfile e baseline-endpoints.json '{pods:$p[0],endpoints:$e[0]}' | sha256sum | awk '{print $1}')"
+          kubectl port-forward service/challenger 18080:80 >/tmp/overtime-pf.log 2>&1 &
+          PF_PID=$!
+          trap 'kill $PF_PID 2>/dev/null || true' EXIT
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/capability.json > execution-v1-response.json; then break; fi
+            sleep 1
+          done
+          jq -e '.result == "FAILURE"' execution-v1-response.json >/dev/null
+          EXECUTION_ID="execution-v1-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          RESPONSE_SHA="$(sha256sum execution-v1-response.json | awk '{print $1}')"
+          POD_NAME="$(jq -r '.items[0].metadata.name' baseline-pods.json)"
+          POD_UID="$(jq -r '.items[0].metadata.uid' baseline-pods.json)"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          jq -n \
+            --arg execution "$EXECUTION_ID" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg source "$GITHUB_SHA" \
+            --arg cap "$CAP_V1_SHA" \
+            --arg response "$RESPONSE_SHA" \
+            --arg route "$ROUTE_SHA" \
+            --arg pod "$POD_NAME" \
+            --arg uid "$POD_UID" \
+            --arg now "$NOW" \
+            '{schema:"external-outcome-v1",execution_id:$execution,run_id:$run,source_revision:$source,capability_digest:$cap,response_sha256:$response,runtime_route_fingerprint:$route,pod_name:$pod,pod_uid:$uid,classification:"FAILURE",observed_at:$now}' \
+            > outcome-v1.json
+          echo "EXECUTION_ID=$EXECUTION_ID" >> "$GITHUB_ENV"
+          echo "OUTCOME_V1_SHA=$(sha256sum outcome-v1.json | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Attest live failure outcome
+        uses: actions/attest@v4
+        with:
+          subject-path: outcome-v1.json
+          predicate-type: https://example.org/external-challenger/outcome/v1
+          predicate-path: outcome-v1.json
+
+      - name: Generate evidence-bound learning proposal
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROPOSER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-proposer.yml"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          jq -n \
+            --arg id "proposal-${GITHUB_RUN_ID}" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg proposer "$PROPOSER" \
+            --arg outcome "$OUTCOME_V1_SHA" \
+            --arg current "$CAP_V1_SHA" \
+            --arg source "$GITHUB_SHA" \
+            --arg now "$NOW" \
+            '{schema:"external-learning-proposal-v1",proposal_id:$id,run_id:$run,proposer_identity:$proposer,source_outcome_digest:$outcome,current_capability_digest:$current,source_revision:$source,proposed_capability:{schema:"external-capability-v1",capability_version:"v2",source_revision:$source,result:"SUCCESS",value:"evidence-driven-fix"},created_at:$now}' \
+            > learning-proposal.json
+          echo "PROPOSAL_SHA=$(sha256sum learning-proposal.json | awk '{print $1}')" >> "$GITHUB_ENV"
+
+      - name: Attest learning proposal
+        uses: actions/attest@v4
+        with:
+          subject-path: learning-proposal.json
+          predicate-type: https://example.org/external-challenger/learning-proposal/v1
+          predicate-path: learning-proposal.json
+
+      - name: Verify learning transition from actual evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROPOSER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-proposer.yml"
+          gh attestation verify outcome-v1.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROPOSER" --predicate-type "$OUTCOME_PREDICATE" >/dev/null
+          gh attestation verify learning-proposal.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROPOSER" --predicate-type "$PROPOSAL_PREDICATE" >/dev/null
+          jq -n \
+            --arg execution "$EXECUTION_ID" --arg cap "$CAP_V1_SHA" --arg run "$GITHUB_RUN_ID" --arg outcome "$OUTCOME_V1_SHA" --arg proposer "$PROPOSER" \
+            '{kind:"learning",policy_verified:true,outcome:{verified:true,classification:"FAILURE",execution_id:$execution,capability_digest:$cap,run_id:$run},proposal:{verified:true,proposer_identity:$proposer,source_outcome_digest:$outcome,current_capability_digest:$cap,run_id:$run},expected:{execution_id:$execution,capability_digest:$cap,run_id:$run,outcome_digest:$outcome,proposer_identity:$proposer}}' > learning-input.json
+          test "$(opa eval --format raw --input learning-input.json --data external_challenger/overtime/policy.rego 'data.external_challenger.overtime.allow_learning')" = true
+
+      - name: Outcome and learning adversarial tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROPOSER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-overtime-proposer.yml"
+          jq '.classification="SUCCESS"' outcome-v1.json > /tmp/forged-outcome.json
+          if gh attestation verify /tmp/forged-outcome.json --repo "$GITHUB_REPOSITORY" --signer-workflow "$PROPOSER" --predicate-type "$OUTCOME_PREDICATE" >/dev/null 2>&1; then exit 1; fi
+          jq '.outcome.verified=false' learning-input.json > /tmp/missing-outcome.json
+          test "$(opa eval --format raw --input /tmp/missing-outcome.json --data external_challenger/overtime/policy.rego 'data.external_challenger.overtime.allow_learning')" = false
+          jq '.outcome.execution_id="other-execution"' learning-input.json > /tmp/lineage-mismatch.json
+          test "$(opa eval --format raw --input /tmp/lineage-mismatch.json --data external_challenger/overtime/policy.rego 'data.external_challenger.overtime.allow_learning')" = false
+          jq '.proposal.run_id="stale-run"' learning-input.json > /tmp/stale-proposal.json
+          test "$(opa eval --format raw --input /tmp/stale-proposal.json --data external_challenger/overtime/policy.rego 'data.external_challenger.overtime.allow_learning')" = false
+          jq '.proposal.proposer_identity="unauthorized"' learning-input.json > /tmp/unauthorized-proposal.json
+          test "$(opa eval --format raw --input /tmp/unauthorized-proposal.json --data external_challenger/overtime/policy.rego 'data.external_challenger.overtime.allow_learning')" = false
+
+      - name: Preserve offline-verifiable outcome bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p offline
+          (cd offline && gh attestation download ../outcome-v1.json -R "$GITHUB_REPOSITORY")
+          gh attestation trusted-root > offline/trusted-root.jsonl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overtime-proposer
+          path: |
+            capability-v1.json
+            execution-v1-response.json
+            outcome-v1.json
+            learning-proposal.json
+            baseline-pods.json
+            baseline-endpoints.json
+            learning-input.json
+            offline/**
+          if-no-files-found: error
+          retention-days: 30
