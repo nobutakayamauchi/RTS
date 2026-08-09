@@ -43,19 +43,15 @@ def verify_collector_provenance(
     observation_fingerprint: str,
     expectation_fingerprint: str,
     observation_session_id: str,
+    active_route_surface: str,
+    executable_or_module: str,
     active_route_instance_ids: Sequence[str],
     expected_artifact_digest: str,
     reference_time: str,
     max_age_seconds: int = 300,
     min_independent_domains: int = 2,
 ) -> dict[str, Any]:
-    """Verify signed, independently sourced route/process/instance/artifact provenance.
-
-    Each trust domain must independently cover the same four measurement stages:
-    route -> process -> instance -> artifact. Records bind the exact deployment
-    observation, expectation and session. This validates provenance diversity and
-    consistency; it does not prove a jointly compromised substrate cannot lie.
-    """
+    """Verify independently sourced route/process/instance/artifact provenance."""
     if not isinstance(records, Sequence) or isinstance(records, (str, bytes)) or not records:
         raise ProvenanceError("collector provenance must be a non-empty array")
     if not isinstance(trusted_collector_keys, Mapping) or not trusted_collector_keys:
@@ -67,12 +63,14 @@ def verify_collector_provenance(
 
     required_stages = {"route", "process", "instance", "artifact"}
     expected_instances = set(active_route_instance_ids)
+    expected_route_value = ",".join(sorted(expected_instances))
     if not expected_instances:
         raise ProvenanceError("active_route_instance_ids must be non-empty")
 
     reference = _parse_timestamp(reference_time, "reference_time")
     seen_record_ids: set[str] = set()
-    collector_domains: dict[str, set[str]] = {}
+    collector_domain: dict[str, str] = {}
+    source_domain: dict[str, str] = {}
     domain_stages: dict[str, set[str]] = {}
     domain_instances: dict[str, set[str]] = {}
     verified_records: list[str] = []
@@ -81,18 +79,9 @@ def verify_collector_provenance(
         if not isinstance(record, Mapping):
             raise ProvenanceError(f"collector_provenance[{index}] must be an object")
         required = (
-            "record_id",
-            "collector_id",
-            "trust_domain",
-            "source_locator",
-            "measurement_stage",
-            "subject_id",
-            "observed_value",
-            "observation_fingerprint",
-            "expectation_fingerprint",
-            "observation_session_id",
-            "issued_at",
-            "signature",
+            "record_id", "collector_id", "trust_domain", "source_locator", "measurement_stage",
+            "subject_id", "observed_value", "observation_fingerprint", "expectation_fingerprint",
+            "observation_session_id", "issued_at", "signature",
         )
         values: dict[str, str] = {}
         for field in required:
@@ -107,9 +96,19 @@ def verify_collector_provenance(
         seen_record_ids.add(record_id)
 
         collector_id = values["collector_id"]
+        domain = values["trust_domain"]
+        source_locator = values["source_locator"]
         secret = trusted_collector_keys.get(collector_id)
         if not isinstance(secret, str) or not secret:
             raise ProvenanceError(f"untrusted collector_id: {collector_id}")
+
+        previous_domain = collector_domain.setdefault(collector_id, domain)
+        if previous_domain != domain:
+            raise ProvenanceError(f"collector {collector_id} cannot claim multiple trust domains")
+        previous_source_domain = source_domain.setdefault(source_locator, domain)
+        if previous_source_domain != domain:
+            raise ProvenanceError(f"source locator {source_locator} is shared across trust domains")
+
         if values["observation_fingerprint"] != observation_fingerprint:
             raise ProvenanceError(f"collector {collector_id} measured a different observation")
         if values["expectation_fingerprint"] != expectation_fingerprint:
@@ -120,35 +119,33 @@ def verify_collector_provenance(
         stage = values["measurement_stage"]
         if stage not in required_stages:
             raise ProvenanceError(f"unsupported measurement_stage: {stage}")
-
         issued = _parse_timestamp(values["issued_at"], f"collector_provenance[{index}].issued_at")
         age = (reference - issued).total_seconds()
         if age < 0 or age > max_age_seconds:
             raise ProvenanceError(f"collector {collector_id} provenance is stale or future-dated")
-
         expected_signature = compute_provenance_signature(provenance_material(record), secret)
         if not hmac.compare_digest(values["signature"], expected_signature):
             raise ProvenanceError(f"invalid provenance signature for collector_id: {collector_id}")
 
-        domain = values["trust_domain"]
-        collector_domains.setdefault(domain, set()).add(collector_id)
         domain_stages.setdefault(domain, set()).add(stage)
-
-        if stage == "instance":
-            if values["subject_id"] not in expected_instances:
-                raise ProvenanceError(f"collector {collector_id} referenced non-routed instance: {values['subject_id']}")
+        if stage == "route":
+            if values["subject_id"] != active_route_surface or values["observed_value"] != expected_route_value:
+                raise ProvenanceError(f"collector {collector_id} route measurement mismatch")
+        elif stage == "process":
+            if values["observed_value"] != executable_or_module:
+                raise ProvenanceError(f"collector {collector_id} process measurement mismatch")
+        elif stage == "instance":
+            if values["subject_id"] not in expected_instances or values["observed_value"] != values["subject_id"]:
+                raise ProvenanceError(f"collector {collector_id} referenced non-routed or mismatched instance")
             domain_instances.setdefault(domain, set()).add(values["subject_id"])
         elif stage == "artifact":
-            if values["observed_value"] != expected_artifact_digest:
+            if values["subject_id"] not in expected_instances or values["observed_value"] != expected_artifact_digest:
                 raise ProvenanceError(f"collector {collector_id} artifact measurement mismatch")
 
         verified_records.append(record_id)
 
     if len(domain_stages) < min_independent_domains:
-        raise ProvenanceError(
-            f"independent provenance domain quorum not met: {len(domain_stages)} < {min_independent_domains}"
-        )
-
+        raise ProvenanceError(f"independent provenance domain quorum not met: {len(domain_stages)} < {min_independent_domains}")
     for domain, stages in domain_stages.items():
         missing = required_stages - stages
         if missing:
