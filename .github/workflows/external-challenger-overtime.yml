@@ -28,6 +28,6 @@ jobs:
     needs: evaluator
     uses: ./.github/workflows/external-challenger-overtime-promoter.yml
 
-  deployer:
+  finalizer:
     needs: promoter
-    uses: ./.github/workflows/external-challenger-overtime-deployer.yml
+    uses: ./.github/workflows/external-challenger-overtime-finalizer.yml
