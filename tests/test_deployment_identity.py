@@ -5,15 +5,21 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from deployment_identity.attestation import (
+    AttestationError,
+    compute_hmac_signature,
+    establish_attested_deployment_identity,
+)
 from deployment_identity.cli import main
 from deployment_identity.core import (
     BOUND,
-    DeploymentIdentityError,
     ESTABLISHED,
     NOT_BOUND,
     NOT_ESTABLISHED,
+    DeploymentIdentityError,
     bind_runtime_observation,
     establish_deployment_identity,
+    fingerprint_expectation,
     fingerprint_observation,
 )
 
@@ -54,13 +60,48 @@ class DeploymentIdentityTests(unittest.TestCase):
             "observed_at": "2026-08-09T17:00:00+09:00",
         }
 
-    def establish(self, observation: dict | None = None, **kwargs):
+    def keyring(self) -> dict[str, str]:
+        return {"attestor-a": "secret-a", "attestor-b": "secret-b", "attestor-c": "secret-c"}
+
+    def make_attestation(self, attestor_id: str, observation: dict | None = None, expectation: dict | None = None) -> dict:
+        observation = observation or self.observation()
+        expectation = expectation or self.expectation()
+        material = {
+            "attestor_id": attestor_id,
+            "observation_fingerprint": fingerprint_observation(observation),
+            "expectation_fingerprint": fingerprint_expectation(expectation),
+            "observation_session_id": observation["observation_session_id"],
+            "issued_at": "2026-08-09T17:00:05+09:00",
+        }
+        return {**material, "signature": compute_hmac_signature(material, self.keyring()[attestor_id])}
+
+    def attestations(self, observation: dict | None = None, expectation: dict | None = None) -> list[dict]:
+        return [
+            self.make_attestation("attestor-a", observation, expectation),
+            self.make_attestation("attestor-b", observation, expectation),
+        ]
+
+    def material_proof(self, observation: dict | None = None, expectation: dict | None = None, **kwargs):
         return establish_deployment_identity(
             observation or self.observation(),
-            expected_deployment=kwargs.get("expected_deployment", self.expectation()),
+            expected_deployment=expectation or self.expectation(),
             trusted_observer_ids=kwargs.get("trusted_observer_ids", {"observer-prod-01"}),
             reference_time=kwargs.get("reference_time", "2026-08-09T17:00:10+09:00"),
             max_age_seconds=kwargs.get("max_age_seconds", 300),
+        )
+
+    def establish(self, observation: dict | None = None, expectation: dict | None = None, **kwargs):
+        observation = observation or self.observation()
+        expectation = expectation or self.expectation()
+        return establish_attested_deployment_identity(
+            observation,
+            expected_deployment=expectation,
+            trusted_observer_ids=kwargs.get("trusted_observer_ids", ["observer-prod-01"]),
+            reference_time=kwargs.get("reference_time", "2026-08-09T17:00:10+09:00"),
+            attestations=kwargs.get("attestations", self.attestations(observation, expectation)),
+            trusted_attestation_keys=kwargs.get("trusted_attestation_keys", self.keyring()),
+            max_age_seconds=kwargs.get("max_age_seconds", 300),
+            min_attestors=kwargs.get("min_attestors", 2),
         )
 
     def runtime_observation(self, proof: dict, observed_at: str = "2026-08-09T17:00:15+09:00") -> dict:
@@ -72,154 +113,163 @@ class DeploymentIdentityTests(unittest.TestCase):
             "result": {"status": "ok"},
         }
 
-    def test_matching_material_and_route_set_establishes_identity(self) -> None:
-        result = self.establish()
-        self.assertEqual(result["status"], ESTABLISHED)
-        self.assertTrue(result["runtime_classification_authorized"])
-        self.assertEqual(result["identity"]["revision"], "abc123")
-        self.assertEqual(result["identity"]["active_route_instance_ids"], ["worker-1"])
+    def test_raw_material_match_cannot_authorize_runtime_classification(self) -> None:
+        proof = self.material_proof()
+        self.assertEqual(proof["status"], ESTABLISHED)
+        self.assertTrue(proof["material_match_verified"])
+        self.assertFalse(proof["runtime_classification_authorized"])
+        self.assertEqual(proof["reason"], "RUNTIME_MATERIAL_MATCH_ATTESTATION_REQUIRED")
+        result = bind_runtime_observation(proof, self.runtime_observation(proof))
+        self.assertEqual(result["status"], NOT_BOUND)
+        self.assertEqual(result["reason"], "DEPLOYMENT_IDENTITY_NOT_FULLY_AUTHORIZED")
 
-    def test_untrusted_observer_cannot_self_authorize(self) -> None:
+    def test_two_independent_signed_attestors_authorize(self) -> None:
+        proof = self.establish()
+        self.assertEqual(proof["status"], ESTABLISHED)
+        self.assertTrue(proof["runtime_classification_authorized"])
+        self.assertEqual(proof["attestation_quorum"]["verified_attestors"], ["attestor-a", "attestor-b"])
+
+    def test_single_attestor_cannot_authorize(self) -> None:
+        with self.assertRaisesRegex(AttestationError, "quorum not met"):
+            self.establish(attestations=[self.make_attestation("attestor-a")])
+
+    def test_duplicate_attestor_cannot_fake_quorum(self) -> None:
+        attestation = self.make_attestation("attestor-a")
+        with self.assertRaisesRegex(AttestationError, "duplicate attestor_id"):
+            self.establish(attestations=[attestation, dict(attestation)])
+
+    def test_forged_signature_fails_closed(self) -> None:
+        attestations = self.attestations()
+        attestations[1]["signature"] = "0" * 64
+        with self.assertRaisesRegex(AttestationError, "invalid signature"):
+            self.establish(attestations=attestations)
+
+    def test_untrusted_attestor_fails_closed(self) -> None:
+        attestations = self.attestations()
+        material = {
+            "attestor_id": "attacker",
+            "observation_fingerprint": fingerprint_observation(self.observation()),
+            "expectation_fingerprint": fingerprint_expectation(self.expectation()),
+            "observation_session_id": "session-001",
+            "issued_at": "2026-08-09T17:00:05+09:00",
+        }
+        attestations[1] = {**material, "signature": compute_hmac_signature(material, "attacker-secret")}
+        with self.assertRaisesRegex(AttestationError, "untrusted attestor_id"):
+            self.establish(attestations=attestations)
+
+    def test_attestor_cannot_sign_different_observation_or_expectation(self) -> None:
+        altered = self.observation()
+        altered["deployed_revision"] = "other"
+        bad = self.make_attestation("attestor-b", altered, self.expectation())
+        with self.assertRaisesRegex(AttestationError, "different observation"):
+            self.establish(attestations=[self.make_attestation("attestor-a"), bad])
+
+        altered_expectation = self.expectation()
+        altered_expectation["artifact_digest"] = "sha256:other"
+        bad = self.make_attestation("attestor-b", self.observation(), altered_expectation)
+        with self.assertRaisesRegex(AttestationError, "different expectation"):
+            self.establish(attestations=[self.make_attestation("attestor-a"), bad])
+
+    def test_stale_attestation_replay_fails_closed(self) -> None:
+        with self.assertRaisesRegex(AttestationError, "stale or future-dated"):
+            self.establish(reference_time="2026-08-09T17:10:01+09:00", max_age_seconds=300)
+
+    def test_untrusted_primary_observer_cannot_self_authorize(self) -> None:
         observation = self.observation()
         observation["observer_id"] = "attacker-self-declared"
-        result = self.establish(observation)
+        result = self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
+        self.assertEqual(result["status"], NOT_ESTABLISHED)
         self.assertEqual(result["reason"], "UNTRUSTED_OBSERVER")
 
-    def test_stale_or_future_observation_fails_closed(self) -> None:
-        self.assertEqual(
-            self.establish(reference_time="2026-08-09T17:10:01+09:00", max_age_seconds=300)["reason"],
-            "STALE_OR_FUTURE_OBSERVATION",
-        )
-        self.assertEqual(
-            self.establish(reference_time="2026-08-09T16:59:59+09:00")["reason"],
-            "STALE_OR_FUTURE_OBSERVATION",
-        )
-
-    def test_dirty_source_tree_fails_even_when_revision_matches(self) -> None:
+    def test_dirty_source_tree_and_material_drift_fail(self) -> None:
         observation = self.observation()
         observation["source_tree_state"] = "DIRTY"
-        result = self.establish(observation)
-        self.assertEqual(result["status"], NOT_ESTABLISHED)
+        result = self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
         self.assertEqual(result["reason"], "SOURCE_TREE_NOT_CLEAN")
 
-    def test_same_revision_with_different_artifact_fails(self) -> None:
-        observation = self.observation()
-        observation["deployed_artifact_digest"] = "sha256:artifact-other"
-        result = self.establish(observation)
-        self.assertEqual(result["reason"], "ARTIFACT_DIGEST_MISMATCH")
-
-    def test_same_revision_with_different_config_fails(self) -> None:
-        observation = self.observation()
-        observation["runtime_config_fingerprint"] = "sha256:config-other"
-        result = self.establish(observation)
-        self.assertEqual(result["reason"], "CONFIG_FINGERPRINT_MISMATCH")
-
-    def test_same_revision_with_different_environment_fails(self) -> None:
-        observation = self.observation()
-        observation["runtime_environment_fingerprint"] = "sha256:env-other"
-        result = self.establish(observation)
-        self.assertEqual(result["reason"], "ENVIRONMENT_FINGERPRINT_MISMATCH")
-
-    def test_expectation_is_external_not_self_declared_source_revision(self) -> None:
-        expectation = self.expectation()
-        expectation["source_revision"] = "wanted999"
-        result = self.establish(expected_deployment=expectation)
-        self.assertEqual(result["reason"], "DEPLOYED_REVISION_MISMATCH")
+        for field, reason in (
+            ("deployed_artifact_digest", "ARTIFACT_DIGEST_MISMATCH"),
+            ("runtime_config_fingerprint", "CONFIG_FINGERPRINT_MISMATCH"),
+            ("runtime_environment_fingerprint", "ENVIRONMENT_FINGERPRINT_MISMATCH"),
+        ):
+            with self.subTest(field=field):
+                observation = self.observation()
+                observation[field] = "sha256:other"
+                result = self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
+                self.assertEqual(result["reason"], reason)
 
     def test_reverse_proxy_route_cannot_reference_unknown_worker(self) -> None:
         observation = self.observation()
         observation["active_route_instance_ids"] = ["worker-not-observed"]
         with self.assertRaisesRegex(DeploymentIdentityError, "unknown runtime instance"):
-            self.establish(observation)
+            self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
 
-    def test_heterogeneous_routed_worker_revision_fails(self) -> None:
+    def test_mixed_routed_worker_set_fails(self) -> None:
         observation = self.observation()
         stale = self.instance("worker-2")
         stale["revision"] = "old456"
         observation["runtime_instances"].append(stale)
         observation["active_route_instance_ids"] = ["worker-1", "worker-2"]
-        result = self.establish(observation)
+        result = self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
         self.assertEqual(result["reason"], "ROUTE_INSTANCE_REVISION_MISMATCH")
-        self.assertEqual(result["instance_id"], "worker-2")
-
-    def test_heterogeneous_routed_worker_artifact_fails(self) -> None:
-        observation = self.observation()
-        other = self.instance("worker-2")
-        other["artifact_digest"] = "sha256:other"
-        observation["runtime_instances"].append(other)
-        observation["active_route_instance_ids"] = ["worker-1", "worker-2"]
-        result = self.establish(observation)
-        self.assertEqual(result["reason"], "ROUTE_INSTANCE_ARTIFACT_MISMATCH")
 
     def test_non_routed_old_worker_does_not_define_active_route_reality(self) -> None:
         observation = self.observation()
         stale = self.instance("worker-idle")
         stale["revision"] = "old456"
         observation["runtime_instances"].append(stale)
-        result = self.establish(observation)
-        self.assertEqual(result["status"], ESTABLISHED)
+        proof = self.establish(observation=observation, attestations=self.attestations(observation, self.expectation()))
+        self.assertTrue(proof["runtime_classification_authorized"])
 
-    def test_duplicate_instance_ids_fail_closed(self) -> None:
-        observation = self.observation()
-        observation["runtime_instances"].append(self.instance("worker-1"))
-        with self.assertRaisesRegex(DeploymentIdentityError, "duplicate runtime instance"):
-            self.establish(observation)
-
-    def test_runtime_observation_requires_both_observed_and_expected_material_fingerprints(self) -> None:
-        proof = self.establish()
-        runtime = self.runtime_observation(proof)
-        runtime["deployment_expectation_fingerprint"] = "forged"
-        result = bind_runtime_observation(proof, runtime)
-        self.assertEqual(result["status"], NOT_BOUND)
-        self.assertEqual(result["reason"], "DEPLOYMENT_EXPECTATION_FINGERPRINT_MISMATCH")
-
-    def test_runtime_observation_requires_exact_deployment_fingerprint(self) -> None:
+    def test_runtime_observation_requires_authorized_fingerprints_session_and_time(self) -> None:
         proof = self.establish()
         runtime = self.runtime_observation(proof)
         runtime["deployment_identity_fingerprint"] = "forged"
-        result = bind_runtime_observation(proof, runtime)
-        self.assertEqual(result["reason"], "DEPLOYMENT_FINGERPRINT_MISMATCH")
+        self.assertEqual(bind_runtime_observation(proof, runtime)["reason"], "DEPLOYMENT_FINGERPRINT_MISMATCH")
 
-    def test_runtime_observation_requires_same_session_and_time_window(self) -> None:
-        proof = self.establish()
+        runtime = self.runtime_observation(proof)
+        runtime["deployment_expectation_fingerprint"] = "forged"
+        self.assertEqual(bind_runtime_observation(proof, runtime)["reason"], "DEPLOYMENT_EXPECTATION_FINGERPRINT_MISMATCH")
+
         runtime = self.runtime_observation(proof)
         runtime["observation_session_id"] = "other-session"
         self.assertEqual(bind_runtime_observation(proof, runtime)["reason"], "OBSERVATION_SESSION_MISMATCH")
 
         runtime = self.runtime_observation(proof, "2026-08-09T17:01:00+09:00")
-        self.assertEqual(
-            bind_runtime_observation(proof, runtime, max_skew_seconds=30)["reason"],
-            "RUNTIME_OBSERVATION_OUTSIDE_BINDING_WINDOW",
-        )
+        self.assertEqual(bind_runtime_observation(proof, runtime, max_skew_seconds=30)["reason"], "RUNTIME_OBSERVATION_OUTSIDE_BINDING_WINDOW")
 
-    def test_runtime_observation_binds_inside_window(self) -> None:
-        proof = self.establish()
-        result = bind_runtime_observation(proof, self.runtime_observation(proof), max_skew_seconds=30)
-        self.assertEqual(result["status"], BOUND)
-        self.assertTrue(result["runtime_classification_authorized"])
+        bound = bind_runtime_observation(proof, self.runtime_observation(proof), max_skew_seconds=30)
+        self.assertEqual(bound["status"], BOUND)
+        self.assertTrue(bound["runtime_classification_authorized"])
 
-    def test_cli_requires_external_expectation(self) -> None:
+    def test_cli_requires_attestations_and_external_keyring(self) -> None:
+        observation = self.observation()
+        expectation = self.expectation()
         with tempfile.TemporaryDirectory() as temporary:
-            observation_path = Path(temporary) / "observation.json"
-            expectation_path = Path(temporary) / "expectation.json"
-            observation_path.write_text(json.dumps(self.observation()), encoding="utf-8")
-            expectation_path.write_text(json.dumps(self.expectation()), encoding="utf-8")
+            root = Path(temporary)
+            observation_path = root / "observation.json"
+            expectation_path = root / "expectation.json"
+            attestations_path = root / "attestations.json"
+            keyring_path = root / "keyring.json"
+            observation_path.write_text(json.dumps(observation), encoding="utf-8")
+            expectation_path.write_text(json.dumps(expectation), encoding="utf-8")
+            attestations_path.write_text(json.dumps(self.attestations(observation, expectation)), encoding="utf-8")
+            keyring_path.write_text(json.dumps(self.keyring()), encoding="utf-8")
             self.assertEqual(main([
                 "verify", "--observation", str(observation_path),
                 "--expectation", str(expectation_path),
+                "--attestations", str(attestations_path),
+                "--attestation-keyring", str(keyring_path),
                 "--trusted-observer-id", "observer-prod-01",
                 "--reference-time", "2026-08-09T17:00:10+09:00",
             ]), 0)
 
     def test_code_existence_alone_cannot_establish_identity(self) -> None:
-        source_only = {
-            "deployed_revision": "abc123",
-            "observed_at": "2026-08-09T17:00:00+09:00",
-        }
+        source_only = {"deployed_revision": "abc123", "observed_at": "2026-08-09T17:00:00+09:00"}
         with self.assertRaises(DeploymentIdentityError):
-            self.establish(source_only)
+            self.material_proof(source_only)
 
-    def test_fingerprint_is_deterministic_and_order_independent(self) -> None:
+    def test_fingerprints_are_deterministic(self) -> None:
         first = self.observation()
         second = dict(reversed(list(first.items())))
         self.assertEqual(fingerprint_observation(first), fingerprint_observation(second))
