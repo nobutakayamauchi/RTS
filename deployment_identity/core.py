@@ -37,7 +37,9 @@ def _require_non_empty_string(observation: Mapping[str, Any], field: str) -> str
     value = observation.get(field)
     if not isinstance(value, str) or not value.strip():
         raise DeploymentIdentityError(f"missing or invalid required field: {field}")
-    return value.strip()
+    if value != value.strip():
+        raise DeploymentIdentityError(f"surrounding whitespace is not allowed: {field}")
+    return value
 
 
 def _validate_timestamp(value: str) -> None:
