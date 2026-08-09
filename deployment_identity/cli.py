@@ -40,6 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--attestation-keyring", required=True, type=Path)
     verify.add_argument("--collector-provenance", required=True, type=Path)
     verify.add_argument("--collector-keyring", required=True, type=Path)
+    verify.add_argument("--collector-domain-map", required=True, type=Path)
     verify.add_argument("--trusted-observer-id", required=True, action="append")
     verify.add_argument("--reference-time", required=True)
     verify.add_argument("--max-age-seconds", type=int, default=300)
@@ -66,6 +67,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             trusted_attestation_keys=_read_object(args.attestation_keyring, "attestation keyring"),
             collector_provenance=_read_array(args.collector_provenance, "collector provenance"),
             trusted_collector_keys=_read_object(args.collector_keyring, "collector keyring"),
+            trusted_collector_domains=_read_object(args.collector_domain_map, "collector domain map"),
             max_age_seconds=args.max_age_seconds,
             min_attestors=args.min_attestors,
             min_independent_domains=args.min_independent_domains,
