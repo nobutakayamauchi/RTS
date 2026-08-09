@@ -40,6 +40,7 @@ def verify_collector_provenance(
     records: Sequence[Mapping[str, Any]],
     *,
     trusted_collector_keys: Mapping[str, str],
+    trusted_collector_domains: Mapping[str, str],
     observation_fingerprint: str,
     expectation_fingerprint: str,
     observation_session_id: str,
@@ -51,11 +52,12 @@ def verify_collector_provenance(
     max_age_seconds: int = 300,
     min_independent_domains: int = 2,
 ) -> dict[str, Any]:
-    """Verify independently sourced route/process/instance/artifact provenance."""
     if not isinstance(records, Sequence) or isinstance(records, (str, bytes)) or not records:
         raise ProvenanceError("collector provenance must be a non-empty array")
     if not isinstance(trusted_collector_keys, Mapping) or not trusted_collector_keys:
         raise ProvenanceError("trusted_collector_keys must be a non-empty mapping")
+    if not isinstance(trusted_collector_domains, Mapping) or not trusted_collector_domains:
+        raise ProvenanceError("trusted_collector_domains must be a non-empty mapping")
     if not isinstance(min_independent_domains, int) or min_independent_domains < 2:
         raise ProvenanceError("min_independent_domains must be at least 2")
     if not isinstance(max_age_seconds, int) or max_age_seconds < 0:
@@ -69,10 +71,10 @@ def verify_collector_provenance(
 
     reference = _parse_timestamp(reference_time, "reference_time")
     seen_record_ids: set[str] = set()
-    collector_domain: dict[str, str] = {}
     source_domain: dict[str, str] = {}
     domain_stages: dict[str, set[str]] = {}
     domain_instances: dict[str, set[str]] = {}
+    domain_artifacts: dict[str, set[str]] = {}
     verified_records: list[str] = []
 
     for index, record in enumerate(records):
@@ -96,15 +98,18 @@ def verify_collector_provenance(
         seen_record_ids.add(record_id)
 
         collector_id = values["collector_id"]
-        domain = values["trust_domain"]
+        claimed_domain = values["trust_domain"]
         source_locator = values["source_locator"]
         secret = trusted_collector_keys.get(collector_id)
         if not isinstance(secret, str) or not secret:
             raise ProvenanceError(f"untrusted collector_id: {collector_id}")
+        policy_domain = trusted_collector_domains.get(collector_id)
+        if not isinstance(policy_domain, str) or not policy_domain:
+            raise ProvenanceError(f"collector {collector_id} has no externally trusted domain binding")
+        if claimed_domain != policy_domain:
+            raise ProvenanceError(f"collector {collector_id} claimed trust domain {claimed_domain} but policy binds {policy_domain}")
+        domain = policy_domain
 
-        previous_domain = collector_domain.setdefault(collector_id, domain)
-        if previous_domain != domain:
-            raise ProvenanceError(f"collector {collector_id} cannot claim multiple trust domains")
         previous_source_domain = source_domain.setdefault(source_locator, domain)
         if previous_source_domain != domain:
             raise ProvenanceError(f"source locator {source_locator} is shared across trust domains")
@@ -141,6 +146,7 @@ def verify_collector_provenance(
         elif stage == "artifact":
             if values["subject_id"] not in expected_instances or values["observed_value"] != expected_artifact_digest:
                 raise ProvenanceError(f"collector {collector_id} artifact measurement mismatch")
+            domain_artifacts.setdefault(domain, set()).add(values["subject_id"])
 
         verified_records.append(record_id)
 
@@ -152,6 +158,8 @@ def verify_collector_provenance(
             raise ProvenanceError(f"trust domain {domain} missing measurement stages: {sorted(missing)}")
         if domain_instances.get(domain, set()) != expected_instances:
             raise ProvenanceError(f"trust domain {domain} did not independently cover every routed instance")
+        if domain_artifacts.get(domain, set()) != expected_instances:
+            raise ProvenanceError(f"trust domain {domain} did not independently measure artifact for every routed instance")
 
     return {
         "status": "COLLECTOR_PROVENANCE_VERIFIED",
