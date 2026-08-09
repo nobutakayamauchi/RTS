@@ -8,22 +8,23 @@ from typing import Sequence
 from .core import DeploymentIdentityError, establish_deployment_identity, fingerprint_observation
 
 
-def _read_observation(path: Path) -> dict:
+def _read_object(path: Path, label: str) -> dict:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise DeploymentIdentityError(f"cannot read observation: {path}") from exc
+        raise DeploymentIdentityError(f"cannot read {label}: {path}") from exc
     if not isinstance(value, dict):
-        raise DeploymentIdentityError("observation must be a JSON object")
+        raise DeploymentIdentityError(f"{label} must be a JSON object")
     return value
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="RTS Deployment Identity v2")
+    parser = argparse.ArgumentParser(description="RTS Deployment Identity v3")
     sub = parser.add_subparsers(dest="command", required=True)
 
     verify = sub.add_parser("verify", help="establish deployment identity")
     verify.add_argument("--observation", required=True, type=Path)
+    verify.add_argument("--expectation", required=True, type=Path)
     verify.add_argument("--trusted-observer-id", required=True, action="append")
     verify.add_argument("--reference-time", required=True)
     verify.add_argument("--max-age-seconds", type=int, default=300)
@@ -36,13 +37,15 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        observation = _read_observation(args.observation)
+        observation = _read_object(args.observation, "observation")
         if args.command == "fingerprint":
             print(fingerprint_observation(observation))
             return 0
 
+        expectation = _read_object(args.expectation, "expectation")
         result = establish_deployment_identity(
             observation,
+            expected_deployment=expectation,
             trusted_observer_ids=args.trusted_observer_id,
             reference_time=args.reference_time,
             max_age_seconds=args.max_age_seconds,

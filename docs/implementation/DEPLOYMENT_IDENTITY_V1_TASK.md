@@ -1,86 +1,79 @@
-# Deployment Identity v1 — Completion Task
+# Deployment Identity — Completion Contract through v3
 
 ## Problem
 
-RTS observation can misclassify stale or non-deployed source code as runtime reality.
+RTS must not classify source presence, matching revisions, or stale attestations as runtime reality.
 
-The governing invariant is:
+Governing invariants:
 
 ```text
 Code existence != runtime evidence.
+Revision equality != runtime reality.
 ```
 
-Runtime implementation classification MUST NOT occur until Deployment Identity is established.
+## v1 proof boundary
 
-## Required identity surface
+v1 established the minimum runtime subject: service/unit, working directory, executable/module, active surface, deployed revision, expected source revision, and timezone-aware observation time. Missing evidence failed closed.
 
-Deployment Identity v1 requires explicit evidence for:
+## Devil's Advocate v2
 
-1. service/unit/container/job identity;
-2. working directory;
-3. executable/module/entrypoint;
-4. active route/command/worker/interface surface;
-5. deployed commit/revision/image digest;
-6. expected source revision;
-7. timezone-aware observation timestamp.
+v2 closed three immediate bypasses:
 
-## Establishment rule
+- self-declared observer trust;
+- stale/replayed evidence and bounded TOCTOU;
+- runtime observation bypass of Deployment Identity.
 
-All required observations MUST be present.
+It requires an externally supplied trusted observer set, observer/session identity, freshness reference/window, and fingerprint/session/time binding into Runtime Observation.
 
-`deployed_revision` MUST exactly equal `source_revision`.
+## Devil's Advocate v3
 
-Only then may the verifier emit:
+v3 attacks the assumption that a matching commit implies an identical runtime.
 
-```text
-DEPLOYMENT_IDENTITY_ESTABLISHED
-runtime_classification_authorized: true
-```
+The expectation is now externally supplied and contains:
 
-Every missing field, invalid timestamp, or revision mismatch fails closed. No repository-path inference, branch-name inference, source-code existence, or best-effort guess may substitute for runtime observation.
+1. source revision;
+2. expected artifact digest;
+3. expected configuration fingerprint;
+4. expected environment fingerprint.
+
+The runtime observation additionally requires:
+
+1. deployed artifact digest;
+2. runtime configuration fingerprint;
+3. runtime environment fingerprint;
+4. exact `CLEAN` source-tree state;
+5. enumerated runtime instances;
+6. enumerated active-route instance ids.
+
+Every instance reachable from the active route MUST match the external expectation across revision, artifact, config, and environment. Unknown route targets, duplicate identities, dirty source state, mixed routed workers, or material mismatch fail closed.
 
 ## Evidence chain
 
 ```text
-Source Identity
-    -> Deployment Identity
-    -> Runtime Observation
+Expected Source / Material
+    -> Trusted + Fresh Deployment Observation
+    -> Active Route Instance Set
+    -> Observation + Expectation Fingerprints
+    -> Session/Time-Bound Runtime Observation
     -> Outcome Evidence
 ```
 
-Deployment Identity does not claim that an outcome is correct. It proves the runtime subject of the claim before outcome classification begins.
-
-## v1 implementation
-
-- `deployment_identity/core.py` — deterministic validator and fingerprinting
-- `deployment_identity/cli.py` — read-only verification CLI
-- `deployment_identity/README.md` — operator contract and boundary
-- `tests/test_deployment_identity.py` — fail-closed invariants
-
-## Prohibited behavior
-
-Deployment Identity v1 MUST NOT:
-
-- execute shell commands;
-- inspect a live host itself;
-- call a network or provider;
-- deploy or restart services;
-- mutate another repository;
-- infer deployment state from source presence;
-- authorize runtime classification after partial identity evidence.
-
-Those observations must be collected by a separately governed observer/adapter and supplied as evidence.
-
 ## Acceptance criteria
 
-- deterministic fingerprints;
-- exact revision binding;
-- missing identity fields fail closed;
-- mismatched source/deployed revision fails closed;
-- timezone-less observations fail closed;
-- code/source evidence alone cannot establish runtime identity;
-- successful proof explicitly authorizes runtime classification and nothing beyond it.
+- source existence alone cannot establish runtime identity;
+- a matching revision with dirty source state fails closed;
+- a matching revision with a different artifact fails closed;
+- config/environment drift fails closed;
+- the expected revision/material cannot be self-declared by the runtime observation;
+- every routed worker is measured against the same expectation;
+- an unknown route target fails closed;
+- a heterogeneous routed worker set fails closed;
+- runtime observation must bind both observation and expectation fingerprints;
+- replay/future evidence and oversized TOCTOU windows fail closed;
+- dedicated and full-repository test suites pass.
 
-## Completion boundary
+## Remaining boundary
 
-Deployment Identity v1 closes the previously observed classification gap at the proof boundary. It does not yet provide privileged live-host collection. Any future collector requires a separate authority, privacy, and execution-safety review.
+v3 remains an attestation validator, not cryptographic host truth. A trusted observer may still lie or be compromised. Reverse-proxy/service-mesh discovery, privileged host collection, signed evidence, key management, TPM/container attestation, and secret-safe material measurement require separate governed implementation and review.
+
+Deployment Identity authorizes runtime classification only. It does not prove outcome correctness and does not authorize deployment, mutation, publication, provider execution, or capability promotion.
