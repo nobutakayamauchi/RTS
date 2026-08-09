@@ -12,12 +12,13 @@ permissions:
   attestations: write
 
 jobs:
-  provider-binding-2a:
+  provider-binding-2b:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       KIND_VERSION: v0.32.0
       KIND_NODE: kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+      SPIFFE_ID: spiffe://example.org/ns/default/sa/default
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +37,6 @@ jobs:
           echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Generate real GitHub provenance attestation
-        id: attest
         uses: actions/attest@v4
         with:
           subject-path: challenger-bundle.tgz
@@ -68,7 +68,29 @@ jobs:
           set -euo pipefail
           kind create cluster --name challenger --image "$KIND_NODE" --wait 120s
 
-      - name: Deploy the attested artifact into the live runtime
+      - name: Install supported SPIRE stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          helm upgrade --install --create-namespace -n spire spire-crds spire-crds \
+            --repo https://spiffe.github.io/helm-charts-hardened/ \
+            --wait --timeout 5m
+          helm upgrade --install -n spire spire spire \
+            --repo https://spiffe.github.io/helm-charts-hardened/ \
+            --set global.spire.clusterName=challenger \
+            --set global.spire.trustDomain=example.org \
+            --wait --timeout 5m
+
+          kubectl get daemonsets -A -o json > /tmp/daemonsets.json
+          AGENT_NS="$(jq -r '[.items[] | select(.metadata.name|contains("spire-agent")) | .metadata.namespace][0]' /tmp/daemonsets.json)"
+          AGENT_NAME="$(jq -r '[.items[] | select(.metadata.name|contains("spire-agent")) | .metadata.name][0]' /tmp/daemonsets.json)"
+          test -n "$AGENT_NS" && test "$AGENT_NS" != "null"
+          test -n "$AGENT_NAME" && test "$AGENT_NAME" != "null"
+          SOCKET_DIR="$(kubectl get daemonset -n "$AGENT_NS" "$AGENT_NAME" -o json | jq -r '[.spec.template.spec.volumes[]? | .hostPath.path? // empty | select(contains("spire"))][0]')"
+          test -n "$SOCKET_DIR" && test "$SOCKET_DIR" != "null"
+          echo "SPIRE_SOCKET_DIR=$SOCKET_DIR" >> "$GITHUB_ENV"
+
+      - name: Deploy attested artifact with SPIRE identity probe
         env:
           BUNDLE_SHA: ${{ steps.bundle.outputs.sha256 }}
         shell: bash
@@ -102,6 +124,15 @@ jobs:
                   challenger.rts/source-revision: "$GITHUB_SHA"
                   challenger.rts/bundle-sha256: "$BUNDLE_SHA"
               spec:
+                initContainers:
+                  - name: identity-probe
+                    image: ghcr.io/spiffe/spire-agent:1.15.2
+                    command: ["/opt/spire/bin/spire-agent"]
+                    args: ["api", "fetch", "-socketPath", "/run/spire/sockets/agent.sock"]
+                    volumeMounts:
+                      - name: spire-agent-socket
+                        mountPath: /run/spire/sockets
+                        readOnly: true
                 containers:
                   - name: web
                     image: nginx:1.27-alpine
@@ -115,6 +146,10 @@ jobs:
                   - name: challenger-bundle
                     configMap:
                       name: challenger-bundle
+                  - name: spire-agent-socket
+                    hostPath:
+                      path: "$SPIRE_SOCKET_DIR"
+                      type: Directory
           ---
           apiVersion: v1
           kind: Service
@@ -128,9 +163,19 @@ jobs:
                 targetPort: 80
           EOF
           kubectl apply -f /tmp/challenger.yaml
-          kubectl rollout status deployment/challenger --timeout=120s
+          kubectl rollout status deployment/challenger --timeout=180s
           kubectl wait --for=jsonpath='{.endpoints[0].conditions.ready}'=true \
             endpointslice -l kubernetes.io/service-name=challenger --timeout=120s
+
+      - name: Fetch live SPIRE workload identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          POD="$(kubectl get pods -l app=challenger -o jsonpath='{.items[0].metadata.name}')"
+          test -n "$POD"
+          kubectl logs "$POD" -c identity-probe > spire-identity.txt
+          grep -F "$SPIFFE_ID" spire-identity.txt
+          echo "CHALLENGER_POD=$POD" >> "$GITHUB_ENV"
 
       - name: Collect raw external provider evidence
         env:
@@ -149,12 +194,16 @@ jobs:
             --slurpfile dep k8s-deployment.json \
             --slurpfile pods k8s-pods.json \
             --slurpfile eps k8s-endpointslices.json \
+            --rawfile spire spire-identity.txt \
             --arg source "$GITHUB_SHA" \
             --arg bundle "$BUNDLE_SHA" \
+            --arg pod "$CHALLENGER_POD" \
+            --arg spiffe "$SPIFFE_ID" \
             '{
               verification:{github_cli_exit_verified:true},
-              expected:{source_revision:$source,bundle_sha256:$bundle,service_name:"challenger",app_label:"challenger"},
+              expected:{source_revision:$source,bundle_sha256:$bundle,service_name:"challenger",app_label:"challenger",spiffe_id:$spiffe},
               github_attestations:$att[0],
+              spire:{pod_name:$pod,workload_api_output:$spire},
               kubernetes:{config_map:$cm[0],deployment:$dep[0],pods:$pods[0],endpoint_slices:$eps[0]}
             }' > provider-input.json
 
@@ -178,15 +227,16 @@ jobs:
 
           jq '.kubernetes.config_map.data.source_revision="forged"' provider-input.json > /tmp/forged-source.json
           assert_denied /tmp/forged-source.json
-
           jq '.kubernetes.endpoint_slices.items[0].endpoints[0].conditions.ready=false' provider-input.json > /tmp/unready-route.json
           assert_denied /tmp/unready-route.json
-
           jq '.kubernetes.pods.items[0].metadata.annotations["challenger.rts/bundle-sha256"]="forged"' provider-input.json > /tmp/forged-runtime.json
           assert_denied /tmp/forged-runtime.json
-
           jq '.github_attestations=[]' provider-input.json > /tmp/no-attestation.json
           assert_denied /tmp/no-attestation.json
+          jq '.spire.workload_api_output="spiffe://attacker.invalid/ns/default/sa/default"' provider-input.json > /tmp/forged-spiffe.json
+          assert_denied /tmp/forged-spiffe.json
+          jq '.spire.pod_name="different-pod"' provider-input.json > /tmp/wrong-spiffe-pod.json
+          assert_denied /tmp/wrong-spiffe-pod.json
 
       - name: Report glue size
         shell: bash
