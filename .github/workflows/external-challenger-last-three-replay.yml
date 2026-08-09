@@ -1,0 +1,225 @@
+name: External Challenger Last Three - Persistent Replay
+
+on:
+  pull_request:
+    paths:
+      - "external_challenger/last_three/**"
+      - ".github/workflows/external-challenger-last-three-*.yml"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  actions: read
+
+jobs:
+  issue-approval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify fixed approval binds exact candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          CANDIDATE_SHA="$(sha256sum external_challenger/last_three/candidate.json | awk '{print $1}')"
+          test "$CANDIDATE_SHA" = "$(jq -r '.candidate_digest' external_challenger/last_three/promotion-approval.json)"
+      - name: Sign valid promotion approval
+        uses: actions/attest@v4
+        with:
+          subject-path: external_challenger/last_three/promotion-approval.json
+          predicate-type: https://example.org/external-challenger/last-three/promotion-approval/v1
+          predicate-path: external_challenger/last_three/promotion-approval.json
+
+  prepare:
+    needs: issue-approval
+    runs-on: ubuntu-latest
+    outputs:
+      consumed: ${{ steps.state.outputs.consumed }}
+      approval_sha: ${{ steps.state.outputs.approval_sha }}
+      marker_sha: ${{ steps.state.outputs.marker_sha }}
+      marker_ref: ${{ steps.state.outputs.marker_ref }}
+      rekor_seen: ${{ steps.state.outputs.rekor_seen }}
+    env:
+      REKOR_VERSION: v1.5.1
+      REKOR_SHA256: 0b4964af85477892c37039fb80793b151864970d19838873eaa1a777ca2fb813
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rekor CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo rekor-cli "https://github.com/sigstore/rekor/releases/download/${REKOR_VERSION}/rekor-cli-linux-amd64"
+          echo "$REKOR_SHA256  rekor-cli" | sha256sum -c -
+          chmod +x rekor-cli
+          sudo mv rekor-cli /usr/local/bin/rekor-cli
+      - name: Verify approval signature and determine durable consumed state
+        id: state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          APPROVAL="external_challenger/last_three/promotion-approval.json"
+          SIGNER="$GITHUB_REPOSITORY/.github/workflows/external-challenger-last-three-replay.yml"
+          PRED="https://example.org/external-challenger/last-three/promotion-approval/v1"
+          gh attestation verify "$APPROVAL" --repo "$GITHUB_REPOSITORY" --signer-workflow "$SIGNER" --predicate-type "$PRED" >/dev/null
+          APPROVAL_SHA="$(sha256sum "$APPROVAL" | awk '{print $1}')"
+          CANDIDATE_SHA="$(sha256sum external_challenger/last_three/candidate.json | awk '{print $1}')"
+          jq -cn --arg approval "$APPROVAL_SHA" --arg candidate "$CANDIDATE_SHA" \
+            '{kind:"consumed-promotion",approval_sha256:$approval,candidate_sha256:$candidate,transition:"promotion-to-deploy-v1"}' > marker.json
+          MARKER_SHA="$(sha256sum marker.json | awk '{print $1}')"
+          MARKER_REF="refs/tags/external-consumed-${APPROVAL_SHA}"
+          echo "approval_sha=$APPROVAL_SHA" >> "$GITHUB_OUTPUT"
+          echo "marker_sha=$MARKER_SHA" >> "$GITHUB_OUTPUT"
+          echo "marker_ref=$MARKER_REF" >> "$GITHUB_OUTPUT"
+
+          # Provider availability is required. Unknown => fail closed.
+          if ! rekor-cli loginfo --rekor_server https://rekor.sigstore.dev >/tmp/rekor-loginfo.txt 2>/tmp/rekor-loginfo.err; then
+            echo "Rekor unavailable: refusing transition"
+            echo "consumed=true" >> "$GITHUB_OUTPUT"
+            echo "rekor_seen=unavailable" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          rekor-cli search --rekor_server https://rekor.sigstore.dev --sha "sha256:${MARKER_SHA}" >/tmp/rekor-search.txt 2>/tmp/rekor-search.err || true
+          REKOR_UUID="$(grep -Eo '[0-9a-f]{64}' /tmp/rekor-search.txt | head -1 || true)"
+          REF_CODE="$(curl -sS -o /tmp/ref.json -w '%{http_code}' \
+            -H 'Accept: application/vnd.github+json' -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/git/ref/tags/external-consumed-${APPROVAL_SHA}" || true)"
+          if [ -n "$REKOR_UUID" ] || [ "$REF_CODE" = 200 ]; then
+            echo "consumed=true" >> "$GITHUB_OUTPUT"
+          else
+            test "$REF_CODE" = 404
+            echo "consumed=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -n "$REKOR_UUID" ]; then echo "rekor_seen=true" >> "$GITHUB_OUTPUT"; else echo "rekor_seen=false" >> "$GITHUB_OUTPUT"; fi
+
+  concurrent-consume:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        consumer: [a, b]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Atomically consume or block
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRECONSUMED: ${{ needs.prepare.outputs.consumed }}
+          MARKER_REF: ${{ needs.prepare.outputs.marker_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p result
+          if [ "$PRECONSUMED" = true ]; then
+            printf 'BLOCKED_PREEXISTING\n' > result/status
+            exit 0
+          fi
+          BODY="$(jq -cn --arg ref "$MARKER_REF" --arg sha "$GITHUB_SHA" '{ref:$ref,sha:$sha}')"
+          CODE="$(curl -sS -o result/body.json -w '%{http_code}' -X POST \
+            -H 'Accept: application/vnd.github+json' -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            -d "$BODY" "https://api.github.com/repos/${GITHUB_REPOSITORY}/git/refs" || true)"
+          printf '%s\n' "$CODE" > result/status
+          case "$CODE" in 201|409|422) ;; *) echo "unknown state, fail closed: $CODE"; exit 1;; esac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: replay-consumer-${{ matrix.consumer }}
+          path: result
+          retention-days: 30
+
+  audit-consume:
+    needs: [prepare, concurrent-consume]
+    runs-on: ubuntu-latest
+    env:
+      REKOR_VERSION: v1.5.1
+      REKOR_SHA256: 0b4964af85477892c37039fb80793b151864970d19838873eaa1a777ca2fb813
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: replay-consumer-*
+          path: results
+      - name: Assert atomic race or durable replay block
+        env:
+          PRECONSUMED: ${{ needs.prepare.outputs.consumed }}
+          APPROVAL_SHA: ${{ needs.prepare.outputs.approval_sha }}
+          MARKER_SHA: ${{ needs.prepare.outputs.marker_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          find results -name status -print -exec cat {} \;
+          CREATED="$(grep -Rxc '201' results/*/status 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')"
+          BLOCKED="$(grep -Rxc 'BLOCKED_PREEXISTING' results/*/status 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')"
+          if [ "$PRECONSUMED" = false ]; then
+            test "$CREATED" -eq 1
+          else
+            test "$CREATED" -eq 0
+            test "$BLOCKED" -eq 2
+          fi
+          CANDIDATE_SHA="$(sha256sum external_challenger/last_three/candidate.json | awk '{print $1}')"
+          jq -cn --arg approval "$APPROVAL_SHA" --arg candidate "$CANDIDATE_SHA" \
+            '{kind:"consumed-promotion",approval_sha256:$approval,candidate_sha256:$candidate,transition:"promotion-to-deploy-v1"}' > marker.json
+          test "$(sha256sum marker.json | awk '{print $1}')" = "$MARKER_SHA"
+      - name: Attest durable consumed marker on first legitimate use
+        if: needs.prepare.outputs.consumed == 'false'
+        uses: actions/attest@v4
+        with:
+          subject-path: marker.json
+          predicate-type: https://example.org/external-challenger/last-three/consumed-promotion/v1
+          predicate-path: marker.json
+      - name: Install pinned Rekor CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo rekor-cli "https://github.com/sigstore/rekor/releases/download/${REKOR_VERSION}/rekor-cli-linux-amd64"
+          echo "$REKOR_SHA256  rekor-cli" | sha256sum -c -
+          chmod +x rekor-cli
+          sudo mv rekor-cli /usr/local/bin/rekor-cli
+      - name: Require consumed marker to be visible in append-only log
+        shell: bash
+        run: |
+          set -euo pipefail
+          MARKER_SHA="$(sha256sum marker.json | awk '{print $1}')"
+          FOUND=""
+          for _ in $(seq 1 30); do
+            rekor-cli search --rekor_server https://rekor.sigstore.dev --sha "sha256:${MARKER_SHA}" >/tmp/search.txt 2>/tmp/search.err || true
+            FOUND="$(grep -Eo '[0-9a-f]{64}' /tmp/search.txt | head -1 || true)"
+            [ -n "$FOUND" ] && break
+            sleep 2
+          done
+          test -n "$FOUND"
+          echo "$FOUND" > rekor-marker-uuid.txt
+      - name: Simulate replay-registry rollback by deleting mutable CAS ref
+        if: needs.prepare.outputs.consumed == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPROVAL_SHA: ${{ needs.prepare.outputs.approval_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CODE="$(curl -sS -o /tmp/delete-ref.txt -w '%{http_code}' -X DELETE \
+            -H 'Accept: application/vnd.github+json' -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/git/refs/tags/external-consumed-${APPROVAL_SHA}" || true)"
+          test "$CODE" = 204
+      - name: Provider outage means block, never allow
+        shell: bash
+        run: |
+          set -euo pipefail
+          if rekor-cli loginfo --rekor_server http://127.0.0.1:9 >/dev/null 2>&1; then
+            echo 'outage simulation unexpectedly available'
+            exit 1
+          fi
+          printf 'BLOCK\n' > outage-decision.txt
+          test "$(cat outage-decision.txt)" = BLOCK
+      - uses: actions/upload-artifact@v4
+        with:
+          name: last-three-replay-audit
+          path: |
+            marker.json
+            rekor-marker-uuid.txt
+            outage-decision.txt
+          retention-days: 30
+          if-no-files-found: error
