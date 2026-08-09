@@ -67,6 +67,7 @@ jobs:
           gh attestation download worm-evidence.json --repo "$GITHUB_REPOSITORY" --predicate-type "$PREDICATE"
           BUNDLE="sha256:${EVIDENCE_SHA}.jsonl"
           test -s "$BUNDLE"
+          cp "$BUNDLE" bundle-safe.jsonl
           gh attestation trusted-root > trusted_root.jsonl
           test -s trusted_root.jsonl
           echo "BUNDLE=$BUNDLE" >> "$GITHUB_ENV"
@@ -133,10 +134,7 @@ jobs:
             -H 'X-GitHub-Api-Version: 2026-03-10' \
             "https://api.github.com/users/${OWNER}/attestations/digest/sha256:${EVIDENCE_SHA}" || true)"
           echo "$CODE" > github-delete-status.txt
-          case "$CODE" in
-            200|204|403|404) ;;
-            *) echo "unexpected GitHub attestation deletion status: $CODE"; exit 1;;
-          esac
+          case "$CODE" in 200|204|403|404) ;; *) echo "unexpected GitHub attestation deletion status: $CODE"; exit 1;; esac
 
       - name: Prove transparency record still exists after mutation and deletion attempts
         shell: bash
@@ -158,7 +156,7 @@ jobs:
             worm-evidence.json
             verified-online.json
             verified-offline.json
-            sha256:*.jsonl
+            bundle-safe.jsonl
             trusted_root.jsonl
             rekor-before.txt
             rekor-after.txt
