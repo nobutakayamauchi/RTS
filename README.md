@@ -60,8 +60,6 @@ Each block records:
 
 This forms a reconstructable decision state.
 
----
-
 ### 2) State Transition Tracking
 
 RTS tracks transitions between decision states to identify:
@@ -72,8 +70,6 @@ RTS tracks transitions between decision states to identify:
 - which decision altered the trajectory
 
 This enables precise reconstruction after failure.
-
----
 
 ### 3) Append-Only Ledger
 
@@ -136,6 +132,30 @@ RTS is a **structural ledger**.
 
 ---
 
+## Open Development and Use
+
+RTS is developed publicly and its source remains inspectable.
+
+Legitimate use is intentionally broad. Personal use, research, modification, forks, integrations, commercial products and services, collaboration, sponsorship, and funding are welcome.
+
+Three boundaries are non-negotiable:
+
+1. **Do not falsify origin.** If RTS code, documentation, architecture, or substantial project material is used as a basis, do not knowingly present the resulting work as wholly independent of RTS.
+2. **Do not use RTS maliciously.** Intentional harmful or abusive use is outside the license grant.
+3. **Do not deploy RTS in bad faith to materially enable such abuse.**
+
+Independent development is not restricted merely because another project reaches a similar idea.
+
+See:
+
+- License → [`LICENSE`](LICENSE)
+- Attribution / Acceptable Use → [`docs/legal/USE_POLICY.md`](docs/legal/USE_POLICY.md)
+- Public origin chronology → [`docs/genesis/ORIGIN_LEDGER.md`](docs/genesis/ORIGIN_LEDGER.md)
+
+Because the current RTS license includes use restrictions, RTS does **not** claim OSI-approved open-source status. The accurate terms are **source-available** and **open development**.
+
+---
+
 ## Documentation
 
 - Manifest → `docs/manifest.md`
@@ -147,4 +167,8 @@ RTS is a **structural ledger**.
 
 ## License
 
-MIT
+RTS Responsible Open Use License v1.0.
+
+Commercial use is permitted subject to attribution/origin and prohibited-use conditions.
+
+Copyright (c) 2026 Nobutaka Yamauchi.
