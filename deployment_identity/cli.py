@@ -19,11 +19,14 @@ def _read_observation(path: Path) -> dict:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="RTS Deployment Identity v1")
+    parser = argparse.ArgumentParser(description="RTS Deployment Identity v2")
     sub = parser.add_subparsers(dest="command", required=True)
 
     verify = sub.add_parser("verify", help="establish deployment identity")
     verify.add_argument("--observation", required=True, type=Path)
+    verify.add_argument("--trusted-observer-id", required=True, action="append")
+    verify.add_argument("--reference-time", required=True)
+    verify.add_argument("--max-age-seconds", type=int, default=300)
 
     fingerprint = sub.add_parser("fingerprint", help="fingerprint a deployment observation")
     fingerprint.add_argument("--observation", required=True, type=Path)
@@ -38,7 +41,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(fingerprint_observation(observation))
             return 0
 
-        result = establish_deployment_identity(observation)
+        result = establish_deployment_identity(
+            observation,
+            trusted_observer_ids=args.trusted_observer_id,
+            reference_time=args.reference_time,
+            max_age_seconds=args.max_age_seconds,
+        )
         print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
         return 0 if result["runtime_classification_authorized"] else 2
     except DeploymentIdentityError as exc:
