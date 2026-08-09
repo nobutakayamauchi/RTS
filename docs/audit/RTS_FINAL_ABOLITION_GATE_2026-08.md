@@ -15,7 +15,7 @@ This is a mandatory survival test, not a marketing comparison.
 
 RTS survives only if a material, testable gap remains after constructing the strongest external replacement stack.
 
-A replacement wins if it can provide equal-or-better behavior with lower total complexity/cost while preserving all mandatory invariants below. Familiarity, sunk cost, authorship, branding, and historical priority are not valid reasons to retain RTS.
+A replacement wins if it can provide equal-or-better behavior with equal-or-lower total complexity/cost while preserving all mandatory invariants below. Familiarity, sunk cost, authorship, branding, and historical priority are not valid reasons to retain RTS.
 
 If the external stack wins, the correct RTS action is deprecation or reduction to only the irreducible policy/reference layer.
 
