@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Sequence
+
+from .core import DeploymentIdentityError, establish_deployment_identity, fingerprint_observation
+
+
+def _read_observation(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DeploymentIdentityError(f"cannot read observation: {path}") from exc
+    if not isinstance(value, dict):
+        raise DeploymentIdentityError("observation must be a JSON object")
+    return value
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="RTS Deployment Identity v1")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    verify = sub.add_parser("verify", help="establish deployment identity")
+    verify.add_argument("--observation", required=True, type=Path)
+
+    fingerprint = sub.add_parser("fingerprint", help="fingerprint a deployment observation")
+    fingerprint.add_argument("--observation", required=True, type=Path)
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        observation = _read_observation(args.observation)
+        if args.command == "fingerprint":
+            print(fingerprint_observation(observation))
+            return 0
+
+        result = establish_deployment_identity(observation)
+        print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
+        return 0 if result["runtime_classification_authorized"] else 2
+    except DeploymentIdentityError as exc:
+        print(json.dumps({
+            "status": "DEPLOYMENT_IDENTITY_NOT_ESTABLISHED",
+            "runtime_classification_authorized": False,
+            "error": str(exc),
+        }, sort_keys=True))
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
