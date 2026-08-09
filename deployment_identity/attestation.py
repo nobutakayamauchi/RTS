@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from .core import DeploymentIdentityError, ESTABLISHED, establish_deployment_identity
+from .provenance import verify_collector_provenance
 
 
 class AttestationError(ValueError):
@@ -49,11 +50,6 @@ def verify_attestation_quorum(
     max_age_seconds: int = 300,
     min_attestors: int = 2,
 ) -> dict[str, Any]:
-    """Verify independent signed attestations over one deployment claim.
-
-    This proves cryptographic origin/integrity and independent policy quorum. It
-    does not prove that a compromised collector measured physical host truth.
-    """
     if not isinstance(attestations, Sequence) or isinstance(attestations, (str, bytes)):
         raise AttestationError("attestations must be an array")
     if not isinstance(trusted_keys, Mapping) or not trusted_keys:
@@ -71,12 +67,8 @@ def verify_attestation_quorum(
         if not isinstance(attestation, Mapping):
             raise AttestationError(f"attestations[{index}] must be an object")
         required = (
-            "attestor_id",
-            "observation_fingerprint",
-            "expectation_fingerprint",
-            "observation_session_id",
-            "issued_at",
-            "signature",
+            "attestor_id", "observation_fingerprint", "expectation_fingerprint",
+            "observation_session_id", "issued_at", "signature",
         )
         values: dict[str, str] = {}
         for field in required:
@@ -89,7 +81,6 @@ def verify_attestation_quorum(
         if attestor_id in seen:
             raise AttestationError(f"duplicate attestor_id: {attestor_id}")
         seen.add(attestor_id)
-
         secret = trusted_keys.get(attestor_id)
         if not isinstance(secret, str) or not secret:
             raise AttestationError(f"untrusted attestor_id: {attestor_id}")
@@ -104,7 +95,6 @@ def verify_attestation_quorum(
         age = (reference - issued).total_seconds()
         if age < 0 or age > max_age_seconds:
             raise AttestationError(f"attestor {attestor_id} attestation is stale or future-dated")
-
         expected_signature = compute_hmac_signature(attestation_material(attestation), secret)
         if not hmac.compare_digest(values["signature"], expected_signature):
             raise AttestationError(f"invalid signature for attestor_id: {attestor_id}")
@@ -112,7 +102,6 @@ def verify_attestation_quorum(
 
     if len(verified) < min_attestors:
         raise AttestationError(f"attestation quorum not met: {len(verified)} < {min_attestors}")
-
     return {
         "status": "ATTESTATION_QUORUM_VERIFIED",
         "verified_attestors": sorted(verified),
@@ -129,15 +118,13 @@ def establish_attested_deployment_identity(
     reference_time: str,
     attestations: Sequence[Mapping[str, Any]],
     trusted_attestation_keys: Mapping[str, str],
+    collector_provenance: Sequence[Mapping[str, Any]],
+    trusted_collector_keys: Mapping[str, str],
     max_age_seconds: int = 300,
     min_attestors: int = 2,
+    min_independent_domains: int = 2,
 ) -> dict[str, Any]:
-    """Establish runtime material, then require independent signed quorum.
-
-    The lower-level material proof is deliberately non-authorizing. Final
-    runtime classification authority is granted only after the signed quorum
-    binds the exact observation, external expectation and observation session.
-    """
+    """Require material match, signed attestors, and independent measured provenance."""
     proof = establish_deployment_identity(
         observation,
         expected_deployment=expected_deployment,
@@ -162,8 +149,23 @@ def establish_attested_deployment_identity(
         max_age_seconds=max_age_seconds,
         min_attestors=min_attestors,
     )
+
+    provenance = verify_collector_provenance(
+        collector_provenance,
+        trusted_collector_keys=trusted_collector_keys,
+        observation_fingerprint=str(proof["observation_fingerprint"]),
+        expectation_fingerprint=str(proof["expectation_fingerprint"]),
+        observation_session_id=str(identity["observation_session_id"]),
+        active_route_instance_ids=identity["active_route_instance_ids"],
+        expected_artifact_digest=str(identity["artifact_digest"]),
+        reference_time=reference_time,
+        max_age_seconds=max_age_seconds,
+        min_independent_domains=min_independent_domains,
+    )
+
     result = dict(proof)
-    result["reason"] = "SIGNED_MULTI_ATTESTOR_RUNTIME_MATERIAL_MATCH"
+    result["reason"] = "SIGNED_ATTESTATION_AND_INDEPENDENT_PROVENANCE_VERIFIED"
     result["runtime_classification_authorized"] = True
     result["attestation_quorum"] = quorum
+    result["collector_provenance"] = provenance
     return result
