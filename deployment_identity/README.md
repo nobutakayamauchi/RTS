@@ -1,56 +1,52 @@
-# Deployment Identity v2
+# Deployment Identity v3
 
-Deployment Identity establishes what code and execution surface were actually active at observation time before RTS classifies runtime behavior.
+Deployment Identity establishes which runtime material and route set were actually active before RTS classifies runtime behavior.
 
 ## Invariant
 
 ```text
-Code existence != runtime evidence.
+Revision equality != runtime reality.
 ```
 
-A repository file, branch, or commit is source evidence only. Runtime implementation classification is forbidden until deployed identity is established from explicit, trusted, fresh observations.
+A matching Git commit is insufficient. Runtime identity also depends on the built artifact, configuration, environment, source-tree cleanliness, and the actual instances reachable from the active route.
 
-## Required deployment observation
+## External expectation
 
-A v2 observation identifies:
+The verifier now requires a caller-supplied `expected_deployment` object containing:
 
-- `service_unit`
-- `working_directory`
-- `executable_or_module`
-- `active_route_surface`
-- `deployed_revision`
 - `source_revision`
-- `observer_id`
-- `observation_session_id`
-- `observed_at`
+- `artifact_digest`
+- `config_fingerprint`
+- `environment_fingerprint`
 
-The verifier also requires an external trust anchor (`trusted_observer_ids`), a caller-supplied `reference_time`, and a bounded freshness window. An observation cannot make itself trusted by merely naming an observer.
+These values are not accepted from the runtime observation itself as the expected truth.
 
-## Fail-closed rules
+## Required runtime material
 
-Deployment identity is established only when:
+The observation must include:
 
-1. every required field is present exactly, without normalization of surrounding whitespace;
-2. `observer_id` is in the externally supplied trusted observer set;
-3. the observation is not future-dated or older than the allowed freshness window;
-4. `deployed_revision == source_revision` exactly.
+- service/unit, working directory, executable/module, active route surface;
+- deployed revision and artifact digest;
+- runtime config and environment fingerprints;
+- `source_tree_state`, which must be exactly `CLEAN`;
+- trusted observer/session/time evidence;
+- a non-empty `runtime_instances` set;
+- a non-empty `active_route_instance_ids` set.
 
-Otherwise runtime classification remains unauthorized.
+Every instance reachable through the active route must match the externally expected revision, artifact, config, and environment. Unknown route targets, duplicate instance identities, dirty source state, mixed blue/green workers, or material drift fail closed.
 
-## Runtime observation binding
+An observed but non-routed stale worker does not define the active route reality. The route set is the classification boundary.
 
-An established deployment proof is not enough by itself to classify a later runtime observation. The runtime observation must carry:
+## Proof chain
 
-- the exact Deployment Identity observation fingerprint;
-- the same `observation_session_id`;
-- a timezone-aware observation timestamp within the configured binding window.
-
-This closes the direct proof-chain bypass and bounds the TOCTOU interval:
+The Runtime Observation must bind both the observation fingerprint and the external expectation fingerprint, plus the same observation session and bounded time window.
 
 ```text
-Source Identity
-  -> trusted + fresh Deployment Identity
-  -> fingerprint/session-bound Runtime Observation
+Expected Source/Material
+  -> Trusted + Fresh Deployment Material Observation
+  -> Active Route Instance Set
+  -> observation + expectation fingerprints
+  -> Runtime Observation
   -> Outcome Evidence
 ```
 
@@ -59,17 +55,16 @@ Source Identity
 ```bash
 python -m deployment_identity.cli verify \
   --observation path/to/observation.json \
+  --expectation path/to/expected-deployment.json \
   --trusted-observer-id observer-prod-01 \
   --reference-time 2026-08-09T17:00:10+09:00 \
   --max-age-seconds 300
-
-python -m deployment_identity.cli fingerprint --observation path/to/observation.json
 ```
 
 ## Security boundary
 
-v2 deliberately does **not** claim cryptographic proof that a host observation is truthful. `trusted_observer_ids` is a policy trust anchor supplied from outside the observation. Privileged live-host collection, signatures/attestation, key management, route-to-process verification, container/image/config/environment measurement, and distributed deployment identity remain separately governed work.
+v3 still does **not** prove that the trusted observer or host cannot lie. It validates an externally anchored expectation against a fresh, policy-trusted runtime attestation and route set.
 
-Therefore v2 proves: **a trusted policy-recognized observer supplied a fresh, internally consistent deployment attestation and a later runtime observation is explicitly bound to it.** It does not prove the physical host cannot lie.
+Cryptographic host attestation, signed collector evidence, secret-safe config/environment measurement, reverse-proxy discovery, Kubernetes/service-mesh discovery, and privileged live-host collection remain separately governed work.
 
-The verifier remains deterministic, standard-library-only, read-only, and performs no network, shell, provider, deployment, or repository mutation.
+The verifier is deterministic, standard-library-only, read-only, and performs no network, shell, provider, deployment, or repository mutation.
