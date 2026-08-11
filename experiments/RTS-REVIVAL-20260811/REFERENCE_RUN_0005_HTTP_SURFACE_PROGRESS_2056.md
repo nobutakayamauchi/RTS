@@ -109,9 +109,39 @@ This supports that an application route graph is live behind the observed uvicor
 
 It still does not prove the exact source blob loaded at process startup, nor does it establish semantic correctness of each documented route.
 
+## Observation 0005-S — OpenAPI application identity
+
+Observed timestamp: **2026-08-11 21:00 JST**
+
+Read-only command:
+
+`python3 -c "import json,urllib.request as u; d=json.load(u.urlopen('http://127.0.0.1:8000/openapi.json')); print('TITLE=',d.get('info',{}).get('title'),'VERSION=',d.get('info',{}).get('version'),'PATHS=',len(d.get('paths',{})))"`
+
+Observed result:
+
+`TITLE= RTS Vlog Composition Console v3 VERSION= 0.1.0 PATHS= 33`
+
+This establishes an application-level identity surface emitted by the live process:
+
+- OpenAPI title: `RTS Vlog Composition Console v3`
+- OpenAPI version: `0.1.0`
+- documented path count: `33`
+
+This is stronger than a generic framework response because the live application identifies itself with project-specific metadata and exposes a non-trivial route graph.
+
+Therefore:
+
+`LIVE_APPLICATION_TITLE = OBSERVED`
+
+`LIVE_APPLICATION_VERSION = OBSERVED`
+
+`LIVE_ROUTE_GRAPH_SIZE = 33 PATHS`
+
+This still does not prove that the loaded Python source bytes equal the currently observed Git/index blob. Runtime metadata is evidence of the active application identity, not cryptographic load-time source attestation.
+
 ## Progress verdict
 
-The evidence chain has now reached both a human-facing root response and a framework/application metadata surface:
+The evidence chain has now reached both a human-facing root response and a project-specific application metadata surface:
 
 `SYSTEMD UNIT`
 → `MAINPID 86796`
@@ -124,10 +154,13 @@ The evidence chain has now reached both a human-facing root response and a frame
 → `HTTP /openapi.json = 200`
 → `application/json`
 → `31608-byte OpenAPI response`
+→ `TITLE = RTS Vlog Composition Console v3`
+→ `VERSION = 0.1.0`
+→ `PATHS = 33`
 
 Current classification:
 
-`DEPLOYMENT_IDENTITY_RUNTIME_CHAIN = STRONGLY_OBSERVED_THROUGH_APPLICATION_SURFACE`
+`DEPLOYMENT_IDENTITY_RUNTIME_CHAIN = STRONGLY_OBSERVED_THROUGH_PROJECT_SPECIFIC_APPLICATION_SURFACE`
 
 Remaining material limitation:
 
