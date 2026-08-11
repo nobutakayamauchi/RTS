@@ -87,6 +87,8 @@ class BehaviorMetrics:
 @dataclass(frozen=True)
 class OperatorStateInput:
     sleep_hours_24h: float | None = None
+    continuous_awake_hours: float | None = None
+    sleep_restriction_nights: int | None = None
     subjective_fatigue_0_10: float | None = None
     subjective_recovery_0_10: float | None = None
     bad_status: tuple[str, ...] = ()
@@ -149,8 +151,15 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
     Population evidence supplies only weak priors. Personal longitudinal calibration is required
     before behavioral features contribute. `bad_status_assessed` distinguishes confirmed-none from
     not-yet-asked, so evidence coverage cannot rise merely because an empty tuple is the default.
+
+    This score is deliberately separate from evidence-catalog performance impacts. A person can
+    report low subjective fatigue while still carrying a population-level vigilance/reaction prior
+    from short sleep, and the reverse can also occur.
     """
     sleep = _optional_range(state.sleep_hours_24h, 0.0, 24.0, "sleep_hours_24h")
+    _optional_range(state.continuous_awake_hours, 0.0, 72.0, "continuous_awake_hours")
+    if state.sleep_restriction_nights is not None and state.sleep_restriction_nights < 0:
+        raise StateModelError("sleep_restriction_nights must be nonnegative")
     subjective = _optional_range(
         state.subjective_fatigue_0_10, 0.0, 10.0, "subjective_fatigue_0_10"
     )
@@ -176,6 +185,7 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
 
     if sleep is not None:
         # MHLW adult guidance uses >=6 h as a rough target, with explicit individual differences.
+        # This is a weak operational prior, not a clinical threshold or a measured percent impairment.
         shortfall = max(0.0, 6.0 - sleep) / 6.0
         components["sleep_shortfall"] = round(25.0 * shortfall, 3)
         burden += 25.0 * shortfall
