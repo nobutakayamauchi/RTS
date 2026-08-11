@@ -13,6 +13,21 @@ class StateModelTests(unittest.TestCase):
         )
         self.assertGreater(deprived.operational_fatigue_100, rested.operational_fatigue_100)
 
+    def test_unassessed_empty_status_is_unknown_not_confirmed_none(self):
+        unknown = estimate_fatigue(OperatorStateInput())
+        confirmed_none = estimate_fatigue(OperatorStateInput(bad_status_assessed=True))
+        self.assertIsNone(unknown.components["bad_status"])
+        self.assertEqual(confirmed_none.components["bad_status"], 0.0)
+        self.assertGreater(confirmed_none.evidence_coverage, unknown.evidence_coverage)
+        self.assertIn("bad_status_unassessed", unknown.notes)
+
+    def test_unknown_reported_status_does_not_invent_fatigue_burden(self):
+        result = estimate_fatigue(
+            OperatorStateInput(bad_status=("some_new_status",), bad_status_assessed=True)
+        )
+        self.assertEqual(result.components["bad_status"], 0.0)
+        self.assertIn("reported_status_not_in_fatigue_prior", result.notes)
+
     def test_behavior_without_personal_baseline_does_not_invent_fatigue(self):
         result = estimate_fatigue(
             OperatorStateInput(
