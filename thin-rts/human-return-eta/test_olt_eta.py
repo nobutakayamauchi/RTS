@@ -5,7 +5,7 @@ import olt_eta
 
 
 class OLTETATests(unittest.TestCase):
-    def run(self, minutes, vector, task="meteor", strength="STRONG"):
+    def make_run(self, minutes, vector, task="meteor", strength="STRONG"):
         return olt_eta.HistoricalRun(
             duration_minutes=minutes,
             load=vector,
@@ -16,9 +16,9 @@ class OLTETATests(unittest.TestCase):
     def test_near_vectors_dominate_distant_vectors(self):
         target = olt.LoadVector(E=10, J=4, O=3, R=2, X=1)
         runs = [
-            self.run(5, olt.LoadVector(E=10, J=4, O=3, R=2, X=1)),
-            self.run(6, olt.LoadVector(E=11, J=4, O=3, R=2, X=1)),
-            self.run(40, olt.LoadVector(E=40, J=16, O=20, R=10, X=8)),
+            self.make_run(5, olt.LoadVector(E=10, J=4, O=3, R=2, X=1)),
+            self.make_run(6, olt.LoadVector(E=11, J=4, O=3, R=2, X=1)),
+            self.make_run(40, olt.LoadVector(E=40, J=16, O=20, R=10, X=8)),
         ]
         result = olt_eta.estimate_from_vector(runs, target, task_class="meteor")
         self.assertLessEqual(result["come_back_after_minutes"], 6)
@@ -27,17 +27,17 @@ class OLTETATests(unittest.TestCase):
     def test_weak_exact_match_does_not_automatically_beat_strong_near_match(self):
         target = olt.LoadVector(E=10, J=4, O=3, R=2, X=1)
         runs = [
-            self.run(
+            self.make_run(
                 30,
                 target,
                 strength="WEAK",
             ),
-            self.run(
+            self.make_run(
                 6,
                 olt.LoadVector(E=10.5, J=4, O=3, R=2, X=1),
                 strength="STRONG",
             ),
-            self.run(
+            self.make_run(
                 7,
                 olt.LoadVector(E=10.2, J=4.2, O=3, R=2, X=1),
                 strength="STRONG",
@@ -49,8 +49,8 @@ class OLTETATests(unittest.TestCase):
     def test_task_class_match_gets_small_boost_not_hard_filter(self):
         target = olt.LoadVector(E=8, J=3, O=2, R=1, X=1)
         runs = [
-            self.run(8, target, task="other"),
-            self.run(6, target, task="meteor"),
+            self.make_run(8, target, task="other"),
+            self.make_run(6, target, task="meteor"),
         ]
         result = olt_eta.estimate_from_vector(runs, target, task_class="meteor")
         self.assertEqual(result["class_matched_neighbors"], 1)
@@ -88,10 +88,10 @@ class OLTETATests(unittest.TestCase):
     def test_invalid_duration_and_evidence_strength_fail_closed(self):
         target = olt.LoadVector(E=1, J=1, O=1, R=1, X=1)
         with self.assertRaises(olt_eta.OLTETAError):
-            olt_eta.estimate_from_vector([self.run(0, target)], target)
+            olt_eta.estimate_from_vector([self.make_run(0, target)], target)
         with self.assertRaises(olt_eta.OLTETAError):
             olt_eta.estimate_from_vector(
-                [self.run(5, target, strength="TRUST_ME")],
+                [self.make_run(5, target, strength="TRUST_ME")],
                 target,
             )
 
