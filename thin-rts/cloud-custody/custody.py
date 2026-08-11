@@ -15,7 +15,6 @@ import gzip
 import hashlib
 import io
 import json
-import os
 from pathlib import Path, PurePosixPath
 import re
 import secrets
@@ -30,6 +29,7 @@ from typing import Iterable
 SCHEMA = "thin-rts-cloud-custody/v0"
 INTERNAL_MANIFEST = "RTS_BUNDLE_MANIFEST.json"
 FINGERPRINT_RE = re.compile(r"^[0-9A-Fa-f]{40,64}$")
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 class CustodyError(RuntimeError):
@@ -65,6 +65,14 @@ def tool_path(name: str) -> str | None:
     return shutil.which(name)
 
 
+def assert_private_runtime_path(path: Path, *, repo_root: Path = REPO_ROOT) -> Path:
+    resolved = path.expanduser().resolve()
+    repo = repo_root.expanduser().resolve()
+    if resolved == repo or resolved.is_relative_to(repo):
+        raise CustodyError(f"private runtime path must be outside public repository: {resolved}")
+    return resolved
+
+
 def normalized_rel_files(root: Path) -> list[Path]:
     root = root.resolve()
     files: list[Path] = []
@@ -76,17 +84,36 @@ def normalized_rel_files(root: Path) -> list[Path]:
     return sorted(files, key=lambda p: p.relative_to(root).as_posix())
 
 
+def _validate_manifest_relpath(value: object) -> str:
+    if not isinstance(value, str) or not value:
+        raise CustodyError("manifest path must be a non-empty string")
+    rel = PurePosixPath(value)
+    if rel.is_absolute() or ".." in rel.parts or value == ".":
+        raise CustodyError(f"unsafe manifest path: {value!r}")
+    if value == INTERNAL_MANIFEST:
+        raise CustodyError("reserved internal manifest path cannot be an evidence entry")
+    return rel.as_posix()
+
+
 def build_manifest(root: Path) -> dict:
     root = root.resolve()
     if not root.is_dir():
         raise CustodyError(f"input directory not found: {root}")
+
     entries = []
     for p in normalized_rel_files(root):
+        rel = p.relative_to(root).as_posix()
+        if rel == INTERNAL_MANIFEST:
+            raise CustodyError(f"source evidence collides with reserved path: {INTERNAL_MANIFEST}")
         entries.append({
-            "path": p.relative_to(root).as_posix(),
+            "path": rel,
             "size": p.stat().st_size,
             "sha256": sha256_file(p),
         })
+
+    if not entries:
+        raise CustodyError("evidence bundle is empty")
+
     return {
         "schema": SCHEMA,
         "kind": "evidence-bundle-manifest",
@@ -113,7 +140,6 @@ def create_deterministic_bundle(input_dir: Path, output_path: Path) -> dict:
     manifest_bytes = canonical_json_bytes(manifest)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Write deterministic tar first, then gzip with fixed mtime and no source filename.
     with tempfile.NamedTemporaryFile(prefix="rts-custody-", suffix=".tar", delete=False) as tf:
         tar_tmp = Path(tf.name)
     try:
@@ -224,10 +250,16 @@ def gcs_object_uri(base: str, object_id: str) -> str:
 
 
 def gcs_upload(local: Path, remote: str) -> dict:
-    cp = run(["gcloud", "storage", "cp", "--no-clobber", str(local), remote], check=False)
+    cp = run([
+        "gcloud", "storage", "cp", str(local), remote,
+        "--if-generation-match=0",
+    ], check=False)
     if cp.returncode != 0:
         raise CustodyError(f"cloud upload failed: {cp.stderr.strip() or cp.stdout.strip()}")
-    return gcs_stat(remote)
+    meta = gcs_stat(remote)
+    if not str(meta.get("generation", "")):
+        raise CustodyError("remote object metadata missing generation")
+    return meta
 
 
 def gcs_stat(remote: str) -> dict:
@@ -244,22 +276,38 @@ def gcs_stat(remote: str) -> dict:
     return data
 
 
-def gcs_download(remote: str, local: Path) -> None:
+def gcs_download(remote: str, local: Path, generation: str) -> None:
+    if not generation or not generation.isdigit():
+        raise CustodyError("recorded remote generation must be numeric")
     local.parent.mkdir(parents=True, exist_ok=True)
-    cp = run(["gcloud", "storage", "cp", remote, str(local)], check=False)
+    cp = run([
+        "gcloud", "storage", "cp", remote, str(local),
+        f"--if-generation-match={generation}",
+    ], check=False)
     if cp.returncode != 0:
         local.unlink(missing_ok=True)
-        raise CustodyError(f"cloud download failed: {cp.stderr.strip() or cp.stdout.strip()}")
+        raise CustodyError(f"cloud download failed or generation changed: {cp.stderr.strip() or cp.stdout.strip()}")
 
 
 def safe_extract_tar_gz(archive: Path, output_dir: Path) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if output_dir.exists():
+        if not output_dir.is_dir():
+            raise CustodyError(f"restore destination is not a directory: {output_dir}")
+        if any(output_dir.iterdir()):
+            raise CustodyError(f"restore destination must be empty: {output_dir}")
+    else:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
     root = output_dir.resolve()
     with tarfile.open(archive, "r:gz") as tar:
+        seen = set()
         for member in tar.getmembers():
             member_path = PurePosixPath(member.name)
             if member_path.is_absolute() or ".." in member_path.parts:
                 raise CustodyError(f"unsafe archive member: {member.name}")
+            if member.name in seen:
+                raise CustodyError(f"duplicate archive member: {member.name}")
+            seen.add(member.name)
             if member.issym() or member.islnk() or member.isdev():
                 raise CustodyError(f"unsupported archive member type: {member.name}")
             target = (root / Path(*member_path.parts)).resolve()
@@ -269,24 +317,69 @@ def safe_extract_tar_gz(archive: Path, output_dir: Path) -> None:
 
 
 def verify_extracted_tree(root: Path) -> dict:
+    root = root.resolve()
     manifest_path = root / INTERNAL_MANIFEST
-    if not manifest_path.is_file():
-        raise CustodyError("internal manifest missing")
-    manifest = json.loads(manifest_path.read_text("utf-8"))
+    if not manifest_path.is_file() or manifest_path.is_symlink():
+        raise CustodyError("internal manifest missing or unsafe")
+
+    try:
+        manifest = json.loads(manifest_path.read_text("utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        raise CustodyError("internal manifest is unreadable or invalid JSON") from e
+
     if manifest.get("schema") != SCHEMA:
         raise CustodyError("manifest schema mismatch")
+    if manifest.get("kind") != "evidence-bundle-manifest" or manifest.get("hash") != "sha256":
+        raise CustodyError("manifest kind/hash contract mismatch")
+
+    entries = manifest.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise CustodyError("manifest entries must be a non-empty list")
+
+    expected_paths: set[str] = set()
     failures = []
-    for entry in manifest.get("entries", []):
-        rel = entry.get("path", "")
-        p = root / rel
-        if not p.is_file():
-            failures.append({"path": rel, "reason": "missing"})
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise CustodyError("manifest entry must be an object")
+        rel = _validate_manifest_relpath(entry.get("path"))
+        if rel in expected_paths:
+            raise CustodyError(f"duplicate manifest path: {rel}")
+        expected_paths.add(rel)
+
+        p = (root / Path(*PurePosixPath(rel).parts)).resolve()
+        if p != root and root not in p.parents:
+            raise CustodyError(f"manifest path escapes restored root: {rel}")
+        if not p.is_file() or p.is_symlink():
+            failures.append({"path": rel, "reason": "missing_or_unsafe"})
             continue
+
         actual_size = p.stat().st_size
         actual_hash = sha256_file(p)
         if actual_size != entry.get("size") or actual_hash != entry.get("sha256"):
             failures.append({"path": rel, "reason": "digest_or_size_mismatch"})
-    return {"status": "PASS" if not failures else "FAIL", "failures": failures, "entries": len(manifest.get("entries", []))}
+
+    actual_paths = {
+        p.relative_to(root).as_posix()
+        for p in normalized_rel_files(root)
+        if p.relative_to(root).as_posix() != INTERNAL_MANIFEST
+    }
+    for rel in sorted(actual_paths - expected_paths):
+        failures.append({"path": rel, "reason": "unmanifested_extra"})
+    for rel in sorted(expected_paths - actual_paths):
+        if not any(f.get("path") == rel for f in failures):
+            failures.append({"path": rel, "reason": "missing"})
+
+    return {"status": "PASS" if not failures else "FAIL", "failures": failures, "entries": len(entries)}
+
+
+def verify_bundle_archive(archive: Path) -> dict:
+    with tempfile.TemporaryDirectory(prefix="rts-custody-selfverify-") as td:
+        out = Path(td) / "restored"
+        safe_extract_tar_gz(archive, out)
+        result = verify_extracted_tree(out)
+        if result["status"] != "PASS":
+            raise CustodyError(f"deterministic bundle self-verification failed: {result['failures']}")
+        return result
 
 
 def make_recovery_card(receipt: dict, path: Path) -> None:
@@ -298,6 +391,7 @@ def make_recovery_card(receipt: dict, path: Path) -> None:
         f"Bundle ID: `{receipt['bundle_id']}`",
         f"Ciphertext SHA-256: `{receipt['ciphertext']['sha256']}`",
         f"Remote generation: `{receipt['provider'].get('generation', 'UNKNOWN')}`",
+        f"Authority ref: `{receipt.get('authority_ref', 'NOT_RECORDED')}`",
         "",
         "Recovery requires:",
         "- this recovery receipt/card;",
@@ -312,11 +406,13 @@ def make_recovery_card(receipt: dict, path: Path) -> None:
 
 
 def build_local_candidate(input_dir: Path, work_dir: Path, recipients: list[str], key_epoch: str) -> dict:
+    work_dir = assert_private_runtime_path(work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
     object_id = secrets.token_hex(16)
     archive = work_dir / f"{object_id}.tar.gz"
     ciphertext = work_dir / f"{object_id}.gpg"
     bundle = create_deterministic_bundle(input_dir, archive)
+    verify_bundle_archive(archive)
     enc = encrypt_gpg(archive, ciphertext, recipients)
     return {
         "schema": SCHEMA,
@@ -330,7 +426,10 @@ def build_local_candidate(input_dir: Path, work_dir: Path, recipients: list[str]
     }
 
 
-def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path) -> dict:
+def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path, authority_ref: str) -> dict:
+    if not authority_ref.strip():
+        raise CustodyError("live upload requires a non-empty authority reference")
+    recovery_dir = assert_private_runtime_path(recovery_dir)
     remote = gcs_object_uri(gcs_base, candidate["bundle_id"])
     meta = gcs_upload(Path(candidate["ciphertext"]["path"]), remote)
     remote_size = int(meta.get("size", -1))
@@ -344,6 +443,7 @@ def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path) -> dict:
         "update_time": meta.get("updateTime"),
         "verification": "REMOTE_OBJECT_PRESENT_SIZE_MATCH",
     }
+    candidate["authority_ref"] = authority_ref.strip()
     candidate["upload_observed_at"] = now_utc()
     recovery_dir.mkdir(parents=True, exist_ok=True)
     receipt_path = recovery_dir / f"{candidate['bundle_id']}.receipt.json"
@@ -353,6 +453,8 @@ def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path) -> dict:
 
 
 def restore_from_receipt(receipt_path: Path, output_dir: Path, work_dir: Path) -> dict:
+    work_dir = assert_private_runtime_path(work_dir)
+    output_dir = assert_private_runtime_path(output_dir)
     receipt = json.loads(receipt_path.read_text("utf-8"))
     if receipt.get("schema") != SCHEMA:
         raise CustodyError("receipt schema mismatch")
@@ -361,15 +463,16 @@ def restore_from_receipt(receipt_path: Path, output_dir: Path, work_dir: Path) -
     if not remote or not generation:
         raise CustodyError("receipt does not contain a verified remote object generation")
 
-    work_dir.mkdir(parents=True, exist_ok=True)
-    ciphertext = work_dir / f"restore-{receipt['bundle_id']}.gpg"
-    archive = work_dir / f"restore-{receipt['bundle_id']}.tar.gz"
-    gcs_download(remote, ciphertext)
-    if sha256_file(ciphertext) != receipt["ciphertext"]["sha256"]:
-        raise CustodyError("ciphertext digest mismatch")
     meta = gcs_stat(remote)
     if str(meta.get("generation", "")) != generation:
         raise CustodyError("remote object generation mismatch / possible stale or replaced object")
+
+    work_dir.mkdir(parents=True, exist_ok=True)
+    ciphertext = work_dir / f"restore-{receipt['bundle_id']}.gpg"
+    archive = work_dir / f"restore-{receipt['bundle_id']}.tar.gz"
+    gcs_download(remote, ciphertext, generation)
+    if sha256_file(ciphertext) != receipt["ciphertext"]["sha256"]:
+        raise CustodyError("ciphertext digest mismatch")
     decrypt_gpg(ciphertext, archive)
     if sha256_file(archive) != receipt["plaintext"]["sha256"]:
         raise CustodyError("decrypted bundle digest mismatch")
@@ -377,7 +480,7 @@ def restore_from_receipt(receipt_path: Path, output_dir: Path, work_dir: Path) -
     verify = verify_extracted_tree(output_dir)
     if verify["status"] != "PASS":
         raise CustodyError(f"manifest verification failed: {verify['failures']}")
-    return {"status": "PASS", "bundle_id": receipt["bundle_id"], "verified_entries": verify["entries"]}
+    return {"status": "PASS", "bundle_id": receipt["bundle_id"], "verified_entries": verify["entries"], "generation": generation}
 
 
 def doctor(recipients: list[str] | None = None, gcs_base: str | None = None) -> dict:
@@ -407,8 +510,9 @@ def cmd_goal(args: argparse.Namespace) -> int:
         print(json.dumps({"goal": "ERROR", "reason": "at least two separated recovery recipients are required for this candidate"}, indent=2))
         return 2
 
-    candidate = build_local_candidate(Path(args.input), Path(args.work), args.recipient, args.key_epoch)
-    recovery_dir = Path(args.recovery_dir)
+    work_dir = assert_private_runtime_path(Path(args.work))
+    recovery_dir = assert_private_runtime_path(Path(args.recovery_dir))
+    candidate = build_local_candidate(Path(args.input), work_dir, args.recipient, args.key_epoch)
     recovery_dir.mkdir(parents=True, exist_ok=True)
     local_receipt = recovery_dir / f"{candidate['bundle_id']}.preupload.json"
     write_json(local_receipt, candidate)
@@ -416,7 +520,7 @@ def cmd_goal(args: argparse.Namespace) -> int:
     if not args.approve_live_upload:
         print(json.dumps({
             "goal": "APPROVAL_REQUIRED",
-            "reason": "local deterministic bundle and public-key ciphertext created; live provider write not executed",
+            "reason": "local deterministic bundle and public-key ciphertext created and self-verified; live provider write not executed",
             "bundle_id": candidate["bundle_id"],
             "ciphertext_sha256": candidate["ciphertext"]["sha256"],
             "planned_remote": gcs_object_uri(args.gcs_base, candidate["bundle_id"]),
@@ -424,11 +528,19 @@ def cmd_goal(args: argparse.Namespace) -> int:
         }, ensure_ascii=False, indent=2))
         return 3
 
-    uploaded = live_upload(candidate, args.gcs_base, recovery_dir)
+    if not args.authority_ref:
+        print(json.dumps({
+            "goal": "APPROVAL_REQUIRED",
+            "reason": "--approve-live-upload was supplied but no explicit --authority-ref was recorded",
+        }, ensure_ascii=False, indent=2))
+        return 3
+
+    uploaded = live_upload(candidate, args.gcs_base, recovery_dir, args.authority_ref)
     print(json.dumps({
         "goal": "LIVE_UPLOAD_VERIFIED",
         "bundle_id": uploaded["bundle_id"],
         "remote_generation": uploaded["provider"].get("generation"),
+        "authority_ref": uploaded.get("authority_ref"),
         "next_gate": "fresh-environment restore using separated recovery identity",
         "full_completion": "NOT_COMPLETE",
     }, ensure_ascii=False, indent=2))
@@ -451,6 +563,7 @@ def build_parser() -> argparse.ArgumentParser:
     goal.add_argument("--key-epoch", required=True)
     goal.add_argument("--gcs-base", required=True, help="dedicated gs://bucket/prefix")
     goal.add_argument("--approve-live-upload", action="store_true")
+    goal.add_argument("--authority-ref", help="normalized reference to explicit live-upload authority; required with --approve-live-upload")
 
     restore = sub.add_parser("restore")
     restore.add_argument("--receipt", required=True)
