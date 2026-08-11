@@ -5,6 +5,11 @@ from dataclasses import dataclass, field
 from typing import Iterable, Mapping
 
 from effect_catalog import estimate_performance_impact, PerformanceImpact
+from environment_context import (
+    EnvironmentConsent,
+    EnvironmentObservation,
+    minimized_environment_record,
+)
 from medical_guard import evaluate_medical_guard, MedicalGuardResult
 from state_model import OperatorStateInput, FatigueEstimate, estimate_fatigue
 from vitals_model import Vitals, personal_vital_deviation
@@ -20,6 +25,9 @@ class ResponseContext:
     cannot_drink: bool = False
     vitals: Vitals | None = None
     vitals_baseline: Mapping[str, Iterable[float]] = field(default_factory=dict)
+    sleep_environment_kind: str | None = None
+    environment_consent: EnvironmentConsent = field(default_factory=EnvironmentConsent)
+    environment: EnvironmentObservation | None = None
 
 
 @dataclass(frozen=True)
@@ -42,9 +50,51 @@ def _questions(state: OperatorStateInput, medical: MedicalGuardResult, ctx: Resp
         questions.append("仮眠・睡眠・食事・水分・休憩のあと、回復感は0〜10でどれくらい？")
     if not state.bad_status_assessed and not state.bad_status:
         questions.append("今あるバッドステータスは？（なければ『なし』。頭痛、吐き気、めまい、発熱感、倒れた等）")
+
+    consent = ctx.environment_consent.validated()
+    if (
+        (ctx.sleep_environment_kind or "").strip().lower() == "vehicle"
+        and consent.weather_mode == "NOT_ASKED"
+        and len(questions) < 3
+    ):
+        questions.append(
+            "車中泊の睡眠環境補正に、現在地を天気取得だけへ一時利用していい？"
+            "（既定ではGPSを保存しない）"
+        )
+    if (
+        (ctx.sleep_environment_kind or "").strip().lower() == "vehicle"
+        and consent.noise_mode == "NOT_ASKED"
+        and len(questions) < 3
+    ):
+        questions.append(
+            "周囲音も取る？（任意。許可時も既定は音声保存なし・dB等の派生値だけ）"
+        )
     if ctx.vitals is None and len(questions) < 3:
         questions.append("測っているバイタルがあれば数値も残す？（任意。なくても進める）")
     return tuple(questions[:3])
+
+
+def _environment_line(ctx: ResponseContext) -> str | None:
+    if ctx.environment is None:
+        return None
+    obs = ctx.environment.validated()
+    parts: list[str] = []
+    if obs.outdoor_temp_c is not None:
+        parts.append(f"OUT {obs.outdoor_temp_c:.1f}C")
+    if obs.outdoor_relative_humidity_pct is not None:
+        parts.append(f"RH {obs.outdoor_relative_humidity_pct:.0f}%")
+    if obs.cabin_temp_c is not None:
+        parts.append(f"CABIN {obs.cabin_temp_c:.1f}C")
+    if obs.cabin_relative_humidity_pct is not None:
+        parts.append(f"CABIN_RH {obs.cabin_relative_humidity_pct:.0f}%")
+    consent = ctx.environment_consent.validated()
+    if consent.noise_mode == "DERIVED_DB_ONLY" and obs.noise_laeq_db is not None:
+        parts.append(f"NOISE_LAEQ {obs.noise_laeq_db:.1f}dB")
+    if obs.subjective_noise_0_10 is not None:
+        parts.append(f"NOISE_SUBJ {obs.subjective_noise_0_10:.1f}/10")
+    if not parts:
+        return None
+    return "SLEEP_ENV " + " / ".join(parts)
 
 
 def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillResult:
@@ -83,6 +133,9 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     ]
     if performance.comparative_references:
         lines.append("COMPARATOR " + " | ".join(performance.comparative_references))
+    env_line = _environment_line(ctx)
+    if env_line:
+        lines.append(env_line)
     if state.recovery_events:
         lines.append("RECOVERY " + ", ".join(state.recovery_events))
     if state.bad_status:
@@ -110,11 +163,18 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     if questions:
         lines.append("ASK " + " / ".join(questions))
 
+    environment_record = minimized_environment_record(ctx.environment, ctx.environment_consent)
     log_record = {
         "schema": "operator-state-response/v0",
         "sleep_hours_24h": state.sleep_hours_24h,
         "continuous_awake_hours": state.continuous_awake_hours,
         "sleep_restriction_nights": state.sleep_restriction_nights,
+        "sleep_environment_kind": ctx.sleep_environment_kind,
+        "environment_consent": {
+            "weather_mode": ctx.environment_consent.validated().weather_mode,
+            "noise_mode": ctx.environment_consent.validated().noise_mode,
+        },
+        "environment": environment_record,
         "subjective_fatigue_0_10": state.subjective_fatigue_0_10,
         "subjective_recovery_0_10": state.subjective_recovery_0_10,
         "recovery_events": list(state.recovery_events),
