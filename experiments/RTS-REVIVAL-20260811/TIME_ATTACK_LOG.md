@@ -39,17 +39,74 @@ A prior claimed/remembered `5400x` acceleration figure is **not accepted as prov
 - Created branch: `revival/zero-cost-timeattack-20260811` from `main`.
 - Phase: baseline/reference extraction begins.
 
+### T+03 — BASELINE / LEGAL / EXTERNALIZATION MAP FROZEN
+
+- **2026-08-11 18:52 JST**
+- Old RTS core and final abolition/freeze evidence reviewed.
+- Prior privacy/presentation failure retained: unnecessary raw wording should not be copied when normalized intent plus one-way fingerprint/reference is sufficient.
+- Authority fail-closed rule retained.
+- RTS responsibility surface mapped to `EXTERNALIZE / GLUE_ONLY / REUSE_TEST / ARCHIVE`.
+- No custom Runtime/Controller/Governance Kernel authorized.
+- Artifact: `BASELINE_AND_REPLACEMENT_MAP.md`.
+
+### T+05 — THIN RTS V0 COMPOSED
+
+- **2026-08-11 18:54 JST**
+- Added `thin-rts/README.md` and `thin-rts/RECORD_TEMPLATE.md`.
+- New RTS-owned surface reduced to a minimal binding/reconstruction contract.
+- Storage, AI execution, CI, deployment observation, review, promotion authority, signing/trust, and governance remain externally owned unless a tested gap proves otherwise.
+- Additional custom service/software spend: **JPY 0** at this checkpoint.
+
+### T+06 — FIRST REAL RECONSTRUCTABLE DEVELOPMENT CHAIN RECORDED
+
+- **2026-08-11 18:55 JST**
+- `REFERENCE_RUN_0001.md` binds intent, constraints, authority, branch mutations, commit evidence, outcome, promotion boundary, unknowns, and next action.
+- Result: `PASS` for first reconstructability/composition checkpoint.
+- No runtime claim made; therefore no fake Deployment Identity claim was inserted.
+
+### T+07 — DESTRUCTIVE CORRUPTION / RECOVERY START
+
+- **2026-08-11 18:56 JST**
+- Deliberately corrupted `thin-rts/README.md`.
+- Corruption commit: `ffd487f79fc4069da9b57a7506a279c0605fba75`.
+- Observed corrupted blob: `32a0352c48cbcb2175f02dd9706e24abb75b7d9b`.
+- Restored from preserved Git evidence, not memory.
+- Recovery commit: `a3dbf72fa363bfd56bc2432e09c3888cd46a345a`.
+- Restored blob exactly matched pre-attack blob: `dfcdc8b827f52a3b042a6a4f5e0517612d1c450e`.
+- Result: exact recovery `PASS`; attack evidence remains preserved in Git history.
+
+### T+08 — FIRST ADVERSARIAL SET CLOSED
+
+- **2026-08-11 18:57 JST**
+- Exercised nonexistent commit reference rejection.
+- Exercised stale/corrupted commit rejection.
+- Exercised `CODE EXISTS != RUNTIME REALITY` fail-closed classification.
+- Exercised missing promotion-authority block.
+- Exercised outcome-binding boundary.
+- Re-applied privacy-minimized retention.
+- Preserved administratively independent authority as unproven rather than simulating it.
+- Artifact: `ADVERSARIAL_TEST_0001.md`.
+- Result: no custom RTS Runtime/Controller/Governance Kernel became necessary.
+
+### T+09 — CHECKPOINT
+
+- **2026-08-11 18:58 JST**
+- Elapsed from reset start: **9 minutes**.
+- Current surviving minimum: external evidence/tooling + thin binding/reconstruction contract + explicit authority boundaries.
+- Current benchmark status: `IN_PROGRESS`.
+- Next required phase: materially different second development workload, then attack/reconstruction again to test whether the result generalizes beyond self-description.
+
 ## Planned measured phases
 
-1. Freeze old RTS responsibility/reference baseline.
-2. Extract prior legal/privacy and authority constraints.
-3. Map every responsibility to existing external capability / thin glue / irreducible gap.
-4. Compose the thinnest viable new RTS representation.
-5. Exercise the reference workload and record runtime/development evidence.
-6. Run adversarial/destructive tests after baseline protection.
-7. Repair or recompose only demonstrated failures.
-8. Re-run the same workload.
-9. Record total elapsed time, surviving RTS minimum, killed responsibilities, and unresolved gaps.
+1. Freeze old RTS responsibility/reference baseline. **DONE**
+2. Extract prior legal/privacy and authority constraints. **DONE**
+3. Map every responsibility to existing external capability / thin glue / irreducible gap. **DONE**
+4. Compose the thinnest viable new RTS representation. **DONE / v0**
+5. Exercise the reference workload and record runtime/development evidence. **FIRST WORKLOAD DONE**
+6. Run adversarial/destructive tests after baseline protection. **FIRST SET DONE**
+7. Repair or recompose only demonstrated failures. **RECOVERY TEST DONE; NO NEW GLUE YET**
+8. Re-run the same workload. **PARTIAL — exact file recovery confirmed; second material workload still required**
+9. Record total elapsed time, surviving RTS minimum, killed responsibilities, and unresolved gaps. **PENDING**
 
 ## Current verdict
 
