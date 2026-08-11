@@ -1,0 +1,30 @@
+name: Operator State Response Prototype Tests
+
+on:
+  push:
+    branches:
+      - feature/operator-state-response-v0
+    paths:
+      - 'thin-rts/operator-state-response/**'
+      - '.github/workflows/operator-state-response-tests.yml'
+  pull_request:
+    paths:
+      - 'thin-rts/operator-state-response/**'
+      - '.github/workflows/operator-state-response-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: thin-rts/operator-state-response
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile prototype
+        run: python3 -m compileall -q .
+      - name: Run baseline plus Meteor suite
+        run: python3 -m unittest -v
