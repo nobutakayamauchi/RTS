@@ -59,7 +59,27 @@ Selection rule:
 
 `READ_ONLY / NO_PATH_ARGUMENT / PROJECT_SPECIFIC → /api/health`
 
-This route selection does not assume the endpoint succeeds or has any particular response shape. That remains to be observed.
+## Observation 0005-T — project-specific health outcome
+
+Observed timestamp: **2026-08-11 21:03 JST**
+
+Read-only command:
+
+`curl -sS http://127.0.0.1:8000/api/health`
+
+Observed result:
+
+`{"status":"ok"}`
+
+This proves that the live project-specific `/api/health` route executed and returned an application-level health payload at the observation point.
+
+Therefore:
+
+`PROJECT_SPECIFIC_READ_ONLY_ROUTE = OBSERVED`
+
+`HEALTH_ROUTE_RESPONSE = {"status":"ok"}`
+
+This is a bounded functional outcome. It does not prove semantic correctness of the full application, exact loaded-source revision, or equivalence of the dirty worktree to Git HEAD.
 
 ## Current progress state
 
@@ -69,6 +89,14 @@ This route selection does not assume the endpoint succeeds or has any particular
 
 `DESTRUCTIVE_ROUTES = IDENTIFIED / NOT_INVOKED`
 
-`NEXT_BOUNDED_FUNCTIONAL_TARGET = GET /api/health`
+`PROJECT_SPECIFIC_HEALTH_ROUTE = OBSERVED / {"status":"ok"}`
 
-No service restart, worktree mutation, project mutation, render, delete, purge, restore, cloud dispatch, or other state-changing endpoint was invoked while creating this inventory.
+`BOUND_FUNCTIONAL_OUTCOME = OBSERVED`
+
+The remaining material identity limitation remains:
+
+`LOADED_SOURCE_REVISION = NOT_PROVEN`
+
+A useful final continuity check is to confirm that the service MainPID is still `86796` after the HTTP/OpenAPI/health observations, so the beginning and end of the run remain bound to the same process identity.
+
+No service restart, worktree mutation, project mutation, render, delete, purge, restore, cloud dispatch, or other state-changing endpoint was invoked while creating this inventory or health observation.
