@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / ENTRY_MODULE_INDEX_BLOB_OBSERVED`
+Status: `IN_PROGRESS / ENTRY_MODULE_WORKTREE_BYTES_MATCH_INDEX`
 
 ## Why this workload exists
 
@@ -180,26 +180,50 @@ Read-only command used:
 
 Observed result:
 
-`100644 8d6e1b60f2dd530b801f40842526919d3e677f8 0 web_console/app_v5.py`
+`100644 b86de1b60f2dd530b801f40842526919d3e677f8 0 web_console/app_v5.py`
 
-## Material finding after entry-module probe
+### Record correction
 
-The runtime argv names `web_console.app_v5:app`, and the corresponding source path `web_console/app_v5.py` is a tracked Git file with index blob identity:
+An earlier written reconstruction of Observation 0005-I transcribed the blob as beginning `8d6e...`. The screen-observed command output is `b86de1b60f2dd530b801f40842526919d3e677f8`; this document now preserves the observed value and records the correction instead of silently retaining the transcription error.
 
-`8d6e1b60f2dd530b801f40842526919d3e677f8`
+## Observation 0005-J — current worktree entry-module bytes
 
-This is useful but still **not sufficient** to claim that PID `86796` loaded exactly those bytes:
+Observed timestamp: **2026-08-11 20:45 JST**
 
-- `ls-files -s` identifies the index entry, not the already-loaded Python module in memory;
+Read-only command used:
+
+`git -C /home/ubuntu/rts-video-flow-segment-test hash-object web_console/app_v5.py`
+
+Observed result:
+
+`b86de1b60f2dd530b801f40842526919d3e677f8`
+
+The current bytes of `web_console/app_v5.py` hash to the exact same Git object identity observed for the tracked index entry in Observation 0005-I.
+
+Therefore, at the 20:45 JST observation point:
+
+`WORKTREE_ENTRY_MODULE_BYTES_MATCH_INDEX = PROVEN_FOR_OBSERVED_FILE`
+
+This does **not** prove that PID `86796` loaded those exact bytes when the process started. A long-lived Python process may have imported the module before later filesystem changes or restoration. The loaded-source/time binding therefore remains a separate unresolved question.
+
+## Material finding after entry-module probes
+
+The runtime argv names `web_console.app_v5:app`, and the corresponding source path `web_console/app_v5.py` is a tracked Git file whose current worktree bytes match the observed index blob identity:
+
+`b86de1b60f2dd530b801f40842526919d3e677f8`
+
+This materially strengthens the source-side identity chain, but it remains **not sufficient** to claim that PID `86796` loaded exactly those bytes:
+
 - the overall worktree is dirty;
-- a file could theoretically change after process start even if later restored;
-- Python import/load-time identity has not yet been captured by the application itself.
+- static files used by the service are modified and may contribute runtime behavior independently of the Python entry module;
+- a source file could change after process start and later be restored to the same bytes;
+- Python import/load-time identity has not been captured by the application itself.
 
 Therefore the correct state is:
 
-`ENTRY_MODULE_INDEX_BLOB_OBSERVED != LOADED_PROCESS_SOURCE_PROVEN`
+`CURRENT_ENTRY_MODULE_BYTES_MATCH_INDEX != LOADED_PROCESS_SOURCE_PROVEN`
 
-The next narrow check is to hash the current worktree bytes for `web_console/app_v5.py` and compare them with the Git index blob. If they match, current file bytes are bound to the index blob, while the separate load-time question remains explicit.
+The next narrow step is to observe process start time and then compare it with the current entry-module file modification time. This can provide temporal support, but not cryptographic load-time attestation, because filesystem timestamps can be changed independently.
 
 ## Current evidence state
 
@@ -216,16 +240,16 @@ The next narrow check is to hash the current worktree bytes for `web_console/app
 - full process argv: `OBSERVED / MATCHES_SYSTEMD_CONFIG`
 - runtime worktree HEAD: `OBSERVED = 216bbc511c306754b5e69f6b58fae021691074fc`
 - runtime worktree cleanliness: `DIRTY / OBSERVED`
-- entry-module index blob: `OBSERVED = 8d6e1b60f2dd530b801f40842526919d3e677f8`
-- current entry-module worktree bytes: `NOT_YET_HASHED`
+- entry-module index blob: `OBSERVED = b86de1b60f2dd530b801f40842526919d3e677f8`
+- current entry-module worktree bytes: `OBSERVED / MATCH_INDEX = b86de1b60f2dd530b801f40842526919d3e677f8`
 - source/module material loaded by process: `NOT_YET_PROVEN`
 - repository revision bound to running process: `NOT_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Hash the current worktree bytes of `web_console/app_v5.py` with Git's object hashing and compare them with the observed index blob.
+Observe the start time of PID `86796`, preserving process-time evidence separately from filesystem-time evidence.
 
 ## Current verdict
 
-`PARTIAL PASS — the tracked entry module has an observed Git index identity, but current bytes/load-time identity/route outcome remain open`
+`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob, while load-time identity and route/outcome remain open`
