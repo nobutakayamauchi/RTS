@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable
+from dataclasses import dataclass, field
+from typing import Iterable, Mapping
 
 from medical_guard import evaluate_medical_guard, MedicalGuardResult
 from state_model import OperatorStateInput, FatigueEstimate, estimate_fatigue
+from vitals_model import Vitals, personal_vital_deviation
 
 
 @dataclass(frozen=True)
@@ -16,7 +17,8 @@ class ResponseContext:
     decision_review_level: str | None = None
     heat_exposure: bool = False
     cannot_drink: bool = False
-    vitals_present: bool = False
+    vitals: Vitals | None = None
+    vitals_baseline: Mapping[str, Iterable[float]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -38,7 +40,7 @@ def _questions(state: OperatorStateInput, medical: MedicalGuardResult, ctx: Resp
         questions.append("仮眠・睡眠・食事・水分・休憩のあと、回復感は0〜10でどれくらい？")
     if not state.bad_status:
         questions.append("今あるバッドステータスは？（頭痛、吐き気、めまい、発熱感、倒れた等）")
-    if ctx.vitals_present is False and len(questions) < 3:
+    if ctx.vitals is None and len(questions) < 3:
         questions.append("測っているバイタルがあれば数値も残す？（任意。なくても進める）")
     return tuple(questions[:3])
 
@@ -50,6 +52,7 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
         heat_exposure=ctx.heat_exposure,
         cannot_drink=ctx.cannot_drink,
     )
+    vital_z = personal_vital_deviation(ctx.vitals, ctx.vitals_baseline)
     questions = _questions(state, medical, ctx)
 
     if ctx.eta_return_minutes is None:
@@ -75,6 +78,12 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     elif "behavior_uncalibrated" in fatigue.notes:
         lines.append("BEHAVIOR uncalibrated")
 
+    vital_hits = [f"{k} z={v:+.1f}" for k, v in vital_z.items() if v is not None and abs(v) > 1.5]
+    if vital_hits:
+        lines.append("VITAL_BASELINE Δ " + ", ".join(vital_hits))
+    elif ctx.vitals is not None and not any(v is not None for v in vital_z.values()):
+        lines.append("VITAL_BASELINE uncalibrated")
+
     if ctx.decision_review_level:
         lines.append(f"DECISION_REVIEW {ctx.decision_review_level.upper()}")
     if medical.level != "NONE":
@@ -96,6 +105,7 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
         "fatigue_confidence": fatigue.confidence,
         "fatigue_coverage": fatigue.evidence_coverage,
         "behavior_z": fatigue.behavior_z,
+        "vital_z": vital_z,
         "eta_return_minutes": ctx.eta_return_minutes,
         "eta_late_after_minutes": ctx.eta_late_after_minutes,
         "rework_minutes": ctx.rework_minutes,
