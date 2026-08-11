@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / PID_CONTINUITY_CONFIRMED_AFTER_CLIENT_RECONNECT`
+Status: `IN_PROGRESS / ACTUAL_EXECUTABLE_OBSERVED`
 
 ## Why this workload exists
 
@@ -117,6 +117,26 @@ The SSH client failure did not coincide with a service PID change. The same `Mai
 
 This proves only PID continuity across these observations. It does not prove that executable/module/source/revision identity has remained unchanged; those remain separate claims.
 
+## Observation 0005-D — actual executable behind MainPID
+
+Observed timestamp: **2026-08-11 19:30 JST**
+
+Read-only command used:
+
+`readlink -f /proc/86796/exe`
+
+Observed result:
+
+`/usr/bin/python3.12`
+
+## Material finding after executable probe
+
+The kernel reports the process executable as the system Python binary `/usr/bin/python3.12`.
+
+This does **not** by itself prove that the configured virtual environment is bypassed. A virtual-environment Python entry commonly resolves to the underlying interpreter binary, while environment-specific import paths and package state remain separate runtime facts.
+
+Therefore the earlier path split must not be overinterpreted. The next required evidence is the process command line and then the source/module/repository identity actually bound to the running process.
+
 ## Current evidence state
 
 - systemd unit identity: `OBSERVED`
@@ -126,15 +146,16 @@ This proves only PID continuity across these observations. It does not prove tha
 - configured executable/module command: `OBSERVED`
 - active/running state: `OBSERVED`
 - MainPID: `OBSERVED / SAME BEFORE_AND_AFTER_CLIENT_RECONNECT`
-- actual executable behind MainPID: `NOT_YET_OBSERVED`
+- actual executable behind MainPID: `OBSERVED = /usr/bin/python3.12`
+- actual process command line: `NOT_YET_OBSERVED`
 - source/module material loaded by process: `NOT_YET_OBSERVED`
 - repository revision bound to running process: `NOT_YET_OBSERVED`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Confirm the **actual executable** mapped to PID `86796` rather than trusting `ExecStart` configuration alone.
+Confirm the **actual process command line** for PID `86796` so the kernel-observed executable can be related to the configured uvicorn/module invocation.
 
 ## Current verdict
 
-`PARTIAL PASS — runtime cwd and PID continuity confirmed; executable/source/revision identity not yet closed`
+`PARTIAL PASS — actual executable is runtime-observed; command/module/source/revision identity not yet closed`
