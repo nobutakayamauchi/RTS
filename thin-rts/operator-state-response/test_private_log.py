@@ -13,6 +13,25 @@ class PrivateLogTests(unittest.TestCase):
         with self.assertRaises(PrivateLogError):
             validate_private_path(REPO_ROOT / "operator-health.jsonl")
 
+    def test_raw_chat_text_is_rejected_even_when_logger_called_directly(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "state.jsonl"
+            with self.assertRaises(PrivateLogError):
+                append_private_record(
+                    {"schema": "operator-state-response/v0", "nested": {"chat_text": "sensitive"}},
+                    target,
+                )
+            self.assertFalse(target.exists())
+
+    def test_direct_identifier_field_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "state.jsonl"
+            with self.assertRaises(PrivateLogError):
+                append_private_record(
+                    {"schema": "operator-state-response/v0", "email": "example@example.invalid"},
+                    target,
+                )
+
     def test_private_log_is_append_only_jsonl_and_owner_only(self):
         with tempfile.TemporaryDirectory() as temp:
             target = Path(temp) / "state.jsonl"
