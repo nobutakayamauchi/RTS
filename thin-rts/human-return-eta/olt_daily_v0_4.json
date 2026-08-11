@@ -1,0 +1,92 @@
+{
+  "schema": "thin-rts-olt-daily/v0.4",
+  "source_workbook": "Operator_Load_Timeline_v0_4_chat_fused.xlsx",
+  "range_jst": ["2026-01-20", "2026-08-12"],
+  "exact_human": {
+    "events": 36,
+    "active_minutes": 167.06666666666672,
+    "rule": "only exact confirmed HUMAN timestamps; adjacent exact HUMAN gap <30m contributes active minutes",
+    "by_day": [
+      {"date":"2026-02-16","project":"RTS","events":8,"active_minutes":31.433333333333337},
+      {"date":"2026-02-18","project":"RTS","events":9,"active_minutes":47.266666666666666},
+      {"date":"2026-02-28","project":"RTS","events":3,"active_minutes":10.75},
+      {"date":"2026-04-19","project":"RTS-Skills / dev-method","events":4,"active_minutes":20.816666666666666},
+      {"date":"2026-05-05","project":"RTS ecosystem","events":2,"active_minutes":19.266666666666666},
+      {"date":"2026-05-07","project":"PORTFOLIO","events":1,"active_minutes":0.0},
+      {"date":"2026-06-26","project":"RTS-minicompany","events":1,"active_minutes":0.0},
+      {"date":"2026-07-23","project":"UNRESOLVED_PROJECT","events":2,"active_minutes":0.8666666666666667},
+      {"date":"2026-07-27","project":"RTS","events":5,"active_minutes":36.66666666666667},
+      {"date":"2026-08-05","project":"CROSS_REPO / 限界開発","events":1,"active_minutes":0.0}
+    ]
+  },
+  "project_daily": [
+    {"date":"2026-02-16","project":"RTS","load":{"E":10.095555555555556,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":11.890808919611654,"evidence":"STRONG"},
+    {"date":"2026-02-18","project":"RTS","load":{"E":12.15111111111111,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":13.659579457323034,"evidence":"STRONG"},
+    {"date":"2026-02-22","project":"RTS","load":{"E":null,"J":2,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":11.038772132144437,"evidence":"STRONG"},
+    {"date":"2026-02-28","project":"RTS","load":{"E":3.716666666666667,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":5.087640436600558,"evidence":"STRONG"},
+    {"date":"2026-04-19","project":"RTS-Skills / dev-method","load":{"E":5.387777777777778,"J":2,"O":null,"R":1,"X":null},"coverage":0.6,"olt_lower_bound":16.63928066367583,"evidence":"STRONG"},
+    {"date":"2026-05-05","project":"RTS ecosystem","load":{"E":3.2844444444444445,"J":3,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":15.48827223740441,"evidence":"STRONG"},
+    {"date":"2026-05-07","project":"PORTFOLIO","load":{"E":1,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.4631172649785795,"evidence":"STRONG"},
+    {"date":"2026-06-21","project":"RTS-AGE / recovery-design","load":{"E":null,"J":2,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":7.7419725925008285,"evidence":"MEDIUM"},
+    {"date":"2026-06-26","project":"RTS-minicompany","load":{"E":1,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.4631172649785795,"evidence":"STRONG"},
+    {"date":"2026-07-16","project":"RTS-minicompany","load":{"E":null,"J":5,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":19.562649541478947,"evidence":"STRONG"},
+    {"date":"2026-07-23","project":"RTS-minicompany","load":{"E":null,"J":3,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":10.944875242315971,"evidence":"STRONG"},
+    {"date":"2026-07-23","project":"UNRESOLVED_PROJECT","load":{"E":2.057777777777778,"J":null,"O":null,"R":3,"X":null},"coverage":0.4,"olt_lower_bound":7.4450671776359005,"evidence":"MEDIUM","attribution":"UNRESOLVED"},
+    {"date":"2026-07-24","project":"RTS","load":{"E":null,"J":1,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":4.112608409539159,"evidence":"MEDIUM"},
+    {"date":"2026-07-27","project":"RTS","load":{"E":7.444444444444445,"J":10,"O":26.5,"R":10,"X":null},"coverage":0.8,"olt_lower_bound":61.529922924947165,"evidence":"STRONG+MEDIUM","dedup_note":"ChatGPT J=5 is a corroborating subset of governed J>=10 and is not added again."},
+    {"date":"2026-08-01","project":"RTS-AGE","load":{"E":null,"J":2,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":11.038772132144437,"evidence":"STRONG"},
+    {"date":"2026-08-05","project":"CROSS_REPO / 限界開発","load":{"E":1,"J":2,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":9.205089857479408,"evidence":"STRONG"},
+    {"date":"2026-08-06","project":"RTS","load":{"E":null,"J":2,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":7.7419725925008285,"evidence":"MEDIUM"},
+    {"date":"2026-08-08","project":"RTS","load":{"E":null,"J":null,"O":1,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.9032516392808099,"evidence":"STRONG"},
+    {"date":"2026-08-09","project":"RTS","load":{"E":null,"J":7,"O":13.69,"R":11,"X":null},"coverage":0.6,"olt_lower_bound":44.21457385546497,"evidence":"STRONG+MEDIUM"},
+    {"date":"2026-08-11","project":"RTS","load":{"E":null,"J":4,"O":3.48,"R":4,"X":null},"coverage":0.6,"olt_lower_bound":25.15615974459793,"evidence":"MEDIUM"}
+  ],
+  "overall_daily": [
+    {"date":"2026-07-23","load":{"E":2.057777777777778,"J":3,"O":null,"R":3,"X":null},"coverage":0.6,"olt_lower_bound":18.389942419951872,"state":"EXACT_HUMAN_PRESENT","note":"UNRESOLVED_PROJECT reversal is fused into overall load but not attributed to MiniCompany."},
+    {"date":"2026-07-27","load":{"E":7.444444444444445,"J":10,"O":26.5,"R":10,"X":null},"coverage":0.8,"olt_lower_bound":61.529922924947165,"state":"EXACT_HUMAN_PRESENT"},
+    {"date":"2026-08-09","load":{"E":null,"J":7,"O":13.69,"R":11,"X":null},"coverage":0.6,"olt_lower_bound":44.21457385546497,"state":"SEMANTIC_ONLY"},
+    {"date":"2026-08-11","load":{"E":null,"J":4,"O":3.48,"R":4,"X":null},"coverage":0.6,"olt_lower_bound":25.15615974459793,"state":"SEMANTIC_ONLY"}
+  ],
+  "hotspot": {
+    "date": "2026-07-27",
+    "project": "RTS",
+    "previous_v0_3_lower_bound": 52.205955016318626,
+    "v0_4_lower_bound": 61.529922924947165,
+    "new_exact_E": 7.444444444444445,
+    "exact_human_events": 5,
+    "active_minutes": 36.66666666666667,
+    "coverage": 0.8
+  },
+  "unresolved_events": [
+    {
+      "date":"2026-07-23",
+      "project":"UNRESOLVED_PROJECT",
+      "event":"revert-all reversal",
+      "exact_human_events":2,
+      "E":2.057777777777778,
+      "R":3,
+      "evidence":"MEDIUM",
+      "forbidden_link":"Do not link to later RTS-minicompany PUBLIC_SALE_APPROVED without evidence."
+    }
+  ],
+  "invariants": {
+    "timezone":"Asia/Tokyo",
+    "exact_e_requires_confirmed_human_timestamp":true,
+    "date_only_semantics_may_contribute_e":false,
+    "semantic_duplicates_must_be_deduplicated":true,
+    "unresolved_project_may_remain_unresolved":true,
+    "missing_axis_equals_zero":false,
+    "blank_date_equals_zero_work":false,
+    "weak_pr_git_proxy_may_become_direct_e_or_j":false,
+    "fatigue_from_gap_or_pr_drop":false,
+    "full_daily_materialization":"PARTIAL"
+  },
+  "known_source_representation_notes": [
+    {
+      "id":"V04-UNOBSERVED-AXIS-ZERO-CELLS",
+      "source":"Daily_Project_v0_4 and Daily_Overall_v0_4 render numeric zero in some unobserved axis cells while separate observation flags/state mark the axis or day unobserved.",
+      "canonical":"Repository machine-readable load uses null for an unobserved axis. Zero is reserved for an observed zero contribution.",
+      "reason":"Preserve Unknown != zero across programmatic fusion."
+    }
+  ]
+}
