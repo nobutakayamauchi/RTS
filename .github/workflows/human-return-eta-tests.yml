@@ -1,0 +1,30 @@
+name: Human Return ETA Prototype Tests
+
+on:
+  push:
+    branches:
+      - feature/human-return-eta-v0
+    paths:
+      - 'thin-rts/human-return-eta/**'
+      - '.github/workflows/human-return-eta-tests.yml'
+  pull_request:
+    paths:
+      - 'thin-rts/human-return-eta/**'
+      - '.github/workflows/human-return-eta-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: thin-rts/human-return-eta
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile prototype and attacks
+        run: python3 -m py_compile eta.py test_eta.py test_meteor_eta.py
+      - name: Run baseline plus Meteor suite
+        run: python3 -m unittest -v
