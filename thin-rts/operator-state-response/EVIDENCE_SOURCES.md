@@ -1,6 +1,6 @@
 # Evidence Sources — Operator State Response v0
 
-This registry separates safety rules, operational-fatigue features, and evidence-bounded performance-effect profiles.
+This registry separates safety rules, operational-fatigue features, evidence-bounded performance-effect profiles, and optional environmental context.
 
 ## Tier A — official safety / public-health guidance
 
@@ -41,7 +41,7 @@ Tier A sources may drive medical safety messages. They do NOT define the operati
    - The review did not find a uniform significant pooled effect for choice reaction time, cognitive throughput, working memory, or inhibitory control.
    - Therefore a short-sleep profile may raise reaction/attention priors without pretending every judgment domain is equally impaired.
 
-6. Belenky-style sleep dose-response evidence represented here by *Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study.* 2003. PMID: 12603781.
+6. *Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study.* 2003. PMID: 12603781.
    - Repeated 5 h time-in-bed conditions showed reduced PVT speed and increased lapses.
    - This profile requires multiday history and must not be inferred from one 5 h night alone.
 
@@ -52,6 +52,22 @@ Tier A sources may drive medical safety messages. They do NOT define the operati
 
 Tier B sources justify testing behavioral/performance features. They do not justify diagnosis or fixed universal personal thresholds.
 
+## Tier C — sleep environment evidence
+
+1. *災害時の避難所泊および車中泊を想定した睡眠環境における睡眠の包括的検討* (Japanese sleep-environment experimental study).
+   - A small winter experiment recreated shelter and vehicle-sleep conditions in healthy young men.
+   - Cold and difficulty turning in the vehicle-sleep condition were identified as plausible sleep-maintenance disruptors.
+   - Use as a rationale to measure vehicle sleep environment; do not convert outdoor temperature directly into a personal fatigue score.
+
+2. *Associations of Bedroom PM2.5, CO2, Temperature, Humidity and Noise with Sleep: an Observational Actigraphy Study*.
+   - Fourteen-day bedroom monitoring in 62 participants found lower hourly sleep efficiency in higher exposure quintiles for temperature, CO2, PM2.5 and noise after adjustment.
+   - This supports keeping environmental variables as candidate features, not assuming causation or universal thresholds.
+
+3. Thermal-environment sleep literature summarized in Japanese biometeorology/sleep-environment journals.
+   - Ambient temperature and humidity can affect sleep and thermoregulation; outdoor weather is only an imperfect proxy for the microenvironment around the sleeper.
+
+Environment evidence is lower authority than direct personal measurements for prediction. Outdoor weather must remain separate from cabin temperature/humidity/CO2 and from actual noise measurements.
+
 ## Effect Catalog rule
 
 The runtime catalog preserves four separate operational domains:
@@ -61,6 +77,16 @@ The runtime catalog preserves four separate operational domains:
 A population study stores its original endpoint/effect metric where possible. The runtime may assign an ordinal evidence prior (`UNKNOWN`, `CAUTION`, `MODERATE`, `HIGH`) but must not reinterpret an SMD, BAC comparison, or reaction-time change as "X% of this person's ability lost".
 
 Comparators such as alcohol are explanatory calibration anchors only. They require their own exposure trigger and may not be inferred from a neighboring condition.
+
+## Environment/privacy rule
+
+- Location/weather collection is opt-in.
+- Precise coordinates are not persisted by the v0 schema.
+- `EPHEMERAL` location may be used only to fetch weather and is then discarded by the external adapter.
+- Coarse location labels may be stored only under explicit `COARSE_LOG` permission.
+- Weather does not establish actual cabin temperature or environmental noise.
+- Microphone-derived noise metrics require separate permission; raw audio is outside v0 and is not stored.
+- Environment features begin in Shadow Mode and gain predictive weight only if held-out personal data improves ETA or decision-review utility.
 
 ## Evidence rule
 
