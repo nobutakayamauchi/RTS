@@ -25,6 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Compile prototype and attacks
-        run: python3 -m py_compile eta.py test_eta.py test_meteor_eta.py
+        run: python3 -m compileall -q .
       - name: Run baseline plus Meteor suite
         run: python3 -m unittest -v
