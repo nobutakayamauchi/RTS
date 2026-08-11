@@ -1,0 +1,6 @@
+timestamp,project,event_type,text,J,stage_id,stage_type,output_count,human_required_at,observed_human_return_at,evidence,binding_status
+2026-01-01T10:00:00+09:00,demo,human_decision,"Add login flow",2,,,,,,chat,NA
+2026-01-01T10:01:00+09:00,demo,machine_stage,"Implement login UI",,S1,implement,4,,,git_patch,STRONG
+2026-01-01T10:05:00+09:00,demo,machine_stage,"Run login tests",,S2,test,8,,,ci,STRONG
+2026-01-01T10:12:00+09:00,demo,machine_stage,"Repair failed login tests",,S3,repair,3,2026-01-01T10:15:00+09:00,2026-01-01T10:18:00+09:00,ci,STRONG
+2026-01-01T10:20:00+09:00,demo,machine_stage,"Unrelated README cleanup",,S4,docs,1,,,git_patch,REJECT
