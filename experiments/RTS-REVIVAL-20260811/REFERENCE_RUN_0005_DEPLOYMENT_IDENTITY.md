@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / SOURCE_MTIME_AND_SERVER_TIMEZONE_OBSERVED`
+Status: `IN_PROGRESS / TEMPORAL_SOURCE_ORDERING_EXPLICIT_UTC`
 
 ## Why this workload exists
 
@@ -234,7 +234,7 @@ Observed result:
 
 `2026-08-06 13:04:19.163352128 +0000 /home/ubuntu/rts-video-flow-segment-test/web_console/app_v5.py`
 
-The filesystem mtime is explicitly UTC and precedes the raw `ps lstart` clock reading by approximately 0.84 seconds **if** that `ps` reading is interpreted in the server's local timezone.
+The filesystem mtime is explicitly UTC.
 
 This is temporal support only. File mtime can be changed independently and does not attest which source bytes Python imported.
 
@@ -250,7 +250,30 @@ Observed result:
 
 `UTC +0000`
 
-The server's current local timezone is UTC. This supports interpreting local-time-rendered process timestamps from ordinary system tools as UTC on this host, but the prior `ps lstart` output itself did not carry a zone token. A direct systemd start timestamp with an explicit zone is preferable before treating the 0.84-second ordering as final evidence.
+The server's current local timezone is UTC.
+
+## Observation 0005-N — systemd main-process start timestamp with explicit zone
+
+Observed timestamp: **2026-08-11 20:52 JST**
+
+Read-only command used:
+
+`systemctl show rts-video-flow-web.service -p ExecMainStartTimestamp --value`
+
+Observed result:
+
+`Thu 2026-08-06 13:04:20 UTC`
+
+This directly binds the service's recorded main-process start time to UTC and matches the earlier raw `ps lstart` reading at second precision.
+
+The source-file mtime is therefore directly comparable:
+
+- `web_console/app_v5.py` mtime: `2026-08-06 13:04:19.163352128 +0000`
+- systemd main-process start: `2026-08-06 13:04:20 UTC`
+
+The observed source mtime precedes the recorded process start by approximately **0.836647872 seconds**.
+
+This materially supports that the currently matching entry-module file existed in its observed filesystem state before the process started. It still does **not** cryptographically prove that Python loaded those exact bytes, because mtime is mutable metadata and no load-time source digest was emitted by the running process.
 
 ## Material finding after source/time probes
 
@@ -262,9 +285,12 @@ Observed timing evidence now includes:
 
 - source-file mtime: `2026-08-06 13:04:19.163352128 +0000`;
 - process `lstart` raw clock: `Thu Aug 6 13:04:20 2026`;
-- server local timezone: `UTC +0000`.
+- server local timezone: `UTC +0000`;
+- systemd main-process start: `Thu 2026-08-06 13:04:20 UTC`.
 
-This is consistent with the current entry-module file having been present before the process started. It materially strengthens the source-side Deployment Identity chain, but it still does **not** prove load-time bytes:
+The temporal ordering is now directly supported with an explicit UTC process-start timestamp: the entry-module mtime predates process start by about 0.84 seconds.
+
+This materially strengthens the source-side Deployment Identity chain, but it still does **not** prove load-time bytes:
 
 - mtime is mutable metadata rather than a cryptographic load-time measurement;
 - the file could theoretically have changed and later been restored while retaining/manipulating timestamps;
@@ -274,7 +300,9 @@ This is consistent with the current entry-module file having been present before
 
 Therefore the correct state is:
 
-`CURRENT_BYTES_MATCH_INDEX + SOURCE_MTIME_PRECEDES_PROCESS_START_SUPPORTED != LOADED_PROCESS_SOURCE_PROVEN`
+`CURRENT_BYTES_MATCH_INDEX + EXPLICIT_UTC_SOURCE_MTIME_PRECEDES_PROCESS_START != LOADED_PROCESS_SOURCE_PROVEN`
+
+At this point, more source-time probing has diminishing value without process- or application-level load-time attestation. The next useful read-only evidence target is the active network surface and bounded route outcome.
 
 ## Current evidence state
 
@@ -296,15 +324,17 @@ Therefore the correct state is:
 - process start clock reading: `OBSERVED = Thu Aug 6 13:04:20 2026`
 - current entry-module filesystem mtime: `OBSERVED = 2026-08-06 13:04:19.163352128 +0000`
 - server local timezone: `OBSERVED = UTC +0000`
-- temporal ordering: `SUPPORTED / DIRECT_EXPLICIT_ZONE_FOR_PROCESS_START_NOT_YET_OBSERVED`
-- source/module material loaded by process: `NOT_YET_PROVEN`
+- systemd explicit process start: `OBSERVED = Thu 2026-08-06 13:04:20 UTC`
+- temporal ordering: `SUPPORTED / EXPLICIT UTC / SOURCE MTIME PRECEDES PROCESS START BY ~0.836647872s`
+- source/module material loaded by process: `NOT_PROVEN`
 - repository revision bound to running process: `NOT_PROVEN`
+- active network surface: `NOT_YET_OBSERVED`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Observe the systemd-recorded main-process start timestamp with explicit timezone if available.
+Observe whether port 8000 is actually listening and which process is bound to it, without mutating the service.
 
 ## Current verdict
 
-`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob and source mtime is consistent with predating process start; exact load-time identity and route/outcome remain open`
+`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob and explicit UTC timing places the file mtime before service start; exact load-time identity and route/outcome remain open`
