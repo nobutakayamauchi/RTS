@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / ENTRY_MODULE_WORKTREE_BYTES_MATCH_INDEX`
+Status: `IN_PROGRESS / PROCESS_START_TIME_OBSERVED`
 
 ## Why this workload exists
 
@@ -206,24 +206,45 @@ Therefore, at the 20:45 JST observation point:
 
 This does **not** prove that PID `86796` loaded those exact bytes when the process started. A long-lived Python process may have imported the module before later filesystem changes or restoration. The loaded-source/time binding therefore remains a separate unresolved question.
 
-## Material finding after entry-module probes
+## Observation 0005-K — process start time
+
+Observed timestamp: **2026-08-11 20:46 JST**
+
+Read-only command used:
+
+`ps -p 86796 -o lstart=`
+
+Observed raw result:
+
+`Thu Aug  6 13:04:20 2026`
+
+The command output did not include an explicit timezone. The raw value is therefore preserved without silently assigning a zone.
+
+This establishes a process-start clock reading for PID `86796` that can be compared with filesystem modification-time evidence, but it does not by itself prove which source bytes were imported at startup.
+
+## Material finding after entry-module and process-time probes
 
 The runtime argv names `web_console.app_v5:app`, and the corresponding source path `web_console/app_v5.py` is a tracked Git file whose current worktree bytes match the observed index blob identity:
 
 `b86de1b60f2dd530b801f40842526919d3e677f8`
 
-This materially strengthens the source-side identity chain, but it remains **not sufficient** to claim that PID `86796` loaded exactly those bytes:
+The running PID also now has an observed start-time reading:
+
+`Thu Aug  6 13:04:20 2026` (`TIMEZONE_NOT_EMITTED_BY_COMMAND`)
+
+This materially strengthens the temporal/source-side identity chain, but it remains **not sufficient** to claim that PID `86796` loaded exactly those bytes:
 
 - the overall worktree is dirty;
 - static files used by the service are modified and may contribute runtime behavior independently of the Python entry module;
 - a source file could change after process start and later be restored to the same bytes;
+- filesystem mtime is not load-time attestation and can itself be modified;
 - Python import/load-time identity has not been captured by the application itself.
 
-Therefore the correct state is:
+Therefore the correct state remains:
 
-`CURRENT_ENTRY_MODULE_BYTES_MATCH_INDEX != LOADED_PROCESS_SOURCE_PROVEN`
+`CURRENT_ENTRY_MODULE_BYTES_MATCH_INDEX + PROCESS_START_TIME_OBSERVED != LOADED_PROCESS_SOURCE_PROVEN`
 
-The next narrow step is to observe process start time and then compare it with the current entry-module file modification time. This can provide temporal support, but not cryptographic load-time attestation, because filesystem timestamps can be changed independently.
+The next narrow step is to observe the current entry-module filesystem modification time and compare it with the process-start reading while preserving timezone uncertainty.
 
 ## Current evidence state
 
@@ -242,14 +263,16 @@ The next narrow step is to observe process start time and then compare it with t
 - runtime worktree cleanliness: `DIRTY / OBSERVED`
 - entry-module index blob: `OBSERVED = b86de1b60f2dd530b801f40842526919d3e677f8`
 - current entry-module worktree bytes: `OBSERVED / MATCH_INDEX = b86de1b60f2dd530b801f40842526919d3e677f8`
+- process start clock reading: `OBSERVED = Thu Aug 6 13:04:20 2026 / TIMEZONE_NOT_EMITTED`
+- current entry-module filesystem mtime: `NOT_YET_OBSERVED`
 - source/module material loaded by process: `NOT_YET_PROVEN`
 - repository revision bound to running process: `NOT_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Observe the start time of PID `86796`, preserving process-time evidence separately from filesystem-time evidence.
+Observe the current filesystem modification time for `web_console/app_v5.py` without mutating the file.
 
 ## Current verdict
 
-`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob, while load-time identity and route/outcome remain open`
+`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob and process start time is observed; load-time identity and route/outcome remain open`
