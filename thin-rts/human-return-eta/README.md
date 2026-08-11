@@ -8,7 +8,7 @@ This prototype predicts **when the human should come back**, not how long the un
 
 ## Outcome
 
-Given timestamped history for materially similar work, optionally combined with a weighted chunk estimate for the incoming work, produce a compact return recommendation:
+Given timestamped history for materially similar work, optionally combined with a weighted chunk estimate and Operator Load Timeline evidence for the incoming work, produce a compact return recommendation:
 
 - `COME_BACK_AFTER_MINUTES`
 - `EXPECTED_RANGE_MINUTES`
@@ -21,25 +21,9 @@ The terminal event is the first point where unattended execution has either comp
 
 ## External-first boundary
 
-External systems remain responsible for:
+External systems remain responsible for CI/workflow execution, notification delivery, Git/GitHub/Chat timestamps, provider/runtime timestamps, timers, schedulers, and actual work execution.
 
-- CI/workflow execution;
-- notification delivery;
-- Git/GitHub event timestamps;
-- provider/runtime timestamps;
-- timers and schedulers;
-- actual work execution.
-
-Thin RTS owns at most bounded GLUE for:
-
-- normalizing past start/human-hinge timestamps;
-- keeping task classes separate;
-- robust duration statistics;
-- consuming an externally calculated weighted-chunk estimate;
-- calibrating minutes-per-weighted-chunk from observed timestamps;
-- consuming evidence-bounded Operator Load Timeline observations;
-- conservative cold-start behavior;
-- a return recommendation with explicit uncertainty.
+Thin RTS owns at most bounded GLUE for timestamp normalization, task-class separation, robust duration statistics, chunk calibration, evidence-bounded OLT fusion, and return recommendations with explicit uncertainty.
 
 No daemon, queue, scheduler, notification platform, telemetry platform, database, ML model, or custom time-series service is authorized by this prototype.
 
@@ -51,125 +35,95 @@ JSON Lines, one observation per line:
 {"task_class":"meteor_ci_repair","started_at":"2026-08-11T22:19:46+09:00","human_hinge_at":"2026-08-11T22:23:08+09:00","terminal":"READY_FOR_REVIEW","weighted_chunks":4.5,"evidence_strength":"STRONG","source":"paired-meteor-commits"}
 ```
 
-Required fields:
-
-- `task_class`: stable bounded label for materially similar work;
-- `started_at`: timezone-aware ISO-8601 timestamp;
-- `human_hinge_at`: timezone-aware ISO-8601 timestamp when unattended work stopped being useful without a human;
-- `terminal`: observed terminal/handoff condition.
-
-Optional fields:
-
-- `weighted_chunks`: positive weighted chunk-equivalent produced by the chunk/load model;
-- `evidence_strength`: `STRONG`, `MEDIUM`, or `WEAK`;
-- `source`: bounded provenance label.
-
-The estimator must not mix unrelated task classes merely to gain raw duration sample size.
+The estimator keeps unrelated task classes separate and treats timestamp/evidence quality explicitly.
 
 ## Hybrid model
 
 The intended model is:
 
-`OLD LOAD/CHUNK PRIOR + OLT + GIT/GITHUB/CI TIMESTAMPS -> OBSERVED CALIBRATION -> RECALIBRATED ETA -> MORE REAL RUNS -> HIGHER ACCURACY`
+`OLD LOAD/CHUNK PRIOR + OLT + GIT/GITHUB/CI/CHAT TIMESTAMPS -> OBSERVED CALIBRATION -> RECALIBRATED ETA -> MORE REAL RUNS -> HIGHER ACCURACY`
 
-The historical chunk concept is treated as a **prior and workload-size signal**, not as unquestionable wall-clock truth. The exact historical chunk accounting formula was not found as canonical code in the current RTS repository, so this prototype does not invent a replacement formula. It accepts `weighted_chunks` as an input boundary and learns the wall-clock conversion from real timestamp evidence.
+The historical chunk concept is a prior/workload-size signal, not unquestionable wall-clock truth. The ETA layer learns conversion from real timestamp evidence. Complete OLT vectors may act as sparse-history priors; partial daily OLT must remain calibration evidence until held-out validation proves a safe ETA fusion rule.
 
-When enough comparable records contain `weighted_chunks`, the estimator calculates observed `minutes / weighted_chunk` and uses an evidence-weighted P80 rate. For a new task with a target weighted-chunk estimate, it scales the empirical task-class duration by relative chunk size and blends that with the learned chunk-rate estimate.
+## Operator Load Timeline
 
-If same-class chunk history does not exist, global chunk-rate history may seed a **low-confidence prior**. An explicitly supplied historical `--prior-minutes-per-chunk` can bootstrap a cold start, but real observations should replace its influence over time.
-
-## Operator Load Timeline v0.2
-
-The recovered workload model is now represented primarily as:
+The canonical workload representation is:
 
 `L[p,W] = (E, J, O, R, X)`
 
 with:
 
-- E: direct human activity;
-- J: decision load;
-- O: governed AI/CI/Kernel orchestration load;
-- R: revision/rejection/adversarial repair load;
-- X: active-window context switches.
+- `E`: confirmed direct-human intervention plus bounded active-time evidence;
+- `J`: evidence-bound decision load;
+- `O`: independently governed AI/CI/Kernel stages plus known non-double-counted gate time;
+- `R`: revision/rejection/adversarial repair load;
+- `X`: confirmed within-session project switches.
 
-The v0.2 evidence rule is strict: **blank means UNOBSERVED, not zero**. Partial vectors are preserved with `null` axes, `axis_coverage = observed_axes / 5`, and a display-only `OLT lower bound` calculated from observed axes only.
+The strict rule is **blank/unknown means UNOBSERVED, not zero**. `OLT_100` remains a secondary evidence-bounded display lower bound; the vector plus axis coverage are primary.
 
-The current evidence-bounded actual corpus is stored in `olt_actual_v0_2.json` and documented in `OLT_ACTUAL_V0_2.md`. It includes RTS, RTS-minicompany, RTS-AGE and rts-video-flow windows. The current largest RTS lower-bound window is 2026-07-27 at about 52.2 with J/O/R observed and E/X still unknown.
+`Gamma = machine_visible_output / governed_stages` is output amplification, never human effort. `JPR = (J + R) / O` is workload-shape diagnostics only, never fatigue evidence.
 
-Two secondary diagnostics are available:
+`olt.fuse_partial_vectors()` now sums observed project contributions axis-by-axis while preserving an axis as `None` if no source observed it. This is a lower-bound fusion operation.
 
-- `Gamma = machine_visible_output / governed_stages` — output amplification, never human effort;
-- `JPR = (J + R) / O` — observed workload-shape ratio, never a fatigue score and not guaranteed to be a lower bound when source axes are partial.
+## OLT v0.4 — ChatGPT timestamp fusion
 
-Complete-vector OLT similarity is already available as an optional ETA prior. Partial-vector ETA fusion is not yet authorized; it must first prove held-out accuracy improvement without imputing missing axes.
+The source-bound daily anchor corpus is `olt_daily_v0_4.json`, derived from `Operator_Load_Timeline_v0_4_chat_fused.xlsx` and reviewed in `OLT_V0_4_DIFF_REVIEW.md`.
 
-## Timestamp evidence tiers
+Recovered anchors:
 
-Not all timestamps mean the same thing.
+- 36 exact confirmed HUMAN events;
+- 167.0667 minutes of eligible adjacent exact-human activity (`gap < 30 min`);
+- Pre-Kernel split to real JST days: Feb 16 E=10.0956 and Feb 18 E=12.1511;
+- Post-Kernel HUMAN/AUTO/UNKNOWN separation retained;
+- Jul 27: 5 exact ChatGPT HUMAN events + 36.6667 active min -> E=7.4444;
+- Jul 27 fused partial vector: `(E=7.4444, J=10, O=26.5, R=10, X=UNOBSERVED)`, 80% axis coverage, OLT lower bound 61.5299;
+- ChatGPT-observed Jul 27 J=5 is treated as corroborating evidence inside the stronger governed J>=10 row and is not double-counted;
+- Jul 23 exact reversal remains `UNRESOLVED_PROJECT`; no link is invented to later MiniCompany `PUBLIC_SALE_APPROVED`;
+- Jan 20 through Aug 12 remains a partial daily materialization: missing days are `UNOBSERVED`, never zero-work days.
 
-- `STRONG`: explicit run start -> first human hinge, or another semantically bound pair.
-- `MEDIUM`: materially credible but incomplete binding.
-- `WEAK`: approximate timing such as adjacent Git commit timestamps where active work duration is not proven.
+Some workbook daily tables render numeric zero in cells whose observation flags say the axis is unobserved. Repository machine-readable data canonicalizes those cells to `null`. Observed zero and unknown are different states.
 
-Weak evidence may improve a prior but must not silently outweigh strong observations.
+## Evidence tiers
 
-`git_history.py` can import bounded adjacent Git intervals as `WEAK` evidence. It deliberately drops gaps above a configured maximum and labels the provenance as `git-adjacent:*`. Arbitrary adjacent commits must never be promoted to proven active-work duration.
+- `STRONG`: explicit human/run semantic binding;
+- `MEDIUM`: materially credible but incomplete binding;
+- `WEAK`: approximation such as adjacent Git intervals, PR density, or portfolio-surface proxies.
 
-## Estimation rule v0.1
+Weak evidence may improve missing-data priors but must never silently become direct HUMAN workload.
 
-- Use only the most recent bounded sample window for the selected class.
-- Raw task-class history remains the primary direct evidence.
-- Evidence strength changes statistical weight; weak Git approximations have lower influence.
-- Median remains a center diagnostic.
-- Evidence-weighted P80 is the default direct-history return target.
-- P90 defines `LATE_AFTER_MINUTES` with a small floor above the return target.
-- Report an observed P20–P80 range.
-- If target weighted chunks are available, scale same-class empirical timing by task size and blend it with the learned P80 minutes-per-chunk rate.
-- Complete OLT vector-neighbor history may act as a sparse-data prior; direct task history removes that influence as samples mature.
-- Cold start may use an explicit chunk prior; otherwise it returns a conservative fallback and `LOW` confidence instead of fake precision.
-- High spread, weak evidence, very small sample count, or low axis coverage lowers confidence.
+## Estimation rule
 
-The P80 policy and the current blend are human-attention tradeoffs, not statistical truths. They remain replaceable under DARWIN ARENA if real use shows a better policy.
+- use recent bounded direct task history first;
+- evidence strength changes statistical influence;
+- P80 is the current return target and P90 contributes to late-after guidance;
+- weighted chunks may scale workload size;
+- complete OLT-vector neighbors may help sparse-history estimation;
+- direct task history progressively removes prior influence;
+- cold starts remain explicitly low confidence;
+- low coverage, weak evidence, and high spread reduce confidence.
 
 ## Safety / truth rules
 
-- Timestamps must be timezone-aware.
-- Negative or zero durations are rejected.
+- Timestamps used for E must be timezone-aware and confirmed HUMAN.
+- Negative or zero duration artifacts are rejected where duration is required.
 - `weighted_chunks`, when present, must be positive and finite.
-- Evidence strength must be explicit and bounded.
-- Malformed observations do not silently become valid evidence.
-- A currently running job is not fabricated into a completed duration.
-- Historical observations are evidence of prior human-hinge time, not a guarantee of future completion.
-- Adjacent Git timestamps are approximation evidence, not proof that the operator worked continuously between commits.
+- AUTO/UNKNOWN rows do not become human workload.
+- Date-only semantic evidence may contribute J/R/O where supported but never fabricate E.
+- Semantic duplicates must be deduplicated before rollup.
+- Unresolved project attribution may remain unresolved.
+- Commit count is not decision count or human effort.
+- PR-density drops or long gaps do not prove fatigue/cognitive decline.
 - Missing OLT axes remain unobserved and are never silently imputed to zero.
-- Commit amplification is not human effort.
-- JPR is descriptive workload shape, not fatigue or clinical evidence.
-- Prediction output must expose sample count, effective sample weight, confidence, basis, and evidence mix.
+- Prediction output must expose sample count, confidence, basis, and evidence mix.
 
 ## WITNESS gate
 
 This file does not authorize survival.
 
-The candidate must be attacked for at least:
+Required comparison before promotion:
 
-1. outliers;
-2. mixed task classes;
-3. tiny sample counts;
-4. malformed and naive timestamps;
-5. negative durations;
-6. long-tail runs;
-7. stale/older observations versus recent observations;
-8. early `ERROR` / `APPROVAL_REQUIRED` as legitimate return hinges;
-9. identical timestamps and duplicate observations;
-10. no-history cold start;
-11. incorrect or zero chunk estimates;
-12. weak Git evidence overwhelming strong observations;
-13. large idle Git gaps being mistaken for active task duration;
-14. unseen task classes using chunk priors with fake confidence;
-15. target workload materially larger or smaller than historical runs;
-16. missing OLT axes being silently converted to zero;
-17. low-coverage lower bounds being compared as complete vectors;
-18. extreme commits/stage being mistaken for human load;
-19. partial-axis JPR being treated as a monotonic lower bound.
+`TIMESTAMP_ONLY` vs `CHUNK_ONLY` vs `PORTFOLIO_PRIOR` vs `OLT_VECTOR_PRIOR` vs `PARTIAL_OLT_PRIOR` vs `HYBRID`
 
-If existing CI/analytics already exposes an equal-or-better return ETA with lower burden, this GLUE should be dropped or externalized.
+using held-out real runs for absolute ETA error, early-return waste, late-return waste, and false-confidence rate.
+
+Full 2026-01-20→present ChatGPT event-level materialization, complete context-switch X, safe partial-vector ETA fusion, automatic strong-history adapters, and notification delivery remain unproven or externalized.
