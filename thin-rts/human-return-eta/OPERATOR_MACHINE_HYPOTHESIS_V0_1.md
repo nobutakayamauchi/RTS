@@ -18,6 +18,12 @@ where `E` is direct execution/intervention evidence, `J` decision load, `O` orch
 
 The existing saturated `OLT_100` scalar remains secondary. Unknown axes remain UNOBSERVED, not semantic zero.
 
+A DA pass established an important prediction boundary:
+
+- retrospective `L_post` may include realized orchestration elapsed time;
+- live ETA must use a launch-time feature set containing only information already known at launch;
+- future gate elapsed time is forbidden as a predictor of future return time.
+
 ## Human hinge -> machine lineage
 
 For a human decision hinge `h_i` and machine stage `s_j`, a STRONG binding requires:
@@ -58,21 +64,41 @@ This factorization matters because the system can evolve in two different ways:
 
 Those mechanisms must not be collapsed into raw commit count.
 
+### Bound semantics discovered by DA
+
+If the evidence only establishes `J_true >= J_lower`, then division reverses the direction of uncertainty:
+
+`Gamma_J_true = S/J_true <= S/J_lower`
+
+and
+
+`Lambda_true = Y/J_true <= Y/J_lower`.
+
+Therefore ratios computed with a decision-load lower bound are **upper-bound proxies**, not point estimates and not lower bounds.
+
+`Gamma_M = Y/S` is a point proxy only to the extent that both the output unit `Y` and governed-stage ontology `S` are stable and correctly classified.
+
 ## Timing hypothesis
 
 For each direct lineage, define:
 
 `T_first(i) = first_bound_machine_stage_time - human_hinge_time`
 
-and, when the evidence identifies the next human-required point:
+and, when the evidence identifies the first defensible human-required point:
 
-`T_return(i) = next_human_required_time - human_hinge_time`
+`T_required(i) = human_required_time - human_hinge_time`.
 
-Human Return ETA should ultimately estimate:
+Observed operator return is separate:
 
-`P80(T_return | task_class, L, Gamma_J, Gamma_M, evidence_quality)`
+`T_observed(i) = observed_human_return_time - human_hinge_time`.
 
-rather than machine compute time alone.
+Human Return ETA should target `T_required`, not `T_observed`, otherwise operator overshoot/absence can be learned as if it were machine readiness.
+
+The live prediction target is therefore:
+
+`P80(T_required | task_class, launch_features, evidence_quality)`
+
+with post-hoc load/outcome features retained for analysis and recalibration only.
 
 ## Binding quality
 
@@ -107,7 +133,7 @@ Hinge 2 at 09:11:59 JST:
 Observed strong micro-pilot:
 
 - decision hinges = 2
-- decision units = 2
+- decision units = 2 exact DLU
 - STRONG bound PR stages = 4
 - `Gamma_J = 4 / 2 = 2.0 stages per DLU`
 - first-stage latencies = 42 s, 54 s
@@ -126,7 +152,7 @@ The March 13 two-layer logging decision is visibly inherited by later run artifa
 
 The March 16 boundary-semantics decision is followed about one hour later by AGENTS/spec/organization/fix contracts (#185-#188) that encode explicit role, scope, direction, and separation boundaries. This is principle-level MEDIUM evidence until the missing causal bridge is recovered.
 
-## Later governed windows
+## Later governed windows — corrected DA interpretation
 
 Using existing evidence-bounded RTS windows and commits only as a machine-visible output proxy:
 
@@ -138,9 +164,9 @@ Using existing evidence-bounded RTS windows and commits only as a machine-visibl
 
 Thus:
 
-- `Gamma_J = 16 / 10 = 1.6 stages/DLU`
-- `Gamma_M = 226 / 16 = 14.125 commit-proxy/stage`
-- `Lambda = 226 / 10 = 22.6 commit-proxy/DLU`
+- `Gamma_J_true <= 16 / 10 = 1.6 stages/DLU`
+- `Gamma_M_proxy = 226 / 16 = 14.125 commit-proxy/stage`
+- `Lambda_true <= 226 / 10 = 22.6 commit-proxy/DLU`
 
 ### 2026-08-11
 
@@ -150,21 +176,21 @@ Thus:
 
 Thus:
 
-- `Gamma_J = 3 / 4 = 0.75 stages/DLU`
-- `Gamma_M = 107 / 3 = 35.6667 commit-proxy/stage`
-- `Lambda = 107 / 4 = 26.75 commit-proxy/DLU`
+- `Gamma_J_true <= 3 / 4 = 0.75 stages/DLU`
+- `Gamma_M_proxy = 107 / 3 = 35.6667 commit-proxy/stage`
+- `Lambda_true <= 107 / 4 = 26.75 commit-proxy/DLU`
 
-The important change is not simply 'more commits'. The observed later system uses fewer, larger governed stages per decision unit while each stage contains much more machine-visible work.
+The robust observation is therefore narrower than the earlier point-estimate wording: the measured machine-visible output per governed stage is substantially larger in the Aug 11 window than in Jul 27 under the current stage/output definitions. The decision-normalized ratios remain upper-bound proxies until J is more completely recovered.
 
 ## Observed control-pressure proxy
 
-For windows where `E` is observed, define only as a descriptive observed-data proxy:
+For windows where the components are observed, define only as a descriptive observed-data proxy:
 
 `K_obs(W) = (J + O + R) / E`
 
-It is NOT coverage-invariant, NOT a fatigue score, and missing components must not be invented as zero.
+It is NOT coverage-invariant, NOT a fatigue score, and missing components must not be invented as zero. Because both numerator and denominator can be partially observed, `K_obs` is not generally a lower bound or an upper bound.
 
-Using the current monthly lower-bound table as recorded:
+Using the currently recorded observed-component table:
 
 - Feb: 0.154
 - Mar: 0.826
@@ -172,7 +198,19 @@ Using the current monthly lower-bound table as recorded:
 - Jul: 6.367
 - Aug 1-12: 26.085
 
-Because historical axis coverage differs by month, this sequence is evidence for a role-shape hypothesis, not a calibrated longitudinal physiological/workload scale.
+Because historical axis coverage differs by month, this sequence supports only a role-shape hypothesis, not a calibrated longitudinal physiological/workload scale.
+
+## Decision Sentinel counter-DA result
+
+A later revision is not automatically an error. Revisions must distinguish at least:
+
+- `CORRECTIVE_ERROR`;
+- `NEW_EVIDENCE`;
+- `SCOPE_CHANGE`;
+- `ROUTINE_ITERATION`;
+- `UNKNOWN`.
+
+The first Decision Sentinel prototype therefore does **not** output `P(wrong)`. It emits advisory Decision Review Pressure from decision-time evidence only and can ask for an extra independent check/DA before a high-impact or poorly supported decision.
 
 ## Provisional final conclusion
 
@@ -186,19 +224,19 @@ and increasingly supports the model:
 
 `machine = implementation / expansion / repeated execution / verification bundles`
 
-The best current historical hypothesis is therefore:
+The best current historical hypothesis remains:
 
 `Human role: Implementation -> Architecture -> Orchestration -> Adversarial Judgment`
 
-while machine-visible work becomes increasingly compressed behind each governed stage.
+while machine-visible work becomes increasingly bundled behind governed stages.
 
 A more precise statement is:
 
-**The operator did not simply do less implementation over time. The unit of human contribution moved upward in abstraction: from touching implementation toward selecting structure, defining boundaries, delegating bounded work, judging results, and attacking failures. Simultaneously, the amount of machine-visible output inside one governed stage increased materially.**
+**The operator did not simply do less implementation over time. The observed unit of human contribution moved upward in abstraction: from touching implementation toward selecting structure, defining boundaries, delegating bounded work, judging results, and attacking failures. Simultaneously, later observed governed stages can contain much larger machine-visible work bundles. Decision-normalized amplification is still only bound-constrained where J is incomplete.**
 
-The final measurement object should therefore be the tuple:
+The final measurement object should therefore preserve uncertainty and timing semantics, conceptually:
 
-`D_W = (L_W, Gamma_J, Gamma_M, Lambda, T_return, Q)`
+`D_W = (L_post, L_launch, Gamma_J_bounds, Gamma_M_proxy, Lambda_bounds, T_required, T_observed, Q)`
 
 not commit count alone.
 
@@ -208,8 +246,10 @@ The hypothesis must be revised if broader exact-chat/PR binding shows that:
 
 - most apparent machine bursts actually required dense hidden manual intervention;
 - later high `Gamma_M` is mostly merge/rebase/bot artifact rather than real agent work;
+- stage definitions changed enough that cross-era `Gamma_M` is not comparable;
 - missing early `O/R` evidence erases the apparent role-shape change;
-- strong held-out lineages do not reproduce the hinge -> stage -> human-return structure;
-- a different simpler model predicts Human Return ETA materially better.
+- strong held-out lineages do not reproduce the hinge -> stage -> human-required structure;
+- launch-safe OLT/amplification features do not improve held-out Human Return ETA;
+- a simpler decision rule performs as well as Decision Sentinel with fewer interruptions.
 
 Until then this is the strongest evidence-bounded model recovered from the current history, not a universal law and not a clinical workload claim.
