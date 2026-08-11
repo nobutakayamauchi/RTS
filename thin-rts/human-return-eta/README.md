@@ -37,6 +37,7 @@ Thin RTS owns at most bounded GLUE for:
 - robust duration statistics;
 - consuming an externally calculated weighted-chunk estimate;
 - calibrating minutes-per-weighted-chunk from observed timestamps;
+- consuming evidence-bounded Operator Load Timeline observations;
 - conservative cold-start behavior;
 - a return recommendation with explicit uncertainty.
 
@@ -69,13 +70,38 @@ The estimator must not mix unrelated task classes merely to gain raw duration sa
 
 The intended model is:
 
-`OLD LOAD/CHUNK PRIOR + GIT/GITHUB/CI TIMESTAMPS -> OBSERVED MINUTES PER WEIGHTED CHUNK -> RECALIBRATED ETA -> MORE REAL RUNS -> HIGHER ACCURACY`
+`OLD LOAD/CHUNK PRIOR + OLT + GIT/GITHUB/CI TIMESTAMPS -> OBSERVED CALIBRATION -> RECALIBRATED ETA -> MORE REAL RUNS -> HIGHER ACCURACY`
 
-The historical chunk concept is treated as a **prior and workload-size signal**, not as unquestionable wall-clock truth. The earlier operational meaning was human attention/evaluation/choice/verification burden, with materially heavier judgments represented as multiple chunk-equivalents. The exact historical chunk accounting formula was not found as canonical code in the current RTS repository, so this prototype does not invent a replacement formula. It accepts `weighted_chunks` as an input boundary and learns the wall-clock conversion from real timestamp evidence.
+The historical chunk concept is treated as a **prior and workload-size signal**, not as unquestionable wall-clock truth. The exact historical chunk accounting formula was not found as canonical code in the current RTS repository, so this prototype does not invent a replacement formula. It accepts `weighted_chunks` as an input boundary and learns the wall-clock conversion from real timestamp evidence.
 
 When enough comparable records contain `weighted_chunks`, the estimator calculates observed `minutes / weighted_chunk` and uses an evidence-weighted P80 rate. For a new task with a target weighted-chunk estimate, it scales the empirical task-class duration by relative chunk size and blends that with the learned chunk-rate estimate.
 
 If same-class chunk history does not exist, global chunk-rate history may seed a **low-confidence prior**. An explicitly supplied historical `--prior-minutes-per-chunk` can bootstrap a cold start, but real observations should replace its influence over time.
+
+## Operator Load Timeline v0.2
+
+The recovered workload model is now represented primarily as:
+
+`L[p,W] = (E, J, O, R, X)`
+
+with:
+
+- E: direct human activity;
+- J: decision load;
+- O: governed AI/CI/Kernel orchestration load;
+- R: revision/rejection/adversarial repair load;
+- X: active-window context switches.
+
+The v0.2 evidence rule is strict: **blank means UNOBSERVED, not zero**. Partial vectors are preserved with `null` axes, `axis_coverage = observed_axes / 5`, and a display-only `OLT lower bound` calculated from observed axes only.
+
+The current evidence-bounded actual corpus is stored in `olt_actual_v0_2.json` and documented in `OLT_ACTUAL_V0_2.md`. It includes RTS, RTS-minicompany, RTS-AGE and rts-video-flow windows. The current largest RTS lower-bound window is 2026-07-27 at about 52.2 with J/O/R observed and E/X still unknown.
+
+Two secondary diagnostics are available:
+
+- `Gamma = machine_visible_output / governed_stages` — output amplification, never human effort;
+- `JPR = (J + R) / O` — observed workload-shape ratio, never a fatigue score and not guaranteed to be a lower bound when source axes are partial.
+
+Complete-vector OLT similarity is already available as an optional ETA prior. Partial-vector ETA fusion is not yet authorized; it must first prove held-out accuracy improvement without imputing missing axes.
 
 ## Timestamp evidence tiers
 
@@ -99,8 +125,9 @@ Weak evidence may improve a prior but must not silently outweigh strong observat
 - P90 defines `LATE_AFTER_MINUTES` with a small floor above the return target.
 - Report an observed P20–P80 range.
 - If target weighted chunks are available, scale same-class empirical timing by task size and blend it with the learned P80 minutes-per-chunk rate.
+- Complete OLT vector-neighbor history may act as a sparse-data prior; direct task history removes that influence as samples mature.
 - Cold start may use an explicit chunk prior; otherwise it returns a conservative fallback and `LOW` confidence instead of fake precision.
-- High spread, weak evidence, or very small sample count lowers confidence.
+- High spread, weak evidence, very small sample count, or low axis coverage lowers confidence.
 
 The P80 policy and the current blend are human-attention tradeoffs, not statistical truths. They remain replaceable under DARWIN ARENA if real use shows a better policy.
 
@@ -114,6 +141,9 @@ The P80 policy and the current blend are human-attention tradeoffs, not statisti
 - A currently running job is not fabricated into a completed duration.
 - Historical observations are evidence of prior human-hinge time, not a guarantee of future completion.
 - Adjacent Git timestamps are approximation evidence, not proof that the operator worked continuously between commits.
+- Missing OLT axes remain unobserved and are never silently imputed to zero.
+- Commit amplification is not human effort.
+- JPR is descriptive workload shape, not fatigue or clinical evidence.
 - Prediction output must expose sample count, effective sample weight, confidence, basis, and evidence mix.
 
 ## WITNESS gate
@@ -136,6 +166,10 @@ The candidate must be attacked for at least:
 12. weak Git evidence overwhelming strong observations;
 13. large idle Git gaps being mistaken for active task duration;
 14. unseen task classes using chunk priors with fake confidence;
-15. target workload materially larger or smaller than historical runs.
+15. target workload materially larger or smaller than historical runs;
+16. missing OLT axes being silently converted to zero;
+17. low-coverage lower bounds being compared as complete vectors;
+18. extreme commits/stage being mistaken for human load;
+19. partial-axis JPR being treated as a monotonic lower bound.
 
 If existing CI/analytics already exposes an equal-or-better return ETA with lower burden, this GLUE should be dropped or externalized.
