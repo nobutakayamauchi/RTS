@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / FIRST_RUNTIME_OBSERVATION_CONFIRMED`
+Status: `IN_PROGRESS / ACTUAL_PROCESS_CWD_CONFIRMED`
 
 ## Why this workload exists
 
@@ -74,15 +74,38 @@ This may be intentional or may represent mixed deployment surfaces. At this stag
 
 It is not yet evidence of a defect.
 
+## Observation 0005-B — actual kernel process cwd
+
+Observed timestamp: **2026-08-11 19:23 JST**
+
+Read-only command used:
+
+`readlink -f /proc/86796/cwd`
+
+Observed result:
+
+`/home/ubuntu/rts-video-flow-segment-test`
+
+## Material finding after cwd probe
+
+The actual running kernel process cwd matches the systemd-configured WorkingDirectory exactly.
+
+Therefore:
+
+- configured WorkingDirectory: `CONFIRMED_BY_RUNTIME`
+- actual process cwd: `OBSERVED`
+- the earlier path split remains real, because the interpreter/venv path is still under `/home/ubuntu/rts-video-flow/` while the running process cwd is under `/home/ubuntu/rts-video-flow-segment-test`
+- the split is still `SIGNIFICANCE_UNKNOWN`; no defect claim is authorized yet
+
 ## Current evidence state
 
 - systemd unit identity: `OBSERVED`
 - unit file path: `OBSERVED`
 - configured working directory: `OBSERVED`
+- actual kernel process cwd: `OBSERVED / MATCHES_CONFIG`
 - configured executable/module command: `OBSERVED`
 - active/running state: `OBSERVED`
 - MainPID: `OBSERVED`
-- actual kernel process cwd: `NOT_YET_OBSERVED`
 - actual executable behind MainPID: `NOT_YET_OBSERVED`
 - source/module material loaded by process: `NOT_YET_OBSERVED`
 - repository revision bound to running process: `NOT_YET_OBSERVED`
@@ -90,8 +113,8 @@ It is not yet evidence of a defect.
 
 ## Next probe
 
-Confirm the **actual kernel process working directory** for PID `86796` rather than trusting configuration alone.
+Confirm the **actual executable** mapped to PID `86796` rather than trusting `ExecStart` configuration alone.
 
 ## Current verdict
 
-`PARTIAL PASS — real runtime process exists; deployment/source identity not yet closed`
+`PARTIAL PASS — actual process cwd is runtime-confirmed; executable/source/revision identity not yet closed`
