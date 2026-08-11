@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / RUNTIME_EVIDENCE_REQUIRED`
+Status: `IN_PROGRESS / FIRST_RUNTIME_OBSERVATION_CONFIRMED`
 
 ## Why this workload exists
 
@@ -24,8 +24,6 @@ Candidate service from the current development environment:
 
 The name alone is **not evidence** that the service exists, is active, points at the expected working directory, or executes the expected revision.
 
-Until runtime evidence is observed, every runtime claim remains `UNKNOWN`.
-
 ## Required chain
 
 Thin RTS must reconstruct and bind, where available:
@@ -42,24 +40,58 @@ Thin RTS must reconstruct and bind, where available:
 
 No link may be inferred merely because the code exists in Git.
 
-## First probe
+## Observation 0005-A — systemd identity/status
 
-The first probe is intentionally read-only and asks systemd for the service identity and execution configuration/status.
+Observed timestamp: **2026-08-11 19:22 JST**
 
-Expected evidence fields:
+Read-only command used:
 
-- `Id`
-- `ActiveState`
-- `SubState`
-- `FragmentPath`
-- `WorkingDirectory`
-- `ExecStart`
-- `MainPID`
+`systemctl show rts-video-flow-web.service -p Id -p ActiveState -p SubState -p FragmentPath -p WorkingDirectory -p ExecStart -p MainPID --no-pager`
 
-## Attack rule
+Observed fields:
 
-If any expected field is absent, inconsistent, stale, or points outside the expected source/deployment surface, record the mismatch rather than repairing the claim by assumption.
+- `Id=rts-video-flow-web.service`
+- `ActiveState=active`
+- `SubState=running`
+- `MainPID=86796`
+- `FragmentPath=/etc/systemd/system/rts-video-flow-web.service`
+- `WorkingDirectory=/home/ubuntu/rts-video-flow-segment-test`
+- `ExecStart` executable path: `/home/ubuntu/rts-video-flow/venv/bin/python3`
+- `ExecStart` command: `/home/ubuntu/rts-video-flow/venv/bin/python3 -m uvicorn web_console.app_v5:app --host 127.0.0.1 --port 8000`
+
+## Material finding
+
+The service is not merely present in code or configuration. systemd currently reports it as `active/running` with a concrete `MainPID=86796`.
+
+A potentially material identity split is also visible and must not be normalized away by assumption:
+
+- Python interpreter/venv path is under `/home/ubuntu/rts-video-flow/`
+- systemd `WorkingDirectory` is `/home/ubuntu/rts-video-flow-segment-test`
+
+This may be intentional or may represent mixed deployment surfaces. At this stage it is classified only as:
+
+`OBSERVED_PATH_SPLIT / SIGNIFICANCE_UNKNOWN`
+
+It is not yet evidence of a defect.
+
+## Current evidence state
+
+- systemd unit identity: `OBSERVED`
+- unit file path: `OBSERVED`
+- configured working directory: `OBSERVED`
+- configured executable/module command: `OBSERVED`
+- active/running state: `OBSERVED`
+- MainPID: `OBSERVED`
+- actual kernel process cwd: `NOT_YET_OBSERVED`
+- actual executable behind MainPID: `NOT_YET_OBSERVED`
+- source/module material loaded by process: `NOT_YET_OBSERVED`
+- repository revision bound to running process: `NOT_YET_OBSERVED`
+- active route/outcome: `NOT_YET_OBSERVED`
+
+## Next probe
+
+Confirm the **actual kernel process working directory** for PID `86796` rather than trusting configuration alone.
 
 ## Current verdict
 
-`UNKNOWN — awaiting first runtime observation`
+`PARTIAL PASS — real runtime process exists; deployment/source identity not yet closed`
