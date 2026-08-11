@@ -104,7 +104,7 @@
     "axis_coverage": 0.6,
     "olt_lower_bound": 49.40891696378457,
     "commits_per_stage": 11.636363636363637,
-    "judgment_pressure_ratio": 1.1667247920191626,
+    "judgment_pressure_ratio": 1.166726515415698,
     "interpretation": "External publication, correction, routing and feature-freeze window; gate time uses only completed <=30m gates.",
     "source_refs": ["RTS-minicompany PR #92", "RTS-minicompany PR #111"]
   },
