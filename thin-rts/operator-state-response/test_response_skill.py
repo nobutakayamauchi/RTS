@@ -6,14 +6,37 @@ from vitals_model import Vitals
 
 
 class ResponseSkillTests(unittest.TestCase):
-    def test_compact_response_contains_return_fatigue_and_questions(self):
+    def test_compact_response_contains_return_fatigue_performance_and_questions(self):
         result = evaluate_response(
             OperatorStateInput(subjective_fatigue_0_10=6),
             ResponseContext(eta_return_minutes=7, eta_late_after_minutes=10, rework_minutes=2),
         )
         self.assertIn("RETURN 7m / LATE 10m / REWORK +2m", result.text)
         self.assertIn("FATIGUE_EST", result.text)
+        self.assertIn("PERF_PRIOR", result.text)
         self.assertIn("ASK", result.text)
+
+    def test_five_hours_sleep_can_have_low_subjective_fatigue_and_attention_prior(self):
+        result = evaluate_response(
+            OperatorStateInput(
+                sleep_hours_24h=5.0,
+                subjective_fatigue_0_10=2.0,
+                subjective_recovery_0_10=7.0,
+                bad_status_assessed=True,
+            ),
+            ResponseContext(),
+        )
+        self.assertIn("PERF_PRIOR J:UNKNOWN R:MODERATE A:MODERATE O:CAUTION", result.text)
+        self.assertNotIn("COMPARATOR BAC", result.text)
+        self.assertIn("acute_sleep_restriction_2_6h", result.log_record["performance_evidence_ids"])
+
+    def test_alcohol_comparator_needs_matching_continuous_wakefulness(self):
+        result = evaluate_response(
+            OperatorStateInput(continuous_awake_hours=18.0, bad_status_assessed=True),
+            ResponseContext(),
+        )
+        self.assertIn("COMPARATOR BAC 0.05%", result.text)
+        self.assertIn("prolonged_wake_17_19h", result.log_record["performance_evidence_ids"])
 
     def test_emergency_suppresses_optimization_questions(self):
         result = evaluate_response(
