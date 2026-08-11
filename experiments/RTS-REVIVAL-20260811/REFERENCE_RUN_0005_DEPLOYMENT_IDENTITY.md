@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / FULL_RUNTIME_ARGV_CONFIRMED`
+Status: `IN_PROGRESS / RUNTIME_WORKTREE_HEAD_OBSERVED`
 
 ## Why this workload exists
 
@@ -59,21 +59,6 @@ Observed fields:
 - `ExecStart` executable path: `/home/ubuntu/rts-video-flow/venv/bin/python3`
 - `ExecStart` command: `/home/ubuntu/rts-video-flow/venv/bin/python3 -m uvicorn web_console.app_v5:app --host 127.0.0.1 --port 8000`
 
-## Material finding
-
-The service is not merely present in code or configuration. systemd currently reports it as `active/running` with a concrete `MainPID=86796`.
-
-A potentially material identity split is also visible and must not be normalized away by assumption:
-
-- Python interpreter/venv path is under `/home/ubuntu/rts-video-flow/`
-- systemd `WorkingDirectory` is `/home/ubuntu/rts-video-flow-segment-test`
-
-This may be intentional or may represent mixed deployment surfaces. At this stage it is classified only as:
-
-`OBSERVED_PATH_SPLIT / SIGNIFICANCE_UNKNOWN`
-
-It is not yet evidence of a defect.
-
 ## Observation 0005-B — actual kernel process cwd
 
 Observed timestamp: **2026-08-11 19:23 JST**
@@ -86,22 +71,11 @@ Observed result:
 
 `/home/ubuntu/rts-video-flow-segment-test`
 
-## Material finding after cwd probe
-
 The actual running kernel process cwd matches the systemd-configured WorkingDirectory exactly.
-
-Therefore:
-
-- configured WorkingDirectory: `CONFIRMED_BY_RUNTIME`
-- actual process cwd: `OBSERVED`
-- the earlier path split remains real, because the interpreter/venv path is still under `/home/ubuntu/rts-video-flow/` while the running process cwd is under `/home/ubuntu/rts-video-flow-segment-test`
-- the split is still `SIGNIFICANCE_UNKNOWN`; no defect claim is authorized yet
 
 ## Observation 0005-C — client reconnect / PID continuity
 
 Observed timestamp: **2026-08-11 19:28 JST**
-
-The mobile SSH client disconnected/restarted. After reconnect, the service PID was re-queried instead of assuming continuity.
 
 Read-only command used:
 
@@ -111,11 +85,7 @@ Observed result:
 
 `86796`
 
-## Material finding after reconnect
-
-The SSH client failure did not coincide with a service PID change. The same `MainPID=86796` was observed again after reconnect.
-
-This proves only PID continuity across these observations. It does not prove that executable/module/source/revision identity has remained unchanged; those remain separate claims.
+The SSH client reconnect did not coincide with a service PID change. This proves PID continuity across these observations only.
 
 ## Observation 0005-D — actual executable behind MainPID
 
@@ -129,11 +99,7 @@ Observed result:
 
 `/usr/bin/python3.12`
 
-## Material finding after executable probe
-
-The kernel reports the process executable as the system Python binary `/usr/bin/python3.12`.
-
-This does **not** by itself prove that the configured virtual environment is bypassed. A virtual-environment Python entry commonly resolves to the underlying interpreter binary, while environment-specific import paths and package state remain separate runtime facts.
+The kernel executable alone does not prove the configured virtual environment is bypassed.
 
 ## Observation 0005-E — actual process command line
 
@@ -147,14 +113,6 @@ Observed visible result:
 
 `/home/ubuntu/rts-video-flow/venv/bin/python3 -m uvicorn web_console.app_v5:app`
 
-## Material finding after command-line probe
-
-The running process command line confirms that PID `86796` was launched through the configured virtual-environment Python path and is invoking:
-
-`-m uvicorn web_console.app_v5:app`
-
-The visible `ps` output may be terminal-width truncated, so absence of the configured host/port suffix in that view was not treated as a mismatch.
-
 ## Observation 0005-F — full null-delimited runtime argv
 
 Observed timestamp: **2026-08-11 19:33 JST**
@@ -167,19 +125,36 @@ Observed result:
 
 `/home/ubuntu/rts-video-flow/venv/bin/python3 -m uvicorn web_console.app_v5:app --host 127.0.0.1 --port 8000`
 
-## Material finding after full argv probe
+The actual process argv matches the systemd-configured invocation in all material arguments observed.
 
-The actual process argv now matches the systemd-configured invocation in all material arguments observed:
+## Observation 0005-G — current Git HEAD of runtime working directory
 
-- launcher: `/home/ubuntu/rts-video-flow/venv/bin/python3`
-- module runner: `-m uvicorn`
-- application import target: `web_console.app_v5:app`
-- bind host: `127.0.0.1`
-- port: `8000`
+Observed timestamp: **2026-08-11 19:34 JST**
 
-This closes the earlier terminal-width ambiguity. The configured execution command and the actual process argv are consistent.
+Read-only command used:
 
-The remaining material gap is no longer the command itself. It is the identity of the source tree/revision from which `web_console.app_v5` is being resolved and whether the running process can be bounded to that repository state rather than merely to a directory name.
+`git -C /home/ubuntu/rts-video-flow-segment-test rev-parse HEAD`
+
+Observed result:
+
+`216bbc511c306754b5e69f6b58fae021691074fc`
+
+## Material finding after HEAD probe
+
+The directory that is both the configured WorkingDirectory and the runtime-observed cwd is a Git worktree currently pointing at commit:
+
+`216bbc511c306754b5e69f6b58fae021691074fc`
+
+This is a **candidate source revision**, not yet a proven deployed revision for PID `86796`.
+
+Two material uncertainties remain before the source identity can be promoted:
+
+1. the worktree may contain tracked or untracked changes relative to that HEAD;
+2. the Python process may have imported source before later filesystem changes, so current worktree state is not automatically equivalent to loaded process state.
+
+Therefore:
+
+`CURRENT_WORKTREE_HEAD_OBSERVED != RUNNING_PROCESS_REVISION_PROVEN`
 
 ## Current evidence state
 
@@ -194,14 +169,16 @@ The remaining material gap is no longer the command itself. It is the identity o
 - actual process launcher path: `OBSERVED = /home/ubuntu/rts-video-flow/venv/bin/python3`
 - actual application module invocation: `OBSERVED = web_console.app_v5:app`
 - full process argv: `OBSERVED / MATCHES_SYSTEMD_CONFIG`
-- source tree repository identity: `NOT_YET_OBSERVED`
-- repository revision bound to running process: `NOT_YET_OBSERVED`
+- runtime worktree HEAD: `OBSERVED = 216bbc511c306754b5e69f6b58fae021691074fc`
+- runtime worktree cleanliness: `NOT_YET_OBSERVED`
+- source/module material loaded by process: `NOT_YET_OBSERVED`
+- repository revision bound to running process: `NOT_YET_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Identify the Git revision currently checked out in the runtime working directory. This is only a **candidate deployed revision** until later evidence binds it to the already-running process.
+Check whether the runtime working tree has tracked or untracked differences from the observed HEAD. A dirty worktree would make `HEAD` alone insufficient even as a candidate source snapshot.
 
 ## Current verdict
 
-`PARTIAL PASS — unit, PID, cwd, executable, launcher, module and full argv are runtime-confirmed; source/revision/route identity not yet closed`
+`PARTIAL PASS — runtime worktree HEAD observed; worktree cleanliness, loaded-source binding, and route/outcome identity remain open`
