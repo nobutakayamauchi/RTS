@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / ACTUAL_PROCESS_COMMAND_CONFIRMED`
+Status: `IN_PROGRESS / FULL_RUNTIME_ARGV_CONFIRMED`
 
 ## Why this workload exists
 
@@ -153,16 +153,33 @@ The running process command line confirms that PID `86796` was launched through 
 
 `-m uvicorn web_console.app_v5:app`
 
-This materially narrows the earlier path split:
+The visible `ps` output may be terminal-width truncated, so absence of the configured host/port suffix in that view was not treated as a mismatch.
 
-- runtime cwd is `/home/ubuntu/rts-video-flow-segment-test`
-- process argv identifies the launcher as `/home/ubuntu/rts-video-flow/venv/bin/python3`
-- kernel executable resolves to `/usr/bin/python3.12`
-- application module claim is `web_console.app_v5:app`
+## Observation 0005-F — full null-delimited runtime argv
 
-The visible `ps` output may be terminal-width truncated, so absence of the configured `--host 127.0.0.1 --port 8000` suffix in this observation is **not** treated as a mismatch. Full argv remains to be read from `/proc/86796/cmdline` before comparing argument tails.
+Observed timestamp: **2026-08-11 19:33 JST**
 
-The split remains a real composition boundary, but there is still no evidence that it is defective: using a venv from one directory while running application source from another cwd may be intentional.
+Read-only command used:
+
+`xargs -0 -a /proc/86796/cmdline`
+
+Observed result:
+
+`/home/ubuntu/rts-video-flow/venv/bin/python3 -m uvicorn web_console.app_v5:app --host 127.0.0.1 --port 8000`
+
+## Material finding after full argv probe
+
+The actual process argv now matches the systemd-configured invocation in all material arguments observed:
+
+- launcher: `/home/ubuntu/rts-video-flow/venv/bin/python3`
+- module runner: `-m uvicorn`
+- application import target: `web_console.app_v5:app`
+- bind host: `127.0.0.1`
+- port: `8000`
+
+This closes the earlier terminal-width ambiguity. The configured execution command and the actual process argv are consistent.
+
+The remaining material gap is no longer the command itself. It is the identity of the source tree/revision from which `web_console.app_v5` is being resolved and whether the running process can be bounded to that repository state rather than merely to a directory name.
 
 ## Current evidence state
 
@@ -176,15 +193,15 @@ The split remains a real composition boundary, but there is still no evidence th
 - actual executable behind MainPID: `OBSERVED = /usr/bin/python3.12`
 - actual process launcher path: `OBSERVED = /home/ubuntu/rts-video-flow/venv/bin/python3`
 - actual application module invocation: `OBSERVED = web_console.app_v5:app`
-- full process argv: `NOT_YET_OBSERVED`
-- source/module material loaded by process: `NOT_YET_OBSERVED`
+- full process argv: `OBSERVED / MATCHES_SYSTEMD_CONFIG`
+- source tree repository identity: `NOT_YET_OBSERVED`
 - repository revision bound to running process: `NOT_YET_OBSERVED`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Read the process's **full null-delimited argv** directly from `/proc/86796/cmdline` so terminal-width truncation cannot hide configured arguments.
+Identify the Git revision currently checked out in the runtime working directory. This is only a **candidate deployed revision** until later evidence binds it to the already-running process.
 
 ## Current verdict
 
-`PARTIAL PASS — launcher and application module are runtime-confirmed; full argv/source/revision/route identity not yet closed`
+`PARTIAL PASS — unit, PID, cwd, executable, launcher, module and full argv are runtime-confirmed; source/revision/route identity not yet closed`
