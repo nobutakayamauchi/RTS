@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable, Mapping
 
+from effect_catalog import estimate_performance_impact, PerformanceImpact
 from medical_guard import evaluate_medical_guard, MedicalGuardResult
 from state_model import OperatorStateInput, FatigueEstimate, estimate_fatigue
 from vitals_model import Vitals, personal_vital_deviation
@@ -25,6 +26,7 @@ class ResponseContext:
 class SkillResult:
     text: str
     fatigue: FatigueEstimate
+    performance: PerformanceImpact
     medical: MedicalGuardResult
     questions: tuple[str, ...]
     log_record: dict[str, object]
@@ -47,6 +49,11 @@ def _questions(state: OperatorStateInput, medical: MedicalGuardResult, ctx: Resp
 
 def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillResult:
     fatigue = estimate_fatigue(state)
+    performance = estimate_performance_impact(
+        sleep_hours_24h=state.sleep_hours_24h,
+        continuous_awake_hours=state.continuous_awake_hours,
+        sleep_restriction_nights=state.sleep_restriction_nights,
+    )
     medical = evaluate_medical_guard(
         state.bad_status,
         heat_exposure=ctx.heat_exposure,
@@ -64,10 +71,18 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     if ctx.rework_minutes is not None:
         return_text += f" / REWORK +{ctx.rework_minutes}m"
 
+    axis = performance.axes
     lines = [
         return_text,
         f"FATIGUE_EST {fatigue.operational_fatigue_100:.1f}/100 {fatigue.band} ({fatigue.confidence}, cov={fatigue.evidence_coverage:.0%})",
+        "PERF_PRIOR "
+        f"J:{axis['judgment'].grade} "
+        f"R:{axis['reaction'].grade} "
+        f"A:{axis['accuracy'].grade} "
+        f"O:{axis['operation'].grade}",
     ]
+    if performance.comparative_references:
+        lines.append("COMPARATOR " + " | ".join(performance.comparative_references))
     if state.recovery_events:
         lines.append("RECOVERY " + ", ".join(state.recovery_events))
     if state.bad_status:
@@ -98,6 +113,8 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     log_record = {
         "schema": "operator-state-response/v0",
         "sleep_hours_24h": state.sleep_hours_24h,
+        "continuous_awake_hours": state.continuous_awake_hours,
+        "sleep_restriction_nights": state.sleep_restriction_nights,
         "subjective_fatigue_0_10": state.subjective_fatigue_0_10,
         "subjective_recovery_0_10": state.subjective_recovery_0_10,
         "recovery_events": list(state.recovery_events),
@@ -107,6 +124,9 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
         "fatigue_band": fatigue.band,
         "fatigue_confidence": fatigue.confidence,
         "fatigue_coverage": fatigue.evidence_coverage,
+        "performance_prior": {key: value.grade for key, value in performance.axes.items()},
+        "performance_evidence_ids": list(performance.matched_profiles),
+        "performance_comparators": list(performance.comparative_references),
         "behavior_z": fatigue.behavior_z,
         "vital_z": vital_z,
         "eta_return_minutes": ctx.eta_return_minutes,
@@ -120,6 +140,7 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
     return SkillResult(
         text="\n".join(lines),
         fatigue=fatigue,
+        performance=performance,
         medical=medical,
         questions=questions,
         log_record=log_record,
