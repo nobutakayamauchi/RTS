@@ -1,12 +1,12 @@
 # Evidence Sources — Operator State Response v0
 
-This registry separates safety rules from exploratory fatigue features.
+This registry separates safety rules, operational-fatigue features, and evidence-bounded performance-effect profiles.
 
 ## Tier A — official safety / public-health guidance
 
 1. Ministry of Health, Labour and Welfare (Japan), *健康づくりのための睡眠ガイド2023* (partially revised 2024-09-18).
-   - Sleep insufficiency is associated with daytime sleepiness/fatigue, complaints such as headache, reduced attention/judgment and lower work efficiency.
-   - Adult guidance includes securing necessary sleep with 6 hours or more as a rough target, while explicitly noting individual differences.
+   - Adult guidance uses 6 hours or more as a rough sleep-duration target while explicitly noting individual differences.
+   - This is a public-health prior, not a clinical threshold and not a percent-performance conversion.
    - https://www.mhlw.go.jp/content/001305530.pdf
 
 2. Ministry of Health, Labour and Welfare (Japan), *熱中症が疑われる人を見かけたら*.
@@ -33,10 +33,34 @@ Tier A sources may drive medical safety messages. They do NOT define the operati
    - One night of sleep deprivation increased response errors/omissions and impaired post-error adjustments in a small laboratory study.
 
 4. Fang Y et al. *Patterns of smartphone typing performance by time awake: implications for unobtrusive ambulatory mental fatigue assessment.* PLOS Digital Health. 2026;5(3):e0001281. DOI: 10.1371/journal.pdig.0001281.
-   - Smartphone typing metrics from a large longitudinal physician cohort showed non-linear associations with time awake.
-   - New evidence; treat as exploratory and do not assume transportability to this operator or Japanese IME behavior.
+   - Smartphone typing metrics from a longitudinal physician cohort showed non-linear associations with time awake.
+   - Treat as exploratory and do not assume transportability to this operator or Japanese IME behavior.
 
-Tier B sources justify testing behavioral features. They do not justify diagnosis or fixed universal thresholds.
+5. *Impact of one night of sleep restriction on sleepiness and cognitive function: A systematic review and meta-analysis.* 2024. PMID: 38759474.
+   - Across 44 studies using 2-6 h one-night sleep restriction, sustained-attention reaction times and attentional lapses worsened with pooled SMDs around 0.51 and 0.49 respectively.
+   - The review did not find a uniform significant pooled effect for choice reaction time, cognitive throughput, working memory, or inhibitory control.
+   - Therefore a short-sleep profile may raise reaction/attention priors without pretending every judgment domain is equally impaired.
+
+6. Belenky-style sleep dose-response evidence represented here by *Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study.* 2003. PMID: 12603781.
+   - Repeated 5 h time-in-bed conditions showed reduced PVT speed and increased lapses.
+   - This profile requires multiday history and must not be inferred from one 5 h night alone.
+
+7. Williamson AM, Feyer AM. *Moderate sleep deprivation produces impairments in cognitive and motor performance equivalent to legally prescribed levels of alcohol intoxication.* Occup Environ Med. 2000. PMID: 10984335.
+   - After 17-19 h continuous wakefulness, performance on some tests was equivalent or worse than BAC 0.05%; some response-speed measures were up to 50% slower and accuracy measures were poorer.
+   - This is a task- and protocol-bounded comparator, NOT a universal conversion and NOT a "hangover equivalence".
+   - The comparator may be matched only when continuous-awake duration is actually known; 5 h sleep alone does not authorize it.
+
+Tier B sources justify testing behavioral/performance features. They do not justify diagnosis or fixed universal personal thresholds.
+
+## Effect Catalog rule
+
+The runtime catalog preserves four separate operational domains:
+
+`J = judgment / R = reaction / A = accuracy / O = operation`
+
+A population study stores its original endpoint/effect metric where possible. The runtime may assign an ordinal evidence prior (`UNKNOWN`, `CAUTION`, `MODERATE`, `HIGH`) but must not reinterpret an SMD, BAC comparison, or reaction-time change as "X% of this person's ability lost".
+
+Comparators such as alcohol are explanatory calibration anchors only. They require their own exposure trigger and may not be inferred from a neighboring condition.
 
 ## Evidence rule
 
