@@ -1,0 +1,59 @@
+{
+  "schema": "thin-rts-olt-timeline/v0.3",
+  "source_workbook": "Operator_Load_Timeline_v0_3_timeline.xlsx",
+  "portfolio_monthly": [
+    {"period":"2026-01-20..31","RTS":0,"RTS-AGE":0,"RTS-minicompany":0,"rts-video-flow":0,"tracked_total":0,"dominant_surface":"RTS_GENESIS_MISSED_BY_PR_PROXY","evidence":"WEAK"},
+    {"period":"2026-02","RTS":59,"RTS-AGE":0,"RTS-minicompany":0,"rts-video-flow":0,"tracked_total":59,"shares":{"RTS":1.0,"RTS-AGE":0.0,"RTS-minicompany":0.0,"rts-video-flow":0.0},"dominant_surface":"RTS","evidence":"WEAK"},
+    {"period":"2026-03","RTS":129,"RTS-AGE":0,"RTS-minicompany":0,"rts-video-flow":1,"tracked_total":130,"shares":{"RTS":0.9923076923076923,"RTS-AGE":0.0,"RTS-minicompany":0.0,"rts-video-flow":0.007692307692307693},"dominant_surface":"RTS","evidence":"WEAK"},
+    {"period":"2026-04","RTS":21,"RTS-AGE":0,"RTS-minicompany":0,"rts-video-flow":0,"tracked_total":21,"shares":{"RTS":1.0,"RTS-AGE":0.0,"RTS-minicompany":0.0,"rts-video-flow":0.0},"dominant_surface":"RTS","evidence":"WEAK"},
+    {"period":"2026-05","RTS":1,"RTS-AGE":10,"RTS-minicompany":0,"rts-video-flow":0,"tracked_total":11,"shares":{"RTS":0.09090909090909091,"RTS-AGE":0.9090909090909091,"RTS-minicompany":0.0,"rts-video-flow":0.0},"dominant_surface":"RTS-AGE","evidence":"WEAK"},
+    {"period":"2026-06","RTS":0,"RTS-AGE":46,"RTS-minicompany":26,"rts-video-flow":0,"tracked_total":72,"shares":{"RTS":0.0,"RTS-AGE":0.6388888888888888,"RTS-minicompany":0.3611111111111111,"rts-video-flow":0.0},"dominant_surface":"RTS-AGE","evidence":"WEAK"},
+    {"period":"2026-07","RTS":74,"RTS-AGE":2,"RTS-minicompany":76,"rts-video-flow":1,"tracked_total":153,"shares":{"RTS":0.48366013071895425,"RTS-AGE":0.013071895424836602,"RTS-minicompany":0.49673202614379086,"rts-video-flow":0.006535947712418301},"dominant_surface":"RTS-minicompany≈RTS","evidence":"WEAK"},
+    {"period":"2026-08-01..12","RTS":19,"RTS-AGE":4,"RTS-minicompany":0,"rts-video-flow":3,"tracked_total":26,"shares":{"RTS":0.7307692307692307,"RTS-AGE":0.15384615384615385,"RTS-minicompany":0.0,"rts-video-flow":0.11538461538461539},"dominant_surface":"RTS","evidence":"WEAK"}
+  ],
+  "rts_bursts": [
+    {"window":"2026-02-16..22","days":7,"prs":2,"pr_per_day":0.2857142857142857,"phase":"manual-baseline neighborhood","evidence":"WEAK"},
+    {"window":"2026-02-23..28","days":6,"prs":59,"pr_per_day":9.833333333333334,"phase":"post-Kernel expansion","evidence":"WEAK"},
+    {"window":"2026-03-01..07","days":7,"prs":104,"pr_per_day":14.857142857142858,"phase":"extreme construction burst","evidence":"WEAK"},
+    {"window":"2026-03-08..14","days":7,"prs":11,"pr_per_day":1.5714285714285714,"phase":"sharp deceleration","evidence":"WEAK"},
+    {"window":"2026-03-15..21","days":7,"prs":17,"pr_per_day":2.4285714285714284,"phase":"secondary burst","evidence":"WEAK"},
+    {"window":"2026-03-22..31","days":10,"prs":0,"pr_per_day":0.0,"phase":"no new PRs","evidence":"WEAK"},
+    {"window":"2026-07-01..07","days":7,"prs":2,"pr_per_day":0.2857142857142857,"phase":"low RTS surface","evidence":"WEAK"},
+    {"window":"2026-07-08..14","days":7,"prs":0,"pr_per_day":0.0,"phase":"no new RTS PRs","evidence":"WEAK"},
+    {"window":"2026-07-15..21","days":7,"prs":0,"pr_per_day":0.0,"phase":"MiniCompany active","evidence":"WEAK"},
+    {"window":"2026-07-22..28","days":7,"prs":67,"pr_per_day":9.571428571428571,"phase":"RTS return / governance burst","evidence":"WEAK"},
+    {"window":"2026-07-29..31","days":3,"prs":5,"pr_per_day":1.6666666666666667,"phase":"tail after burst","evidence":"WEAK"},
+    {"window":"2026-08-01..07","days":7,"prs":3,"pr_per_day":0.42857142857142855,"phase":"runtime-debug buildup","evidence":"WEAK"},
+    {"window":"2026-08-08..12","days":5,"prs":16,"pr_per_day":3.2,"phase":"Deployment Identity / freeze / revival","evidence":"WEAK"}
+  ],
+  "selected_decisions": [
+    {"date":"2026-02-22","project":"RTS","dedup_group":"RTS-MEMORY-20260222","decision":"persistent execution memory required beyond conversation history","J":2,"R":2,"class":"D2","evidence":"STRONG","rollup":true},
+    {"date":"2026-07-16","project":"RTS-minicompany","dedup_group":"MINI-MEDIA-CYCLE-001","decision":"accepted publication cycle requires pre-action canonical packet/runbook correction","J":2,"R":2,"class":"D2","evidence":"STRONG","rollup":true},
+    {"date":"2026-07-16","project":"RTS-minicompany","dedup_group":"MINI-MEDIA-FREEZE","decision":"Media Engine v0 feature-freeze","J":3,"R":0,"class":"D3","evidence":"STRONG","rollup":true},
+    {"date":"2026-07-23","project":"RTS-minicompany","dedup_group":"MINI-PUBLIC-SALE","decision":"PUBLIC_SALE_APPROVED with constrained launch boundary","J":3,"R":0,"class":"D3","evidence":"STRONG","rollup":true},
+    {"date":"2026-08-01","project":"RTS-AGE","dedup_group":"AGE-SERVER-PIVOT","decision":"Apps Script superseded by server-side FastAPI + SQLite","J":2,"R":2,"class":"D2","evidence":"STRONG","rollup":true},
+    {"date":"2026-08-07","project":"RTS","dedup_group":"RTS-DEPLOY-ID","decision":"Deployment Identity mandatory before runtime implementation classification","J":2,"R":0,"class":"D2","evidence":"STRONG","rollup":true},
+    {"date":"2026-08-09","project":"RTS","dedup_group":"RTS-FINAL-ABOLITION","decision":"abolition-test verdict EVIDENCE_INSUFFICIENT / REVISE","J":2,"R":0,"class":"D2","evidence":"STRONG","rollup":true},
+    {"date":"2026-08-09","project":"RTS","dedup_group":"RTS-FINAL-FREEZE","decision":"engineering continuation NO; FROZEN / DEVELOPMENT ENDED","J":3,"R":0,"class":"D3","evidence":"STRONG","rollup":true},
+    {"date":"2026-08-11","project":"RTS","dedup_group":"RTS-OLT-WITNESS","decision":"Human Return ETA /goal binds OLT to strict actor ingestion under WITNESS","J":2,"R":1,"class":"D2","evidence":"STRONG","rollup":true}
+  ],
+  "rollup": {"selected_J":21,"selected_R":7,"selected_D3":3},
+  "timeline_invariants": {
+    "genesis":"2026-01-20T18:08:00+09:00",
+    "portfolio_proxy_is_human_load":false,
+    "pr_burst_is_fatigue_evidence":false,
+    "zero_pr_means_zero_work":false,
+    "canonical_load":"(E,J,O,R,X)",
+    "unknown_equals_zero":false,
+    "full_event_level_materialization":"NOT_PROVEN"
+  },
+  "known_source_discrepancies": [
+    {
+      "id":"V03-DASH-JPR-VIDEO",
+      "location":"Timeline_Dashboard_v0_3 / rts-video-flow 2026-08-03–06",
+      "source_value":0,
+      "canonical_value":null,
+      "reason":"J and R are unobserved; (J+R)/O is therefore UNOBSERVED, not zero. Actual_Calc_v0_2 correctly leaves the ratio blank."
+    }
+  ]
+}
