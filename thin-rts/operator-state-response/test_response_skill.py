@@ -1,5 +1,6 @@
 import unittest
 
+from environment_context import EnvironmentConsent, EnvironmentObservation
 from response_skill import ResponseContext, evaluate_response
 from state_model import OperatorStateInput
 from vitals_model import Vitals
@@ -29,6 +30,48 @@ class ResponseSkillTests(unittest.TestCase):
         self.assertIn("PERF_PRIOR J:UNKNOWN R:MODERATE A:MODERATE O:CAUTION", result.text)
         self.assertNotIn("COMPARATOR BAC", result.text)
         self.assertIn("acute_sleep_restriction_2_6h", result.log_record["performance_evidence_ids"])
+
+    def test_vehicle_sleep_asks_weather_and_noise_permission_without_vitals_noise(self):
+        result = evaluate_response(
+            OperatorStateInput(
+                sleep_hours_24h=5.0,
+                subjective_fatigue_0_10=2.0,
+                subjective_recovery_0_10=7.0,
+                bad_status_assessed=True,
+            ),
+            ResponseContext(sleep_environment_kind="vehicle"),
+        )
+        self.assertTrue(any("現在地を天気取得" in q for q in result.questions))
+        self.assertTrue(any("周囲音も取る" in q for q in result.questions))
+
+    def test_ephemeral_weather_display_and_log_do_not_persist_location(self):
+        result = evaluate_response(
+            OperatorStateInput(
+                sleep_hours_24h=5.0,
+                subjective_fatigue_0_10=2.0,
+                subjective_recovery_0_10=7.0,
+                bad_status_assessed=True,
+            ),
+            ResponseContext(
+                sleep_environment_kind="vehicle",
+                environment_consent=EnvironmentConsent(
+                    weather_mode="EPHEMERAL",
+                    noise_mode="DERIVED_DB_ONLY",
+                ),
+                environment=EnvironmentObservation(
+                    coarse_location="Nagoya",
+                    outdoor_temp_c=29.5,
+                    outdoor_relative_humidity_pct=74,
+                    cabin_temp_c=31.0,
+                    noise_laeq_db=51.2,
+                    weather_source="provider",
+                ),
+            ),
+        )
+        self.assertIn("SLEEP_ENV OUT 29.5C", result.text)
+        self.assertIn("NOISE_LAEQ 51.2dB", result.text)
+        self.assertNotIn("coarse_location", result.log_record["environment"])
+        self.assertEqual(result.log_record["environment_consent"]["weather_mode"], "EPHEMERAL")
 
     def test_alcohol_comparator_needs_matching_continuous_wakefulness(self):
         result = evaluate_response(
