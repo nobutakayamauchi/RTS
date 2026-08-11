@@ -109,7 +109,10 @@ class CustodyMeteorAttackTests(unittest.TestCase):
             calls.append(cmd)
             if "describe" in cmd:
                 return subprocess.CompletedProcess(
-                    cmd, 0, stdout='{"generation":"1","size":"3"}', stderr=""
+                    cmd,
+                    0,
+                    stdout='{"generation":"1","size":"3","md5Hash":"kAFQmDzST7DWlj99KOF/cg=="}',
+                    stderr="",
                 )
             return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
 
