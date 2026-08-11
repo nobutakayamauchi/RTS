@@ -11,6 +11,7 @@ must remain outside the public repository.
 from __future__ import annotations
 
 import argparse
+import base64
 import gzip
 import hashlib
 import io
@@ -29,6 +30,7 @@ from typing import Iterable
 SCHEMA = "thin-rts-cloud-custody/v0"
 INTERNAL_MANIFEST = "RTS_BUNDLE_MANIFEST.json"
 FINGERPRINT_RE = re.compile(r"^[0-9A-Fa-f]{40,64}$")
+AUTHORITY_REF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/@+\-]{0,159}$")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -46,6 +48,14 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def md5_b64_file(path: Path) -> str:
+    h = hashlib.md5(usedforsecurity=False)
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return base64.b64encode(h.digest()).decode("ascii")
 
 
 def canonical_json_bytes(obj: object) -> bytes:
@@ -169,6 +179,12 @@ def _validate_fingerprint(value: str) -> str:
     return value.upper()
 
 
+def validate_authority_ref(value: str) -> str:
+    if not AUTHORITY_REF_RE.fullmatch(value or ""):
+        raise CustodyError("authority reference must be an opaque token, not free-form text")
+    return value
+
+
 def gpg_version() -> str:
     cp = run(["gpg", "--version"])
     return cp.stdout.splitlines()[0].strip() if cp.stdout else "gpg/version-unknown"
@@ -186,6 +202,24 @@ def gpg_public_fingerprints(query: str) -> set[str]:
     return result
 
 
+def gpg_primary_fingerprint(query: str) -> str | None:
+    cp = run(["gpg", "--batch", "--with-colons", "--fingerprint", "--list-keys", query], check=False)
+    if cp.returncode != 0:
+        return None
+    saw_pub = False
+    for line in cp.stdout.splitlines():
+        parts = line.split(":")
+        kind = parts[0] if parts else ""
+        if kind == "pub":
+            saw_pub = True
+            continue
+        if saw_pub and kind == "fpr" and len(parts) > 9 and parts[9]:
+            return parts[9].upper()
+        if kind in {"sub", "uid", "uat"} and saw_pub:
+            break
+    return None
+
+
 def gpg_has_secret_record(fingerprint: str) -> bool:
     cp = run(["gpg", "--batch", "--with-colons", "--list-secret-keys", fingerprint], check=False)
     for line in cp.stdout.splitlines():
@@ -200,10 +234,13 @@ def assert_recipient_separation(recipients: Iterable[str]) -> list[str]:
     if len(set(normalized)) != len(normalized):
         raise CustodyError("duplicate recipient fingerprint")
     for fpr in normalized:
-        if fpr not in gpg_public_fingerprints(fpr):
+        primary = gpg_primary_fingerprint(fpr)
+        if primary is None:
             raise CustodyError(f"public recipient key unavailable: {fpr}")
-        if gpg_has_secret_record(fpr):
-            raise CustodyError(f"key separation failed: producer has secret-key record for recipient {fpr}")
+        if primary != fpr:
+            raise CustodyError(f"recipient must be the primary-key fingerprint, not a subkey: {fpr}")
+        if gpg_has_secret_record(primary):
+            raise CustodyError(f"key separation failed: producer has secret-key record for recipient {primary}")
     return normalized
 
 
@@ -237,6 +274,8 @@ def decrypt_gpg(ciphertext: Path, plaintext: Path) -> None:
 def validate_gs_base(uri: str) -> str:
     if not uri.startswith("gs://"):
         raise CustodyError("GCS target must start with gs://")
+    if any(ch.isspace() for ch in uri) or "#" in uri or "?" in uri:
+        raise CustodyError("GCS target contains unsupported fragment/query/whitespace")
     tail = uri[5:].strip("/")
     if "/" not in tail:
         raise CustodyError("GCS target must include a dedicated prefix, not bucket root")
@@ -250,15 +289,22 @@ def gcs_object_uri(base: str, object_id: str) -> str:
 
 
 def gcs_upload(local: Path, remote: str) -> dict:
+    local_md5 = md5_b64_file(local)
     cp = run([
         "gcloud", "storage", "cp", str(local), remote,
         "--if-generation-match=0",
+        f"--content-md5={local_md5}",
     ], check=False)
     if cp.returncode != 0:
         raise CustodyError(f"cloud upload failed: {cp.stderr.strip() or cp.stdout.strip()}")
     meta = gcs_stat(remote)
     if not str(meta.get("generation", "")):
         raise CustodyError("remote object metadata missing generation")
+    remote_md5 = str(meta.get("md5Hash", ""))
+    if not remote_md5:
+        raise CustodyError("remote object metadata missing MD5 transfer digest")
+    if remote_md5 != local_md5:
+        raise CustodyError("remote provider MD5 does not match local ciphertext")
     return meta
 
 
@@ -427,8 +473,7 @@ def build_local_candidate(input_dir: Path, work_dir: Path, recipients: list[str]
 
 
 def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path, authority_ref: str) -> dict:
-    if not authority_ref.strip():
-        raise CustodyError("live upload requires a non-empty authority reference")
+    authority_ref = validate_authority_ref(authority_ref)
     recovery_dir = assert_private_runtime_path(recovery_dir)
     remote = gcs_object_uri(gcs_base, candidate["bundle_id"])
     meta = gcs_upload(Path(candidate["ciphertext"]["path"]), remote)
@@ -440,10 +485,11 @@ def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path, authority_re
         "uri": remote,
         "generation": str(meta.get("generation", "")),
         "size": remote_size,
+        "md5": meta.get("md5Hash"),
         "update_time": meta.get("updateTime"),
-        "verification": "REMOTE_OBJECT_PRESENT_SIZE_MATCH",
+        "verification": "REMOTE_OBJECT_PRESENT_SIZE_AND_PROVIDER_MD5_MATCH",
     }
-    candidate["authority_ref"] = authority_ref.strip()
+    candidate["authority_ref"] = authority_ref
     candidate["upload_observed_at"] = now_utc()
     recovery_dir.mkdir(parents=True, exist_ok=True)
     receipt_path = recovery_dir / f"{candidate['bundle_id']}.receipt.json"
@@ -453,6 +499,7 @@ def live_upload(candidate: dict, gcs_base: str, recovery_dir: Path, authority_re
 
 
 def restore_from_receipt(receipt_path: Path, output_dir: Path, work_dir: Path) -> dict:
+    receipt_path = assert_private_runtime_path(receipt_path)
     work_dir = assert_private_runtime_path(work_dir)
     output_dir = assert_private_runtime_path(output_dir)
     receipt = json.loads(receipt_path.read_text("utf-8"))
@@ -559,11 +606,11 @@ def build_parser() -> argparse.ArgumentParser:
     goal.add_argument("--input", required=True, help="ready evidence bundle directory")
     goal.add_argument("--work", required=True, help="private local work directory outside the repository")
     goal.add_argument("--recovery-dir", required=True, help="private recovery-package output directory outside the repository")
-    goal.add_argument("--recipient", action="append", required=True, help="full OpenPGP recipient fingerprint; repeat for recovery recipients")
+    goal.add_argument("--recipient", action="append", required=True, help="full OpenPGP primary-key recipient fingerprint; repeat for recovery recipients")
     goal.add_argument("--key-epoch", required=True)
     goal.add_argument("--gcs-base", required=True, help="dedicated gs://bucket/prefix")
     goal.add_argument("--approve-live-upload", action="store_true")
-    goal.add_argument("--authority-ref", help="normalized reference to explicit live-upload authority; required with --approve-live-upload")
+    goal.add_argument("--authority-ref", help="opaque normalized reference to explicit live-upload authority; required with --approve-live-upload")
 
     restore = sub.add_parser("restore")
     restore.add_argument("--receipt", required=True)
