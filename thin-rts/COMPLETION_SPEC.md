@@ -8,11 +8,16 @@ Adversarial revisions:
 - Review 0002 — targeted re-attack
 - Review 0003 — saturation attack
 - Review 0004 — consolidation-regression check
+- Review 0005 — final consistency / saturation closure
 
-Status: `FINAL_CONSISTENCY_CHECK / NOT_COMPLETE`
+Status: `FROZEN_FOR_IMPLEMENTATION / NOT_COMPLETE`
+
+Saturation verdict: `SEARCH_SATURATED_UNDER_CURRENT_EVIDENCE`
 
 This is the canonical integrated completion contract for the successor RTS candidate.
 Detailed requirement documents and adversarial reviews remain evidence for how this contract was derived, but new implementation work should target this consolidated surface rather than re-expanding overlapping architecture prose.
+
+New real evidence may reopen this specification. Wording variants alone do not.
 
 ## 1. Founding invariant
 
@@ -447,7 +452,7 @@ Until then:
 
 `NEW_RTS_STATUS = NOT_COMPLETE`
 
-## 25. Implementation sequencing after final saturation
+## 25. Implementation sequencing
 
 `finish Deployment Identity workload`
 → `Destroy/Meteor each proposed custom responsibility`
@@ -478,3 +483,4 @@ Material source documents:
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0002.md`
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0003.md`
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0004.md`
+- `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0005.md`
