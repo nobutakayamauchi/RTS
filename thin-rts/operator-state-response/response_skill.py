@@ -38,8 +38,8 @@ def _questions(state: OperatorStateInput, medical: MedicalGuardResult, ctx: Resp
         questions.append("直近24時間の睡眠は合計何時間くらい？")
     if state.subjective_recovery_0_10 is None:
         questions.append("仮眠・睡眠・食事・水分・休憩のあと、回復感は0〜10でどれくらい？")
-    if not state.bad_status:
-        questions.append("今あるバッドステータスは？（頭痛、吐き気、めまい、発熱感、倒れた等）")
+    if not state.bad_status_assessed:
+        questions.append("今あるバッドステータスは？（なければ『なし』。頭痛、吐き気、めまい、発熱感、倒れた等）")
     if ctx.vitals is None and len(questions) < 3:
         questions.append("測っているバイタルがあれば数値も残す？（任意。なくても進める）")
     return tuple(questions[:3])
@@ -72,6 +72,8 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
         lines.append("RECOVERY " + ", ".join(state.recovery_events))
     if state.bad_status:
         lines.append("BAD " + ", ".join(state.bad_status))
+    elif state.bad_status_assessed:
+        lines.append("BAD none_reported")
     if any(v is not None and v > 1.5 for v in fatigue.behavior_z.values()):
         abnormal = [f"{k} z={v:.1f}" for k, v in fatigue.behavior_z.items() if v is not None and v > 1.5]
         lines.append("BEHAVIOR ↑ " + ", ".join(abnormal))
@@ -100,6 +102,7 @@ def evaluate_response(state: OperatorStateInput, ctx: ResponseContext) -> SkillR
         "subjective_recovery_0_10": state.subjective_recovery_0_10,
         "recovery_events": list(state.recovery_events),
         "bad_status": list(state.bad_status),
+        "bad_status_assessed": state.bad_status_assessed,
         "fatigue_estimate_100": fatigue.operational_fatigue_100,
         "fatigue_band": fatigue.band,
         "fatigue_confidence": fatigue.confidence,
