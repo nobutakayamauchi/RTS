@@ -5,7 +5,8 @@ import olt
 
 class OLTTests(unittest.TestCase):
     def test_pre_kernel_worked_example(self):
-        value = olt.activity_load(17, [78.7])
+        eligible_gaps = [10, 10, 10, 10, 10, 10, 10, 8.7]
+        value = olt.activity_load(17, eligible_gaps)
         self.assertAlmostEqual(value, 22.2466666667, places=6)
 
     def test_governed_pr_example(self):
