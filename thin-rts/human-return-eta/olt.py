@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Iterable, Sequence
+from typing import Iterable, Mapping, Sequence
 
 SESSION_GAP_MINUTES = 30.0
 CONTINUOUS_UNIT_MINUTES = 15.0
+OLT_AXES = ("E", "J", "O", "R", "X")
 
 OLT_SCALES = {
     "E": 20.0,
@@ -38,6 +39,20 @@ class LoadVector:
     X: float
 
     def as_dict(self) -> dict[str, float]:
+        return {"E": self.E, "J": self.J, "O": self.O, "R": self.R, "X": self.X}
+
+
+@dataclass(frozen=True)
+class PartialLoadVector:
+    """Evidence-bounded OLT vector. None means unobserved, never zero."""
+
+    E: float | None = None
+    J: float | None = None
+    O: float | None = None
+    R: float | None = None
+    X: float | None = None
+
+    def as_dict(self) -> dict[str, float | None]:
         return {"E": self.E, "J": self.J, "O": self.O, "R": self.R, "X": self.X}
 
 
@@ -126,15 +141,64 @@ def saturation(value: float, scale: float) -> float:
 def display_score(vector: LoadVector) -> float:
     values = vector.as_dict()
     score = 0.0
-    for key in ("E", "J", "O", "R", "X"):
+    for key in OLT_AXES:
         value = _nonnegative_finite(values[key], key)
         score += OLT_DISPLAY_WEIGHTS[key] * saturation(value, OLT_SCALES[key])
     return 100.0 * score
 
 
+def axis_coverage(vector: PartialLoadVector | Mapping[str, float | None]) -> float:
+    values = vector.as_dict() if isinstance(vector, PartialLoadVector) else dict(vector)
+    unknown_keys = set(values) - set(OLT_AXES)
+    if unknown_keys:
+        raise OLTError(f"unknown OLT axes: {sorted(unknown_keys)}")
+    observed = 0
+    for key in OLT_AXES:
+        value = values.get(key)
+        if value is None:
+            continue
+        _nonnegative_finite(value, key)
+        observed += 1
+    return observed / len(OLT_AXES)
+
+
+def lower_bound_score(vector: PartialLoadVector | Mapping[str, float | None]) -> float:
+    """Score only observed axes; omitted axes remain semantically UNKNOWN, not zero."""
+    values = vector.as_dict() if isinstance(vector, PartialLoadVector) else dict(vector)
+    unknown_keys = set(values) - set(OLT_AXES)
+    if unknown_keys:
+        raise OLTError(f"unknown OLT axes: {sorted(unknown_keys)}")
+    score = 0.0
+    for key in OLT_AXES:
+        value = values.get(key)
+        if value is None:
+            continue
+        clean = _nonnegative_finite(value, key)
+        score += OLT_DISPLAY_WEIGHTS[key] * saturation(clean, OLT_SCALES[key])
+    return 100.0 * score
+
+
+def amplification_ratio(machine_visible_output: float, governed_stages: int) -> float:
+    """Machine-visible output per governed human stage; not a human-effort measure."""
+    output = _nonnegative_finite(machine_visible_output, "machine_visible_output")
+    if governed_stages <= 0:
+        raise OLTError("governed_stages must be positive for amplification ratio")
+    return output / governed_stages
+
+
+def judgment_pressure_ratio(J: float, R: float, O: float) -> float:
+    """(J + R) / O. Descriptive workload-shape ratio, not a fatigue score."""
+    decision = _nonnegative_finite(J, "J")
+    rework = _nonnegative_finite(R, "R")
+    orchestration = _nonnegative_finite(O, "O")
+    if orchestration <= 0:
+        raise OLTError("O must be positive for judgment pressure ratio")
+    return (decision + rework) / orchestration
+
+
 def normalized_vector(vector: LoadVector) -> tuple[float, float, float, float, float]:
     values = vector.as_dict()
-    return tuple(values[key] / OLT_SCALES[key] for key in ("E", "J", "O", "R", "X"))
+    return tuple(values[key] / OLT_SCALES[key] for key in OLT_AXES)
 
 
 def vector_distance(a: LoadVector, b: LoadVector) -> float:
