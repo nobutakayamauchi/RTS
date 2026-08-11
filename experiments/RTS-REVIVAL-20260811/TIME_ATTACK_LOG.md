@@ -88,13 +88,61 @@ A prior claimed/remembered `5400x` acceleration figure is **not accepted as prov
 - Artifact: `ADVERSARIAL_TEST_0001.md`.
 - Result: no custom RTS Runtime/Controller/Governance Kernel became necessary.
 
-### T+09 — CHECKPOINT
+### T+09 — FIRST CHECKPOINT
 
 - **2026-08-11 18:58 JST**
 - Elapsed from reset start: **9 minutes**.
 - Current surviving minimum: external evidence/tooling + thin binding/reconstruction contract + explicit authority boundaries.
 - Current benchmark status: `IN_PROGRESS`.
-- Next required phase: materially different second development workload, then attack/reconstruction again to test whether the result generalizes beyond self-description.
+
+### T+10 — LEGACY DECISION-BOUNDARY RESPONSIBILITY REBUILT EXTERNALLY
+
+- **2026-08-11 18:59 JST**
+- Inspected legacy `scripts/decision_boundary_append.py`.
+- Reframed the requirement as preservation of timestamped actor/role/scope/justification/state authority evidence, not execution of the old Python file.
+- Created `REFERENCE_RUN_0002_DECISION_BOUNDARY.md` using Git/GitHub history + thin semantic record.
+- No Python append runtime required.
+
+### T+11 — DECISION-BOUNDARY TAMPER / RECOVERY PASS
+
+- **2026-08-11 19:00 JST**
+- Deliberately mutated the boundary record to a synthetic invalid broader-scope/self-authority fixture in commit `691b1ceb8685ca8599052751ebba0ab31ea52875`.
+- Original boundary remained recoverable from commit `fce1160d072c4bf23e8cd95f4016be5f940dea29`.
+- Restored current record in commit `d0d2da0de4d5a80223e2da63afbf424bc6324cb3`.
+- Restored blob exactly matched pre-attack blob `ce175e99da084d041d82ab1116c2f00cfcb978b9`.
+- Legacy append script classified `ARCHIVE`; new custom append service `NOT_AUTHORIZED`.
+
+### T+12 — EXTERNAL REVIEW / CI SURFACE EXERCISED
+
+- **2026-08-11 19:01–19:02 JST**
+- Opened draft PR **#313** from the experiment branch to `main`.
+- PR explicitly records `DRAFT / NOT PROMOTION AUTHORITY`.
+- GitHub Actions runtime evidence observed for tested head `0dc5cf91746b876c7c59a5df50d3a647d31d07f2`:
+  - workflow `Unicode Guard`;
+  - run `31480351896`;
+  - job `93743627933`;
+  - conclusion `success`;
+  - invisible-unicode guard step `success`.
+- This supplies real external execution/outcome evidence for the CI workload without inferring runtime from code existence.
+
+### T+14 — EVIDENCE DISCOVERY / LEARNING-PROMOTION SEPARATION
+
+- **2026-08-11 19:03 JST**
+- Exercised GitHub repository search against legacy `ESC_` evidence and located ESC/index/session artifacts without executing `scripts/evidence_index_build.py`.
+- Recorded `REFERENCE_RUN_0004_EVIDENCE_DISCOVERY.md`.
+- Created `LEARNING_PROPOSAL_0001.md` proposing archival treatment of the legacy decision-boundary script while explicitly granting no deletion/merge/promotion authority.
+- Learning exists; promotion does not.
+
+### T+15 — INITIAL TIME-ATTACK CANDIDATE CLOSED
+
+- **2026-08-11 19:04 JST**
+- Elapsed from reset start: **15 minutes**.
+- Candidate verdict recorded in `CANDIDATE_VERDICT.md`.
+- `THIN_RTS_CANDIDATE`: `PASS_FOR_CURRENT_REFERENCE_WORKLOAD`.
+- Additional software/service cost target: `JPY 0` met for the exercised composition.
+- No custom RTS Runtime/Controller/Governance Kernel became necessary.
+- Full equivalence across every historical RTS scenario remains `EVIDENCE_INSUFFICIENT` rather than being overclaimed.
+- Remembered `5400x` figure remains unproven; measured result is the 15-minute candidate reconstruction/test window.
 
 ## Planned measured phases
 
@@ -102,12 +150,14 @@ A prior claimed/remembered `5400x` acceleration figure is **not accepted as prov
 2. Extract prior legal/privacy and authority constraints. **DONE**
 3. Map every responsibility to existing external capability / thin glue / irreducible gap. **DONE**
 4. Compose the thinnest viable new RTS representation. **DONE / v0**
-5. Exercise the reference workload and record runtime/development evidence. **FIRST WORKLOAD DONE**
-6. Run adversarial/destructive tests after baseline protection. **FIRST SET DONE**
-7. Repair or recompose only demonstrated failures. **RECOVERY TEST DONE; NO NEW GLUE YET**
-8. Re-run the same workload. **PARTIAL — exact file recovery confirmed; second material workload still required**
-9. Record total elapsed time, surviving RTS minimum, killed responsibilities, and unresolved gaps. **PENDING**
+5. Exercise the reference workload and record runtime/development evidence. **DONE for current workloads**
+6. Run adversarial/destructive tests after baseline protection. **DONE for current workloads**
+7. Repair or recompose only demonstrated failures. **DONE; exact recovery exercised, no new runtime glue required**
+8. Re-run the same workload. **DONE for corruption/authority reconstruction; external CI/runtime also exercised**
+9. Record total elapsed time, surviving RTS minimum, killed responsibilities, and unresolved gaps. **DONE for initial candidate**
 
 ## Current verdict
 
-`IN_PROGRESS`
+`PASS_FOR_CURRENT_REFERENCE_WORKLOAD / FULL_EQUIVALENCE_EVIDENCE_INSUFFICIENT`
+
+The initial time-attack candidate is closed. Do not add more RTS machinery unless a materially new workload or failure mode reopens the gate.
