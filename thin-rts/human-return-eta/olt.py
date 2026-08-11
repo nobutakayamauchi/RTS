@@ -178,6 +178,33 @@ def lower_bound_score(vector: PartialLoadVector | Mapping[str, float | None]) ->
     return 100.0 * score
 
 
+def fuse_partial_vectors(
+    vectors: Iterable[PartialLoadVector | Mapping[str, float | None]],
+) -> PartialLoadVector:
+    """Sum observed contributions axis-wise while preserving wholly unobserved axes as None.
+
+    This is a lower-bound fusion operation: an unobserved axis in one project does not erase
+    observed evidence from another project, but an axis with no evidence anywhere remains None.
+    """
+    totals: dict[str, float | None] = {key: None for key in OLT_AXES}
+    found = False
+    for vector in vectors:
+        found = True
+        values = vector.as_dict() if isinstance(vector, PartialLoadVector) else dict(vector)
+        unknown_keys = set(values) - set(OLT_AXES)
+        if unknown_keys:
+            raise OLTError(f"unknown OLT axes: {sorted(unknown_keys)}")
+        for key in OLT_AXES:
+            value = values.get(key)
+            if value is None:
+                continue
+            clean = _nonnegative_finite(value, key)
+            totals[key] = clean if totals[key] is None else totals[key] + clean
+    if not found:
+        raise OLTError("cannot fuse an empty vector collection")
+    return PartialLoadVector(**totals)
+
+
 def amplification_ratio(machine_visible_output: float, governed_stages: int) -> float:
     """Machine-visible output per governed human stage; not a human-effort measure."""
     output = _nonnegative_finite(machine_visible_output, "machine_visible_output")
