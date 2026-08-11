@@ -1,0 +1,36 @@
+name: Cloud Custody Candidate Tests
+
+on:
+  push:
+    branches:
+      - feature/encrypted-cloud-custody-v0
+    paths:
+      - 'thin-rts/cloud-custody/**'
+      - '.github/workflows/cloud-custody-candidate-tests.yml'
+  pull_request:
+    paths:
+      - 'thin-rts/cloud-custody/**'
+      - '.github/workflows/cloud-custody-candidate-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: thin-rts/cloud-custody
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile candidate
+        run: python3 -m py_compile custody.py test_custody.py
+      - name: Run pure unit tests
+        run: python3 -m unittest -v test_custody.py
+      - name: Confirm no generated custody artifacts are tracked
+        run: |
+          if git ls-files '*.gpg' '*.tar.gz' '*.receipt.json' '*.preupload.json' '*.RECOVERY_CARD.md' | grep -q .; then
+            echo 'generated custody/recovery artifact is tracked' >&2
+            exit 1
+          fi
