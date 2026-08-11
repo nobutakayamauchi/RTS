@@ -7,8 +7,9 @@ Adversarial revisions:
 - Review 0001 — broad DA / Counter-DA
 - Review 0002 — targeted re-attack
 - Review 0003 — saturation attack
+- Review 0004 — consolidation-regression check
 
-Status: `FROZEN_PENDING_FINAL_NO_NEW_CLASS_CHECK / NOT_COMPLETE`
+Status: `FINAL_CONSISTENCY_CHECK / NOT_COMPLETE`
 
 This is the canonical integrated completion contract for the successor RTS candidate.
 Detailed requirement documents and adversarial reviews remain evidence for how this contract was derived, but new implementation work should target this consolidated surface rather than re-expanding overlapping architecture prose.
@@ -131,7 +132,42 @@ Expose, where applicable:
 
 The system must not imply omniscient life-event detection.
 
-## 8. Evidence lifecycle
+## 8. Privacy / minimization
+
+Legal or evidentiary usefulness does not authorize indiscriminate collection.
+
+`COLLECT != TRUST != RETAIN != PUBLISH`
+
+Rules:
+
+- collect only materially justified and authorized content;
+- third-party/private material does not become collectible merely because it may be useful;
+- raw sensitive material is retained only when materially justified;
+- secrets, provider credentials, private keys, and private evidence payloads stay out of public repositories;
+- public/presentation copies minimize sensitive content;
+- redaction creates a derivative and must preserve protected-original linkage where authorized;
+- collection, transformation, retention, disclosure, and deletion remain distinct decisions.
+
+Encryption reduces disclosure risk but does not cure overcollection.
+
+## 9. Authority separation
+
+`EVIDENCE_EXISTS != AUTHORITY_EXISTS`
+
+Keep separate, where material:
+
+- authority to observe/collect;
+- authority to access private material;
+- authority to transform/redact;
+- authority to publish/disclose;
+- authority to change repository/production state;
+- authority to submit/sign/spend/represent;
+- authority to approve/promote;
+- authority to independently attest, only when genuinely independent.
+
+Urgency, eligibility, evidence value, or AI confidence cannot manufacture authority.
+
+## 10. Evidence lifecycle
 
 Encryption does not justify indefinite retention.
 
@@ -148,20 +184,9 @@ Deletion is a custody event with authority, reason, time, target identity, and v
 Convenience/index/derivative copies may expire earlier than canonical protected evidence.
 No automated cleanup may destroy material evidence under an active hold or unresolved preserve state.
 
-## 9. External-first implementation boundary
+## 11. External-first implementation boundary
 
-Prefer existing tools/services for:
-
-- archive/compression;
-- cryptography;
-- cloud/object transport and versioning;
-- scheduling/notifications;
-- official-source retrieval/search;
-- document/PDF/form handling;
-- Git/GitHub history/review;
-- CI/regression;
-- external timestamp/signature/notarial/transparency proof;
-- OS/provider runtime evidence.
+Prefer existing tools/services for archive/compression, cryptography, cloud/object transport/versioning, scheduling/notifications, official-source retrieval, document/PDF/form handling, Git/GitHub history/review, CI/regression, external trust/timestamps, and OS/provider runtime evidence.
 
 Candidate custom surface is limited to the smallest surviving glue for:
 
@@ -175,7 +200,7 @@ Candidate custom surface is limited to the smallest surviving glue for:
 
 No custom cipher, KDF, secret-sharing cryptography, cloud engine, national law database, news crawler, autonomous legal-decision engine, custom runtime kernel, or custom WORM store is authorized merely for completeness.
 
-## 10. Threat model
+## 12. Threat model
 
 Security PASS must name the threat class tested. At minimum distinguish:
 
@@ -190,7 +215,7 @@ Client-side archive encryption protects against some storage/transport threats; 
 
 `SECURITY_EXISTS != SECURITY_WORKS`
 
-## 11. Key lifecycle and recipient integrity
+## 13. Key lifecycle and recipient integrity
 
 Every encrypted generation binds a `KEY_EPOCH` or equivalent recipient-generation identity.
 
@@ -203,16 +228,11 @@ A healthy key epoch requires:
 - compromise-response procedure;
 - successful fresh-environment recovery drill for the frozen workload.
 
-Recipient configuration is security-critical even when the public key is public.
-
 No silent recipient replacement.
 Recipient/key change requires authority, old/new identity, reason, time, and recovery proof.
-
 A bundle encrypted successfully to an unintended/unauthorized recipient is FAIL.
 
-## 12. Sealed bundle root and cloud generation identity
-
-Per-file hashes are necessary but not sufficient.
+## 14. Sealed bundle root and cloud generation identity
 
 Each sealed logical bundle requires an unambiguous checkpoint such as `BUNDLE_ROOT_DIGEST` derived from a defined canonical root input that binds, according to the schema:
 
@@ -235,7 +255,7 @@ Remote custody binds, where available:
 Detect or explicitly mark UNKNOWN for rollback, stale-valid substitution, truncation, wrong object/version, or generation ambiguity.
 A mutable `latest.*` pointer must not be the sole current truth.
 
-## 13. Availability / deletion resilience
+## 15. Availability / deletion resilience
 
 Confidential ciphertext in one deletable failure domain is not durable evidence preservation.
 
@@ -249,9 +269,7 @@ If only one deletable recoverable ciphertext copy exists, surface `SINGLE_COPY_R
 
 RTS does not need to build its own redundant storage engine.
 
-## 14. Auto-pin attention and notification privacy
-
-Warnings must conserve attention.
+## 16. Auto-pin attention and notification privacy
 
 Material Auto-pins should bind:
 
@@ -271,9 +289,9 @@ Notification channels are a separate confidentiality boundary:
 `ENCRYPTED_ARCHIVE != PRIVATE_NOTIFICATION_CHANNEL`
 
 Default external previews should minimize sensitive case/evidence details.
-Where supported, preserve channel identity, delivery state, and user-selected disclosure level; sensitive details belong behind an authorized protected view unless explicitly allowed in the notification channel.
+Where supported, preserve channel identity, delivery state, and user-selected disclosure level; sensitive details belong behind an authorized protected view unless explicitly allowed.
 
-## 15. Watch health
+## 17. Watch health
 
 Every recurring legal/program/deadline/news/source watch should expose, where available:
 
@@ -281,7 +299,7 @@ Every recurring legal/program/deadline/news/source watch should expose, where av
 
 A stale/broken watch surfaces `WATCH_DEGRADED` or `UNKNOWN`; it must not silently continue presenting old results as current coverage.
 
-## 16. Case-pattern typing and contestable decisions
+## 18. Case-pattern typing and contestable decisions
 
 Case-pattern knowledge distinguishes at least:
 
@@ -299,9 +317,9 @@ Material classifications/corrections are versioned rather than overwritten:
 
 A later correction may replace operational effect but must not erase the historical decision that drove prior behavior.
 
-No archive or audit reconstruction may depend on hidden model chain-of-thought; preserve explicit decision result, material basis/source references, uncertainty, and tool/model identity needed for audit.
+No archive/audit reconstruction may depend on hidden model chain-of-thought; preserve explicit result, material basis/source references, uncertainty, and tool/model identity needed for audit.
 
-## 17. Document/submission authority state machine
+## 19. Document/submission authority state machine
 
 Procedure assistance uses explicit states such as:
 
@@ -314,9 +332,8 @@ Procedure assistance uses explicit states such as:
 → `RECEIPT / OUTCOME_OBSERVED`
 
 Eligibility, urgency, or document readiness cannot manufacture submission authority.
-Submission, signature, disclosure, spending, representation, merge/deploy, or other high-consequence external action requires appropriate authority.
 
-## 18. Logical reproducibility and long-term format survival
+## 20. Logical reproducibility and long-term format survival
 
 Require deterministic **logical identity and verification**, not necessarily byte-identical compressed/encrypted archives across platforms/tool versions.
 
@@ -336,10 +353,10 @@ Schema/format migration is a derivative/custody transformation:
 
 `PARENT_BUNDLE/ROOT + TOOL/VERSION + TIME + REASON + NEW_BUNDLE/ROOT`
 
-Do not silently rewrite the original bundle identity.
+Do not silently rewrite original bundle identity.
 At least one completion test must verify an older-schema fixture or perform a versioned migration while preserving provenance.
 
-## 19. Verifier identity
+## 21. Verifier identity
 
 A verification report binds:
 
@@ -353,68 +370,59 @@ A verification report binds:
 
 At least one frozen completion path must not require trusting RTS-owned verifier code; ordinary/off-the-shelf tooling must independently verify material integrity invariants.
 
-## 20. Legal / epistemic boundary
+## 22. Legal / epistemic boundary
 
 Thin RTS provides evidence workflow/integrity engineering plus issue spotting for deadlines, benefits, procedures, and evidence gaps.
 
-It does **not** guarantee:
-
-- legal admissibility or acceptance;
-- that AI classification is a legal conclusion;
-- that news proves a legal change;
-- that cached rules remain current;
-- that missing search results mean no relevant law/program exists;
-- that evidence existence grants disclosure/submission authority;
-- that content integrity proves source authenticity or event truth;
-- that an unobserved event did not occur;
-- that one cloud object is durable preservation;
-- that archive encryption protects a compromised plaintext endpoint.
+It does **not** guarantee legal admissibility/acceptance, exhaustive legal discovery, currentness of cached rules, event truth from hashes, authority from evidence existence, event nonexistence from silence, durable preservation from one cloud object, or endpoint security from archive encryption.
 
 Mandatory states include, where appropriate:
 
 `UNKNOWN / CONFLICT / EVIDENCE_INSUFFICIENT / WATCH_DEGRADED / INDEPENDENCE_NOT_PROVEN / SINGLE_COPY_RISK / PROFESSIONAL_REVIEW_RECOMMENDED`
 
-## 21. Frozen integrated completion workload
+## 23. Frozen integrated completion workload
 
-The final frozen workload must demonstrate the whole chain, including at minimum:
+The final workload must demonstrate the whole chain, including at minimum:
 
 1. real event via declared authorized input;
 2. visible event-input coverage/blind spots;
 3. time/provenance/staleness-bound applicability facts;
 4. early common-mistake/evidence-gap warning;
 5. reasoned evidence triage;
-6. later correction of one material classification without erasing prior decision history;
-7. authorized capture of still-obtainable evidence where possible;
-8. bounded current authoritative legal/program/procedure search;
-9. historical source-as-observed preserved separately from later revalidation;
-10. prioritized Auto-pin with privacy-safe external notification behavior;
-11. current `DOCUMENT_READY_DRAFT` without unauthorized submission;
-12. original/derivative separation;
-13. byte-level evidence hashes + time + description + custody + lifecycle;
-14. integrity/provenance/time/authenticity/event-truth states remain separate;
-15. sealed `BUNDLE_ROOT_DIGEST` or equivalent checkpoint;
-16. compression + client-side encryption to verified intended recipient/key epoch;
-17. upload with generation/version/root identity;
-18. remote identity/current-generation verification;
-19. stale/rollback/substitution test;
-20. simulated primary storage loss with successful recovery from second failure domain;
-21. fresh-environment recovery with separated recovery identity;
-22. independent verification of evidence/custody/derivative/root invariants;
-23. recorded verifier identity/procedure;
-24. deliberate mutation, missing file, stale object, wrong parent, wrong execution, and rollback detection;
-25. unauthorized recipient/key change fails closed;
-26. wrong/missing submission/disclosure authority fails closed;
-27. stale/news-only legal source is not promoted to verified current law;
-28. broken/stale watch surfaces `WATCH_DEGRADED/UNKNOWN`;
-29. explicit retention/preservation/deletion-review behavior;
-30. at least one external root-digest trust/timestamp/transparency attachment when feasible;
-31. older-schema verification or provenance-preserving migration;
-32. explicit threat-class test with no broader security promotion;
-33. final PASS/FAIL/UNKNOWN report reconstructable without original AI conversation.
+6. correction of one material classification without erasing prior decision history;
+7. privacy/minimization decision for at least one sensitive/third-party candidate;
+8. explicit authority separation for collection/access/transform/disclosure/submission;
+9. authorized capture of still-obtainable evidence where possible;
+10. bounded current authoritative legal/program/procedure search;
+11. historical source-as-observed preserved separately from later revalidation;
+12. prioritized Auto-pin with privacy-safe external notification behavior;
+13. current `DOCUMENT_READY_DRAFT` without unauthorized submission;
+14. original/derivative separation;
+15. byte-level evidence hashes + time + description + custody + lifecycle;
+16. integrity/provenance/time/authenticity/event-truth states remain separate;
+17. sealed `BUNDLE_ROOT_DIGEST` or equivalent checkpoint;
+18. compression + client-side encryption to verified intended recipient/key epoch;
+19. upload with generation/version/root identity;
+20. remote identity/current-generation verification;
+21. stale/rollback/substitution test;
+22. simulated primary storage loss with successful recovery from second failure domain;
+23. fresh-environment recovery with separated recovery identity;
+24. independent verification of evidence/custody/derivative/root invariants;
+25. recorded verifier identity/procedure;
+26. deliberate mutation, missing file, stale object, wrong parent, wrong execution, and rollback detection;
+27. unauthorized recipient/key change fails closed;
+28. wrong/missing collection/disclosure/submission authority fails closed;
+29. stale/news-only legal source is not promoted to verified current law;
+30. broken/stale watch surfaces `WATCH_DEGRADED/UNKNOWN`;
+31. explicit retention/preservation/deletion-review behavior;
+32. at least one external root-digest trust/timestamp/transparency attachment when feasible;
+33. older-schema verification or provenance-preserving migration;
+34. explicit threat-class test with no broader security promotion;
+35. final PASS/FAIL/UNKNOWN report reconstructable without original AI conversation.
 
 The workload may not be weakened after failure.
 
-## 22. Completion verdict
+## 24. Completion verdict
 
 `NEW_RTS_STATUS = COMPLETE` is prohibited until all are true:
 
@@ -425,6 +433,7 @@ The workload may not be weakened after failure.
 - deletion-resilient ciphertext availability: `PASS`
 - event evidence coverage + case-pattern warning: `PASS`
 - automatic evidence triage: `PASS`
+- privacy/minimization + authority boundaries: `PASS`
 - bounded current law/program/deadline watch + document readiness: `PASS`
 - alert/watch/event-input coverage: `PASS`
 - lifecycle/rollback/key-epoch/recipient-integrity: `PASS`
@@ -438,7 +447,7 @@ Until then:
 
 `NEW_RTS_STATUS = NOT_COMPLETE`
 
-## 23. Implementation sequencing after final saturation
+## 25. Implementation sequencing after final saturation
 
 `finish Deployment Identity workload`
 → `Destroy/Meteor each proposed custom responsibility`
@@ -455,7 +464,7 @@ Until then:
 The implementation gets attacked again.
 A surviving specification grants no survival right to its code.
 
-## 24. Source lineage
+## 26. Source lineage
 
 Material source documents:
 
@@ -468,3 +477,4 @@ Material source documents:
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0001.md`
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0002.md`
 - `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0003.md`
+- `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0004.md`
