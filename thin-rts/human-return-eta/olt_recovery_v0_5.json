@@ -1,0 +1,77 @@
+{
+  "schema": "thin-rts-olt-recovery/v0.5",
+  "source_workbook": "Operator_Load_Timeline_v0_5_deeper_history.xlsx",
+  "summary": {
+    "exact_human_events": 57,
+    "exact_chat_user_events": 37,
+    "eligible_active_minutes": 225.90000000000003,
+    "observed_days": 26,
+    "march_exact_chat_events": 10,
+    "march_J_lower_bound": 9,
+    "peak_day": "2026-07-27",
+    "peak_daily_olt_lower_bound": 61.529922924947165,
+    "historical_status": "PARTIAL"
+  },
+  "daily_project": [
+    {"date":"2026-02-16","project":"RTS","exact_human":8,"exact_chat":0,"active_min":31.433333333333337,"load":{"E":10.095555555555556,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":11.890808919611654,"evidence":"STRONG"},
+    {"date":"2026-02-18","project":"RTS","exact_human":9,"exact_chat":0,"active_min":47.266666666666666,"load":{"E":12.15111111111111,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":13.659579457323034,"evidence":"STRONG"},
+    {"date":"2026-02-22","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":2,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":11.038772132144437,"evidence":"STRONG"},
+    {"date":"2026-02-28","project":"RTS","exact_human":3,"exact_chat":0,"active_min":10.75,"load":{"E":3.716666666666667,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":5.087640436600558,"evidence":"STRONG"},
+    {"date":"2026-03-03","project":"RTS","exact_human":6,"exact_chat":6,"active_min":11.583333333333334,"load":{"E":6.772222222222223,"J":2,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":16.359185208096534,"evidence":"STRONG"},
+    {"date":"2026-03-06","project":"RTS","exact_human":2,"exact_chat":2,"active_min":1.95,"load":{"E":2.13,"J":3,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":13.975623797479027,"evidence":"STRONG"},
+    {"date":"2026-03-13","project":"RTS","exact_human":1,"exact_chat":1,"active_min":0.0,"load":{"E":1.0,"J":2,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":9.205089857479408,"evidence":"STRONG"},
+    {"date":"2026-03-16","project":"RTS","exact_human":1,"exact_chat":1,"active_min":0.0,"load":{"E":1.0,"J":2,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":9.205089857479408,"evidence":"STRONG"},
+    {"date":"2026-04-19","project":"RTS-Skills / dev-method","exact_human":4,"exact_chat":4,"active_min":20.816666666666666,"load":{"E":5.387777777777778,"J":2,"O":null,"R":1,"X":null},"coverage":0.6,"olt_lower_bound":16.63928066367583,"evidence":"STRONG"},
+    {"date":"2026-04-20","project":"RTS-Hermes architecture","exact_human":4,"exact_chat":4,"active_min":11.166666666666666,"load":{"E":4.7444444444444445,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":6.335520716997123,"evidence":"STRONG"},
+    {"date":"2026-05-05","project":"RTS ecosystem","exact_human":2,"exact_chat":2,"active_min":19.266666666666666,"load":{"E":3.2844444444444445,"J":3,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":15.48827223740441,"evidence":"STRONG"},
+    {"date":"2026-05-07","project":"PORTFOLIO","exact_human":4,"exact_chat":4,"active_min":33.15,"load":{"E":6.21,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":8.007590267646949,"evidence":"STRONG"},
+    {"date":"2026-06-21","project":"RTS-AGE / recovery-design","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":2,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":7.7419725925008285,"evidence":"MEDIUM"},
+    {"date":"2026-06-26","project":"RTS-minicompany","exact_human":1,"exact_chat":1,"active_min":0.0,"load":{"E":1.0,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.4631172649785795,"evidence":"STRONG"},
+    {"date":"2026-06-29","project":"RTS-minicompany","exact_human":3,"exact_chat":3,"active_min":0.9833333333333333,"load":{"E":3.0655555555555556,"J":4,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":18.034685343617372,"evidence":"STRONG"},
+    {"date":"2026-07-16","project":"RTS-minicompany","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":5,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":19.562649541478947,"evidence":"STRONG"},
+    {"date":"2026-07-23","project":"RTS-minicompany","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":3,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":10.944875242315971,"evidence":"STRONG"},
+    {"date":"2026-07-23","project":"UNRESOLVED_PROJECT","exact_human":2,"exact_chat":2,"active_min":0.8666666666666667,"load":{"E":2.057777777777778,"J":null,"O":null,"R":3,"X":null},"coverage":0.4,"olt_lower_bound":7.4450671776359005,"evidence":"MEDIUM"},
+    {"date":"2026-07-24","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":1,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":4.112608409539159,"evidence":"MEDIUM"},
+    {"date":"2026-07-27","project":"RTS","exact_human":5,"exact_chat":5,"active_min":36.66666666666667,"load":{"E":7.444444444444445,"J":10,"O":26.5,"R":10,"X":null},"coverage":0.8,"olt_lower_bound":61.529922924947165,"evidence":"STRONG"},
+    {"date":"2026-08-01","project":"RTS-AGE","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":2,"O":null,"R":2,"X":null},"coverage":0.4,"olt_lower_bound":11.038772132144437,"evidence":"STRONG"},
+    {"date":"2026-08-04","project":"rts-video-flow","exact_human":1,"exact_chat":1,"active_min":0.0,"load":{"E":1.0,"J":null,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.4631172649785795,"evidence":"STRONG"},
+    {"date":"2026-08-05","project":"CROSS_REPO / 限界開発","exact_human":1,"exact_chat":1,"active_min":0.0,"load":{"E":1.0,"J":2,"O":null,"R":null,"X":null},"coverage":0.4,"olt_lower_bound":9.205089857479408,"evidence":"STRONG"},
+    {"date":"2026-08-06","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":2,"O":null,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":7.7419725925008285,"evidence":"MEDIUM"},
+    {"date":"2026-08-08","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":null,"O":1,"R":null,"X":null},"coverage":0.2,"olt_lower_bound":1.9032516392808099,"evidence":"STRONG"},
+    {"date":"2026-08-09","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":7,"O":13.69,"R":11,"X":null},"coverage":0.6,"olt_lower_bound":44.21457385546497,"evidence":"STRONG"},
+    {"date":"2026-08-11","project":"RTS","exact_human":0,"exact_chat":0,"active_min":0.0,"load":{"E":null,"J":4,"O":3.48,"R":4,"X":null},"coverage":0.6,"olt_lower_bound":25.15615974459793,"evidence":"STRONG"}
+  ],
+  "monthly_fused": [
+    {"month":"2026-01","days_in_scope":12,"observed_days":0,"exact_human_days":0,"exact_chat":0,"exact_human":0,"active_min":0.0,"load":{"E":null,"J":null,"O":null,"R":null,"X":null},"coverage":0.0,"olt_mass":null,"peak_daily":null},
+    {"month":"2026-02","days_in_scope":28,"observed_days":4,"exact_human_days":3,"exact_chat":0,"exact_human":20,"active_min":89.45,"load":{"E":25.96333333333333,"J":2,"O":null,"R":2,"X":null},"coverage":0.6,"olt_mass":32.84781534396202,"peak_daily":13.659579457323034},
+    {"month":"2026-03","days_in_scope":31,"observed_days":4,"exact_human_days":4,"exact_chat":10,"exact_human":10,"active_min":13.533333333333333,"load":{"E":10.902222222222223,"J":9,"O":null,"R":null,"X":null},"coverage":0.4,"olt_mass":36.2438428408327,"peak_daily":16.359185208096534},
+    {"month":"2026-04","days_in_scope":30,"observed_days":2,"exact_human_days":2,"exact_chat":8,"exact_human":8,"active_min":31.983333333333334,"load":{"E":10.132222222222222,"J":2,"O":null,"R":1,"X":null},"coverage":0.6,"olt_mass":21.4786437500681,"peak_daily":16.63928066367583},
+    {"month":"2026-05","days_in_scope":31,"observed_days":2,"exact_human_days":2,"exact_chat":6,"exact_human":6,"active_min":52.416666666666664,"load":{"E":9.494444444444444,"J":3,"O":null,"R":null,"X":null},"coverage":0.4,"olt_mass":22.283140453053807,"peak_daily":15.48827223740441},
+    {"month":"2026-06","days_in_scope":30,"observed_days":3,"exact_human_days":2,"exact_chat":4,"exact_human":4,"active_min":0.9833333333333333,"load":{"E":4.065555555555555,"J":6,"O":null,"R":null,"X":null},"coverage":0.4,"olt_mass":23.985624785295723,"peak_daily":18.034685343617372},
+    {"month":"2026-07","days_in_scope":31,"observed_days":4,"exact_human_days":2,"exact_chat":7,"exact_human":7,"active_min":37.53333333333334,"load":{"E":9.502222222222223,"J":19,"O":26.5,"R":15,"X":null},"coverage":0.8,"olt_mass":71.17911907381753,"peak_daily":61.529922924947165},
+    {"month":"2026-08","days_in_scope":12,"observed_days":7,"exact_human_days":2,"exact_chat":2,"exact_human":2,"active_min":0.0,"load":{"E":2,"J":17,"O":18.169999999999998,"R":17,"X":null},"coverage":0.8,"olt_mass":60.09073970933827,"peak_daily":44.21457385546497}
+  ],
+  "recovery_coverage": [
+    {"month":"2026-01","exact_chat":0,"exact_git_human":0,"semantic_only_days":0,"observed_days":0,"days_in_scope":12,"confidence":"LOW","next_target":"RTS genesis commit history + early ChatGPT export"},
+    {"month":"2026-02","exact_chat":0,"exact_git_human":20,"semantic_only_days":1,"observed_days":4,"days_in_scope":28,"confidence":"LOW-MEDIUM","next_target":"Kernel-onset chat messages Feb 23-28"},
+    {"month":"2026-03","exact_chat":10,"exact_git_human":0,"semantic_only_days":0,"observed_days":4,"days_in_scope":31,"confidence":"LOW-MEDIUM","next_target":"PR #1-#130 stage-to-chat binding"},
+    {"month":"2026-04","exact_chat":8,"exact_git_human":0,"semantic_only_days":0,"observed_days":2,"days_in_scope":30,"confidence":"LOW-MEDIUM","next_target":"RTS-Skills/Hermes adjacent chats"},
+    {"month":"2026-05","exact_chat":6,"exact_git_human":0,"semantic_only_days":0,"observed_days":2,"days_in_scope":31,"confidence":"LOW-MEDIUM","next_target":"RTS-AGE exact implementation chats"},
+    {"month":"2026-06","exact_chat":4,"exact_git_human":0,"semantic_only_days":1,"observed_days":3,"days_in_scope":30,"confidence":"LOW-MEDIUM","next_target":"AGE-to-MiniCompany switch chats"},
+    {"month":"2026-07","exact_chat":7,"exact_git_human":0,"semantic_only_days":2,"observed_days":4,"days_in_scope":31,"confidence":"LOW-MEDIUM","next_target":"PR stage to exact chat hinge mapping"},
+    {"month":"2026-08","exact_chat":2,"exact_git_human":0,"semantic_only_days":5,"observed_days":7,"days_in_scope":12,"confidence":"MEDIUM","next_target":"Original exact chat timestamps Aug 6-11"}
+  ],
+  "interpretation": {
+    "role_transition_hypothesis": "Implementation -> Architecture -> Orchestration -> Adversarial Judgment",
+    "status": "HYPOTHESIS_SUPPORTED_BY_PARTIAL_EVIDENCE_NOT_CAUSALLY_PROVEN",
+    "next_material_test": "Bind March PR #1-#130 stages to recovered exact ChatGPT decision timestamps and measure machine-visible work between human hinges."
+  },
+  "invariants": {
+    "unknown_equals_zero": false,
+    "assistant_messages_create_E": false,
+    "question_equals_decision": false,
+    "pr_count_equals_human_load": false,
+    "fatigue_from_gap_or_pr_drop": false,
+    "full_historical_materialization": "NOT_PROVEN"
+  }
+}
