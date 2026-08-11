@@ -2,6 +2,8 @@
 
 Timestamp: **2026-08-11 20:29 JST**
 
+Canonical motto added: **2026-08-11 20:33 JST**
+
 Status: `NAMED / METHOD_CANONICALIZATION`
 
 Formal name: **ULTIMATE LOOP**
@@ -10,6 +12,18 @@ ULTIMATE LOOP is the development method that combines the three survival loops w
 
 It is not a single implementation, framework, runtime, or product.
 It is the method used to decide what deserves to exist, which concrete implementation deserves to survive, when a promoted implementation should be replaced, and how the human-important outcome remains recoverable after implementations, providers, tools, or even the original creator disappear.
+
+## Canonical motto
+
+> **百万回死んでも残るものだけ、作るべきである。**
+
+Operational form:
+
+> **百万回殺せ。なお立つものだけ作れ。**
+
+This language applies to ideas, requirements, architectures, implementations, dependencies, and promoted software occupants — **not to people**.
+
+The method deliberately makes software disposable so that human-important outcomes do not have to be.
 
 ## The three loops
 
