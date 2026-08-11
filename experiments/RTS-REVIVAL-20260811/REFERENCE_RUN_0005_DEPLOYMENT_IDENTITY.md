@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / RUNTIME_WORKTREE_HEAD_OBSERVED`
+Status: `IN_PROGRESS / DIRTY_RUNTIME_WORKTREE_OBSERVED`
 
 ## Why this workload exists
 
@@ -139,22 +139,52 @@ Observed result:
 
 `216bbc511c306754b5e69f6b58fae021691074fc`
 
-## Material finding after HEAD probe
+## Observation 0005-H — runtime worktree status
 
-The directory that is both the configured WorkingDirectory and the runtime-observed cwd is a Git worktree currently pointing at commit:
+Observed timestamp: **2026-08-11 19:36 JST**
 
-`216bbc511c306754b5e69f6b58fae021691074fc`
+Read-only command used:
 
-This is a **candidate source revision**, not yet a proven deployed revision for PID `86796`.
+`git -C /home/ubuntu/rts-video-flow-segment-test status --short`
 
-Two material uncertainties remain before the source identity can be promoted:
+Observed result: **DIRTY WORKTREE**.
 
-1. the worktree may contain tracked or untracked changes relative to that HEAD;
-2. the Python process may have imported source before later filesystem changes, so current worktree state is not automatically equivalent to loaded process state.
+Tracked changes observed:
 
-Therefore:
+- `D output/.gitkeep`
+- `D projects/vlog-template/README.md`
+- `M web_console/static/new-vlog.html`
+- `M web_console/static/timed-narration.html`
 
-`CURRENT_WORKTREE_HEAD_OBSERVED != RUNNING_PROCESS_REVISION_PROVEN`
+Untracked material observed includes:
+
+- `docs/debug-safety/`
+- `output`
+- `output.before-service-20260804T040957Z/`
+- `projects`
+- `projects.before-service-20260804T040957Z/`
+- `state/`
+- `venv`
+- several `web_console/app_v5.py.before-*` backups
+- several `web_console/static/*.bak` files
+
+## Material finding after worktree-status probe
+
+This is a **material Deployment Identity finding**.
+
+The runtime cwd is not a clean checkout of HEAD `216bbc511c306754b5e69f6b58fae021691074fc`.
+Therefore the HEAD SHA alone cannot identify the complete filesystem state from which the service is currently operating.
+
+The finding must not be simplified into either of these unsupported claims:
+
+- `RUNNING_PROCESS == HEAD`
+- `DIRTY_WORKTREE == BROKEN_DEPLOYMENT`
+
+The correct state is:
+
+`HEAD_OBSERVED + DIRTY_WORKTREE_OBSERVED + LOADED_SOURCE_BINDING_NOT_YET_PROVEN`
+
+A further important nuance is visible: `web_console/app_v5.py` itself is **not listed as modified/untracked** in this status output, while related static assets are modified and several historical backup copies of `app_v5.py` are untracked. That makes the Python entry module a promising next binding target, but its tracked/current identity must be verified directly rather than inferred from omission in status output.
 
 ## Current evidence state
 
@@ -170,15 +200,15 @@ Therefore:
 - actual application module invocation: `OBSERVED = web_console.app_v5:app`
 - full process argv: `OBSERVED / MATCHES_SYSTEMD_CONFIG`
 - runtime worktree HEAD: `OBSERVED = 216bbc511c306754b5e69f6b58fae021691074fc`
-- runtime worktree cleanliness: `NOT_YET_OBSERVED`
+- runtime worktree cleanliness: `DIRTY / OBSERVED`
 - source/module material loaded by process: `NOT_YET_OBSERVED`
-- repository revision bound to running process: `NOT_YET_PROVEN`
+- repository revision bound to running process: `NOT_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Check whether the runtime working tree has tracked or untracked differences from the observed HEAD. A dirty worktree would make `HEAD` alone insufficient even as a candidate source snapshot.
+Verify whether `web_console/app_v5.py`, the actual import target named in the running argv, is tracked by Git and obtain its index identity before attempting to bind current source material to the running service.
 
 ## Current verdict
 
-`PARTIAL PASS — runtime worktree HEAD observed; worktree cleanliness, loaded-source binding, and route/outcome identity remain open`
+`PARTIAL PASS — Deployment Identity correctly refused to collapse a dirty runtime worktree into a HEAD-only claim; loaded source and active route/outcome remain open`
