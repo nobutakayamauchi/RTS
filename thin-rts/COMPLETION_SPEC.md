@@ -1,157 +1,141 @@
 # Thin RTS — Consolidated Completion Specification
 
-Timestamp: **2026-08-11 20:00 JST**
+Initial consolidation: **2026-08-11 20:00 JST**
 
 Adversarial revisions:
 
-- **2026-08-11 20:01 JST — DA / Counter-DA Review 0001**
-- **2026-08-11 20:03 JST — targeted re-attack Review 0002**
+- Review 0001 — broad DA / Counter-DA
+- Review 0002 — targeted re-attack
+- Review 0003 — saturation attack
 
-Status: `FROZEN_PENDING_FINAL_SATURATION_REATTACK / NOT_COMPLETE`
+Status: `FROZEN_PENDING_FINAL_NO_NEW_CLASS_CHECK / NOT_COMPLETE`
 
-This file is the integration point for the hard completion requirements accumulated during the RTS revival time attack.
+This is the canonical integrated completion contract for the successor RTS candidate.
+Detailed requirement documents and adversarial reviews remain evidence for how this contract was derived, but new implementation work should target this consolidated surface rather than re-expanding overlapping architecture prose.
 
-The individual requirement documents remain detailed source material. This file defines how they combine into one product boundary and one completion verdict.
-
-## Founding invariant — specification is not build authorization
+## 1. Founding invariant
 
 `COMPLETION_SPEC != IMPLEMENTATION_AUTHORIZATION`
 
-This specification defines outcomes, evidence obligations, state boundaries, and workloads.
-It does **not** authorize a monolithic RTS platform or any particular custom component.
+This specification defines **outcomes, evidence obligations, state boundaries, and frozen workloads**.
+It does not authorize a monolithic platform or any particular custom component.
 
-Every proposed custom implementation remains subject to the WITNESS-style Destroy Loop / Meteor decision:
+Every proposed custom responsibility must independently survive:
 
 `DROP / EXTERNALIZE / GLUE / IRREDUCIBLE_BUILD`
 
-A capability may be mandatory as an outcome while its implementation is entirely externalized.
+A mandatory outcome may be implemented entirely with external tools.
 
-## Product boundary
+## 2. Product outcome
 
-Thin RTS is complete only when it can reproduce the practical development responsibilities of old RTS **and** close the old evidence/legal-reconstruction hole with a low-burden, external-first evidence protection workflow suitable for an operator who may be poor at filing, forget deadlines, and lack legal/procedural knowledge.
+The successor RTS is complete only when it reproduces the practical development responsibilities of old RTS **and** closes the old evidence/legal-reconstruction hole with a low-burden workflow suitable for an operator who may be poor at filing, forget deadlines, and lack legal/procedural knowledge.
 
-Completion therefore requires one integrated loop:
+Integrated outcome:
 
-`AUTHORIZED EVENT / DEVELOPMENT / DISPUTE-RELEVANT INPUT`
-→ `EVENT CLASSIFICATION + EVENT-INPUT COVERAGE STATE`
+`AUTHORIZED INPUT / EVENT`
+→ `EVENT CLASSIFICATION + INPUT-COVERAGE STATE`
 → `BOUND APPLICABILITY FACTS / JURISDICTION`
 → `BOUNDED CURRENT LAW / PROGRAM / PROCEDURE CHECK WHEN RELEVANT`
 → `CASE-PATTERN / COMMON-MISTAKE WARNING`
-→ `EVIDENCE CANDIDATE TRIAGE`
-→ `EVIDENCE COVERAGE CHECK`
+→ `EVIDENCE TRIAGE + COVERAGE CHECK`
 → `MISSING-EVIDENCE / TOOL-GAP DETECTION`
-→ `COLLECT / EXPORT / CAPTURE THROUGH AUTHORIZED EXTERNAL TOOLS`
+→ `AUTHORIZED COLLECTION / EXPORT / CAPTURE`
 → `ORIGINAL / DERIVATIVE SEPARATION`
-→ `HASH / TIME / PROVENANCE / CUSTODY RECORD`
-→ `SOURCE-AS-OBSERVED SNAPSHOT/REFERENCE WHEN MATERIAL`
-→ `LOGICAL REPRODUCTION BUNDLE`
-→ `COMPRESS`
-→ `CLIENT-SIDE ENCRYPT WITH PINNED RECIPIENT / KEY EPOCH`
-→ `UPLOAD TO USER-SELECTED CLOUD / STORAGE`
-→ `REMOTE OBJECT / GENERATION / VERSION VERIFICATION`
-→ `DELETION-RESILIENT SECOND FAILURE DOMAIN OR EXPLICIT INCOMPLETE STATE`
-→ `AUTO-PIN DEADLINES / CLAIMS / MISSING ITEMS`
-→ `DOCUMENT_READY_DRAFT WHEN A PROCEDURE IS IDENTIFIED`
-→ `SEPARATE USER AUTHORITY FOR SUBMISSION / DISCLOSURE / PROMOTION`
+→ `HASH / TIME / PROVENANCE / CUSTODY / LIFECYCLE`
+→ `HISTORICAL SOURCE-AS-OBSERVED BINDING WHEN MATERIAL`
+→ `SEALED LOGICAL REPRODUCTION BUNDLE`
+→ `COMPRESS + CLIENT-SIDE ENCRYPT TO PINNED RECIPIENT / KEY EPOCH`
+→ `UPLOAD + GENERATION / VERSION / ROOT VERIFICATION`
+→ `DELETION-RESILIENT SECOND FAILURE DOMAIN`
+→ `PRIORITIZED PRIVACY-SAFE AUTO-PINS`
+→ `DOCUMENT_READY_DRAFT`
+→ `SEPARATE AUTHORITY FOR SUBMISSION / DISCLOSURE / PROMOTION`
 → `FRESH-ENVIRONMENT RESTORE`
 → `INDEPENDENT VERIFY`
 → `PASS / FAIL / UNKNOWN`
 
-No stage may silently manufacture legal certainty, authority, evidence completeness, runtime identity, historical authenticity, event truth, independent custody, monitoring coverage, or recoverability.
+No stage may silently manufacture legal certainty, authority, completeness, runtime identity, event truth, independent custody, monitoring coverage, or recoverability.
 
-## Hard completion sources
-
-The following documents are mandatory parts of this specification:
-
-1. `experiments/RTS-REVIVAL-20260811/LEGAL_EVIDENCE_COMPLETION_GATE.md`
-2. `experiments/RTS-REVIVAL-20260811/ENCRYPTED_CLOUD_CUSTODY_REQUIREMENT.md`
-3. `experiments/RTS-REVIVAL-20260811/AUTO_EVIDENCE_TRIAGE_REQUIREMENT.md`
-4. `experiments/RTS-REVIVAL-20260811/EVENT_EVIDENCE_COVERAGE_REQUIREMENT.md`
-5. `experiments/RTS-REVIVAL-20260811/CASE_PATTERN_WARNING_REQUIREMENT.md`
-6. `experiments/RTS-REVIVAL-20260811/LEGAL_RULES_AND_BENEFITS_WATCH_REQUIREMENT.md`
-7. `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0001.md`
-8. `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0002.md`
-
-The adversarial reviews are normative only for the material revisions explicitly incorporated here; they do not become an endlessly expanding architecture source.
-
-## User model — mandatory design constraint
-
-The normal workflow MUST NOT require the operator to be good at evidence management or law.
+## 3. User model
 
 Assume the operator may:
 
-- forget to file or back up evidence;
+- forget filing/backups;
 - not know which evidence matters;
-- not know which legal/procedural deadline has started;
-- not know which benefit/claim exists;
+- not know which deadline, benefit, claim, notice, or procedure exists;
 - lose a phone/server/device;
 - make mistakes under stress;
 - need to explain the record months or years later.
 
-A design that works only when the operator remembers a long checklist is a failure.
+A design that is safe only when the operator remembers a long checklist FAILS.
 
-## Epistemic separation — integrity is not event truth
+Normal evidence preservation should approach zero manual filing steps while still failing visibly when automation cannot complete.
 
-The system MUST keep these claims separate:
+## 4. Evidence claim separation
 
-- `CONTENT_INTEGRITY`
-- `CAPTURE_PROVENANCE`
-- `TIME_ATTESTATION`
-- `SOURCE_AUTHENTICITY`
-- `EVENT_TRUTH`
+Never collapse these into one “verified” state:
 
-A PASS for content integrity MUST NOT silently promote source authenticity or event truth.
+- `CONTENT_INTEGRITY` — preserved bytes match recorded identity;
+- `CAPTURE_PROVENANCE` — acquisition path/actor/tool/source;
+- `TIME_ATTESTATION` — timestamp evidence and independence/trust level;
+- `SOURCE_AUTHENTICITY` — evidence for claimed source/creator/system;
+- `EVENT_TRUTH` — whether the underlying real-world event occurred as alleged.
 
-When all timing/custody systems remain under one administrator, preserve `INDEPENDENCE_NOT_PROVEN` rather than simulate independence.
+`CONTENT_INTEGRITY_PASS != EVENT_TRUTH_PROVEN`
 
-Where feasible in the frozen workload, at least one covered digest should receive an external/independent timestamp, transparency, signature, notarization, or equivalent attestation through an external provider/tool.
+When all timing/custody systems remain under one ultimate administrator, preserve `INDEPENDENCE_NOT_PROVEN`.
 
-## Historical source observation vs current truth
+At least one frozen workload should attach an external timestamp/transparency/signature/notarial/equivalent attestation to a covered root digest when feasible, without overstating what that attestation proves.
 
-A legal/procedure/program alert must preserve two distinct concepts:
+## 5. Historical source vs current source
+
+Legal/procedure/program decisions must distinguish:
 
 - `SOURCE_AS_OBSERVED_AT_DECISION_TIME`
 - `SOURCE_CURRENTLY_REVALIDATED`
 
-When material and authorized, the decision-time record should preserve a bounded source snapshot/artifact, official downloadable document, version identifier, structured source extract, or other reproducible representation plus digest and retrieval time.
+When material and authorized, preserve a bounded decision-time source artifact/snapshot/version/extract plus digest, source reference, and retrieval time.
 
-A live URL alone is not sufficient historical reconstruction when the source is mutable.
+A mutable live URL alone is not sufficient historical reconstruction.
+Later revalidation must not overwrite the original observed basis.
 
-A later revalidation must not overwrite what the system originally observed.
+## 6. Applicability facts and bounded legal discovery
 
-## Applicability-fact binding
+Material facts used for jurisdiction, eligibility, deadlines, forms, or procedures should bind:
 
-Material facts used to determine jurisdiction, eligibility, deadlines, forms, or procedure must carry, where relevant:
+`VALUE + PROVENANCE + OBSERVED/CONFIRMED_TIME + STATUS + STALENESS/EXPIRY + USER_CONFIRMATION_WHEN_REQUIRED`
 
-`VALUE + SOURCE/PROVENANCE + OBSERVED_OR_CONFIRMED_TIME + STATUS + STALENESS/EXPIRY + USER_CONFIRMATION_WHEN_REQUIRED`
+Device location or conversational inference must not silently substitute for residence, insurer, employer, household status, event date, or other material facts.
 
-Device location or conversational inference must not silently substitute for legal residence, insurer, employer, household status, or other material applicability facts.
+Legal/program discovery is explicitly bounded:
 
-Missing or stale material facts produce a question, `UNKNOWN`, or professional escalation rather than a fabricated answer.
+`DECLARED SEARCH SCOPE + AUTHORITATIVE SOURCE CLASSES CHECKED + RETRIEVAL TIMES + CONTEXT + UNRESOLVED GAPS`
 
-## Bounded legal/program discovery
+Never claim `ALL_RELEVANT_LAW_FOUND` merely because search returned no more results.
+Use `UNKNOWN`, `CONFLICT`, or `PROFESSIONAL_REVIEW_RECOMMENDED` when appropriate.
 
-The system cannot honestly prove that it found every relevant law, case, program, form, exception, or local procedure.
+News/social/public chatter is discovery signal only until current authoritative sources support promotion.
 
-Completion therefore means:
+## 7. Event-input coverage
 
-`BOUNDED_CURRENT_SOURCE_SEARCH_PER_DECLARED_SCOPE + TRACEABLE_RESULTS + UNKNOWN/CONFLICT/ESCALATION`
+`EVENT_NOT_OBSERVED != EVENT_DID_NOT_OCCUR`
 
-Preserve:
+Expose, where applicable:
 
-- declared search scope;
-- source classes actually checked;
-- retrieval times;
-- jurisdiction/context assumptions;
-- unresolved coverage gaps.
+- authorized event/input sources;
+- last successful intake/sync;
+- unsupported/disconnected sources;
+- known blind spots;
+- manual reporting path;
+- event-classification confidence/status.
 
-Do not emit `ALL_RELEVANT_LAW_FOUND` or equivalent universal certainty without a separately justified bounded authority/dataset.
+The system must not imply omniscient life-event detection.
 
-## Evidence lifecycle / retention
+## 8. Evidence lifecycle
 
 Encryption does not justify indefinite retention.
 
-Each material evidence object or bundle must support explicit lifecycle state such as:
+Supported lifecycle states include:
 
 - `ACTIVE_PRESERVE`
 - `PRESERVATION_HOLD`
@@ -160,46 +144,40 @@ Each material evidence object or bundle must support explicit lifecycle state su
 - `DELETED_WITH_RECORD`
 - `UNKNOWN_DO_NOT_DESTROY`
 
-Deletion is itself a custody event and must preserve authority, reason, time, target identity, and verification of what was deleted when material.
+Deletion is a custody event with authority, reason, time, target identity, and verification where material.
+Convenience/index/derivative copies may expire earlier than canonical protected evidence.
+No automated cleanup may destroy material evidence under an active hold or unresolved preserve state.
 
-Convenience/index/derivative copies may have shorter retention than canonical protected evidence.
+## 9. External-first implementation boundary
 
-No automated cleanup may destroy material evidence merely because a storage period elapsed while a preservation hold or unresolved dispute state applies.
+Prefer existing tools/services for:
 
-## External-first implementation rule
+- archive/compression;
+- cryptography;
+- cloud/object transport and versioning;
+- scheduling/notifications;
+- official-source retrieval/search;
+- document/PDF/form handling;
+- Git/GitHub history/review;
+- CI/regression;
+- external timestamp/signature/notarial/transparency proof;
+- OS/provider runtime evidence.
 
-Thin RTS is glue, not a new platform unless evidence forces otherwise.
+Candidate custom surface is limited to the smallest surviving glue for:
 
-Prefer existing capabilities for archive/compression, cryptography, cloud/object transport, scheduling/notifications, official-source retrieval/search, document/PDF/form handling, Git/GitHub history/review, CI/regression, external signatures/timestamps/notarization/transparency, and OS/provider runtime identity.
+- event/evidence schemas;
+- manifest/custody/root binding;
+- adapter/orchestration contracts;
+- state/deadline/Auto-pin records;
+- case-pattern review/promotion;
+- document-ready metadata;
+- PASS/FAIL/UNKNOWN verification reports.
 
-Custom code is limited to the smallest surviving responsibilities such as:
+No custom cipher, KDF, secret-sharing cryptography, cloud engine, national law database, news crawler, autonomous legal-decision engine, custom runtime kernel, or custom WORM store is authorized merely for completeness.
 
-- event/evidence record schema;
-- evidence manifest and custody binding;
-- provider/tool adapter contract;
-- orchestration glue;
-- state / deadline / Auto-pin records;
-- logical reproduction/verification contract;
-- deterministic PASS / FAIL / UNKNOWN verification report;
-- case-pattern registry and reviewed promotion path;
-- document-ready metadata binding.
+## 10. Threat model
 
-No custom cipher, KDF, key-sharing cryptography, cloud engine, national law database, news crawler, autonomous legal-decision engine, custom runtime kernel, or custom WORM store is authorized merely for completeness.
-
-## Security boundary
-
-- plaintext evidence must not be uploaded to cloud merely because transport is convenient;
-- cloud ciphertext and long-term decryption secret must not live in the same trust boundary by default;
-- server-side unattended automation should preferably need encryption capability only;
-- private recovery identity must have a separately recoverable path;
-- public repositories must contain no private keys, provider credentials, secrets, or private evidence payloads;
-- filename/path metadata should be minimized when practical without making recovery fragile;
-- security-sensitive changes receive adversarial review;
-- `SECURITY EXISTS != SECURITY WORKS`.
-
-## Explicit threat model
-
-Security claims must name the threat being tested. At minimum distinguish:
+Security PASS must name the threat class tested. At minimum distinguish:
 
 - `REMOTE_CIPHERTEXT_THEFT`
 - `CLOUD_ACCOUNT_READ_ACCESS`
@@ -208,75 +186,74 @@ Security claims must name the threat being tested. At minimum distinguish:
 - `SOURCE_ENDPOINT_COMPROMISE`
 - `UPLOADER_CONFIG_COMPROMISE`
 
-Client-side encryption can materially protect stored/transmitted archives from ciphertext/cloud theft; it does **not** make plaintext safe on an already-compromised source endpoint.
+Client-side archive encryption protects against some storage/transport threats; it does **not** make plaintext safe on an already-compromised endpoint.
 
-No security PASS may silently expand from one threat class to another.
+`SECURITY_EXISTS != SECURITY_WORKS`
 
-## Key lifecycle / recovery boundary
+## 11. Key lifecycle and recipient integrity
 
-Encrypted custody must bind a `KEY_EPOCH` or equivalent recipient-generation identity.
+Every encrypted generation binds a `KEY_EPOCH` or equivalent recipient-generation identity.
 
-A production-capable key epoch requires:
+A healthy key epoch requires:
 
-- identified encryption recipient/material;
-- expected recipient/key fingerprint(s);
+- intended recipient/key fingerprint(s);
 - separately protected recovery path;
 - recovery-copy verification date;
 - rotation procedure;
 - compromise-response procedure;
-- at least one successful fresh-environment restore drill before the epoch is considered operationally safe for the frozen completion workload.
+- successful fresh-environment recovery drill for the frozen workload.
 
-Recipient/key changes are security/authority events. They must not occur silently.
+Recipient configuration is security-critical even when the public key is public.
 
-Each bundle must record the actual recipient/key epoch used.
+No silent recipient replacement.
+Recipient/key change requires authority, old/new identity, reason, time, and recovery proof.
 
-The design must not invent custom cryptography or custom secret-sharing merely to satisfy redundancy aesthetics.
+A bundle encrypted successfully to an unintended/unauthorized recipient is FAIL.
 
-## Recipient configuration integrity
+## 12. Sealed bundle root and cloud generation identity
 
-A public encryption key is not secret, but its identity is security-critical.
+Per-file hashes are necessary but not sufficient.
 
-The uploader must verify the intended recipient/key fingerprint or equivalent pinned identity before treating an encrypted bundle as healthy.
+Each sealed logical bundle requires an unambiguous checkpoint such as `BUNDLE_ROOT_DIGEST` derived from a defined canonical root input that binds, according to the schema:
 
-A changed recipient configuration requires:
+- evidence object digests;
+- original/derivative links;
+- custody state;
+- lifecycle state where material;
+- schema/version;
+- bundle/generation identity;
+- other integrity-critical manifest fields.
 
-- explicit authority;
-- recorded old/new key epoch identity;
-- reason;
-- transition time;
-- recovery proof for the new epoch.
+Verification reports expected vs observed root.
 
-A pipeline that encrypts successfully to an unauthorized or unintended recipient is a FAIL.
+Remote custody binds, where available:
 
-## Cloud object / rollback identity
+`BUNDLE_ID + GENERATION + BUNDLE_ROOT_DIGEST + PLAINTEXT_DIGEST/IDENTITY + CIPHERTEXT_DIGEST + PROVIDER_OBJECT_ID/VERSION + PRIOR_GENERATION_REF + OBSERVED_TIME`
 
 `REMOTE_OBJECT_EXISTS != CURRENT_CUSTODY_PROVEN`
 
-A remote preservation record should bind, where available:
+Detect or explicitly mark UNKNOWN for rollback, stale-valid substitution, truncation, wrong object/version, or generation ambiguity.
+A mutable `latest.*` pointer must not be the sole current truth.
 
-`BUNDLE_ID + GENERATION + PLAINTEXT_DIGEST + CIPHERTEXT_DIGEST + PROVIDER_OBJECT_ID_OR_VERSION + PRIOR_GENERATION_REF + OBSERVED_TIME`
+## 13. Availability / deletion resilience
 
-Detect or explicitly mark UNKNOWN for stale valid-object substitution, rollback, truncation, wrong object identity, or provider-version ambiguity.
+Confidential ciphertext in one deletable failure domain is not durable evidence preservation.
 
-A single mutable `latest.zip`-style object name must not be the sole current-generation truth.
+The frozen workload must demonstrate recovery after simulated loss of the primary storage location using one externally implemented path such as:
 
-## Availability / deletion resilience
+- separately controlled second ciphertext copy;
+- provider-protected historical/versioned copy outside the primary object-deletion failure;
+- independently retrievable encrypted copy in another failure domain.
 
-Confidential ciphertext that exists in only one deletable failure domain is not durable evidence preservation.
+If only one deletable recoverable ciphertext copy exists, surface `SINGLE_COPY_RISK` and do not pass the durable-evidence gate.
 
-The completion workload must demonstrate one of the following externally implemented outcomes:
+RTS does not need to build its own redundant storage engine.
 
-- a separately controlled second ciphertext copy;
-- provider-protected historical/versioned copy that survives simulated primary-object loss;
-- another independently retrievable encrypted copy outside the primary deletion failure domain.
+## 14. Auto-pin attention and notification privacy
 
-If only one deletable recoverable ciphertext copy exists, surface `SINGLE_COPY_RISK` and do not pass the durable-evidence completion gate.
+Warnings must conserve attention.
 
-The system need not build its own redundant storage engine.
-
-## Alert / attention budget
-
-Each material Auto-pin should support:
+Material Auto-pins should bind:
 
 - severity/consequence;
 - deadline/urgency;
@@ -285,40 +262,28 @@ Each material Auto-pin should support:
 - next smallest action;
 - deduplication/grouping;
 - acknowledgement/snooze/expiry where appropriate;
-- escalation when a recoverability or deadline window materially closes.
+- escalation as a deadline/recoverability window closes.
 
 `ALERT_EXISTS != USER_WAS_EFFECTIVELY_WARNED`
 
-The underlying record may remain even when duplicate notifications are suppressed.
+Notification channels are a separate confidentiality boundary:
 
-## Watch health / degraded monitoring
+`ENCRYPTED_ARCHIVE != PRIVATE_NOTIFICATION_CHANNEL`
 
-Every active recurring law/program/deadline/news/source watch must expose observable health, including where available:
+Default external previews should minimize sensitive case/evidence details.
+Where supported, preserve channel identity, delivery state, and user-selected disclosure level; sensitive details belong behind an authorized protected view unless explicitly allowed in the notification channel.
+
+## 15. Watch health
+
+Every recurring legal/program/deadline/news/source watch should expose, where available:
 
 `LAST_SUCCESSFUL_CHECK + NEXT_EXPECTED_CHECK + SOURCE_SET + FAILURE_STATE + STALENESS_THRESHOLD + NOTIFICATION_DELIVERY_STATE`
 
-A broken or stale watch must surface `WATCH_DEGRADED` or `UNKNOWN` rather than continue presenting old results as current coverage.
+A stale/broken watch surfaces `WATCH_DEGRADED` or `UNKNOWN`; it must not silently continue presenting old results as current coverage.
 
-## Event-input coverage / blind spots
+## 16. Case-pattern typing and contestable decisions
 
-`EVENT_NOT_OBSERVED != EVENT_DID_NOT_OCCUR`
-
-The system must expose what event/input sources are actually authorized and observed.
-
-Where applicable preserve:
-
-- authorized event/input sources;
-- last successful intake/sync;
-- unsupported or disconnected sources;
-- known blind spots;
-- manual event-reporting path;
-- event-classification confidence/status.
-
-Silence from the system must not imply that no relevant life event occurred when the event was outside observed/authorized inputs.
-
-## Case-pattern knowledge typing
-
-Pattern types may include:
+Case-pattern knowledge distinguishes at least:
 
 - `COMMON_PRACTICAL_FAILURE`
 - `OFFICIAL_RECOMMENDATION`
@@ -326,23 +291,19 @@ Pattern types may include:
 - `LOCAL_OR_PROVIDER_SPECIFIC`
 - `UNVERIFIED_CANDIDATE`
 
-Each pattern requires provenance appropriate to its type.
+Pattern repetition does not promote anecdote into law.
 
-Popularity or repetition of an anecdote must never upgrade a practical hint into law.
+Material classifications/corrections are versioned rather than overwritten:
 
-## Contestable decision history
+`DECISION_ID + INPUT_REFS + RESULT + CONFIDENCE/STATUS + ACTOR/TOOL + TIME + REASON + REVIEW_OF/SUPERSEDES`
 
-Material event classifications, evidence triage decisions, eligibility/applicability decisions, case-pattern promotions, and human corrections must be versioned rather than silently overwritten.
+A later correction may replace operational effect but must not erase the historical decision that drove prior behavior.
 
-A material decision record should preserve:
+No archive or audit reconstruction may depend on hidden model chain-of-thought; preserve explicit decision result, material basis/source references, uncertainty, and tool/model identity needed for audit.
 
-`DECISION_ID + INPUT_REFS + RESULT + CONFIDENCE_OR_STATUS + ACTOR_OR_TOOL + TIME + REASON + REVIEW_OF_OR_SUPERSEDES`
+## 17. Document/submission authority state machine
 
-A later correction may supersede an earlier decision operationally, but must not erase the historical decision that drove prior alerts/actions.
-
-## Document/submission authority state machine
-
-Procedure assistance must use explicit state transitions such as:
+Procedure assistance uses explicit states such as:
 
 `IDENTIFIED`
 → `ELIGIBILITY_UNCONFIRMED / ELIGIBILITY_CONFIRMED`
@@ -352,157 +313,158 @@ Procedure assistance must use explicit state transitions such as:
 → `SUBMITTED`
 → `RECEIPT / OUTCOME_OBSERVED`
 
-Eligibility, urgency, or document readiness alone cannot manufacture `SUBMISSION_AUTHORIZED`.
+Eligibility, urgency, or document readiness cannot manufacture submission authority.
+Submission, signature, disclosure, spending, representation, merge/deploy, or other high-consequence external action requires appropriate authority.
 
-External submission, signature, disclosure of sensitive material, spending, representation, or production-state change requires the authority appropriate to that action.
+## 18. Logical reproducibility and long-term format survival
 
-## Logical reproducibility, not archive-byte superstition
+Require deterministic **logical identity and verification**, not necessarily byte-identical compressed/encrypted archives across platforms/tool versions.
 
-The system requires deterministic **logical identity and verification**, not necessarily byte-identical compressed/encrypted archives across different operating systems or tool versions.
+Record:
 
-The bundle must record:
-
-- schema/version;
-- logical path/object identity;
-- evidence/object digests;
-- archive/compression tool + version + parameters;
-- encryption tool + version/format/recipient epoch;
-- verification procedure and expected invariants.
-
-Byte-identical archive/ciphertext output is required only if a specific workload independently demonstrates that need.
-
-## Format / schema longevity
-
-The evidence format must remain reconstructable independently of any one cloud provider or current RTS code version.
-
-Require:
-
-- explicit bundle schema version;
+- bundle schema/version;
 - human-readable schema/recovery specification;
-- open/documented archive and encryption formats where practical;
-- provider-neutral evidence/bundle identity;
-- backward verification of older bundles or a recorded migration path;
-- migration as a derivative/custody transformation with parent digest, tool/version, time, reason, and new digest;
-- preservation of original bundle identity rather than silent rewriting.
+- logical path/object identity;
+- evidence/object/root digests;
+- archive tool/version/parameters;
+- encryption tool/version/format/key epoch;
+- verification procedure/invariants.
 
-At least one frozen completion test must verify an older-schema fixture or perform a versioned migration while preserving provenance.
+Prefer open/documented archive/encryption formats and provider-neutral bundle identity.
 
-## Verifier identity
+Schema/format migration is a derivative/custody transformation:
 
-A verification report must bind:
+`PARENT_BUNDLE/ROOT + TOOL/VERSION + TIME + REASON + NEW_BUNDLE/ROOT`
+
+Do not silently rewrite the original bundle identity.
+At least one completion test must verify an older-schema fixture or perform a versioned migration while preserving provenance.
+
+## 19. Verifier identity
+
+A verification report binds:
 
 - verifier implementation/version/digest or external tool identity;
 - schema version;
-- commands/procedure used;
+- commands/procedure;
 - inputs covered;
-- expected invariants;
-- PASS / FAIL / UNKNOWN result;
+- expected invariants/root;
+- PASS / FAIL / UNKNOWN;
 - discrepancies.
 
-At least one frozen completion verification path must not require trusting RTS-owned verifier code; ordinary/off-the-shelf tools must independently check material integrity invariants.
+At least one frozen completion path must not require trusting RTS-owned verifier code; ordinary/off-the-shelf tooling must independently verify material integrity invariants.
 
-## Legal / epistemic boundary
+## 20. Legal / epistemic boundary
 
-Thin RTS provides issue spotting, evidence workflow assistance, deadline/benefit/procedure checking, and evidence-integrity engineering.
+Thin RTS provides evidence workflow/integrity engineering plus issue spotting for deadlines, benefits, procedures, and evidence gaps.
 
-It does NOT guarantee that:
+It does **not** guarantee:
 
-- a court/regulator/counterparty will accept a record;
-- an AI classification is a legal conclusion;
-- a news report proves a legal change;
-- a cached rule is still current;
-- missing search results mean no relevant law/case/program exists;
-- evidence existence creates authority to disclose or submit it;
-- content integrity proves source authenticity or event truth;
-- an unobserved event did not occur;
-- ciphertext is durable merely because one cloud object exists;
-- client-side archive encryption protects an already-compromised plaintext endpoint.
+- legal admissibility or acceptance;
+- that AI classification is a legal conclusion;
+- that news proves a legal change;
+- that cached rules remain current;
+- that missing search results mean no relevant law/program exists;
+- that evidence existence grants disclosure/submission authority;
+- that content integrity proves source authenticity or event truth;
+- that an unobserved event did not occur;
+- that one cloud object is durable preservation;
+- that archive encryption protects a compromised plaintext endpoint.
 
-Mandatory states include `UNKNOWN`, `CONFLICT`, `EVIDENCE_INSUFFICIENT`, `WATCH_DEGRADED`, `INDEPENDENCE_NOT_PROVEN`, `SINGLE_COPY_RISK`, and `PROFESSIONAL_REVIEW_RECOMMENDED` where appropriate.
+Mandatory states include, where appropriate:
 
-## Integrated completion test
+`UNKNOWN / CONFLICT / EVIDENCE_INSUFFICIENT / WATCH_DEGRADED / INDEPENDENCE_NOT_PROVEN / SINGLE_COPY_RISK / PROFESSIONAL_REVIEW_RECOMMENDED`
 
-A final frozen Reference Workload must exercise the whole chain, not separate demos only.
+## 21. Frozen integrated completion workload
 
-At minimum it must demonstrate:
+The final frozen workload must demonstrate the whole chain, including at minimum:
 
-1. a real event is identified through a declared authorized input path;
-2. event-input coverage and blind spots are visible;
-3. material applicability facts are bound with provenance/time/staleness and confirmed where necessary;
-4. event-specific common evidence omissions are surfaced early;
-5. candidate evidence is triaged with reasons and provenance;
-6. at least one material classification is later reviewed/corrected without erasing prior decision history;
-7. missing evidence is classified and still-obtainable material is captured through authorized existing tools where possible;
-8. applicable current official legal/procedure/program information is checked within a declared bounded scope;
-9. the historical source-as-observed basis is preserved separately from later current revalidation where material;
-10. at least one deadline/claim/notice/document gap produces a prioritized Auto-pin;
-11. a current `DOCUMENT_READY_DRAFT` packet is prepared without unauthorized submission;
-12. originals and derivatives are separated and linked;
-13. evidence objects receive byte-level hashes, timestamps, descriptions, custody records, and lifecycle state;
-14. integrity/provenance/time/source-authenticity/event-truth claims remain separately classified;
-15. the evidence/reproduction bundle is logically identified, compressed and client-side encrypted;
-16. intended recipient/key fingerprint is verified and the actual key epoch is recorded;
-17. ciphertext is uploaded to a selected external storage destination with generation/version identity;
-18. remote object identity/presence/current-generation state is verified rather than trusting upload success;
-19. simulated primary remote-object/location loss still leaves one separately recoverable ciphertext copy/version outside that primary deletion failure domain;
-20. stale/rollback/substituted remote state is detected or explicitly UNKNOWN;
-21. the active key epoch has a separated recovery path and demonstrated restore drill;
-22. the original machine/server is treated as lost;
-23. a fresh environment retrieves ciphertext and separated recovery material;
-24. decryption and extraction succeed;
-25. independent verification recomputes hashes and verifies custody/derivative links using at least one non-RTS verification path;
-26. verifier identity and procedure are recorded;
-27. a deliberate mutation/missing/stale/wrong-parent/wrong-execution/rollback test is detected;
-28. an unauthorized recipient/key change fails closed;
-29. a wrong/missing submission/disclosure authority state fails closed;
-30. a legal/procedure source that is stale or only news-derived is not promoted to verified current law;
-31. a stale or failed watch surfaces `WATCH_DEGRADED/UNKNOWN`;
-32. one evidence item or bundle demonstrates explicit preservation/retention/deletion-review lifecycle behavior;
-33. at least one external trust/timestamp/transparency attachment is demonstrated when feasible, without overstating independence;
-34. one older-schema fixture or migration path remains independently verifiable;
-35. at least one threat-model test states exactly which threat was tested and refuses broader security promotion;
-36. the final report states PASS / FAIL / UNKNOWN and all unresolved gaps without needing the original AI conversation.
+1. real event via declared authorized input;
+2. visible event-input coverage/blind spots;
+3. time/provenance/staleness-bound applicability facts;
+4. early common-mistake/evidence-gap warning;
+5. reasoned evidence triage;
+6. later correction of one material classification without erasing prior decision history;
+7. authorized capture of still-obtainable evidence where possible;
+8. bounded current authoritative legal/program/procedure search;
+9. historical source-as-observed preserved separately from later revalidation;
+10. prioritized Auto-pin with privacy-safe external notification behavior;
+11. current `DOCUMENT_READY_DRAFT` without unauthorized submission;
+12. original/derivative separation;
+13. byte-level evidence hashes + time + description + custody + lifecycle;
+14. integrity/provenance/time/authenticity/event-truth states remain separate;
+15. sealed `BUNDLE_ROOT_DIGEST` or equivalent checkpoint;
+16. compression + client-side encryption to verified intended recipient/key epoch;
+17. upload with generation/version/root identity;
+18. remote identity/current-generation verification;
+19. stale/rollback/substitution test;
+20. simulated primary storage loss with successful recovery from second failure domain;
+21. fresh-environment recovery with separated recovery identity;
+22. independent verification of evidence/custody/derivative/root invariants;
+23. recorded verifier identity/procedure;
+24. deliberate mutation, missing file, stale object, wrong parent, wrong execution, and rollback detection;
+25. unauthorized recipient/key change fails closed;
+26. wrong/missing submission/disclosure authority fails closed;
+27. stale/news-only legal source is not promoted to verified current law;
+28. broken/stale watch surfaces `WATCH_DEGRADED/UNKNOWN`;
+29. explicit retention/preservation/deletion-review behavior;
+30. at least one external root-digest trust/timestamp/transparency attachment when feasible;
+31. older-schema verification or provenance-preserving migration;
+32. explicit threat-class test with no broader security promotion;
+33. final PASS/FAIL/UNKNOWN report reconstructable without original AI conversation.
 
-## Completion verdict
+The workload may not be weakened after failure.
 
-The successor RTS is not complete until all of the following are true:
+## 22. Completion verdict
 
-- old RTS practical responsibility reproduction: `PASS_FOR_FROZEN_REFERENCE_WORKLOAD`
+`NEW_RTS_STATUS = COMPLETE` is prohibited until all are true:
+
+- old RTS responsibility reproduction: `PASS_FOR_FROZEN_REFERENCE_WORKLOAD`
 - persistent-service Deployment Identity: `PASS`
-- engineering evidence preservation/reproduction gate: `PASS_FOR_ENGINEERING_EVIDENCE_GATE`
+- engineering evidence gate: `PASS_FOR_ENGINEERING_EVIDENCE_GATE`
 - encrypted cloud custody + fresh recovery: `PASS`
 - deletion-resilient ciphertext availability: `PASS`
-- event evidence coverage + case-pattern warnings: `PASS`
+- event evidence coverage + case-pattern warning: `PASS`
 - automatic evidence triage: `PASS`
-- bounded current legal/program/deadline watch + document readiness: `PASS`
-- alert/watch/event-input coverage behavior: `PASS`
-- lifecycle/rollback/key-epoch/recipient-integrity behavior: `PASS`
-- schema longevity + independent verifier behavior: `PASS`
+- bounded current law/program/deadline watch + document readiness: `PASS`
+- alert/watch/event-input coverage: `PASS`
+- lifecycle/rollback/key-epoch/recipient-integrity: `PASS`
+- sealed bundle root + independent verification: `PASS`
+- schema longevity/migration: `PASS`
 - integrated adversarial workload: `PASS`
-- unresolved material legal acceptability: always remains case-specific and is never auto-promoted.
+
+Case-specific legal acceptability always remains outside automatic promotion.
 
 Until then:
 
 `NEW_RTS_STATUS = NOT_COMPLETE`
 
-## Implementation sequencing
-
-The requirements are frozen as one batch pending one final saturation re-attack.
-
-Further additions should be integrated only when materially new; do not create overlapping architecture layers for wording variants.
-
-After saturation:
+## 23. Implementation sequencing after final saturation
 
 `finish Deployment Identity workload`
-→ `run Destroy/Meteor on each proposed custom responsibility`
-→ `build only surviving minimal evidence manifest/custody/reproduction glue`
-→ `bind existing compression/encryption/cloud/redundancy tooling`
-→ `add only surviving event/case-pattern/triage records`
-→ `bind current-source legal/program/deadline checks externally where possible`
-→ `add minimal Auto-pin / DOCUMENT_READY state that survives attack`
-→ `run one integrated destructive/reference workload`
+→ `Destroy/Meteor each proposed custom responsibility`
+→ `build only surviving minimal manifest/custody/root/reproduction glue`
+→ `bind existing compression/encryption/cloud/redundancy tools`
+→ `add only surviving event/case-pattern/triage state`
+→ `bind current official-source legal/program/deadline checks externally where possible`
+→ `add minimal Auto-pin / DOCUMENT_READY behavior that survives attack`
+→ `run frozen integrated destructive/reference workload`
 → `repair only observed gaps`
 → `fresh recovery + provider/deletion failure drill`
 → `final verdict`
 
-The implementation itself must be attacked again. A surviving specification does not grant survival rights to its code.
+The implementation gets attacked again.
+A surviving specification grants no survival right to its code.
+
+## 24. Source lineage
+
+Material source documents:
+
+- `experiments/RTS-REVIVAL-20260811/LEGAL_EVIDENCE_COMPLETION_GATE.md`
+- `experiments/RTS-REVIVAL-20260811/ENCRYPTED_CLOUD_CUSTODY_REQUIREMENT.md`
+- `experiments/RTS-REVIVAL-20260811/AUTO_EVIDENCE_TRIAGE_REQUIREMENT.md`
+- `experiments/RTS-REVIVAL-20260811/EVENT_EVIDENCE_COVERAGE_REQUIREMENT.md`
+- `experiments/RTS-REVIVAL-20260811/CASE_PATTERN_WARNING_REQUIREMENT.md`
+- `experiments/RTS-REVIVAL-20260811/LEGAL_RULES_AND_BENEFITS_WATCH_REQUIREMENT.md`
+- `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0001.md`
+- `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0002.md`
+- `experiments/RTS-REVIVAL-20260811/COMPLETION_SPEC_ADVERSARIAL_REVIEW_0003.md`
