@@ -43,12 +43,14 @@ def build_state(payload: dict) -> tuple[OperatorStateInput, ResponseContext]:
     behavior = BehaviorMetrics(**behavior_raw) if isinstance(behavior_raw, dict) else None
     vitals_raw = ctx_raw.get("vitals")
     vitals = Vitals(**vitals_raw) if isinstance(vitals_raw, dict) else None
+    bad_status = _tuple_strings(state_raw.get("bad_status"))
 
     state = OperatorStateInput(
         sleep_hours_24h=state_raw.get("sleep_hours_24h"),
         subjective_fatigue_0_10=state_raw.get("subjective_fatigue_0_10"),
         subjective_recovery_0_10=state_raw.get("subjective_recovery_0_10"),
-        bad_status=_tuple_strings(state_raw.get("bad_status")),
+        bad_status=bad_status,
+        bad_status_assessed=bool(state_raw.get("bad_status_assessed", bool(bad_status))),
         recovery_events=_tuple_strings(state_raw.get("recovery_events")),
         behavior=behavior,
         behavior_baseline=state_raw.get("behavior_baseline", {}),
