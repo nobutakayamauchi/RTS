@@ -90,6 +90,7 @@ class OperatorStateInput:
     subjective_fatigue_0_10: float | None = None
     subjective_recovery_0_10: float | None = None
     bad_status: tuple[str, ...] = ()
+    bad_status_assessed: bool = False
     recovery_events: tuple[str, ...] = ()
     behavior: BehaviorMetrics | None = None
     behavior_baseline: Mapping[str, Iterable[float]] = field(default_factory=dict)
@@ -146,7 +147,8 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
     """Operational fatigue heuristic, not a medical diagnosis.
 
     Population evidence supplies only weak priors. Personal longitudinal calibration is required
-    before behavioral features contribute.
+    before behavioral features contribute. `bad_status_assessed` distinguishes confirmed-none from
+    not-yet-asked, so evidence coverage cannot rise merely because an empty tuple is the default.
     """
     sleep = _optional_range(state.sleep_hours_24h, 0.0, 24.0, "sleep_hours_24h")
     subjective = _optional_range(
@@ -162,7 +164,7 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
     components: dict[str, float | None] = {
         "sleep_shortfall": None,
         "subjective_fatigue": None,
-        "bad_status": 0.0,
+        "bad_status": None,
         "behavior_anomaly": None,
         "workload_pressure": None,
         "recovery_credit": None,
@@ -186,13 +188,17 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
         burden += 25.0 * subjective / 10.0
         observed_weight += 25.0
 
-    status_score = min(
-        15.0,
-        sum(NONURGENT_STATUS_WEIGHTS.get(str(tag).strip().lower(), 0.0) for tag in state.bad_status),
-    )
-    components["bad_status"] = round(status_score, 3)
-    burden += status_score
-    observed_weight += 15.0 if state.bad_status else 0.0
+    normalized_status = tuple(str(tag).strip().lower() for tag in state.bad_status if str(tag).strip())
+    recognized_status = tuple(tag for tag in normalized_status if tag in NONURGENT_STATUS_WEIGHTS)
+    if state.bad_status_assessed or normalized_status:
+        status_score = min(15.0, sum(NONURGENT_STATUS_WEIGHTS[tag] for tag in recognized_status))
+        components["bad_status"] = round(status_score, 3)
+        burden += status_score
+        observed_weight += 15.0
+        if normalized_status and not recognized_status:
+            notes.append("reported_status_not_in_fatigue_prior")
+    else:
+        notes.append("bad_status_unassessed")
 
     anomaly, zscores = behavior_anomaly(state.behavior, state.behavior_baseline)
     if anomaly is not None:
@@ -220,10 +226,7 @@ def estimate_fatigue(state: OperatorStateInput) -> FatigueEstimate:
 
     score = _clamp(burden - credit)
     coverage = min(1.0, observed_weight / possible_weight)
-    if coverage >= 0.75:
-        confidence = "MEDIUM"
-    else:
-        confidence = "LOW"
+    confidence = "MEDIUM" if coverage >= 0.75 else "LOW"
     if score < 35:
         band = "GREEN"
     elif score < 65:
