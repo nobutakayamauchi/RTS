@@ -63,25 +63,37 @@ The strict rule is **blank/unknown means UNOBSERVED, not zero**. `OLT_100` remai
 
 `Gamma = machine_visible_output / governed_stages` is output amplification, never human effort. `JPR = (J + R) / O` is workload-shape diagnostics only, never fatigue evidence.
 
-`olt.fuse_partial_vectors()` now sums observed project contributions axis-by-axis while preserving an axis as `None` if no source observed it. This is a lower-bound fusion operation.
+`olt.fuse_partial_vectors()` sums observed project contributions axis-by-axis while preserving an axis as `None` if no source observed it. This is a lower-bound fusion operation.
 
-## OLT v0.4 — ChatGPT timestamp fusion
+## OLT v0.4 — first ChatGPT timestamp fusion
 
-The source-bound daily anchor corpus is `olt_daily_v0_4.json`, derived from `Operator_Load_Timeline_v0_4_chat_fused.xlsx` and reviewed in `OLT_V0_4_DIFF_REVIEW.md`.
+The source-bound v0.4 daily anchor corpus is `olt_daily_v0_4.json`, derived from `Operator_Load_Timeline_v0_4_chat_fused.xlsx` and reviewed in `OLT_V0_4_DIFF_REVIEW.md`.
 
-Recovered anchors:
+v0.4 established the daily fusion contract: exact confirmed HUMAN timestamps may add E; semantic J/R/O may be fused after explicit deduplication; unresolved project attribution stays unresolved; and missing daily axes remain `null`, never semantic zero.
 
-- 36 exact confirmed HUMAN events;
-- 167.0667 minutes of eligible adjacent exact-human activity (`gap < 30 min`);
-- Pre-Kernel split to real JST days: Feb 16 E=10.0956 and Feb 18 E=12.1511;
-- Post-Kernel HUMAN/AUTO/UNKNOWN separation retained;
-- Jul 27: 5 exact ChatGPT HUMAN events + 36.6667 active min -> E=7.4444;
-- Jul 27 fused partial vector: `(E=7.4444, J=10, O=26.5, R=10, X=UNOBSERVED)`, 80% axis coverage, OLT lower bound 61.5299;
-- ChatGPT-observed Jul 27 J=5 is treated as corroborating evidence inside the stronger governed J>=10 row and is not double-counted;
-- Jul 23 exact reversal remains `UNRESOLVED_PROJECT`; no link is invented to later MiniCompany `PUBLIC_SALE_APPROVED`;
-- Jan 20 through Aug 12 remains a partial daily materialization: missing days are `UNOBSERVED`, never zero-work days.
+## OLT v0.5 — deeper history recovery
 
-Some workbook daily tables render numeric zero in cells whose observation flags say the axis is unobserved. Repository machine-readable data canonicalizes those cells to `null`. Observed zero and unknown are different states.
+The expanded corpus is `olt_recovery_v0_5.json`, derived from `Operator_Load_Timeline_v0_5_deeper_history.xlsx` and reviewed in `OLT_V0_5_DIFF_REVIEW.md`.
+
+Recovered evidence now includes:
+
+- 57 exact HUMAN events;
+- 37 exact ChatGPT USER events;
+- 225.9 minutes of eligible adjacent exact-HUMAN activity (`gap < 30 min`);
+- 26 calendar days with at least one evidence-bounded observation;
+- March recovery: 10 exact Chat USER events and `J>=9` across Mar 3 / 6 / 13 / 16;
+- Mar 3: `E=6.7722, J=2`, OLT lower bound `16.3592`;
+- Mar 6: `E=2.13, J=3`, OLT lower bound `13.9756`;
+- Mar 13 and Mar 16: one exact structural decision each, `E=1, J=2`;
+- Jun 29 MiniCompany: spec-first -> Codex delegation -> Reference Intake, `E=3.0656, J=4`, OLT lower bound `18.0347`;
+- Jul 27 remains the observed daily peak: `(E=7.4444, J=10, O=26.5, R=10, X=UNOBSERVED)`, 80% coverage, OLT lower bound `61.5299`;
+- Aug 4 adds one exact Vlog deployment command as E-only evidence.
+
+Monthly fused vectors are **observed evidence mass**, not average daily workload and not estimates for missing days. Current observed monthly OLT mass is approximately: Feb `32.85`, Mar `36.24`, Apr `21.48`, May `22.28`, Jun `23.99`, Jul `71.18`, Aug 1-12 `60.09`. Missing days remain unknown.
+
+The current role-transition interpretation — `Implementation -> Architecture -> Orchestration -> Adversarial Judgment` — is a **partial-evidence working hypothesis**, not a causal or clinical fact.
+
+The next material historical test is to bind recovered March human decision hinges to RTS PR `#1..#130`, especially the Mar 1-7 104-PR burst, and measure machine-visible work between human hinges.
 
 ## Evidence tiers
 
@@ -105,6 +117,8 @@ Weak evidence may improve missing-data priors but must never silently become dir
 ## Safety / truth rules
 
 - Timestamps used for E must be timezone-aware and confirmed HUMAN.
+- Only human-authored ChatGPT messages create Chat-derived E; assistant messages do not.
+- Questions may create E but do not create J until an explicit choice is evidenced.
 - Negative or zero duration artifacts are rejected where duration is required.
 - `weighted_chunks`, when present, must be positive and finite.
 - AUTO/UNKNOWN rows do not become human workload.
@@ -114,6 +128,7 @@ Weak evidence may improve missing-data priors but must never silently become dir
 - Commit count is not decision count or human effort.
 - PR-density drops or long gaps do not prove fatigue/cognitive decline.
 - Missing OLT axes remain unobserved and are never silently imputed to zero.
+- Evidence-recovery coverage is not workload coverage.
 - Prediction output must expose sample count, confidence, basis, and evidence mix.
 
 ## WITNESS gate
@@ -126,4 +141,4 @@ Required comparison before promotion:
 
 using held-out real runs for absolute ETA error, early-return waste, late-return waste, and false-confidence rate.
 
-Full 2026-01-20→present ChatGPT event-level materialization, complete context-switch X, safe partial-vector ETA fusion, automatic strong-history adapters, and notification delivery remain unproven or externalized.
+Full 2026-01-20->present ChatGPT event-level materialization, complete context-switch X, March PR-stage-to-human-hinge binding, safe partial-vector ETA fusion, automatic strong-history adapters, and notification delivery remain unproven or externalized.
