@@ -81,9 +81,37 @@ It still does not establish:
 - equivalence of the entire dirty worktree to Git HEAD;
 - correctness of modified static assets not yet independently bound.
 
+## Observation 0005-R — OpenAPI application surface
+
+Observed timestamp: **2026-08-11 20:58 JST**
+
+Read-only command:
+
+`curl -sS -o /dev/null -w 'CODE=%{http_code} TYPE=%{content_type} SIZE=%{size_download}\n' http://127.0.0.1:8000/openapi.json`
+
+Observed result:
+
+`CODE=200 TYPE=application/json SIZE=31608`
+
+This materially strengthens the runtime-outcome observation because the process is not only returning a root HTML document; the application also exposes a live OpenAPI document from the same bound runtime surface.
+
+Therefore:
+
+`OPENAPI_ROUTE_REACHABLE = OBSERVED`
+
+`OPENAPI_HTTP_STATUS = 200`
+
+`OPENAPI_MEDIA_TYPE = application/json`
+
+`OPENAPI_RESPONSE_SIZE = 31608 bytes`
+
+This supports that an application route graph is live behind the observed uvicorn process.
+
+It still does not prove the exact source blob loaded at process startup, nor does it establish semantic correctness of each documented route.
+
 ## Progress verdict
 
-The evidence chain has now reached a real bounded runtime outcome:
+The evidence chain has now reached both a human-facing root response and a framework/application metadata surface:
 
 `SYSTEMD UNIT`
 → `MAINPID 86796`
@@ -92,11 +120,14 @@ The evidence chain has now reached a real bounded runtime outcome:
 → `127.0.0.1:8000 LISTENER OWNED BY PID 86796`
 → `HTTP / = 200`
 → `text/html; charset=utf-8`
-→ `15381-byte response`
+→ `15381-byte root response`
+→ `HTTP /openapi.json = 200`
+→ `application/json`
+→ `31608-byte OpenAPI response`
 
 Current classification:
 
-`DEPLOYMENT_IDENTITY_RUNTIME_CHAIN = STRONGLY_OBSERVED_THROUGH_HTTP_SURFACE`
+`DEPLOYMENT_IDENTITY_RUNTIME_CHAIN = STRONGLY_OBSERVED_THROUGH_APPLICATION_SURFACE`
 
 Remaining material limitation:
 
