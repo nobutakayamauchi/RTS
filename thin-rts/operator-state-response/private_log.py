@@ -14,6 +14,19 @@ class PrivateLogError(RuntimeError):
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LOG_PATH = Path.home() / ".local" / "share" / "rts-private" / "operator-state" / "state.jsonl"
+MAX_RECORD_BYTES = 64 * 1024
+FORBIDDEN_KEYS = {
+    "raw_text",
+    "chat_text",
+    "transcript",
+    "prompt",
+    "message_text",
+    "message_body",
+    "email",
+    "phone",
+    "address",
+    "full_name",
+}
 
 
 def _inside(path: Path, root: Path) -> bool:
@@ -31,17 +44,33 @@ def validate_private_path(path: Path) -> Path:
     return resolved
 
 
+def _validate_minimized(value: object, path: str = "record") -> None:
+    if isinstance(value, Mapping):
+        for key, child in value.items():
+            normalized = str(key).strip().lower()
+            if normalized in FORBIDDEN_KEYS:
+                raise PrivateLogError(f"privacy-minimized log forbids field {path}.{key}")
+            _validate_minimized(child, f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            _validate_minimized(child, f"{path}[{index}]")
+
+
 def append_private_record(record: Mapping[str, object], path: Path | None = None) -> Path:
     """Append a privacy-minimized JSONL record outside the repository.
 
-    Callers should persist derived metrics/tags, not raw chat text. The function adds a timestamp
-    when one is not already present and creates the file with owner-only permissions where supported.
+    The logger rejects common raw-conversation/direct-identifier fields even when called directly,
+    adds a timestamp when absent, caps record size, and creates the file with owner-only permissions
+    where supported.
     """
+    _validate_minimized(record)
     target = validate_private_path(path or DEFAULT_LOG_PATH)
     target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     payload = dict(record)
     payload.setdefault("logged_at", datetime.now().astimezone().isoformat())
     line = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
+    if len(line.encode("utf-8")) > MAX_RECORD_BYTES:
+        raise PrivateLogError("operator-state record exceeds privacy-minimized size limit")
 
     fd = os.open(target, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
     try:
