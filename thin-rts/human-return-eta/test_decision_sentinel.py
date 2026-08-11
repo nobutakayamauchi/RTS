@@ -51,7 +51,8 @@ class DecisionSentinelTests(unittest.TestCase):
             )
         )
         self.assertGreater(high["drp_100"], low["drp_100"])
-        self.assertNotIn("probability", str(high).lower())
+        self.assertNotIn("error_probability", high)
+        self.assertEqual(high["semantics"], "HEURISTIC_REVIEW_PRESSURE_NOT_ERROR_PROBABILITY")
 
     def test_revision_is_not_automatically_wrong(self):
         self.assertEqual(classify_revision_outcome("NEW_EVIDENCE"), "NOT_ERROR_LABEL")
