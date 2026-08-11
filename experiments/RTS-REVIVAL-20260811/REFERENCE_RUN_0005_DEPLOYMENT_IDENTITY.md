@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / ACTUAL_PROCESS_CWD_CONFIRMED`
+Status: `IN_PROGRESS / PID_CONTINUITY_CONFIRMED_AFTER_CLIENT_RECONNECT`
 
 ## Why this workload exists
 
@@ -97,6 +97,26 @@ Therefore:
 - the earlier path split remains real, because the interpreter/venv path is still under `/home/ubuntu/rts-video-flow/` while the running process cwd is under `/home/ubuntu/rts-video-flow-segment-test`
 - the split is still `SIGNIFICANCE_UNKNOWN`; no defect claim is authorized yet
 
+## Observation 0005-C — client reconnect / PID continuity
+
+Observed timestamp: **2026-08-11 19:28 JST**
+
+The mobile SSH client disconnected/restarted. After reconnect, the service PID was re-queried instead of assuming continuity.
+
+Read-only command used:
+
+`systemctl show rts-video-flow-web.service -p MainPID --value`
+
+Observed result:
+
+`86796`
+
+## Material finding after reconnect
+
+The SSH client failure did not coincide with a service PID change. The same `MainPID=86796` was observed again after reconnect.
+
+This proves only PID continuity across these observations. It does not prove that executable/module/source/revision identity has remained unchanged; those remain separate claims.
+
 ## Current evidence state
 
 - systemd unit identity: `OBSERVED`
@@ -105,7 +125,7 @@ Therefore:
 - actual kernel process cwd: `OBSERVED / MATCHES_CONFIG`
 - configured executable/module command: `OBSERVED`
 - active/running state: `OBSERVED`
-- MainPID: `OBSERVED`
+- MainPID: `OBSERVED / SAME BEFORE_AND_AFTER_CLIENT_RECONNECT`
 - actual executable behind MainPID: `NOT_YET_OBSERVED`
 - source/module material loaded by process: `NOT_YET_OBSERVED`
 - repository revision bound to running process: `NOT_YET_OBSERVED`
@@ -117,4 +137,4 @@ Confirm the **actual executable** mapped to PID `86796` rather than trusting `Ex
 
 ## Current verdict
 
-`PARTIAL PASS — actual process cwd is runtime-confirmed; executable/source/revision identity not yet closed`
+`PARTIAL PASS — runtime cwd and PID continuity confirmed; executable/source/revision identity not yet closed`
