@@ -1,0 +1,128 @@
+{
+  "schema": "operator-state-effect-catalog/v0",
+  "principles": {
+    "population_effect_is_not_personal_diagnosis": true,
+    "comparative_equivalence_is_scope_limited": true,
+    "missing_match_is_unknown_not_zero": true,
+    "raw_effect_metrics_are_preserved": true
+  },
+  "profiles": [
+    {
+      "id": "acute_sleep_restriction_2_6h",
+      "label": "Acute one-night sleep restriction, 2-6 h sleep opportunity",
+      "trigger": {
+        "field": "sleep_hours_24h",
+        "min_inclusive": 2.0,
+        "max_inclusive": 6.0,
+        "required_context": "single-night restriction or closest available proxy"
+      },
+      "effects": {
+        "judgment": {
+          "grade": "UNKNOWN",
+          "detail": "Meta-analysis did not find a uniform significant pooled effect for working memory or inhibitory control; do not convert this to zero impairment."
+        },
+        "reaction": {
+          "grade": "MODERATE",
+          "metric": "SMD",
+          "value": 0.512,
+          "direction": "worse",
+          "endpoint": "sustained-attention reaction time"
+        },
+        "accuracy": {
+          "grade": "MODERATE",
+          "metric": "SMD",
+          "value": 0.489,
+          "direction": "worse",
+          "endpoint": "attentional lapses"
+        },
+        "operation": {
+          "grade": "CAUTION",
+          "detail": "Operational caution is inferred only for tasks that depend heavily on sustained attention/reaction; no percent-capacity conversion is claimed."
+        }
+      },
+      "source": {
+        "kind": "systematic_review_meta_analysis",
+        "pmid": "38759474",
+        "title": "Impact of one night of sleep restriction on sleepiness and cognitive function: A systematic review and meta-analysis",
+        "year": 2024
+      }
+    },
+    {
+      "id": "chronic_sleep_restriction_5h_7d",
+      "label": "Repeated 5 h time-in-bed sleep restriction",
+      "trigger": {
+        "field": "sleep_hours_24h",
+        "approx_value": 5.0,
+        "requires_min_nights": 2,
+        "reference_protocol_nights": 7
+      },
+      "effects": {
+        "judgment": {
+          "grade": "UNKNOWN",
+          "detail": "Reference study primarily measured psychomotor vigilance rather than broad judgment."
+        },
+        "reaction": {
+          "grade": "MODERATE",
+          "direction": "worse",
+          "endpoint": "PVT speed"
+        },
+        "accuracy": {
+          "grade": "MODERATE",
+          "direction": "worse",
+          "endpoint": "PVT lapses"
+        },
+        "operation": {
+          "grade": "CAUTION",
+          "detail": "Use only as a vigilance-sensitive operational prior; protocol does not justify a universal productivity percentage."
+        }
+      },
+      "source": {
+        "kind": "controlled_sleep_dose_response_study",
+        "pmid": "12603781",
+        "title": "Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study",
+        "year": 2003
+      }
+    },
+    {
+      "id": "prolonged_wake_17_19h",
+      "label": "17-19 h continuous wakefulness",
+      "trigger": {
+        "field": "continuous_awake_hours",
+        "min_inclusive": 17.0,
+        "max_inclusive": 19.0
+      },
+      "effects": {
+        "judgment": {
+          "grade": "UNKNOWN",
+          "detail": "Do not generalize speed/accuracy equivalence to all judgment domains."
+        },
+        "reaction": {
+          "grade": "HIGH",
+          "direction": "worse",
+          "detail": "Some response-speed measures were up to 50% slower in the reference study."
+        },
+        "accuracy": {
+          "grade": "HIGH",
+          "direction": "worse",
+          "detail": "Accuracy measures were significantly poorer on some tests."
+        },
+        "operation": {
+          "grade": "HIGH",
+          "detail": "Relevant to speed-and-accuracy dependent safety/industrial tasks in the studied context."
+        }
+      },
+      "comparative_reference": {
+        "type": "blood_alcohol_concentration",
+        "value_percent": 0.05,
+        "semantics": "some cognitive/motor test performance equivalent or worse",
+        "not": "hangover equivalence or a universal impairment conversion"
+      },
+      "source": {
+        "kind": "within_subject_comparative_study",
+        "pmid": "10984335",
+        "title": "Moderate sleep deprivation produces impairments in cognitive and motor performance equivalent to legally prescribed levels of alcohol intoxication",
+        "year": 2000
+      }
+    }
+  ]
+}
