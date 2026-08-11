@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / PROCESS_START_TIME_OBSERVED`
+Status: `IN_PROGRESS / SOURCE_MTIME_AND_SERVER_TIMEZONE_OBSERVED`
 
 ## Why this workload exists
 
@@ -222,29 +222,59 @@ The command output did not include an explicit timezone. The raw value is theref
 
 This establishes a process-start clock reading for PID `86796` that can be compared with filesystem modification-time evidence, but it does not by itself prove which source bytes were imported at startup.
 
-## Material finding after entry-module and process-time probes
+## Observation 0005-L — current entry-module filesystem modification time
+
+Observed timestamp: **2026-08-11 20:48 JST**
+
+Read-only command used:
+
+`stat -c '%y %n' /home/ubuntu/rts-video-flow-segment-test/web_console/app_v5.py`
+
+Observed result:
+
+`2026-08-06 13:04:19.163352128 +0000 /home/ubuntu/rts-video-flow-segment-test/web_console/app_v5.py`
+
+The filesystem mtime is explicitly UTC and precedes the raw `ps lstart` clock reading by approximately 0.84 seconds **if** that `ps` reading is interpreted in the server's local timezone.
+
+This is temporal support only. File mtime can be changed independently and does not attest which source bytes Python imported.
+
+## Observation 0005-M — server local timezone
+
+Observed timestamp: **2026-08-11 20:50 JST**
+
+Read-only command used:
+
+`date '+%Z %z'`
+
+Observed result:
+
+`UTC +0000`
+
+The server's current local timezone is UTC. This supports interpreting local-time-rendered process timestamps from ordinary system tools as UTC on this host, but the prior `ps lstart` output itself did not carry a zone token. A direct systemd start timestamp with an explicit zone is preferable before treating the 0.84-second ordering as final evidence.
+
+## Material finding after source/time probes
 
 The runtime argv names `web_console.app_v5:app`, and the corresponding source path `web_console/app_v5.py` is a tracked Git file whose current worktree bytes match the observed index blob identity:
 
 `b86de1b60f2dd530b801f40842526919d3e677f8`
 
-The running PID also now has an observed start-time reading:
+Observed timing evidence now includes:
 
-`Thu Aug  6 13:04:20 2026` (`TIMEZONE_NOT_EMITTED_BY_COMMAND`)
+- source-file mtime: `2026-08-06 13:04:19.163352128 +0000`;
+- process `lstart` raw clock: `Thu Aug 6 13:04:20 2026`;
+- server local timezone: `UTC +0000`.
 
-This materially strengthens the temporal/source-side identity chain, but it remains **not sufficient** to claim that PID `86796` loaded exactly those bytes:
+This is consistent with the current entry-module file having been present before the process started. It materially strengthens the source-side Deployment Identity chain, but it still does **not** prove load-time bytes:
 
+- mtime is mutable metadata rather than a cryptographic load-time measurement;
+- the file could theoretically have changed and later been restored while retaining/manipulating timestamps;
 - the overall worktree is dirty;
-- static files used by the service are modified and may contribute runtime behavior independently of the Python entry module;
-- a source file could change after process start and later be restored to the same bytes;
-- filesystem mtime is not load-time attestation and can itself be modified;
+- modified static files may contribute runtime behavior independently of the Python entry module;
 - Python import/load-time identity has not been captured by the application itself.
 
-Therefore the correct state remains:
+Therefore the correct state is:
 
-`CURRENT_ENTRY_MODULE_BYTES_MATCH_INDEX + PROCESS_START_TIME_OBSERVED != LOADED_PROCESS_SOURCE_PROVEN`
-
-The next narrow step is to observe the current entry-module filesystem modification time and compare it with the process-start reading while preserving timezone uncertainty.
+`CURRENT_BYTES_MATCH_INDEX + SOURCE_MTIME_PRECEDES_PROCESS_START_SUPPORTED != LOADED_PROCESS_SOURCE_PROVEN`
 
 ## Current evidence state
 
@@ -263,16 +293,18 @@ The next narrow step is to observe the current entry-module filesystem modificat
 - runtime worktree cleanliness: `DIRTY / OBSERVED`
 - entry-module index blob: `OBSERVED = b86de1b60f2dd530b801f40842526919d3e677f8`
 - current entry-module worktree bytes: `OBSERVED / MATCH_INDEX = b86de1b60f2dd530b801f40842526919d3e677f8`
-- process start clock reading: `OBSERVED = Thu Aug 6 13:04:20 2026 / TIMEZONE_NOT_EMITTED`
-- current entry-module filesystem mtime: `NOT_YET_OBSERVED`
+- process start clock reading: `OBSERVED = Thu Aug 6 13:04:20 2026`
+- current entry-module filesystem mtime: `OBSERVED = 2026-08-06 13:04:19.163352128 +0000`
+- server local timezone: `OBSERVED = UTC +0000`
+- temporal ordering: `SUPPORTED / DIRECT_EXPLICIT_ZONE_FOR_PROCESS_START_NOT_YET_OBSERVED`
 - source/module material loaded by process: `NOT_YET_PROVEN`
 - repository revision bound to running process: `NOT_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Observe the current filesystem modification time for `web_console/app_v5.py` without mutating the file.
+Observe the systemd-recorded main-process start timestamp with explicit timezone if available.
 
 ## Current verdict
 
-`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob and process start time is observed; load-time identity and route/outcome remain open`
+`PARTIAL PASS — current tracked entry-module bytes match the observed Git index blob and source mtime is consistent with predating process start; exact load-time identity and route/outcome remain open`
