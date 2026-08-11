@@ -6,7 +6,7 @@ Benchmark origin: **2026-08-11 18:49 JST**
 
 Elapsed at workload start: **32 minutes**
 
-Status: `IN_PROGRESS / DIRTY_RUNTIME_WORKTREE_OBSERVED`
+Status: `IN_PROGRESS / ENTRY_MODULE_INDEX_BLOB_OBSERVED`
 
 ## Why this workload exists
 
@@ -168,23 +168,38 @@ Untracked material observed includes:
 - several `web_console/app_v5.py.before-*` backups
 - several `web_console/static/*.bak` files
 
-## Material finding after worktree-status probe
+This means HEAD alone cannot identify the complete current filesystem state.
 
-This is a **material Deployment Identity finding**.
+## Observation 0005-I — tracked entry-module index identity
 
-The runtime cwd is not a clean checkout of HEAD `216bbc511c306754b5e69f6b58fae021691074fc`.
-Therefore the HEAD SHA alone cannot identify the complete filesystem state from which the service is currently operating.
+Observed timestamp: **2026-08-11 19:38 JST**
 
-The finding must not be simplified into either of these unsupported claims:
+Read-only command used:
 
-- `RUNNING_PROCESS == HEAD`
-- `DIRTY_WORKTREE == BROKEN_DEPLOYMENT`
+`git -C /home/ubuntu/rts-video-flow-segment-test ls-files -s web_console/app_v5.py`
 
-The correct state is:
+Observed result:
 
-`HEAD_OBSERVED + DIRTY_WORKTREE_OBSERVED + LOADED_SOURCE_BINDING_NOT_YET_PROVEN`
+`100644 8d6e1b60f2dd530b801f40842526919d3e677f8 0 web_console/app_v5.py`
 
-A further important nuance is visible: `web_console/app_v5.py` itself is **not listed as modified/untracked** in this status output, while related static assets are modified and several historical backup copies of `app_v5.py` are untracked. That makes the Python entry module a promising next binding target, but its tracked/current identity must be verified directly rather than inferred from omission in status output.
+## Material finding after entry-module probe
+
+The runtime argv names `web_console.app_v5:app`, and the corresponding source path `web_console/app_v5.py` is a tracked Git file with index blob identity:
+
+`8d6e1b60f2dd530b801f40842526919d3e677f8`
+
+This is useful but still **not sufficient** to claim that PID `86796` loaded exactly those bytes:
+
+- `ls-files -s` identifies the index entry, not the already-loaded Python module in memory;
+- the overall worktree is dirty;
+- a file could theoretically change after process start even if later restored;
+- Python import/load-time identity has not yet been captured by the application itself.
+
+Therefore the correct state is:
+
+`ENTRY_MODULE_INDEX_BLOB_OBSERVED != LOADED_PROCESS_SOURCE_PROVEN`
+
+The next narrow check is to hash the current worktree bytes for `web_console/app_v5.py` and compare them with the Git index blob. If they match, current file bytes are bound to the index blob, while the separate load-time question remains explicit.
 
 ## Current evidence state
 
@@ -201,14 +216,16 @@ A further important nuance is visible: `web_console/app_v5.py` itself is **not l
 - full process argv: `OBSERVED / MATCHES_SYSTEMD_CONFIG`
 - runtime worktree HEAD: `OBSERVED = 216bbc511c306754b5e69f6b58fae021691074fc`
 - runtime worktree cleanliness: `DIRTY / OBSERVED`
-- source/module material loaded by process: `NOT_YET_OBSERVED`
+- entry-module index blob: `OBSERVED = 8d6e1b60f2dd530b801f40842526919d3e677f8`
+- current entry-module worktree bytes: `NOT_YET_HASHED`
+- source/module material loaded by process: `NOT_YET_PROVEN`
 - repository revision bound to running process: `NOT_PROVEN`
 - active route/outcome: `NOT_YET_OBSERVED`
 
 ## Next probe
 
-Verify whether `web_console/app_v5.py`, the actual import target named in the running argv, is tracked by Git and obtain its index identity before attempting to bind current source material to the running service.
+Hash the current worktree bytes of `web_console/app_v5.py` with Git's object hashing and compare them with the observed index blob.
 
 ## Current verdict
 
-`PARTIAL PASS — Deployment Identity correctly refused to collapse a dirty runtime worktree into a HEAD-only claim; loaded source and active route/outcome remain open`
+`PARTIAL PASS — the tracked entry module has an observed Git index identity, but current bytes/load-time identity/route outcome remain open`
