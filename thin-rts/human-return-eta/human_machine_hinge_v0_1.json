@@ -1,0 +1,83 @@
+{
+  "schema": "thin-rts-human-machine-hinge/v0.1",
+  "status": "PROTOTYPE_EVIDENCE_BOUNDED",
+  "timezone": "Asia/Tokyo",
+  "rules": {
+    "strong_requires": ["machine stage occurs after human hinge", "semantic match", "patch/content support"],
+    "timestamp_proximity_alone": "INSUFFICIENT",
+    "pre_hinge_candidate": "REJECT",
+    "commit_count": "MACHINE_VISIBLE_OUTPUT_PROXY_ONLY"
+  },
+  "hinges": [
+    {
+      "id": "H-20260303-090316",
+      "timestamp": "2026-03-03T09:03:16+09:00",
+      "decision_units": 1,
+      "description": "Move the long README to docs/technical_overview.md without changing its contents.",
+      "next_exact_human": "2026-03-03T09:11:59+09:00",
+      "strong_bound_prs": [97, 98, 99],
+      "strong_first_stage_latency_seconds": 42,
+      "rejected_or_unbound_temporal_candidates": [100],
+      "notes": "PR100 is temporally inside the interval but expands/replaces README content beyond the narrow move decision; it is not counted as a STRONG binding for this hinge."
+    },
+    {
+      "id": "H-20260303-091159",
+      "timestamp": "2026-03-03T09:11:59+09:00",
+      "decision_units": 1,
+      "description": "Limit README changes to the approved opening/Why RTS reinforcement and replace the full README.",
+      "strong_bound_prs": [101],
+      "strong_first_stage_latency_seconds": 54,
+      "notes": "PR101 patch directly matches the bounded reinforcement decision."
+    },
+    {
+      "id": "H-20260306-024430",
+      "timestamp": "2026-03-06T02:44:30+09:00",
+      "decision_units": 2,
+      "description": "Freeze Boundary Discipline specification before implementation.",
+      "next_exact_human": "2026-03-06T02:46:27+09:00",
+      "strong_bound_prs": [],
+      "rejected_pre_hinge_prs": [90, 91, 92],
+      "notes": "PR90-92 are semantically tempting but were created more than two days before the exact hinge; causal binding rejected."
+    },
+    {
+      "id": "H-20260306-024627",
+      "timestamp": "2026-03-06T02:46:27+09:00",
+      "decision_units": 1,
+      "description": "Create handoff data so Boundary Discipline can be implemented in one pass.",
+      "strong_bound_prs": [],
+      "medium_candidates": [123],
+      "medium_first_stage_latency_seconds": 820,
+      "notes": "PR123 occurs 13m40s later but its rts_core initialization patch is not specific enough to prove Boundary Discipline causality."
+    },
+    {
+      "id": "H-20260313-035133",
+      "timestamp": "2026-03-13T03:51:33+09:00",
+      "decision_units": 2,
+      "description": "Choose two-layer logging: humans write decisions; AI writes AI work logs.",
+      "strong_bound_prs": [],
+      "phase_corroboration_prs": [180, 181, 182],
+      "notes": "Run artifacts preserve decision/action/outcome separation, but observed PR timing is too distant for a direct hinge binding."
+    },
+    {
+      "id": "H-20260316-095400",
+      "timestamp": "2026-03-16T09:54:00+09:00",
+      "decision_units": 2,
+      "description": "Boundary strictness fixes the meaning and direction of connections rather than banning connections.",
+      "strong_bound_prs": [],
+      "medium_candidates": [185, 186, 187, 188],
+      "medium_first_stage_latency_seconds": 3625,
+      "notes": "About one hour later, AGENTS/spec/organization/fix contracts encode role, scope, direction and separation rules. Principle-level match is strong, but direct causal chain remains incomplete."
+    }
+  ],
+  "strong_micro_pilot": {
+    "scope": "2026-03-03 first two exact decision hinges",
+    "decision_hinges": 2,
+    "decision_units": 2,
+    "strong_bound_pr_stages": 4,
+    "stages_per_decision_hinge": 2.0,
+    "stages_per_decision_unit": 2.0,
+    "first_stage_latency_seconds": [42, 54],
+    "median_first_stage_latency_seconds": 48,
+    "warning": "Tiny proof-of-method sample; not a March-wide amplification estimate."
+  }
+}
