@@ -1,116 +1,112 @@
-# METEOR AUTOPSY 0001 — Continuity / Recovery Attack Surface
+# METEOR AUTOPSY 0001 — Continuity / Recovery
 
-Status: `ATTACK_CORPUS_FROZEN / AWAITING_CI`
+Status: `ROUND_2_GREEN / DEATH_CAUSES_INHERITED`
 
-Target: 新RTS（仮称） Continuity / Recovery v0 candidate, composed with inherited Encrypted Cloud Custody v0.
+Target: 新RTS（仮称） Continuity / Recovery v0, composed with Encrypted Cloud Custody v0.
 
-## Raison d'être attack
+## Raison d'être verdict
 
-Candidate responsibility survives only if this narrower statement remains necessary:
+`SURVIVES`
 
-> Critical state must be able to leave a failed external substrate and reconstruct elsewhere with bounded integrity evidence.
+The surviving responsibility is narrow:
+
+> Critical Tier-0 state must be able to leave a failed external substrate and reconstruct elsewhere with bounded integrity evidence.
 
 Killed responsibilities:
 
-- build a new cloud;
-- build a new source host;
-- build custom cryptography;
-- build a custom key vault;
-- preserve every artifact forever;
-- define one universal backup interval for every workload.
+- new cloud/source host/object store;
+- custom cryptography/key vault;
+- preserve everything forever;
+- one universal backup interval/retention policy;
+- pretend that two labels prove physical independence.
 
 ## Frozen Meteor attacks
 
-### M-01 — dirty working tree
+The inherited regression corpus now requires:
 
-A committed-history backup that silently drops uncommitted/untracked Tier-0 work is a false PASS.
+- dirty/untracked working tree => `BLOCK`;
+- shallow or partial/promisor clone => `BLOCK`;
+- LFS/submodule state without a separate export => `BLOCK`;
+- required provider-metadata export/scope missing => `BLOCK`;
+- provider export that does not attest secret-value exclusion => `BLOCK`;
+- bundle/manifest/provider-export tamper => `BLOCK`;
+- dirty restore destination => `BLOCK`;
+- one/fake/nested replica domain => `BLOCK`;
+- corrupt replica => `BLOCK` for that domain while a healthy domain remains usable;
+- primary replica disappearance => alternate domain must recover exact protected bytes;
+- wrong recovery identity => decrypt must fail;
+- fresh alternate recovery identity + alternate replica => decrypt + manifest verify + Git mirror reconstruction + `git fsck` + exact refs => `PASS`;
+- restored project code must not execute during verification.
 
-Required result: `BLOCK`.
+## Observed Meteor Round 1 — prototype killed
 
-### M-02 — shallow or partial/promisor clone
+The focused unit corpus passed, but the real integration surface produced two material failures.
 
-A bundle created from missing history/objects can be internally consistent but incomplete.
+### Death C-01 — validator mutated the source before capture
 
-Required result: `BLOCK`.
+`py_compile` created validation artifacts before the live repository capture. The continuity gate correctly saw a dirty/untracked tree and refused to claim a complete snapshot.
 
-### M-03 — Git LFS or submodule external state
+Repair:
 
-A repository bundle can preserve only pointers/references while real content lives elsewhere.
+- run the real repository continuity capture **before** any validator/build step can mutate the worktree;
+- do not weaken the dirty-tree invariant.
 
-Required result: `BLOCK unless separately exported`.
+### Death C-02 — exact OpenPGP recipient still lacked unattended trust binding
 
-### M-04 — provider-only metadata omitted
+The producer contained only the two public recovery keys and correctly had no secret-key records, but GnuPG refused unattended encryption because the newly imported UIDs had no local certification trust.
 
-Issues, PR decisions, rulesets/settings and similar provider state are not contained in ordinary Git history.
+The custody contract already selected recipients by exact full primary fingerprint, so the repair was not to trust a name/UID or disable key separation.
 
-Required result: caller may declare provider scopes Tier 0; missing declared scopes => `BLOCK`.
+Repair:
 
-### M-05 — secret material contaminates metadata export
+- explicitly bind producer owner-trust to the exact selected full fingerprints before unattended encryption;
+- private recovery identities remain outside the producer;
+- wrong unrelated recovery identity must still fail decryption.
 
-A convenient provider export must not turn backup custody into credential exfiltration.
+### Death C-03 — validator lifecycle collision
 
-Required result: exporter must explicitly attest `secret_values_excluded=true`; otherwise `BLOCK`.
+The first test prototype accidentally named a helper `run`, overriding `unittest.TestCase.run`.
 
-### M-06 — bundle / manifest / provider export tamper
+Repair:
 
-Required result: digest/ref/manifest mismatch => `BLOCK`.
+- rename the helper and retain actual unittest discovery/execution as a process regression.
 
-### M-07 — stale restore destination
+## Observed Meteor Round 2 — survived
 
-Restoring into a dirty destination can mix old and recovered state.
+GitHub Actions `Continuity Recovery Candidate Tests` run #6:
 
-Required result: `BLOCK`.
+- actual PR repository capture on untouched worktree: `PASS`;
+- provider-neutral Git bundle: 5,701,092 bytes;
+- bundle SHA-256: `8efd6e01be3656034f9ee99a69344f1040f6f47201122b7ea91d373fa6dfad14`;
+- captured/restored refs: `103`;
+- fresh mirror `git fsck`: `PASS`;
+- restored project code execution: `NOT_PERFORMED`;
+- 10 focused Continuity Meteor regressions: `PASS`;
+- real two-recipient GPG alternate-domain recovery: `PASS`;
+- wrong recovery identity failure regression: `PASS`.
 
-### M-08 — fake redundancy
+Inherited `Cloud Custody Candidate Tests` run #27: `PASS`.
 
-Two replica labels that point to the same or nested local root are not two local failure domains.
+Unicode Guard / independent Semgrep on the same head: `PASS`.
 
-Required result: `BLOCK`.
+## Strength classification
 
-External note: distinct paths still do not prove distinct physical/providers. Production independence needs external evidence.
+No universal “100% safe” claim is made.
 
-### M-09 — one replica corrupted
+- Tier-0 Git reproducibility: `STRONG_UNDER_CURRENT_EVIDENCE`;
+- incomplete/tampered snapshot rejection: `STRONG_UNDER_CURRENT_EVIDENCE`;
+- encrypted alternate-domain failover semantics: `STRONG_UNDER_CURRENT_EVIDENCE`;
+- provider-neutral Git exitability: `STRONG_UNDER_CURRENT_EVIDENCE`;
+- provider-only metadata exitability: `CONTRACT_PROVEN / LIVE_EXPORTER_DEPLOYMENT_DEPENDENT`;
+- real physical/provider/geographic independence: `OPERATIONAL_EVIDENCE_REQUIRED`;
+- cadence/RPO/retention/offline-WORM requirements: `SITUATIONAL_POLICY`.
 
-Required result: corrupted domain => `BLOCK`; healthy domain remains independently recoverable.
+## Promotion verdict
 
-### M-10 — primary storage domain disappears
+`ADOPT_CONTRACT`
 
-Required result: alternate domain alone can return the exact protected artifact.
+Adopt the hard invariants, Tier policy, regression deaths, and current reference occupants into 新RTS（仮称）.
 
-### M-11 — wrong recovery identity
+Do **not** convert situational controls into mandatory base-system weight. When a workload declares a provider metadata scope, RPO, WORM requirement, or real failure-domain requirement critical, that declared requirement becomes fail-closed for that workload.
 
-Required result: encrypted backup cannot be decrypted by an unrelated recovery identity.
-
-### M-12 — fresh separated recovery
-
-Generate two real OpenPGP recovery identities, expose only their public keys to the producer, encrypt the continuity capsule, destroy the primary replica domain, recover from the alternate replica, decrypt using only the alternate private identity, then reconstruct the Git mirror and verify refs/fsck.
-
-Required result: `PASS` without executing restored project code.
-
-### M-13 — validator self-corruption
-
-The first test prototype accidentally overrode `unittest.TestCase.run`, making the validation harness itself invalid.
-
-Required result: retain this as process regression: validation code must not replace framework lifecycle methods accidentally; CI discovery must execute the intended tests.
-
-## Strength semantics
-
-Passing this corpus does **not** mean perfect resilience. It proves only the frozen responsibilities above.
-
-Remaining situational decisions include:
-
-- actual backup cadence / recovery-point objective;
-- retention;
-- which provider metadata scopes are Tier 0;
-- which real second provider/device/account constitutes an independent failure domain;
-- geographic separation;
-- offline/WORM copy requirements;
-- recovery-key operational custody.
-
-Those should be tightened when the workload justifies them rather than bloating the base system pre-emptively.
-
-## Promotion rule
-
-`METEOR GREEN + INHERITED CLOUD-CUSTODY GREEN + REAL GPG ALTERNATE-DOMAIN DRILL GREEN -> CONTRACT MAY BE ADOPTED`
-
-Any newly observed material miss becomes an inherited regression for future DARWIN occupants.
+Any future material miss becomes inherited regression memory for the next DARWIN occupant.
