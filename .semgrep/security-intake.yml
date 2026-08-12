@@ -1,0 +1,24 @@
+rules:
+  - id: rts-security-intake-no-python-dynamic-eval
+    message: Dynamic eval/exec is not admitted on the guarded repository surface.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+
+  - id: rts-security-intake-no-python-shell-exec
+    message: Direct shell execution is not admitted without an explicit reviewed exception.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: os.system(...)
+      - pattern: subprocess.$FUNC(..., shell=True, ...)
+
+  - id: rts-security-intake-no-js-dynamic-eval
+    message: JavaScript/TypeScript dynamic code construction is not admitted on the guarded repository surface.
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)

@@ -16,12 +16,47 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11"
 
       - name: Run invisible unicode guard
         run: python3 scripts/check_invisible_unicode.py
+
+      - name: Run symmetric quarantine regression tests
+        run: python3 -m unittest discover -s tests -p 'test_unicode_intake_guard.py'
+
+      - name: Exercise repository promotion egress gate
+        run: >-
+          python3 scripts/repository_egress_gate.py
+          --producer-id "commit:${GITHUB_SHA}"
+          --target-id "repo:${GITHUB_REPOSITORY}"
+
+  independent-semgrep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install pinned Semgrep engine
+        run: python3 -m pip install --disable-pip-version-check semgrep==1.172.0
+
+      - name: Prove independent scanner rejects attack fixtures
+        run: python3 scripts/verify_semgrep_challenger.py
+
+      - name: Run independent static threat-chain scan
+        run: semgrep scan --config .semgrep/security-intake.yml --error --strict --metrics=off .
