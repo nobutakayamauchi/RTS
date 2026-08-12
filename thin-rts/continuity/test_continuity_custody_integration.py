@@ -97,9 +97,9 @@ class ContinuityCustodyIntegrationTests(unittest.TestCase):
         ).stdout
         return home, fpr, public
 
-    def import_public(self, producer: Path, public: bytes) -> None:
+    def import_trusted_public(self, producer: Path, fingerprint: str, public: bytes) -> None:
         env = self.gpg_env(producer)
-        cp = subprocess.run(
+        imported = subprocess.run(
             ["gpg", "--batch", "--import"],
             input=public,
             stdout=subprocess.PIPE,
@@ -107,8 +107,22 @@ class ContinuityCustodyIntegrationTests(unittest.TestCase):
             check=False,
             env=env,
         )
-        if cp.returncode != 0:
-            raise AssertionError(cp.stderr.decode("utf-8", errors="replace"))
+        if imported.returncode != 0:
+            raise AssertionError(imported.stderr.decode("utf-8", errors="replace"))
+
+        # The custody contract binds recipients by full primary fingerprint. GPG still
+        # requires a local certification-trust decision before unattended encryption.
+        # Record that decision against the exact fingerprint; never trust by UID search.
+        trusted = subprocess.run(
+            ["gpg", "--batch", "--import-ownertrust"],
+            input=f"{fingerprint}:6:\n".encode("ascii"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            env=env,
+        )
+        if trusted.returncode != 0:
+            raise AssertionError(trusted.stderr.decode("utf-8", errors="replace"))
 
     def test_real_gpg_two_recipient_encryption_survives_primary_domain_loss(self) -> None:
         if shutil.which("gpg") is None:
@@ -122,8 +136,8 @@ class ContinuityCustodyIntegrationTests(unittest.TestCase):
         home_a, fpr_a, pub_a = self.generate_recovery_identity("a")
         home_b, fpr_b, pub_b = self.generate_recovery_identity("b")
         producer = self.root / "gnupg-producer"
-        self.import_public(producer, pub_a)
-        self.import_public(producer, pub_b)
+        self.import_trusted_public(producer, fpr_a, pub_a)
+        self.import_trusted_public(producer, fpr_b, pub_b)
 
         os.environ["GNUPGHOME"] = str(producer)
         candidate = custody.build_local_candidate(
@@ -185,8 +199,8 @@ class ContinuityCustodyIntegrationTests(unittest.TestCase):
         _, fpr_b, pub_b = self.generate_recovery_identity("b")
         wrong_home, _, _ = self.generate_recovery_identity("wrong")
         producer = self.root / "gnupg-producer"
-        self.import_public(producer, pub_a)
-        self.import_public(producer, pub_b)
+        self.import_trusted_public(producer, fpr_a, pub_a)
+        self.import_trusted_public(producer, fpr_b, pub_b)
         os.environ["GNUPGHOME"] = str(producer)
         candidate = custody.build_local_candidate(
             capsule,
