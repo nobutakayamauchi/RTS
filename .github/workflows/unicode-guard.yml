@@ -29,6 +29,12 @@ jobs:
       - name: Run symmetric quarantine regression tests
         run: python3 -m unittest discover -s tests -p 'test_unicode_intake_guard.py'
 
+      - name: Exercise repository promotion egress gate
+        run: >-
+          python3 scripts/repository_egress_gate.py
+          --producer-id "commit:${GITHUB_SHA}"
+          --target-id "repo:${GITHUB_REPOSITORY}"
+
   independent-semgrep:
     runs-on: ubuntu-latest
     timeout-minutes: 10
