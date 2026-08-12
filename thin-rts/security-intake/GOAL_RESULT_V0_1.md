@@ -1,6 +1,6 @@
 # /goal Result — Pre-WITNESS Intake Quarantine v0.1
 
-Status: `IMPLEMENTED / AWAITING_GITHUB_CI_PROMOTION_EVIDENCE`
+Status: `ADOPTED_AS_NEW_RTS_CONTRACT / SHADOW_IMPLEMENTATION`
 
 ## Goal
 
@@ -55,35 +55,51 @@ The Python scanner is a replaceable occupant. The frozen contract and inherited 
 - `GLASSWORM-VS-001` inherited threat regression capsule;
 - DA / Counter-DA autopsy record.
 
-## Current score before GitHub CI
+## GitHub evidence
 
-Scoring is evidence-oriented, not a quality probability.
+PR: `#317 feat: pre-WITNESS intake quarantine v0`
+
+Actual GitHub Actions result:
+
+- workflow: `Unicode Guard`
+- conclusion: `success`
+- `Run invisible unicode guard`: `success`
+- `Run intake quarantine regression tests`: `success`
+
+The candidate therefore survived both repository-wide Unicode scanning and its focused regression suite on the real PR surface.
+
+## Final bounded score
+
+Scoring is evidence-oriented, not a security probability.
 
 - raison d'être / minimality: 10/10
 - correct pre-WITNESS boundary placement: 15/15
 - exact-byte/source evidence binding: 10/10
-- known invisible/VS regression coverage: 14/15
+- known invisible/VS regression coverage: 15/15
 - `.github/workflows` coverage: 10/10
 - false-positive control: 8/10
-- fail-closed explicit intake behavior: 9/10
+- fail-closed explicit intake behavior: 10/10
 - regression-memory inheritance: 10/10
 - generic egress symmetry: 4/10
 - independent external scanner composition/live proof: 2/10
 
-`CURRENT = 92 / 100` for the bounded shadow candidate.
+`FINAL = 94 / 100` for the bounded shadow candidate.
 
-This does not mean 92% secure. It means 92/100 of this frozen candidate rubric is currently evidenced.
+This means 94/100 of the frozen rubric is currently evidenced. It does not mean 94% secure.
 
-## Provisional adoption verdict
+## Final adoption verdict
 
-`ADOPT_CONTRACT_AND_SHADOW_CANDIDATE`
+`ADOPT`
 
-`DO_NOT_PROMOTE_AS_COMPLETE_YET`
+Adopt the **contract**, boundary placement and inherited regression memory into the new RTS method.
 
-Promotion blockers:
+Adopt the current Python scanner only as a **replaceable shadow occupant** in the DARWIN ARENA / Movable Frame. It has no permanent implementation right.
 
-1. GitHub CI on the actual PR must be green;
-2. generic egress enforcement must be exercised, not only specified;
-3. at least one independent/external scanner or platform control should be composed and compared before claiming mature intake coverage.
+`DO_NOT_CLAIM_COMPLETE_SECURITY_LAYER`
 
-If CI discovers a new death cause, retain it and reopen METEOR rather than weakening the workload.
+Remaining maturity gaps:
+
+1. generic egress enforcement is specified but not yet exercised as an independent adapter;
+2. at least one independent/external scanner or platform control should be composed and compared before claiming mature intake coverage.
+
+Those gaps do not overturn the adoption decision because they belong to implementation maturity/challenger evidence, not to the surviving raison d'être of the intake contract.
