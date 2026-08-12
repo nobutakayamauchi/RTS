@@ -30,15 +30,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Compile continuity candidate and tests
-        working-directory: thin-rts/continuity
-        run: python3 -m py_compile continuity.py test_continuity.py test_continuity_custody_integration.py
-
-      - name: Run Continuity Meteor regressions
-        working-directory: thin-rts/continuity
-        run: python3 -m unittest -v test_continuity.py
-
-      - name: Exercise provider-neutral capture on the actual PR repository
+      - name: Exercise provider-neutral capture on the untouched PR repository
         run: |
           ROOT="$RUNNER_TEMP/new-rts-continuity-live"
           mkdir -p "$ROOT"
@@ -48,6 +40,14 @@ jobs:
             --restore-root "$ROOT/restore" \
             --receipt "$ROOT/recovery-drill.json"
           test -s "$ROOT/recovery-drill.json"
+
+      - name: Compile continuity candidate and tests
+        working-directory: thin-rts/continuity
+        run: python3 -m py_compile continuity.py test_continuity.py test_continuity_custody_integration.py
+
+      - name: Run Continuity Meteor regressions
+        working-directory: thin-rts/continuity
+        run: python3 -m unittest -v test_continuity.py
 
   encrypted-alternate-domain-drill:
     runs-on: ubuntu-latest
