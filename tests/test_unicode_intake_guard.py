@@ -24,23 +24,28 @@ class UnicodeIntakeGuardTests(unittest.TestCase):
         self.assertEqual(guard.scan_file(self.make_file("x.py", "print('ok')\n")), [])
 
     def test_zero_width_is_blocked(self) -> None:
-        findings = guard.scan_file(self.make_file("x.py", "x=1\u200b\n"))
+        payload = "x=1" + chr(0x200B) + "\n"
+        findings = guard.scan_file(self.make_file("x.py", payload))
         self.assertTrue(any(f.codepoint == 0x200B for f in findings))
 
     def test_basic_variation_selector_is_blocked_in_code(self) -> None:
-        findings = guard.scan_file(self.make_file("x.js", "const x='a\ufe0f';\n"))
+        payload = "const x='a" + chr(0xFE0F) + "';\n"
+        findings = guard.scan_file(self.make_file("x.js", payload))
         self.assertTrue(any(f.codepoint == 0xFE0F for f in findings))
 
     def test_supplementary_variation_selector_is_blocked_in_markdown(self) -> None:
-        findings = guard.scan_file(self.make_file("x.md", "hello\U000E0100\n"))
+        payload = "hello" + chr(0xE0100) + "\n"
+        findings = guard.scan_file(self.make_file("x.md", payload))
         self.assertTrue(any(f.codepoint == 0xE0100 for f in findings))
 
     def test_normal_emoji_selector_is_allowed_in_markdown(self) -> None:
-        findings = guard.scan_file(self.make_file("x.md", "hello ❤️\n"))
+        payload = "hello " + chr(0x2764) + chr(0xFE0F) + "\n"
+        findings = guard.scan_file(self.make_file("x.md", payload))
         self.assertEqual(findings, [])
 
     def test_non_emoji_basic_selector_is_blocked_in_markdown(self) -> None:
-        findings = guard.scan_file(self.make_file("x.md", "hello\ufe00\n"))
+        payload = "hello" + chr(0xFE00) + "\n"
+        findings = guard.scan_file(self.make_file("x.md", payload))
         self.assertTrue(any(f.codepoint == 0xFE00 for f in findings))
 
     def test_github_workflow_is_not_excluded(self) -> None:
