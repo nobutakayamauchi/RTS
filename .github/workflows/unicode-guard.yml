@@ -25,3 +25,6 @@ jobs:
 
       - name: Run invisible unicode guard
         run: python3 scripts/check_invisible_unicode.py
+
+      - name: Run intake quarantine regression tests
+        run: python3 -m unittest discover -s tests -p 'test_unicode_intake_guard.py'
