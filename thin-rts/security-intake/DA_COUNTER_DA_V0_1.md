@@ -1,12 +1,10 @@
-# Pre-WITNESS Intake Quarantine — DA / Counter-DA v0.1
+# Pre-WITNESS / Pre-Promotion Quarantine — DA / Counter-DA v0.2
 
-Status: `COMPLETED_FOR_CURRENT_EVIDENCE / SHADOW_ONLY`
+Status: `SURVIVED / READY_FOR_ADOPTION`
 
 ## Candidate under attack
 
-Original candidate:
-
-> Put a security check immediately before WITNESS ingestion, preserve raw evidence separately, turn discovered threat conditions into METEOR regressions, admit only verified normalized learning into ULTIMATE LOOP, and re-check output before promotion.
+> Put an evidence-bound quarantine immediately before WITNESS ingestion, preserve raw evidence separately, turn discovered threat conditions into METEOR regressions, admit only verified normalized learning into ULTIMATE LOOP, and enforce the same hygiene contract again before generated output is promoted.
 
 ## DA Round 1 — kill the proposal
 
@@ -16,7 +14,7 @@ Attack: a bespoke GlassWorm engine would fossilize one incident and violate Thin
 
 Verdict: `FAIL`.
 
-Repair: kill the incident-specific subsystem. Preserve only the generic `Pre-WITNESS Intake Quarantine` contract. GlassWorm becomes one inherited regression capsule.
+Repair: kill the incident-specific subsystem. Preserve only the generic quarantine contract. GlassWorm becomes one inherited regression capsule.
 
 ### DA-02 — blanket `U+FE00..U+FE0F` ban breaks legitimate prose
 
@@ -54,9 +52,9 @@ Repair: preserve raw evidence outside the learning path. WITNESS extracts a norm
 
 Attack: a scanner that skips unknown extensions can produce false confidence.
 
-Verdict: `FAIL` for explicit WITNESS intake.
+Verdict: `FAIL` for explicit governed intake/egress.
 
-Repair: `scripts/intake_quarantine.py` fails closed for explicitly submitted unsupported/unscanned file types.
+Repair: explicit intake and egress fail closed for unsupported/unscanned file types.
 
 ## Counter-DA Round 2 — attack the repairs
 
@@ -66,7 +64,7 @@ Attack: embedding actual invisible/Variation Selector characters in Python regre
 
 Verdict: `FAIL`.
 
-Repair: regression fixtures synthesize codepoints at runtime with `chr(...)`; malicious bytes are not committed as literal source text.
+Repair: regression fixtures synthesize dangerous codepoints at runtime with `chr(...)`; malicious bytes are not committed as literal source text.
 
 ### CDA-02 — attacker splits a payload across prose to evade a simple line threshold
 
@@ -74,58 +72,120 @@ Attack: line-local density alone is weak.
 
 Verdict: `FAIL` for line-only heuristics.
 
-Repair: current prose policy blocks all non-U+FE0F basic selectors and all supplementary selectors regardless of density, with a file-level U+FE0F density backstop. Known GlassWorm-style Variation Selector encoding therefore has to survive multiple independent conditions.
+Repair: prose blocks all non-U+FE0F basic selectors and all supplementary selectors regardless of density, with a file-level U+FE0F density backstop.
 
 ### CDA-03 — scanner compromise / lower-substrate compromise
 
-Attack: a compromised Python interpreter, runner, repository credential or scanner source can lie about CLEAN.
+Attack: a compromised interpreter, runner, repository credential or scanner source can lie about CLEAN.
 
-Verdict: `SURVIVES_AS_SCOPE_LIMIT`, not solved by more Thin RTS code.
+Verdict: `SURVIVES_AS_SCOPE_LIMIT`, not solved by adding a larger custom RTS security engine.
 
-Disposition: retain scanner/gate version and content hash in the evidence record; use GitHub/platform controls and independent external scanners where available. Do not claim physical truth from this gate alone.
+Repair/containment: evidence records retain scanner/core/gate identity and exact hashes; GitHub workflow is read-only; checkout credentials are not persisted; Actions are full-SHA pinned; an independent scanner is composed. No claim of physical truth is made from one scanner alone.
 
-### CDA-04 — Unicode-only defense misses token theft, dependency compromise and malicious visible code
+### CDA-04 — Unicode-only defense misses token theft, dependencies and visible malicious code
 
 Attack: GlassWorm is not reducible to invisible Unicode.
 
 Verdict: `SURVIVES_AS_SCOPE_LIMIT`.
 
-Disposition: the gate is a composable contract, not a complete malware detector. GitHub credential hardening, branch/ruleset controls, action/dependency pinning and external security scanners remain external responsibilities/challengers.
+Disposition: GitHub account/credential security, branch/ruleset controls, dependency intelligence, secret scanning and other platform controls remain separate external responsibilities. The quarantine contract composes them rather than pretending to replace them.
 
 ### CDA-05 — egress remains asymmetric
 
 Attack: pre-ingest hygiene does not stop ULTIMATE LOOP or an AI from later generating dangerous output.
 
-Verdict: `OPEN_PROMOTION_GAP`.
+Verdict: `FAIL`.
 
-Disposition: require the same hygiene contract at promotion/egress before this candidate can be considered complete. CI currently re-scans repository output, but a general live-environment egress adapter is not yet implemented.
+Repair: factor shared `quarantine_core.py`; add `egress_quarantine.py`; exercise `repository_egress_gate.py` in actual PR CI; bind producer/target identities and exact output hashes; emit aggregate manifest SHA-256.
+
+GitHub evidence on run #1077: repository egress checked 1015 files, 1015 CLEAN, 0 BLOCK, with a concrete manifest digest.
+
+### CDA-06 — the evaluation rubric itself was wrong
+
+Attack: the previous score was presented as `94/100`, but the category maxima summed to 110. A security gate whose own score arithmetic is inconsistent is not promotion-grade evidence.
+
+Verdict: `FAIL`.
+
+Repair: discard the old score rather than renormalizing it after the fact. Freeze a new acceptance rubric whose maxima sum exactly to 100 and require direct evidence for every row.
+
+This is retained as a meta-regression: the evaluator is inside the attack surface.
+
+### CDA-07 — egress CLI + unit tests do not prove promotion enforcement
+
+Attack: an adapter that merely exists can be bypassed operationally.
+
+Verdict: `FAIL`.
+
+Repair: CI now executes the repository-wide promotion egress gate on the actual PR merge surface. The result includes producer identity, target identity, checked-file count and manifest hash.
+
+### CDA-08 — independent scanner with zero findings may simply be broken
+
+Attack: `0 findings` is meaningless if the external scanner/rules cannot detect the intended attack class.
+
+Verdict: `FAIL`.
+
+Repair: before scanning the repository, the Semgrep challenger must accept a clean fixture and reject three generated attack fixtures: Python `eval`, Python shell execution and JavaScript `eval`.
+
+GitHub run #1077: challenger self-test succeeded, then the repository scan completed with 0 blocking findings.
+
+### CDA-09 — adding a security scanner can create a new supply-chain or credential path
+
+Attack: the defense itself downloads code and runs in CI; an unbounded scanner integration could increase the blast radius.
+
+Verdict: `FAIL` for the first loose composition.
+
+Repair/containment:
+
+- Semgrep engine version pinned to `1.172.0`;
+- GitHub Actions pinned to full commit SHAs;
+- workflow permission remains `contents: read`;
+- checkout uses `persist-credentials: false`;
+- no repository secret is required for the challenger;
+- challenger is independent evidence, not sole promotion authority.
+
+## Historical design-gap autopsy
+
+The original Unicode Guard was created before systematic DA/Counter-DA became a normal design step for this surface. It defended the threat classes that were explicitly considered at the time, but Variation Selector encoding and the `.github` exclusion were not adversarially generated as counterexamples.
+
+Classification: `DESIGN_COVERAGE_DEBT / PROCESS_GAP`, not evidence that the earlier guard did nothing.
+
+The process correction is more important than the one patch:
+
+`NEW MATERIAL THREAT CLASS`
+→ freeze raw evidence
+→ DA/autopsy the miss
+→ extract transferable death cause
+→ create regression capsule
+→ attack current occupant and challengers
+→ successors inherit the death cause.
+
+This does not make future imagination complete. It makes discovered misses durable and forces later implementations to survive them.
 
 ## Raison d'être verdict
 
 `SURVIVES`
 
-The responsibility is not “detect GlassWorm.”
-
 The surviving responsibility is:
 
-> No untrusted object may become WITNESS/learning input without immutable source identity, exact-byte integrity and an explicit hygiene verdict.
+> No untrusted object may become WITNESS/learning input, and no generated object may become promoted output, without boundary identity, exact-byte integrity and an explicit hygiene verdict.
 
 ## METEOR verdict
 
-Current minimal candidate:
+`EXTERNAL_CONTROLS + THIN_GLUE_SURVIVES_CURRENT_EVIDENCE`
 
-`EXTERNAL_CONTROLS + THIN_GLUE_SURVIVES_SHADOW`
-
-The Python scanner is replaceable. The contract is the protected object.
+The Python scanner and Semgrep composition remain replaceable occupants. The contract, evidence boundary and inherited death causes are the protected objects.
 
 ## Promotion verdict
 
-`NOT_YET_PROMOTED`
+`SURVIVED / READY_FOR_ADOPTION`
 
-Blocking reasons:
+Evidence satisfied before final promotion:
 
-- GitHub CI must run on the candidate branch/PR and remain green;
-- egress symmetry is specified but not fully implemented as a generic adapter;
-- independent/external scanner composition is not yet demonstrated live.
+- actual GitHub CI is green;
+- 14 symmetric quarantine regressions are green;
+- repository-wide egress is exercised on the PR surface;
+- the independent scanner proves it can reject attack fixtures before its clean scan;
+- CI credentials and Action references are hardened;
+- the score rubric has been corrected and frozen at exactly 100 maximum points.
 
-No material failure discovered in DA/Counter-DA justifies killing the intake responsibility itself.
+Unknown future threat classes remain possible and reopen METEOR/DARWIN when observed; that uncertainty is not hidden by the adoption verdict.
