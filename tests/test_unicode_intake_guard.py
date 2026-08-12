@@ -9,7 +9,9 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_invisible_unicode as guard
+import egress_quarantine
 import intake_quarantine
+import quarantine_core
 
 
 class UnicodeIntakeGuardTests(unittest.TestCase):
@@ -56,16 +58,57 @@ class UnicodeIntakeGuardTests(unittest.TestCase):
         path = self.make_file("node_modules/x.js", "const x=1\n")
         self.assertFalse(guard.should_check(path))
 
+    def test_core_fails_closed_without_boundary_identity(self) -> None:
+        path = self.make_file("x.py", "print('ok')\n")
+        record = quarantine_core.inspect_file(path, phase="test", identity={})
+        self.assertEqual(record["verdict"], "BLOCK")
+        self.assertIn("missing boundary identity", record["findings"])
+
     def test_intake_record_hashes_and_cleans_supported_file(self) -> None:
         path = self.make_file("x.py", "print('ok')\n")
         record = intake_quarantine.inspect_file(path, "commit:abc123")
         self.assertEqual(record["verdict"], "CLEAN")
         self.assertEqual(len(record["sha256"]), 64)
         self.assertEqual(record["source_id"], "commit:abc123")
+        self.assertEqual(record["phase"], "pre-witness-intake")
 
     def test_intake_fails_closed_for_unsupported_file(self) -> None:
         path = self.make_file("x.bin", "not executed")
         record = intake_quarantine.inspect_file(path, "commit:abc123")
+        self.assertEqual(record["verdict"], "BLOCK")
+        self.assertIn("unsupported/unscanned", record["findings"][0])
+
+    def test_egress_hashes_and_cleans_supported_output(self) -> None:
+        path = self.make_file("generated.py", "print('ok')\n")
+        record = egress_quarantine.inspect_file(
+            path,
+            "run:ultimate-loop-123",
+            "branch:feature/example",
+        )
+        self.assertEqual(record["verdict"], "CLEAN")
+        self.assertEqual(len(record["sha256"]), 64)
+        self.assertEqual(record["producer_id"], "run:ultimate-loop-123")
+        self.assertEqual(record["target_id"], "branch:feature/example")
+        self.assertEqual(record["phase"], "pre-promotion-egress")
+
+    def test_egress_blocks_variation_selector_output(self) -> None:
+        payload = "const x='a" + chr(0xFE0F) + "';\n"
+        path = self.make_file("generated.js", payload)
+        record = egress_quarantine.inspect_file(
+            path,
+            "run:ultimate-loop-123",
+            "branch:feature/example",
+        )
+        self.assertEqual(record["verdict"], "BLOCK")
+        self.assertTrue(any("U+FE0F" in item for item in record["findings"]))
+
+    def test_egress_fails_closed_for_unsupported_output(self) -> None:
+        path = self.make_file("generated.bin", "not executed")
+        record = egress_quarantine.inspect_file(
+            path,
+            "run:ultimate-loop-123",
+            "release:v0",
+        )
         self.assertEqual(record["verdict"], "BLOCK")
         self.assertIn("unsupported/unscanned", record["findings"][0])
 
