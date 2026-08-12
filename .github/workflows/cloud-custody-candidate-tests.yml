@@ -1,0 +1,42 @@
+name: Cloud Custody Candidate Tests
+
+on:
+  pull_request:
+    paths:
+      - 'thin-rts/cloud-custody/**'
+      - 'thin-rts/continuity/**'
+      - '.github/workflows/cloud-custody-candidate-tests.yml'
+  push:
+    branches:
+      - feature/new-rts-continuity-recovery-v0
+    paths:
+      - 'thin-rts/cloud-custody/**'
+      - 'thin-rts/continuity/**'
+      - '.github/workflows/cloud-custody-candidate-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inherited-cloud-custody:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: thin-rts/cloud-custody
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compile candidate and inherited Meteor attacks
+        run: python3 -m py_compile custody.py test_custody.py test_meteor_custody.py test_meteor_custody_round2.py
+      - name: Run inherited Cloud Custody candidate plus Meteor suite
+        run: python3 -m unittest -v
+      - name: Confirm no generated custody artifacts are tracked
+        run: |
+          if git ls-files '*.gpg' '*.tar.gz' '*.receipt.json' '*.preupload.json' '*.RECOVERY_CARD.md' | grep -q .; then
+            echo 'generated custody/recovery artifact is tracked' >&2
+            exit 1
+          fi

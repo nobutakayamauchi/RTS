@@ -1,0 +1,10 @@
+# Never commit generated custody artifacts or recovery material.
+work/
+recovery-package/
+*.gpg
+*.tar
+*.tar.gz
+*.receipt.json
+*.preupload.json
+*.RECOVERY_CARD.md
+__pycache__/
