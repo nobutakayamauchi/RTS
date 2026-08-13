@@ -43,9 +43,13 @@ def evaluate(
     state = health.get("state")
     if state not in {"HEALTHY", "DEGRADED", "FAILED", "UNSAFE", "UNKNOWN"}:
         raise StandaloneEmergencyError("invalid health state")
-    if not _text(health.get("source_ref")) or not _text(health.get("stale_after")):
+    if not _text(health.get("source_ref")) or not _text(health.get("observed_at")) or not _text(health.get("stale_after")):
         raise StandaloneEmergencyError("health evidence required")
-    if _time(health["stale_after"], "health.stale_after") <= at:
+    health_at = _time(health["observed_at"], "health.observed_at")
+    stale_at = _time(health["stale_after"], "health.stale_after")
+    if health_at > at:
+        raise StandaloneEmergencyError("health observation cannot be in the future")
+    if stale_at <= at or stale_at <= health_at:
         return {"state": "HEALTH_EVIDENCE_STALE", "action": "HUMAN_REVIEW", "promotion_authorized": False}
     if state == "HEALTHY":
         return {"state": "HEALTHY", "action": "NONE", "promotion_authorized": False}
@@ -60,6 +64,8 @@ def evaluate(
     if not isinstance(candidate, dict):
         blocks.append("NO_FALLBACK_CANDIDATE")
     else:
+        if not _text(candidate.get("candidate_id")):
+            blocks.append("FALLBACK_IDENTITY_MISSING")
         if candidate.get("recovery_probe") != "PASS" or not _text(candidate.get("recovery_probe_ref")):
             blocks.append("EMERGENCY_FALLBACK_UNPROVEN")
         stale = candidate.get("recovery_probe_stale_after")
@@ -92,7 +98,7 @@ def evaluate(
         return {
             "state": "FAILOVER_ELIGIBLE",
             "action": "EXTERNAL_FAILOVER",
-            "candidate": candidate.get("candidate_id"),
+            "candidate": candidate["candidate_id"],
             "temporary_occupant": True,
             "promotion_authorized": False,
             "automatic_failback_authorized": False,
@@ -107,6 +113,9 @@ def evaluate(
         }
     if not _text(recovery.get("executor_evidence_ref")) or not _text(recovery.get("applied_at")):
         raise StandaloneEmergencyError("failover execution evidence required")
+    applied_at = _time(recovery["applied_at"], "recovery.applied_at")
+    if not (health_at < applied_at <= at):
+        raise StandaloneEmergencyError("recovery application time must follow the health observation and not be future")
     if recovery_validator is None:
         return {"state": "RECOVERY_VALIDATION_REQUIRED", "action": "POST_DEPLOY_REALITY_GATE", "temporary_occupant": True, "promotion_authorized": False}
     validation = recovery_validator(recovery)
