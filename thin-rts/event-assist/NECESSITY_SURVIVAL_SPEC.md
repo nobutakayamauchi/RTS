@@ -2,7 +2,7 @@
 
 Timestamp: **2026-08-11 20:20 JST**
 
-Status: `FROZEN_GATE_1 / NEED_NOT_YET_SURVIVED`
+Status: `GATE_1_EXECUTED / GLUE_SURVIVES / GATE_2_REQUIRED`
 
 Purpose: kill the need before authorizing a concrete implementation.
 
@@ -66,8 +66,22 @@ Gate 1 is complete only when rotated attacks stop producing materially new neces
 
 `SEARCH_SATURATED_UNDER_CURRENT_EVIDENCE`
 
-## Gate 1 verdict
+## Gate 1 verdict — 2026-08-13
 
-Current state:
+Executed under the 新RTS（仮称） core-completion `/goal` audit.
 
-`NECESSITY_SURVIVAL = NOT_YET_RUN`
+Result:
+
+`MONOLITHIC_EVENT_ASSIST = KILLED`
+
+`IRREDUCIBLE_CUSTOM_PLATFORM = NOT_JUSTIFIED`
+
+`BOUNDED_EVENT_STATE_GLUE = SURVIVES`
+
+The surviving minimum is limited to cross-boundary EventCase / Evidence Gap / Action Pin / authority / watch-health bindings and handoff references to already-adopted safety, custody and recovery contracts. Retrieval, current-source lookup, calendar/reminders, storage, crypto, document rendering, provider adapters and external actions remain external or replaceable occupants.
+
+Canonical result record:
+
+`NECESSITY_GATE_RESULT_2026-08-13.md`
+
+Gate 1 is therefore complete for the current evidence, but Event Assist is **not** product-complete. The surviving thin responsibility must still survive Gate 2 METEOR and a material real-situation pilot.

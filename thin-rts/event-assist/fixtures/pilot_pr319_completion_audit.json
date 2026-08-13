@@ -1,0 +1,105 @@
+{
+  "schema": "new-rts-event-case/v0",
+  "event_id": "evt-pr319-completion-audit",
+  "event_type": "software_completion_audit",
+  "event_truth_state": "CONFIRMED",
+  "event_time": "2026-08-13T09:18:00+09:00",
+  "observed_at": "2026-08-13T09:18:00+09:00",
+  "event_source_ref": "github:RTS#319",
+  "sources": [
+    {
+      "source_id": "src-pr319",
+      "source_class": "LOCAL_OR_PROVIDER_SPECIFIC",
+      "reference": "github:RTS#319",
+      "retrieved_at": "2026-08-13T00:24:56Z",
+      "status": "CURRENT_OBSERVED"
+    },
+    {
+      "source_id": "src-gate",
+      "source_class": "COMMON_PRACTICAL_FAILURE",
+      "reference": "repo:thin-rts/CORE_COMPLETION_GATE_2026-08-13.md",
+      "retrieved_at": "2026-08-13T00:23:52Z",
+      "status": "CURRENT_OBSERVED"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "fact-foundation",
+      "name": "development_foundation_status",
+      "value": "COMPLETE_UNDER_CURRENT_EVIDENCE",
+      "status": "CONFIRMED",
+      "source_ref": "src-gate",
+      "observed_at": "2026-08-13T00:23:52Z"
+    },
+    {
+      "fact_id": "fact-product",
+      "name": "full_successor_status_at_audit",
+      "value": "REVISE_NOT_COMPLETE",
+      "status": "CONFIRMED",
+      "source_ref": "src-pr319",
+      "observed_at": "2026-08-13T00:24:56Z"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev-audit-record",
+      "evidence_class": "completion-audit-record",
+      "status": "PRESERVED_VERIFIED",
+      "triage": "PRESERVE_HIGH",
+      "source_ref": "src-pr319",
+      "collection_authority": "AUTHORIZED",
+      "preservation_ref": "git:234405821db4f287925d6ff3f46a5f3ef0d215e5:thin-rts/CORE_COMPLETION_GATE_2026-08-13.md",
+      "integrity_state": "CONTENT_INTEGRITY_PASS"
+    }
+  ],
+  "authorities": {
+    "observe": "AUTHORIZED",
+    "collect": "AUTHORIZED",
+    "access": "AUTHORIZED",
+    "transform": "AUTHORIZED",
+    "disclose": "AUTHORIZED",
+    "submit": "NOT_APPLICABLE",
+    "promote": "BLOCKED"
+  },
+  "decisions": [
+    {
+      "decision_id": "dec-pr319-red",
+      "result": "REVISE_NOT_COMPLETE",
+      "status": "VERIFIED",
+      "input_refs": [
+        "src-pr319",
+        "src-gate"
+      ],
+      "actor_tool": "github-audit:/goal",
+      "time": "2026-08-13T00:24:56Z",
+      "reason": "Event Assist Gate 2, material pilot, and PHOENIX creator-independent regeneration were not yet proven."
+    },
+    {
+      "decision_id": "dec-meteor-work-started",
+      "result": "bounded-binder-authorized-for-meteor",
+      "status": "VERIFIED",
+      "input_refs": [
+        "dec-pr319-red"
+      ],
+      "actor_tool": "da-counter-da:2026-08-13",
+      "time": "2026-08-13T01:05:00Z",
+      "reason": "DA/Counter-DA killed a monolith and retained only typed binding/validation as the irreducible machine-checkable gap.",
+      "supersedes": "dec-pr319-red"
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "act-ci-promotion",
+      "pin_class": "ACTION_REQUIRED",
+      "assertion_state": "VERIFIED",
+      "reason": "Local Meteor evidence is not merge/promotion authority; CI is a separate verification gate.",
+      "next_action": "Run repository CI; do not treat this pilot PASS as merge authority.",
+      "source_refs": [
+        "src-pr319"
+      ]
+    }
+  ],
+  "documents": [],
+  "watches": [],
+  "unknowns": []
+}

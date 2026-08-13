@@ -1,0 +1,79 @@
+name: Ultimate Loop Lifecycle Meteor
+
+on:
+  pull_request:
+    paths:
+      - 'thin-rts/ultimate-loop/**'
+      - 'thin-rts/phoenix/ultimate-loop-lifecycle-succession-v0.json'
+      - 'thin-rts/phoenix/test_ultimate_loop_lifecycle_phoenix.py'
+      - 'thin-rts/ULTIMATE_LOOP_METHOD.md'
+      - 'thin-rts/MOVABLE_FRAME_DARWIN_ARENA_SPEC.md'
+      - 'thin-rts/PHOENIX_LINEAGE_CONTINUITY_SPEC.md'
+      - '.github/workflows/ultimate-loop-lifecycle-meteor.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  lifecycle-meteor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Compile bounded lifecycle binder and tests
+        working-directory: thin-rts/ultimate-loop
+        run: python3 -m py_compile lifecycle.py test_lifecycle.py test_meteor_lifecycle.py
+
+      - name: Run lifecycle base and destructive METEOR regressions
+        working-directory: thin-rts/ultimate-loop
+        run: python3 -m unittest -v test_lifecycle.py test_meteor_lifecycle.py
+
+      - name: Exercise canonical lifecycle workloads
+        working-directory: thin-rts/ultimate-loop
+        run: |
+          python3 lifecycle.py fixtures/small_gain_standby.json --at 2026-08-13T03:00:00Z > "$RUNNER_TEMP/small.json"
+          set +e
+          python3 lifecycle.py fixtures/emergency_same_domain_blocked.json --at 2026-08-13T03:00:00Z > "$RUNNER_TEMP/emergency.json"
+          emergency_status=$?
+          set -e
+          test "$emergency_status" -eq 2
+          python3 lifecycle.py fixtures/core_freeze_phoenix_ready.json --at 2026-08-13T03:00:00Z > "$RUNNER_TEMP/core.json"
+          python3 - "$RUNNER_TEMP/small.json" "$RUNNER_TEMP/emergency.json" "$RUNNER_TEMP/core.json" <<'PY'
+          import json, sys
+          small, emergency, core = [json.load(open(path, encoding='utf-8')) for path in sys.argv[1:]]
+          assert small['candidate_disposition'] == 'STANDBY'
+          assert small['next_state'] == 'STANDBY'
+          assert small['transition_authorized'] is False
+          assert emergency['classification'] == 'UNKNOWN_OR_BLOCKED'
+          assert 'FAILURE_DOMAIN_INDEPENDENCE_UNPROVEN' in emergency['blocking_states']
+          assert core['classification'] == 'PASS'
+          assert core['recovery_state'] == 'PHOENIX_READY'
+          assert core['next_state'] == 'STABLE'
+          PY
+
+  creator-absent-lifecycle-phoenix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Run independent lifecycle Phoenix probe
+        working-directory: thin-rts/phoenix
+        run: python3 -m unittest -v test_ultimate_loop_lifecycle_phoenix.py

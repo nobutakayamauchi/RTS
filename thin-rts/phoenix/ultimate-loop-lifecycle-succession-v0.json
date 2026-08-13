@@ -1,0 +1,66 @@
+{
+  "schema": "phoenix-succession-packet/v0",
+  "frame_id": "ultimate-loop-lifecycle-binding",
+  "protected_outcome": "Preserve bounded lifecycle decisions across completion, challenger evaluation, standby retention, emergency failover, recovery and creator-independent regeneration without granting implementation or promotion authority to the validator itself.",
+  "creator_independence": {
+    "original_creator_required": false,
+    "original_ai_conversation_required": false,
+    "original_lifecycle_implementation_required": false
+  },
+  "canonical_invariants": [
+    "BETTER_CANDIDATE != AUTHORIZED_REPLACEMENT",
+    "NEW_EXISTS != CHALLENGE_REQUIRED",
+    "BACKUP_EXISTS != RECOVERABLE",
+    "RECOVERY_PROVEN != CREATOR_INDEPENDENT_REGENERATION_PROVEN",
+    "IMPLEMENTED != PERMANENT",
+    "UNKNOWN_TRIGGER != GUESSED_TRANSITION",
+    "FAILURE_DOMAIN_LABEL != FAILURE_DOMAIN_INDEPENDENCE_EVIDENCE"
+  ],
+  "states": [
+    "BUILD",
+    "STABLE",
+    "WATCH",
+    "METEOR",
+    "SHADOW",
+    "STANDBY",
+    "PARTIAL",
+    "EMERGENCY",
+    "RECOVERY",
+    "RECONSTRUCTION"
+  ],
+  "candidate_dispositions": [
+    "CANDIDATE",
+    "SHADOW",
+    "STANDBY",
+    "PARTIAL_REPLACEMENT_ELIGIBLE",
+    "FULL_REPLACEMENT_ELIGIBLE",
+    "REJECTED_FOR_EMERGENCY"
+  ],
+  "screening_policy": {
+    "observe_delta_pct": 5,
+    "meteor_delta_pct": 15,
+    "full_replace_delta_pct": 30,
+    "note": "These values are screening priors only. Promotion still requires survived same-workload evidence, migration/rollback fitness and explicit authority."
+  },
+  "protected_rules": {
+    "small_gain_high_resilience": "A small or unproven performance winner may remain STANDBY when a bounded recovery probe passes and resilience value is HIGH; it must not become PRIMARY merely because it is numerically better.",
+    "promotion_authority": "No FULL or PARTIAL replacement is authorized unless promote authority is AUTHORIZED.",
+    "emergency_probe": "Emergency failover requires a successful recovery/failover probe.",
+    "failure_domain": "When the triggering failure domain is material, a fallback requires VERIFIED independence evidence; labels alone are insufficient.",
+    "recovery": "backup_present alone is insufficient; fresh_restore_test PASS plus canonical_material PASS is required for RECOVERABLE.",
+    "phoenix": "A Succession Packet without a Phoenix Test is RECOVERABLE at most, not PHOENIX_READY.",
+    "unknown_event": "An unmodeled trigger reopens BUILD / inner design review rather than inventing a transition."
+  },
+  "canonical_workloads": [
+    "../ultimate-loop/fixtures/small_gain_standby.json",
+    "../ultimate-loop/fixtures/emergency_same_domain_blocked.json",
+    "../ultimate-loop/fixtures/core_freeze_phoenix_ready.json"
+  ],
+  "authority_boundary": "Regeneration, comparison and validation do not authorize deployment, promotion, disclosure, spending, submission or other material external action.",
+  "lineage": {
+    "method": "../ULTIMATE_LOOP_METHOD.md",
+    "darwin": "../MOVABLE_FRAME_DARWIN_ARENA_SPEC.md",
+    "phoenix": "../PHOENIX_LINEAGE_CONTINUITY_SPEC.md",
+    "prototype": "../ultimate-loop/lifecycle.py"
+  }
+}

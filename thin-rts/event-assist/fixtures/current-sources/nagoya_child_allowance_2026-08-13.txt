@@ -1,0 +1,4 @@
+Observed from the City of Nagoya page "児童手当" on 2026-08-13.
+Source URL: https://www.city.nagoya.jp/kodomo/ninshin/1008971/1008973.html?hl=ja
+Bounded observation: the page says a child-allowance application is needed after birth notification; for a birth, applying within 15 days from the day after birth preserves payment from the month following the birth month under the stated rule; public employees generally use their workplace procedure.
+This file is a decision-time observation record, not a substitute for later current-source revalidation.

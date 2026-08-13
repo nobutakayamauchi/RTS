@@ -1,0 +1,40 @@
+{
+  "frame_id": "frame-primary-llm",
+  "current_state": "STABLE",
+  "material_durable": true,
+  "authority": {
+    "promote": "BLOCKED",
+    "failover": "BLOCKED"
+  },
+  "policy": {
+    "observe_delta_pct": 5,
+    "meteor_delta_pct": 15,
+    "full_replace_delta_pct": 30
+  },
+  "trigger": {
+    "type": "NEW_CAPABILITY",
+    "evidence_state": "CURRENT_OBSERVED",
+    "source_ref": "external:new-model-observation",
+    "stale_after": "2026-08-20T00:00:00Z",
+    "materiality": "NON_MATERIAL"
+  },
+  "candidate": {
+    "candidate_id": "model-b",
+    "performance_delta_pct": 3,
+    "replacement_value": "SMALL_WIN",
+    "resilience_value": "HIGH",
+    "stability_state": "UNPROVEN",
+    "same_frozen_workload": "NOT_RUN",
+    "recovery_probe": "PASS",
+    "migration_state": "NOT_APPLICABLE",
+    "rollback_state": "PASS",
+    "failure_domain_independence": "VERIFIED"
+  },
+  "recovery": {
+    "backup_present": true,
+    "fresh_restore_test": "PASS",
+    "canonical_material": "PASS",
+    "succession_packet": "PASS",
+    "phoenix_test": "PASS"
+  }
+}

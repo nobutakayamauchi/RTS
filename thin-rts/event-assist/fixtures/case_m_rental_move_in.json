@@ -1,0 +1,77 @@
+{
+  "schema": "new-rts-event-case/v0",
+  "event_id": "evt-rental-move-in",
+  "event_type": "rental_move_in",
+  "event_truth_state": "CONFIRMED",
+  "event_time": "2026-08-13T00:00:00Z",
+  "observed_at": "2026-08-13T00:05:00Z",
+  "event_source_ref": "input:operator:rental-move-in",
+  "sources": [
+    {
+      "source_id": "src-pattern-move-in",
+      "source_class": "COMMON_PRACTICAL_FAILURE",
+      "reference": "pattern:move-in-condition-evidence",
+      "retrieved_at": "2026-08-13T00:05:00Z",
+      "status": "CURRENT_OBSERVED"
+    }
+  ],
+  "facts": [],
+  "evidence": [
+    {
+      "evidence_id": "ev-room-condition",
+      "evidence_class": "room-condition-original-photo-set",
+      "status": "MISSING_RECOVERABLE",
+      "triage": "PRESERVE_HIGH",
+      "source_ref": "src-pattern-move-in",
+      "collection_authority": "AUTHORIZED"
+    },
+    {
+      "evidence_id": "ev-handover",
+      "evidence_class": "handover-record",
+      "status": "PRESERVED_VERIFIED",
+      "triage": "PRESERVE_HIGH",
+      "source_ref": "src-pattern-move-in",
+      "collection_authority": "AUTHORIZED",
+      "preservation_ref": "custody:receipt:rental-001",
+      "integrity_state": "CONTENT_INTEGRITY_PASS"
+    }
+  ],
+  "authorities": {
+    "observe": "AUTHORIZED",
+    "collect": "AUTHORIZED",
+    "access": "AUTHORIZED",
+    "transform": "AUTHORIZED",
+    "disclose": "BLOCKED",
+    "submit": "BLOCKED",
+    "promote": "BLOCKED"
+  },
+  "decisions": [
+    {
+      "decision_id": "dec-1",
+      "result": "incident-confirmed-for-workflow",
+      "status": "VERIFIED",
+      "input_refs": [
+        "src-practical"
+      ],
+      "actor_tool": "fixture:operator",
+      "time": "2026-08-13T00:10:00Z",
+      "reason": "The event was explicitly reported and bounded to this workflow."
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "act-capture-room",
+      "pin_class": "CAPTURE_WINDOW_CLOSING",
+      "assertion_state": "VERIFIED",
+      "reason": "The physical condition can change after move-in.",
+      "next_action": "Capture authorized original room-condition photos while current condition is observable.",
+      "source_refs": [
+        "src-pattern-move-in"
+      ],
+      "authority_required": "collect"
+    }
+  ],
+  "documents": [],
+  "watches": [],
+  "unknowns": []
+}
