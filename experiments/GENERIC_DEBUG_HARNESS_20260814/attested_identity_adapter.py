@@ -11,26 +11,40 @@ class IdentityAdapterError(ValueError):
     pass
 
 
-_REQUIRED = {
-    "observation", "expected_deployment", "trusted_observer_ids", "reference_time",
-    "attestations", "trusted_attestation_keys", "collector_provenance",
-    "trusted_collector_keys", "trusted_collector_domains",
+_EVIDENCE_FIELDS = {"observation", "attestations", "collector_provenance"}
+_VERIFIER_FIELDS = {
+    "expected_deployment",
+    "trusted_observer_ids",
+    "reference_time",
+    "trusted_attestation_keys",
+    "trusted_collector_keys",
+    "trusted_collector_domains",
 }
 
 
-def resolve(bundle: Any) -> dict[str, Any]:
-    if not isinstance(bundle, dict) or set(bundle) != _REQUIRED:
-        raise IdentityAdapterError("exact attested deployment bundle required")
+def resolve(evidence: Any, verifier: Any) -> dict[str, Any]:
+    """Resolve evidence using verifier-controlled trust anchors.
+
+    Evidence producers may submit observations, attestations and provenance only.
+    Expected deployment, observer policy, trusted keys, trust-domain policy and
+    reference time are supplied separately by the verifier and cannot be
+    self-declared inside the evidence payload.
+    """
+    if not isinstance(evidence, dict) or set(evidence) != _EVIDENCE_FIELDS:
+        raise IdentityAdapterError("exact deployment evidence payload required")
+    if not isinstance(verifier, dict) or set(verifier) != _VERIFIER_FIELDS:
+        raise IdentityAdapterError("exact verifier-controlled identity policy required")
+
     proof = establish_attested_deployment_identity(
-        bundle["observation"],
-        expected_deployment=bundle["expected_deployment"],
-        trusted_observer_ids=bundle["trusted_observer_ids"],
-        reference_time=bundle["reference_time"],
-        attestations=bundle["attestations"],
-        trusted_attestation_keys=bundle["trusted_attestation_keys"],
-        collector_provenance=bundle["collector_provenance"],
-        trusted_collector_keys=bundle["trusted_collector_keys"],
-        trusted_collector_domains=bundle["trusted_collector_domains"],
+        evidence["observation"],
+        expected_deployment=verifier["expected_deployment"],
+        trusted_observer_ids=verifier["trusted_observer_ids"],
+        reference_time=verifier["reference_time"],
+        attestations=evidence["attestations"],
+        trusted_attestation_keys=verifier["trusted_attestation_keys"],
+        collector_provenance=evidence["collector_provenance"],
+        trusted_collector_keys=verifier["trusted_collector_keys"],
+        trusted_collector_domains=verifier["trusted_collector_domains"],
     )
     if (
         not isinstance(proof, dict)
@@ -40,9 +54,16 @@ def resolve(bundle: Any) -> dict[str, Any]:
         or proof.get("collector_provenance", {}).get("status") != "COLLECTOR_PROVENANCE_VERIFIED"
     ):
         raise IdentityAdapterError("authorized attested deployment identity required")
+
     identity = proof.get("identity")
-    if not isinstance(identity, dict) or not identity.get("observation_session_id"):
-        raise IdentityAdapterError("deployment identity session missing")
+    if (
+        not isinstance(identity, dict)
+        or not isinstance(identity.get("observation_session_id"), str)
+        or not identity["observation_session_id"]
+        or not isinstance(identity.get("observed_at"), str)
+        or not identity["observed_at"]
+    ):
+        raise IdentityAdapterError("deployment identity session/time missing")
     for key in ("observation_fingerprint", "expectation_fingerprint"):
         if not isinstance(proof.get(key), str) or not proof[key]:
             raise IdentityAdapterError(f"{key} missing")
