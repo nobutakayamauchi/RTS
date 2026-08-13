@@ -2,7 +2,9 @@
 
 Date: **2026-08-14**
 
-Status: `CANONICAL_EXTENSION_CANDIDATE`
+Status: `CANONICAL / ACTIVE`
+
+Canonical parent: `thin-rts/ULTIMATE_LOOP_METHOD.md`
 
 ## Purpose
 
@@ -36,6 +38,7 @@ A discovery result must preserve at least:
 - discovered candidate identities and source references;
 - relationship types such as incumbent, competitor, component, dependency, architecture reference, failure reference or substitute;
 - materiality disposition or explicit UNKNOWN;
+- freshness evidence appropriate to source class/workload;
 - blocked/unsearched gaps;
 - frontier rounds and bounded stop state;
 - handoff to METEOR without promotion authority.
@@ -44,7 +47,7 @@ A discovery result must preserve at least:
 
 `SEARCH_SATURATED_UNDER_CURRENT_EVIDENCE != COMPLETE_WEB_KNOWLEDGE`
 
-Saturation is a bounded evidence state. A materially new candidate, architecture term, source class, dependency, provider capability or failure mode reopens the frontier.
+A quiet round requires the required frontier to have actually been searched. Empty or blocked rounds are not quiet rounds. A materially new candidate resets the quiet tail. A materially new candidate, architecture term, source class, dependency, provider capability or failure mode may reopen the frontier and require a later evidence-bound follow-up.
 
 A required source class that is blocked or unsearched prevents a clean saturation claim unless the workload explicitly records why that source class is not required.
 
@@ -54,7 +57,7 @@ ULTIMATE LOOP does **not** require one owned crawler.
 
 Actual acquisition may be performed by replaceable external search, feeds, GitHub/package APIs, browser crawlers, official documentation search, research indexes, human research or AI-assisted research.
 
-The owned responsibility, when needed, is only the small coverage/provenance/saturation contract that makes heterogeneous acquisition reconstructable.
+The owned responsibility, when needed, is only the small coverage/provenance/freshness/frontier/saturation contract that makes heterogeneous acquisition reconstructable.
 
 ## Relation to Architecture Superiority Gate
 
