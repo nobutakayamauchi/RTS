@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
 from .attested_identity_adapter import binding, resolve
@@ -14,6 +15,19 @@ def _refs(value: Any) -> bool:
         isinstance(item, str) and bool(item.strip()) and item == item.strip()
         for item in value
     )
+
+
+def _timestamp(value: Any, field: str) -> datetime:
+    if not isinstance(value, str) or not value or value != value.strip():
+        raise DebugEvidenceError(f"{field} must be an exact timestamp")
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise DebugEvidenceError(f"{field} must be ISO-8601") from exc
+    if parsed.tzinfo is None:
+        raise DebugEvidenceError(f"{field} timezone required")
+    return parsed.astimezone(timezone.utc)
 
 
 def _manifest(rows: Any) -> dict[str, dict[str, Any]]:
@@ -63,11 +77,21 @@ def _results(rows: Any, manifest: dict[str, dict[str, Any]], proof: dict[str, An
     return out
 
 
-def evaluate(case: Any) -> dict[str, Any]:
+def _verifier(verifiers: Any, key: str) -> dict[str, Any]:
+    if not isinstance(verifiers, dict) or key not in verifiers or not isinstance(verifiers[key], dict):
+        raise DebugEvidenceError(f"verifier-controlled policy missing: {key}")
+    return verifiers[key]
+
+
+def evaluate(case: Any, *, identity_verifiers: Any) -> dict[str, Any]:
     if not isinstance(case, dict):
         raise DebugEvidenceError("case object required")
+
     manifest = _manifest(case.get("probe_manifest"))
-    initial = resolve(case.get("deployment_identity_bundle"))
+    initial = resolve(
+        case.get("deployment_identity_evidence"),
+        _verifier(identity_verifiers, "initial"),
+    )
     results = _results(case.get("probe_results"), manifest, initial, "probe_results")
     required = {pid for pid, row in manifest.items() if row["required"]}
 
@@ -84,14 +108,34 @@ def evaluate(case: Any) -> dict[str, Any]:
     patch = case.get("patch")
     if not isinstance(patch, dict) or patch.get("applied") is not True:
         return {"state": "FAILURE_EVIDENCE_READY", "stable_eligible": False, "fix_validated": False}
+    if not isinstance(patch.get("applied_at"), str):
+        raise DebugEvidenceError("patch applied_at required")
 
-    post = resolve(patch.get("post_deployment_identity_bundle"))
+    post = resolve(
+        patch.get("post_deployment_identity_evidence"),
+        _verifier(identity_verifiers, "post_patch"),
+    )
+
+    blockers: list[str] = []
+    initial_binding = binding(initial)
+    post_binding = binding(post)
+    if post["observation_fingerprint"] == initial["observation_fingerprint"]:
+        blockers.append("POST_PATCH_OBSERVATION_FINGERPRINT_NOT_NEW")
+    if post["identity"]["observation_session_id"] == initial["identity"]["observation_session_id"]:
+        blockers.append("POST_PATCH_SESSION_NOT_NEW")
+
+    initial_at = _timestamp(initial["identity"]["observed_at"], "initial observed_at")
+    applied_at = _timestamp(patch["applied_at"], "patch applied_at")
+    post_at = _timestamp(post["identity"]["observed_at"], "post observed_at")
+    if not (initial_at < applied_at < post_at):
+        blockers.append("POST_PATCH_TEMPORAL_ORDER_NOT_PROVEN")
+
     replay = _results(patch.get("replay_results"), manifest, post, "replay_results")
-    blockers = [
+    blockers.extend(
         f"FAILED_PROBE_REPLAY_NOT_PASS:{pid}"
         for pid in failed
         if pid not in replay or replay[pid]["status"] != "PASS"
-    ]
+    )
 
     reg_manifest = case.get("regression_manifest")
     regression = patch.get("regression_result")
@@ -112,7 +156,7 @@ def evaluate(case: Any) -> dict[str, Any]:
         regression["deployment_observation_fingerprint"],
         regression["deployment_expectation_fingerprint"],
         regression["observation_session_id"],
-    ) != binding(post):
+    ) != post_binding:
         blockers.append("REGRESSION_DEPLOYMENT_BINDING_MISMATCH")
 
     ok = not blockers
@@ -120,5 +164,7 @@ def evaluate(case: Any) -> dict[str, Any]:
         "state": "FIX_VALIDATED" if ok else "PATCH_NOT_VALIDATED",
         "stable_eligible": ok,
         "fix_validated": ok,
+        "initial_deployment_binding": initial_binding,
+        "post_deployment_binding": post_binding,
         "blocking_states": sorted(blockers),
     }
