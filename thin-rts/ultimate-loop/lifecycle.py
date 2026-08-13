@@ -143,6 +143,17 @@ def _candidate_disposition(
     if not candidate:
         return "NONE", False
 
+    # A trigger that is unknown, stale, or otherwise untrusted must dominate any
+    # attractive candidate score. Candidate evidence cannot repair the trigger.
+    if watch_action == "INNER_LOOP_REOPEN":
+        reasons.append("Candidate comparison is suspended until the unknown trigger is re-modeled by the inner loop.")
+        return "BLOCKED_PENDING_INNER_REVIEW", False
+    if case.get("trigger") and watch_action == "NONE" and any(
+        block in blocks for block in {"TRIGGER_EVIDENCE_NOT_CURRENT", "TRIGGER_EVIDENCE_STALE"}
+    ):
+        reasons.append("Candidate comparison is suspended because the trigger evidence is not usable.")
+        return "BLOCKED_BY_TRIGGER_EVIDENCE", False
+
     policy = _policy(case)
     authority = case.get("authority") or {}
     delta = float(candidate.get("performance_delta_pct", 0.0))
