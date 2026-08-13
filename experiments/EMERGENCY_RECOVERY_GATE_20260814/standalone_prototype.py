@@ -42,6 +42,51 @@ def _recovery_validation_ok(validation: Any, *, candidate_id: str, applied_at: d
     return applied_at < validated_at <= at
 
 
+def _applied_recovery(
+    case: dict[str, Any],
+    at: datetime,
+    recovery: dict[str, Any],
+    recovery_validator: Callable[[dict[str, Any]], dict[str, Any]] | None,
+) -> dict[str, Any]:
+    candidate = case.get("candidate")
+    if not isinstance(candidate, dict) or not _text(candidate.get("candidate_id")):
+        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
+    required_text = (
+        "executor_evidence_ref",
+        "applied_at",
+        "candidate_id",
+        "trigger_source_ref",
+        "trigger_observed_at",
+        "failover_authority_ref",
+    )
+    if any(not _text(recovery.get(key)) for key in required_text):
+        raise StandaloneEmergencyError("applied recovery requires bound trigger/executor/authority evidence")
+    if recovery.get("candidate_id") != candidate["candidate_id"]:
+        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
+    if recovery.get("trigger_state") not in {"FAILED", "UNSAFE"}:
+        raise StandaloneEmergencyError("applied recovery requires FAILED or UNSAFE trigger snapshot")
+    trigger_at = _time(recovery["trigger_observed_at"], "recovery.trigger_observed_at")
+    applied_at = _time(recovery["applied_at"], "recovery.applied_at")
+    if not (trigger_at < applied_at <= at):
+        raise StandaloneEmergencyError("recovery application time must follow its persisted trigger observation and not be future")
+    if recovery.get("failback_requested") is True:
+        return {"state": "FAILBACK_BLOCKED_PENDING_DARWIN", "action": "NONE", "temporary_occupant": True, "promotion_authorized": False, "automatic_failback_authorized": False}
+    if recovery_validator is None:
+        return {"state": "RECOVERY_VALIDATION_REQUIRED", "action": "POST_DEPLOY_REALITY_GATE", "temporary_occupant": True, "promotion_authorized": False}
+    validation = recovery_validator(recovery)
+    if not _recovery_validation_ok(validation, candidate_id=candidate["candidate_id"], applied_at=applied_at, at=at):
+        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
+    return {
+        "state": "TEMPORARY_RECOVERY_VALIDATED",
+        "action": "CONTINUE_TEMPORARILY",
+        "temporary_occupant": True,
+        "promotion_authorized": False,
+        "automatic_failback_authorized": False,
+        "post_deployment_binding": validation["post_deployment_binding"],
+        "recovery_debt": ["DISCOVERY_REFRESH", "ROOT_CAUSE_REVIEW", "METEOR_DARWIN", "PERMANENT_OCCUPANT_DECISION"],
+    }
+
+
 def evaluate(
     case: dict[str, Any],
     at: datetime,
@@ -62,6 +107,11 @@ def evaluate(
         raise StandaloneEmergencyError("invalid health state")
     if not _text(health.get("source_ref")) or not _text(health.get("observed_at")) or not _text(health.get("stale_after")):
         raise StandaloneEmergencyError("health evidence required")
+
+    recovery = emergency.get("recovery")
+    if isinstance(recovery, dict) and recovery.get("applied") is True:
+        return _applied_recovery(case, at, recovery, recovery_validator)
+
     health_at = _time(health["observed_at"], "health.observed_at")
     stale_at = _time(health["stale_after"], "health.stale_after")
     if health_at > at:
@@ -76,6 +126,10 @@ def evaluate(
         return {"state": "NO_EMERGENCY_AUTOMATION_REQUIRED", "action": "MANUAL_OR_NORMAL_FAILURE", "promotion_authorized": False}
     if state in {"DEGRADED", "FAILED"} and health.get("hysteresis") != "PASS":
         return {"state": "OBSERVE_CONTINUE", "action": "NONE", "promotion_authorized": False}
+
+    mode = policy.get("operation_mode", "STATELESS")
+    if mode not in {"STATELESS", "READ_ONLY", "READ_WRITE_SINGLE_WRITER"}:
+        raise StandaloneEmergencyError("unsupported operation_mode")
 
     blocks: list[str] = []
     if not isinstance(candidate, dict):
@@ -93,58 +147,22 @@ def evaluate(
         if policy.get("failure_domain_scope") == "MATERIAL":
             if candidate.get("failure_domain_independence") != "VERIFIED" or not _text(candidate.get("failure_domain_independence_ref")):
                 blocks.append("FAILURE_DOMAIN_INDEPENDENCE_UNPROVEN")
-        if policy.get("operation_mode", "STATELESS") == "READ_WRITE_SINGLE_WRITER":
+        if mode == "READ_WRITE_SINGLE_WRITER":
             if emergency.get("primary_write_fence") != "PASS" or not _text(emergency.get("primary_write_fence_ref")):
                 blocks.append("PRIMARY_WRITE_FENCE_UNPROVEN")
 
     blocks = sorted(set(blocks))
     if state == "DEGRADED":
-        return {
-            "state": "DEGRADED" if blocks else "STANDBY_PREPARED",
-            "action": "PREPARE_STANDBY" if blocks else "NONE",
-            "blocking_states": blocks,
-            "promotion_authorized": False,
-        }
+        return {"state": "DEGRADED" if blocks else "STANDBY_PREPARED", "action": "PREPARE_STANDBY" if blocks else "NONE", "blocking_states": blocks, "promotion_authorized": False}
     if blocks:
         return {"state": "NO_VERIFIED_FALLBACK", "action": "FAIL_CLOSED_OR_DECLARED_DEGRADED", "blocking_states": blocks, "promotion_authorized": False}
     if authority.get("failover") != "AUTHORIZED":
         return {"state": "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE", "action": "NONE", "promotion_authorized": False}
-
-    candidate_id = candidate["candidate_id"]
-    recovery = emergency.get("recovery")
-    if not isinstance(recovery, dict) or recovery.get("applied") is not True:
-        return {
-            "state": "FAILOVER_ELIGIBLE",
-            "action": "EXTERNAL_FAILOVER",
-            "candidate": candidate_id,
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-            "automatic_failback_authorized": False,
-        }
-    if recovery.get("failback_requested") is True:
-        return {
-            "state": "FAILBACK_BLOCKED_PENDING_DARWIN",
-            "action": "NONE",
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-            "automatic_failback_authorized": False,
-        }
-    if not _text(recovery.get("executor_evidence_ref")) or not _text(recovery.get("applied_at")):
-        raise StandaloneEmergencyError("failover execution evidence required")
-    applied_at = _time(recovery["applied_at"], "recovery.applied_at")
-    if not (health_at < applied_at <= at):
-        raise StandaloneEmergencyError("recovery application time must follow the health observation and not be future")
-    if recovery_validator is None:
-        return {"state": "RECOVERY_VALIDATION_REQUIRED", "action": "POST_DEPLOY_REALITY_GATE", "temporary_occupant": True, "promotion_authorized": False}
-    validation = recovery_validator(recovery)
-    if not _recovery_validation_ok(validation, candidate_id=candidate_id, applied_at=applied_at, at=at):
-        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
     return {
-        "state": "TEMPORARY_RECOVERY_VALIDATED",
-        "action": "CONTINUE_TEMPORARILY",
+        "state": "FAILOVER_ELIGIBLE",
+        "action": "EXTERNAL_FAILOVER",
+        "candidate": candidate["candidate_id"],
         "temporary_occupant": True,
         "promotion_authorized": False,
         "automatic_failback_authorized": False,
-        "post_deployment_binding": validation["post_deployment_binding"],
-        "recovery_debt": ["DISCOVERY_REFRESH", "ROOT_CAUSE_REVIEW", "METEOR_DARWIN", "PERMANENT_OCCUPANT_DECISION"],
     }
