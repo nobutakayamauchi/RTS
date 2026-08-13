@@ -28,11 +28,15 @@ A successor is not proven superior by novelty, naming, claimed intelligence, ben
 
 The successor does **not** need to copy ULTIMATE LOOP's names, internal loops, agents, tools, implementation, or structure. A radically different method is eligible. Structural similarity is not a survival criterion.
 
+The protected outcome and its material obligations may themselves be challenged or retired through explicit evidence and applicable authority, but a successor may not silently weaken or redefine them merely to appear superior.
+
 `DIFFERENT != INFERIOR`
 
 `NEW != SUPERIOR`
 
 `CLAIMED SUPERIORITY != PROVEN SUPERIORITY`
+
+`GOAL SHIFT != METHOD SUPERIORITY`
 
 ## Anti-self-preservation rule
 
@@ -49,6 +53,14 @@ Proof of a superior protocol ends ULTIMATE LOOP's claim to permanent or exclusiv
 However:
 
 `SUPERIORITY PROVEN != OPERATIONAL HANDOVER AUTHORIZED`
+
+The transition is explicitly two-stage:
+
+`SUPERIOR PROTOCOL PROVEN -> SUPERSEDED_PENDING_HANDOVER`
+
+`AUTHORITY + CONTINUITY PASS -> RETIRED / SUCCESSOR_CANONICAL`
+
+While `SUPERSEDED_PENDING_HANDOVER`, ULTIMATE LOOP may remain the bounded operational caretaker only to prevent a responsibility gap. It no longer has a permanent entitlement to remain canonical.
 
 Operational retirement and succession must remain fail-closed until the applicable authority and continuity obligations are satisfied. A successor may not erase the predecessor before the protected outcome, canonical evidence, known failure memory, authority boundaries and reconstruction path are safely inherited or intentionally dispositioned.
 
