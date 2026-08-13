@@ -47,7 +47,13 @@ def valid_recovery():
 
 
 def recovery_validator(_):
-    return {"state": "DEPLOYMENT_VALIDATED", "stable_eligible": True, "post_deployment_binding": ["obs:new", "expect:new", "session:new"]}
+    return {
+        "state": "DEPLOYMENT_VALIDATED",
+        "stable_eligible": True,
+        "post_deployment_binding": ["obs:new", "expect:new", "session:new"],
+        "validated_candidate_id": "fallback-b",
+        "validated_at": "2026-08-14T04:06:30+09:00",
+    }
 
 
 class ExistingOnlyAttack(unittest.TestCase):
