@@ -1,0 +1,17 @@
+{
+  "frame_id": "frame-ultimate-loop-core",
+  "current_state": "BUILD",
+  "core_acceptance": "PASS",
+  "material_durable": true,
+  "authority": {
+    "promote": "AUTHORIZED",
+    "failover": "BLOCKED"
+  },
+  "recovery": {
+    "backup_present": true,
+    "fresh_restore_test": "PASS",
+    "canonical_material": "PASS",
+    "succession_packet": "PASS",
+    "phoenix_test": "PASS"
+  }
+}
