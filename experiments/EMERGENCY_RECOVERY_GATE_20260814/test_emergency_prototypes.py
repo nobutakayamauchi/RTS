@@ -43,7 +43,17 @@ def base_case():
 
 
 def valid_recovery():
-    return {"applied": True, "applied_at": "2026-08-14T04:06:00+09:00", "executor_evidence_ref": "executor:failover-1", "failback_requested": False}
+    return {
+        "applied": True,
+        "applied_at": "2026-08-14T04:06:00+09:00",
+        "executor_evidence_ref": "executor:failover-1",
+        "candidate_id": "fallback-b",
+        "trigger_state": "FAILED",
+        "trigger_source_ref": "health:primary",
+        "trigger_observed_at": "2026-08-14T04:05:00+09:00",
+        "failover_authority_ref": "authority:failover-approved",
+        "failback_requested": False,
+    }
 
 
 def recovery_validator(_):
