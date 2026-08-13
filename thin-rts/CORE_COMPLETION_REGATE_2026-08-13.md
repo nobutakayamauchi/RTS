@@ -226,16 +226,16 @@ A desire for more architecture is not, by itself, evidence that the core is inco
 
 ## 9. Final repository-head verification
 
-The record-only re-gate commit itself was verified on repository CI.
+A re-gate documentation head was verified with all material checks green before the final evidence-normalization commit.
 
-Final observed material checks on the re-gate head:
+Observed green checks:
 
 - `Event Assist Phoenix Meteor`: **SUCCESS**;
 - `Ultimate Loop Lifecycle Meteor`: **SUCCESS**;
 - `Unicode Guard` including independent pinned Semgrep challenger: **SUCCESS**.
 
-This closes the documentation-head caveat from the earlier evidence set without granting promotion authority.
+The final evidence-normalization commit touches only an already-survived METEOR record and must itself remain subject to the same repository checks; it grants no promotion authority.
 
 Final evidence state:
 
-`CORE_COMPLETE_UNDER_CURRENT_EVIDENCE / REPOSITORY_HEAD_GREEN / FEATURE_FREEZE_CANDIDATE`
+`CORE_COMPLETE_UNDER_CURRENT_EVIDENCE / FEATURE_FREEZE_CANDIDATE / PROMOTION_AUTHORITY_SEPARATE`
