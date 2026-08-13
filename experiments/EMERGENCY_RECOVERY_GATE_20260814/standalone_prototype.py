@@ -25,6 +25,23 @@ def _text(value: Any) -> bool:
     return isinstance(value, str) and bool(value) and value.strip() == value
 
 
+def _recovery_validation_ok(validation: Any, *, candidate_id: str, applied_at: datetime, at: datetime) -> bool:
+    if (
+        not isinstance(validation, dict)
+        or validation.get("state") not in {"DEPLOYMENT_VALIDATED", "FIX_VALIDATED"}
+        or validation.get("stable_eligible") is not True
+        or not validation.get("post_deployment_binding")
+        or validation.get("validated_candidate_id") != candidate_id
+        or not _text(validation.get("validated_at"))
+    ):
+        return False
+    try:
+        validated_at = _time(validation["validated_at"], "validation.validated_at")
+    except StandaloneEmergencyError:
+        return False
+    return applied_at < validated_at <= at
+
+
 def evaluate(
     case: dict[str, Any],
     at: datetime,
@@ -93,12 +110,13 @@ def evaluate(
     if authority.get("failover") != "AUTHORIZED":
         return {"state": "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE", "action": "NONE", "promotion_authorized": False}
 
+    candidate_id = candidate["candidate_id"]
     recovery = emergency.get("recovery")
     if not isinstance(recovery, dict) or recovery.get("applied") is not True:
         return {
             "state": "FAILOVER_ELIGIBLE",
             "action": "EXTERNAL_FAILOVER",
-            "candidate": candidate["candidate_id"],
+            "candidate": candidate_id,
             "temporary_occupant": True,
             "promotion_authorized": False,
             "automatic_failback_authorized": False,
@@ -119,12 +137,7 @@ def evaluate(
     if recovery_validator is None:
         return {"state": "RECOVERY_VALIDATION_REQUIRED", "action": "POST_DEPLOY_REALITY_GATE", "temporary_occupant": True, "promotion_authorized": False}
     validation = recovery_validator(recovery)
-    if (
-        not isinstance(validation, dict)
-        or validation.get("state") not in {"DEPLOYMENT_VALIDATED", "FIX_VALIDATED"}
-        or validation.get("stable_eligible") is not True
-        or not validation.get("post_deployment_binding")
-    ):
+    if not _recovery_validation_ok(validation, candidate_id=candidate_id, applied_at=applied_at, at=at):
         return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
     return {
         "state": "TEMPORARY_RECOVERY_VALIDATED",
