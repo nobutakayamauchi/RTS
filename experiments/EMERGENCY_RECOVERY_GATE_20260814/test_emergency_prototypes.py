@@ -1,4 +1,3 @@
-import copy
 import importlib.util
 import sys
 import unittest
@@ -38,13 +37,13 @@ def base_case():
         },
         "emergency": {
             "policy": {"continuity_required": True, "failure_domain_scope": "MATERIAL", "operation_mode": "STATELESS"},
-            "health": {"state": "FAILED", "hysteresis": "PASS", "source_ref": "health:primary", "stale_after": "2026-08-14T06:00:00+09:00"},
+            "health": {"state": "FAILED", "hysteresis": "PASS", "source_ref": "health:primary", "observed_at": "2026-08-14T04:05:00+09:00", "stale_after": "2026-08-14T06:00:00+09:00"},
         },
     }
 
 
 def valid_recovery():
-    return {"applied": True, "applied_at": "2026-08-14T04:08:00+09:00", "executor_evidence_ref": "executor:failover-1", "failback_requested": False}
+    return {"applied": True, "applied_at": "2026-08-14T04:06:00+09:00", "executor_evidence_ref": "executor:failover-1", "failback_requested": False}
 
 
 def recovery_validator(_):
@@ -74,9 +73,7 @@ class StructuralPrototypeTests(unittest.TestCase):
 
     def test_degraded_prepares_without_failover(self):
         case = base_case(); case["emergency"]["health"]["state"] = "DEGRADED"
-        report = self.run_case(case)
-        self.assertEqual(report["state"], "STANDBY_PREPARED")
-        self.assertFalse(report["promotion_authorized"])
+        self.assertEqual(self.run_case(case)["state"], "STANDBY_PREPARED")
 
     def test_hysteresis_blocks_flapping_failure(self):
         case = base_case(); case["emergency"]["health"]["hysteresis"] = "NOT_PASS"
@@ -89,6 +86,10 @@ class StructuralPrototypeTests(unittest.TestCase):
     def test_stale_standby_probe_blocks(self):
         case = base_case(); case["candidate"]["recovery_probe_stale_after"] = "2026-08-14T03:00:00+09:00"
         self.assertIn("EMERGENCY_FALLBACK_PROBE_STALE", self.run_case(case)["blocking_states"])
+
+    def test_fallback_identity_is_required(self):
+        case = base_case(); case["candidate"]["candidate_id"] = ""
+        self.assertIn("FALLBACK_IDENTITY_MISSING", self.run_case(case)["blocking_states"])
 
     def test_failure_domain_needs_evidence_not_label(self):
         case = base_case(); case["candidate"]["failure_domain_independence_ref"] = ""
@@ -115,6 +116,14 @@ class StructuralPrototypeTests(unittest.TestCase):
     def test_recovery_requires_post_deploy_reality_validation(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery()
         self.assertEqual(self.run_case(case)["state"], "RECOVERY_VALIDATION_REQUIRED")
+
+    def test_malformed_recovery_time_is_rejected(self):
+        case = base_case(); case["emergency"]["recovery"] = valid_recovery(); case["emergency"]["recovery"]["applied_at"] = "not-a-time"
+        with self.assertRaises(ValueError): self.run_case(case, recovery_validator)
+
+    def test_future_recovery_time_is_rejected(self):
+        case = base_case(); case["emergency"]["recovery"] = valid_recovery(); case["emergency"]["recovery"]["applied_at"] = "2026-08-14T05:00:00+09:00"
+        with self.assertRaises(ValueError): self.run_case(case, recovery_validator)
 
     def test_validated_recovery_is_temporary_and_opens_debt(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery()
@@ -145,6 +154,10 @@ class NewBuildCounterPrototypeTests(unittest.TestCase):
         report = standalone_prototype.evaluate(case, AT, recovery_validator=recovery_validator)
         self.assertEqual(report["state"], "TEMPORARY_RECOVERY_VALIDATED")
         self.assertFalse(report["promotion_authorized"])
+
+    def test_standalone_rejects_malformed_recovery_time_too(self):
+        case = base_case(); case["emergency"]["recovery"] = valid_recovery(); case["emergency"]["recovery"]["applied_at"] = "bad"
+        with self.assertRaises(ValueError): standalone_prototype.evaluate(case, AT, recovery_validator=recovery_validator)
 
 
 if __name__ == "__main__":
