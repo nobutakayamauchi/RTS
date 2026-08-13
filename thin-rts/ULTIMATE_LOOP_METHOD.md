@@ -133,15 +133,18 @@ DEPLOY / PUBLISH
 Hard invariants:
 
 - `SELF_DECLARED_IDENTITY != DEPLOYMENT_IDENTITY`;
+- trust anchors, expected deployment and observer/domain policy come from verifier-controlled configuration, never from the evidence producer's payload;
 - `CODE EXISTENCE != RUNTIME EVIDENCE`;
 - `RUNTIME-TO-CODE MAPPING != ROOT CAUSE`;
 - probe identity includes its definition fingerprint;
 - regression identity includes its suite fingerprint;
 - runtime, replay, and regression evidence must bind to the verified deployment identity;
+- post-change Deployment Identity must be genuinely new: reusing the initial observation fingerprint or observation session cannot validate a change;
+- temporal order must be proven: `INITIAL_OBSERVATION < CHANGE_APPLIED < POST_CHANGE_OBSERVATION`;
 - `PATCH APPLIED != FIX VALIDATED`;
 - blocked or missing required evidence fails closed.
 
-A clean first deployment that satisfies all required probes may become `DEPLOYMENT_VALIDATED`. A repaired deployment becomes `FIX_VALIDATED` only after re-identity, exact failed-probe replay, and regression evidence.
+A clean first deployment that satisfies all required probes may become `DEPLOYMENT_VALIDATED`. A repaired deployment becomes `FIX_VALIDATED` only after verifier-controlled re-identity, exact failed-probe replay, and regression evidence.
 
 ## Loop 3 — DARWIN ARENA
 
@@ -208,6 +211,6 @@ Every survivor inherits useful memory of the dead:
 
 ## Method invariant
 
-**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep killing the incumbent when reality changes. Verify the deployed reality before calling it stable. Preserve the human-important outcome and the memory required to regenerate it.**
+**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep killing the incumbent when reality changes. Verify the deployed reality with verifier-controlled trust before calling it stable. Preserve the human-important outcome and the memory required to regenerate it.**
 
 That full method is **ULTIMATE LOOP**.
