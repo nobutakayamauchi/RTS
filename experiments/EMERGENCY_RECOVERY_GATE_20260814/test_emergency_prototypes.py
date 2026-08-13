@@ -27,89 +27,42 @@ def base_case():
         "material_durable": True,
         "authority": {"promote": "BLOCKED", "failover": "AUTHORIZED"},
         "policy": {"observe_delta_pct": 5, "meteor_delta_pct": 15, "full_replace_delta_pct": 30},
-        "recovery": {
-            "backup_present": True,
-            "fresh_restore_test": "PASS",
-            "canonical_material": "PASS",
-            "succession_packet": "PASS",
-            "phoenix_test": "PASS",
-        },
+        "recovery": {"backup_present": True, "fresh_restore_test": "PASS", "canonical_material": "PASS", "succession_packet": "PASS", "phoenix_test": "PASS"},
         "candidate": {
-            "candidate_id": "fallback-b",
-            "performance_delta_pct": 0,
-            "replacement_value": "UNKNOWN",
-            "resilience_value": "HIGH",
-            "stability_state": "SURVIVED",
-            "same_frozen_workload": "PASS",
-            "recovery_probe": "PASS",
-            "recovery_probe_ref": "probe:fallback-b",
-            "recovery_probe_stale_after": "2026-08-14T06:00:00+09:00",
-            "migration_state": "PASS",
-            "rollback_state": "PASS",
-            "failure_domain_independence": "VERIFIED",
-            "failure_domain_independence_ref": "evidence:independent-provider-account",
-            "guardrail_compatibility": "PASS",
+            "candidate_id": "fallback-b", "performance_delta_pct": 0, "replacement_value": "UNKNOWN", "resilience_value": "HIGH",
+            "stability_state": "SURVIVED", "same_frozen_workload": "PASS", "recovery_probe": "PASS",
+            "recovery_probe_ref": "probe:fallback-b", "recovery_probe_stale_after": "2026-08-14T06:00:00+09:00",
+            "migration_state": "PASS", "rollback_state": "PASS", "failure_domain_independence": "VERIFIED",
+            "failure_domain_independence_ref": "evidence:independent-provider-account", "guardrail_compatibility": "PASS",
             "guardrail_compatibility_ref": "evidence:security-privacy-compatible",
         },
         "emergency": {
-            "policy": {
-                "continuity_required": True,
-                "failure_domain_scope": "MATERIAL",
-                "operation_mode": "STATELESS",
-            },
-            "health": {
-                "state": "FAILED",
-                "hysteresis": "PASS",
-                "source_ref": "health:primary",
-                "stale_after": "2026-08-14T06:00:00+09:00",
-            },
+            "policy": {"continuity_required": True, "failure_domain_scope": "MATERIAL", "operation_mode": "STATELESS"},
+            "health": {"state": "FAILED", "hysteresis": "PASS", "source_ref": "health:primary", "stale_after": "2026-08-14T06:00:00+09:00"},
         },
     }
 
 
 def valid_recovery():
-    return {
-        "applied": True,
-        "applied_at": "2026-08-14T04:08:00+09:00",
-        "executor_evidence_ref": "executor:failover-1",
-        "failback_requested": False,
-    }
+    return {"applied": True, "applied_at": "2026-08-14T04:08:00+09:00", "executor_evidence_ref": "executor:failover-1", "failback_requested": False}
 
 
 def recovery_validator(_):
-    return {
-        "state": "DEPLOYMENT_VALIDATED",
-        "stable_eligible": True,
-        "post_deployment_binding": ["obs:new", "expect:new", "session:new"],
-    }
+    return {"state": "DEPLOYMENT_VALIDATED", "stable_eligible": True, "post_deployment_binding": ["obs:new", "expect:new", "session:new"]}
 
 
 class ExistingOnlyAttack(unittest.TestCase):
-    def test_existing_lifecycle_has_emergency_but_provider_degradation_routes_to_meteor(self):
-        case = base_case()
-        case.pop("emergency")
-        case["trigger"] = {
-            "type": "PROVIDER_DEGRADATION",
-            "evidence_state": "CURRENT_OBSERVED",
-            "source_ref": "health:degraded",
-            "stale_after": "2026-08-14T06:00:00+09:00",
-            "materiality": "MATERIAL",
-        }
+    def test_existing_degradation_meteor_signal_is_overridden_by_standby_disposition(self):
+        case = base_case(); case.pop("emergency")
+        case["trigger"] = {"type": "PROVIDER_DEGRADATION", "evidence_state": "CURRENT_OBSERVED", "source_ref": "health:degraded", "stale_after": "2026-08-14T06:00:00+09:00", "materiality": "MATERIAL"}
         report = lifecycle.evaluate(case, AT)
         self.assertEqual(report["watch_action"], "METEOR")
-        self.assertEqual(report["next_state"], "METEOR")
+        self.assertEqual(report["candidate_disposition"], "STANDBY")
+        self.assertEqual(report["next_state"], "STANDBY")
 
     def test_existing_lifecycle_can_already_gate_authorized_emergency_failover(self):
-        case = base_case()
-        case.pop("emergency")
-        case["trigger"] = {
-            "type": "PRIMARY_UNAVAILABLE",
-            "evidence_state": "CURRENT_OBSERVED",
-            "source_ref": "health:failed",
-            "stale_after": "2026-08-14T06:00:00+09:00",
-            "materiality": "MATERIAL",
-            "failure_domain_scope": "MATERIAL",
-        }
+        case = base_case(); case.pop("emergency")
+        case["trigger"] = {"type": "PRIMARY_UNAVAILABLE", "evidence_state": "CURRENT_OBSERVED", "source_ref": "health:failed", "stale_after": "2026-08-14T06:00:00+09:00", "materiality": "MATERIAL", "failure_domain_scope": "MATERIAL"}
         report = lifecycle.evaluate(case, AT)
         self.assertEqual(report["candidate_disposition"], "EMERGENCY_FAILOVER_ELIGIBLE")
         self.assertEqual(report["next_state"], "RECOVERY")
@@ -117,12 +70,7 @@ class ExistingOnlyAttack(unittest.TestCase):
 
 class StructuralPrototypeTests(unittest.TestCase):
     def run_case(self, case, validator=None):
-        return structural_prototype.evaluate(
-            case,
-            AT,
-            lifecycle_evaluator=lifecycle.evaluate,
-            recovery_validator=validator,
-        )
+        return structural_prototype.evaluate(case, AT, lifecycle_evaluator=lifecycle.evaluate, recovery_validator=validator)
 
     def test_degraded_prepares_without_failover(self):
         case = base_case(); case["emergency"]["health"]["state"] = "DEGRADED"
@@ -140,28 +88,23 @@ class StructuralPrototypeTests(unittest.TestCase):
 
     def test_stale_standby_probe_blocks(self):
         case = base_case(); case["candidate"]["recovery_probe_stale_after"] = "2026-08-14T03:00:00+09:00"
-        report = self.run_case(case)
-        self.assertIn("EMERGENCY_FALLBACK_PROBE_STALE", report["blocking_states"])
+        self.assertIn("EMERGENCY_FALLBACK_PROBE_STALE", self.run_case(case)["blocking_states"])
 
     def test_failure_domain_needs_evidence_not_label(self):
         case = base_case(); case["candidate"]["failure_domain_independence_ref"] = ""
-        report = self.run_case(case)
-        self.assertIn("FAILURE_DOMAIN_INDEPENDENCE_UNPROVEN", report["blocking_states"])
+        self.assertIn("FAILURE_DOMAIN_INDEPENDENCE_UNPROVEN", self.run_case(case)["blocking_states"])
 
     def test_guardrail_compatibility_is_hard(self):
         case = base_case(); case["candidate"]["guardrail_compatibility"] = "UNKNOWN"
-        report = self.run_case(case)
-        self.assertIn("EMERGENCY_GUARDRAIL_COMPATIBILITY_UNPROVEN", report["blocking_states"])
+        self.assertIn("EMERGENCY_GUARDRAIL_COMPATIBILITY_UNPROVEN", self.run_case(case)["blocking_states"])
 
     def test_single_writer_requires_write_fence(self):
         case = base_case(); case["emergency"]["policy"]["operation_mode"] = "READ_WRITE_SINGLE_WRITER"
-        report = self.run_case(case)
-        self.assertIn("PRIMARY_WRITE_FENCE_UNPROVEN", report["blocking_states"])
+        self.assertIn("PRIMARY_WRITE_FENCE_UNPROVEN", self.run_case(case)["blocking_states"])
 
     def test_authority_still_owned_by_existing_lifecycle(self):
         case = base_case(); case["authority"]["failover"] = "BLOCKED"
-        report = self.run_case(case)
-        self.assertEqual(report["state"], "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE")
+        self.assertEqual(self.run_case(case)["state"], "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE")
 
     def test_failed_primary_becomes_external_failover_eligible_only(self):
         report = self.run_case(base_case())
@@ -171,8 +114,7 @@ class StructuralPrototypeTests(unittest.TestCase):
 
     def test_recovery_requires_post_deploy_reality_validation(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery()
-        report = self.run_case(case)
-        self.assertEqual(report["state"], "RECOVERY_VALIDATION_REQUIRED")
+        self.assertEqual(self.run_case(case)["state"], "RECOVERY_VALIDATION_REQUIRED")
 
     def test_validated_recovery_is_temporary_and_opens_debt(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery()
@@ -184,14 +126,12 @@ class StructuralPrototypeTests(unittest.TestCase):
 
     def test_automatic_failback_is_blocked(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery(); case["emergency"]["recovery"]["failback_requested"] = True
-        report = self.run_case(case, recovery_validator)
-        self.assertEqual(report["state"], "FAILBACK_BLOCKED_PENDING_DARWIN")
+        self.assertEqual(self.run_case(case, recovery_validator)["state"], "FAILBACK_BLOCKED_PENDING_DARWIN")
 
 
 class NewBuildCounterPrototypeTests(unittest.TestCase):
-    def test_standalone_matches_structural_on_core_death_cases(self):
-        variants = []
-        variants.append(base_case())
+    def test_standalone_matches_structural_on_core_cases(self):
+        variants = [base_case()]
         x = base_case(); x["emergency"]["health"]["state"] = "DEGRADED"; variants.append(x)
         x = base_case(); x["emergency"]["health"]["state"] = "UNKNOWN"; variants.append(x)
         x = base_case(); x["candidate"]["failure_domain_independence_ref"] = ""; variants.append(x)
@@ -200,7 +140,7 @@ class NewBuildCounterPrototypeTests(unittest.TestCase):
             standalone = standalone_prototype.evaluate(case, AT)
             self.assertEqual(standalone["state"], structural["state"])
 
-    def test_standalone_can_validate_recovery_but_does_not_gain_promotion_authority(self):
+    def test_standalone_recovery_remains_temporary(self):
         case = base_case(); case["emergency"]["recovery"] = valid_recovery()
         report = standalone_prototype.evaluate(case, AT, recovery_validator=recovery_validator)
         self.assertEqual(report["state"], "TEMPORARY_RECOVERY_VALIDATED")
