@@ -1,4 +1,4 @@
-name: Temporary Emergency Raison Prototype
+name: Temporary Emergency METEOR
 on:
   pull_request:
     paths:
@@ -17,5 +17,7 @@ jobs:
         run: python thin-rts/ultimate-loop/test_lifecycle.py -v
       - name: Existing lifecycle destructive regression
         run: python thin-rts/ultimate-loop/test_meteor_lifecycle.py -v
-      - name: Emergency prototype comparison
+      - name: Emergency prototype regression
         run: python experiments/EMERGENCY_RECOVERY_GATE_20260814/test_emergency_prototypes.py -v
+      - name: Emergency destructive METEOR
+        run: python experiments/EMERGENCY_RECOVERY_GATE_20260814/test_emergency_meteor.py -v
