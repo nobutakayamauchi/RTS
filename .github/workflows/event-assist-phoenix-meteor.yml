@@ -26,8 +26,6 @@ jobs:
         run: |
           test "$(wc -l < thin-rts/event-assist/SOURCE_MANIFEST.sha256)" -eq 20
           test ! -e thin-rts/event-assist/event_state.py
-          echo "Actual current checksum for case_b fixture:"
-          sha256sum thin-rts/event-assist/fixtures/case_b_childbirth_current_sources.json
           sha256sum -c thin-rts/event-assist/SOURCE_MANIFEST.sha256
 
       - name: Set up Python
