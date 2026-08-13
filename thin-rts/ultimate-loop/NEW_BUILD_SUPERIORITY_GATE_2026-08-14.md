@@ -2,7 +2,9 @@
 
 Date: **2026-08-14**
 
-Status: `CANONICAL_EXTENSION_CANDIDATE`
+Status: `CANONICAL / ACTIVE`
+
+Canonical parent: `thin-rts/ULTIMATE_LOOP_METHOD.md`
 
 ## Rule
 
