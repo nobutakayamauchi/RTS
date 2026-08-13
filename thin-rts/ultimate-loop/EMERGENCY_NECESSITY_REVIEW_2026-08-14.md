@@ -30,7 +30,7 @@ Existing RTS already owns most governance:
 
 The current lifecycle binder does not yet express all of the desired emergency semantics:
 
-- material provider degradation routes to METEOR rather than an emergency-preparation state;
+- material `PROVIDER_DEGRADATION` is classified as `METEOR` at the trigger layer, but an already-present high-resilience fallback can later produce `STANDBY` and override the final `next_state`; there is no explicit `DEGRADED -> PREPARE_STANDBY` emergency-preparation state or precedence contract;
 - emergency recovery-probe freshness/provenance is not bound;
 - failure-domain `VERIFIED` is not itself tied to an evidence reference;
 - guardrail compatibility is not hard in the emergency path;
@@ -38,6 +38,8 @@ The current lifecycle binder does not yet express all of the desired emergency s
 - validated temporary recovery is not distinct from permanent promotion;
 - recovery debt and manual post-incident judgment are not explicit;
 - automatic failback is not explicitly forbidden.
+
+The provider-degradation precedence behavior was observed directly in the prototype comparison and is retained as a future METEOR death case rather than hidden by changing the workload.
 
 ## Manual bounded alternative
 
@@ -50,13 +52,15 @@ A runbook plus a human operator can compose external failover tooling with Conti
 It reuses the existing lifecycle evaluator for trigger, candidate and authority semantics and adds only missing bindings:
 
 - normalized `HEALTHY / DEGRADED / FAILED / UNSAFE / UNKNOWN`;
-- hysteresis evidence before ordinary degradation/failure transition;
+- current health-observation identity/time plus hysteresis evidence before ordinary degradation/failure transition;
+- explicit fallback candidate identity;
 - current fallback probe reference and freshness;
 - failure-domain independence evidence reference;
 - guardrail compatibility evidence;
 - optional single-writer fencing requirement;
 - DEGRADED prepares standby without failover;
 - FAILED/UNSAFE uses existing lifecycle emergency eligibility and external failover only;
+- failover execution evidence and temporal ordering;
 - post-failover Reality Gate requirement;
 - temporary recovery rather than permanent promotion;
 - automatic failback blocked;
@@ -72,9 +76,19 @@ The independent evaluator can reproduce the same bounded outputs, so a standalon
 
 Verdict under current evidence: `STANDALONE NEW ENGINE NOT JUSTIFIED UNLESS STRUCTURAL PROTOTYPE FAILS METEOR`.
 
+## Prototype attack repairs
+
+The first prototype pass exposed and repaired evidence holes before this gate closed:
+
+- fallback eligibility previously permitted a missing `candidate_id`; the structural and standalone candidates now fail closed on missing fallback identity;
+- applied recovery evidence previously accepted any nonblank `applied_at`; both candidates now require timezone-aware ISO-8601 and enforce `HEALTH_OBSERVED < FAILOVER_APPLIED <= EVALUATION_TIME`;
+- test coverage preserves malformed/future recovery timestamps as permanent death cases.
+
+These repairs do not authorize canonicalization. They only make the candidates eligible for the next destructive comparison.
+
 ## Next attack set
 
-The next gate must cover at least: flapping degradation, stale standby evidence, false failure-domain independence, missing guardrail compatibility, single-writer failover without fencing, missing failover authority, no verified fallback, UNKNOWN health, failover without Reality validation, accidental permanent promotion, automatic failback, dropped recovery debt, and architecture growth into monitoring/traffic-switch/provider/secret/scheduler infrastructure.
+The next gate must cover at least: flapping degradation, stale standby evidence, false failure-domain independence, missing guardrail compatibility, single-writer failover without fencing, missing failover authority, no verified fallback, UNKNOWN health, failover without Reality validation, accidental permanent promotion, automatic failback, dropped recovery debt, degradation/standby precedence, and architecture growth into monitoring/traffic-switch/provider/secret/scheduler infrastructure.
 
 ## Gate verdict
 
@@ -83,6 +97,8 @@ The next gate must cover at least: flapping degradation, stale standby evidence,
 `GENERAL MONITORING / FAILOVER PLATFORM = NOT JUSTIFIED`
 
 `EXTERNAL FAILOVER MECHANICS = KEEP / COMPOSE`
+
+`MANUAL_BOUNDED = VALID WHEN WORKLOAD RTO ALLOWS IT`
 
 `CURRENT RTS LIFECYCLE + CONTINUITY + REALITY GATE + DARWIN = REUSE`
 
