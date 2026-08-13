@@ -54,13 +54,7 @@ def _candidate_preflight(case: dict[str, Any], at: datetime) -> list[str]:
     return sorted(set(blocks))
 
 
-def _recovery_validation_ok(
-    validation: Any,
-    *,
-    candidate_id: str,
-    applied_at: datetime,
-    at: datetime,
-) -> bool:
+def _recovery_validation_ok(validation: Any, *, candidate_id: str, applied_at: datetime, at: datetime) -> bool:
     if (
         not isinstance(validation, dict)
         or validation.get("state") not in {"DEPLOYMENT_VALIDATED", "FIX_VALIDATED"}
@@ -77,6 +71,67 @@ def _recovery_validation_ok(
     return applied_at < validated_at <= at
 
 
+def _applied_recovery(
+    case: dict[str, Any],
+    at: datetime,
+    recovery: dict[str, Any],
+    recovery_validator: Callable[[dict[str, Any]], dict[str, Any]] | None,
+) -> dict[str, Any]:
+    candidate = case.get("candidate")
+    if not isinstance(candidate, dict) or not _text(candidate.get("candidate_id")):
+        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
+    required_text = (
+        "executor_evidence_ref",
+        "applied_at",
+        "candidate_id",
+        "trigger_source_ref",
+        "trigger_observed_at",
+        "failover_authority_ref",
+    )
+    if any(not _text(recovery.get(key)) for key in required_text):
+        raise EmergencyPrototypeError("applied recovery requires bound trigger/executor/authority evidence")
+    if recovery.get("candidate_id") != candidate["candidate_id"]:
+        return {"state": "RECOVERY_NOT_VALIDATED", "action": "RETURN_TO_ANALYSIS", "temporary_occupant": True, "promotion_authorized": False}
+    if recovery.get("trigger_state") not in {"FAILED", "UNSAFE"}:
+        raise EmergencyPrototypeError("applied recovery requires FAILED or UNSAFE trigger snapshot")
+    trigger_at = _time(recovery["trigger_observed_at"], "recovery.trigger_observed_at")
+    applied_at = _time(recovery["applied_at"], "recovery.applied_at")
+    if not (trigger_at < applied_at <= at):
+        raise EmergencyPrototypeError("recovery application time must follow its persisted trigger observation and not be future")
+    if recovery.get("failback_requested") is True:
+        return {
+            "state": "FAILBACK_BLOCKED_PENDING_DARWIN",
+            "action": "NONE",
+            "temporary_occupant": True,
+            "promotion_authorized": False,
+            "automatic_failback_authorized": False,
+        }
+    if recovery_validator is None:
+        return {
+            "state": "RECOVERY_VALIDATION_REQUIRED",
+            "action": "POST_DEPLOY_REALITY_GATE",
+            "temporary_occupant": True,
+            "promotion_authorized": False,
+        }
+    validation = recovery_validator(recovery)
+    if not _recovery_validation_ok(validation, candidate_id=candidate["candidate_id"], applied_at=applied_at, at=at):
+        return {
+            "state": "RECOVERY_NOT_VALIDATED",
+            "action": "RETURN_TO_ANALYSIS",
+            "temporary_occupant": True,
+            "promotion_authorized": False,
+        }
+    return {
+        "state": "TEMPORARY_RECOVERY_VALIDATED",
+        "action": "CONTINUE_TEMPORARILY",
+        "temporary_occupant": True,
+        "promotion_authorized": False,
+        "automatic_failback_authorized": False,
+        "post_deployment_binding": validation["post_deployment_binding"],
+        "recovery_debt": ["DISCOVERY_REFRESH", "ROOT_CAUSE_REVIEW", "METEOR_DARWIN", "PERMANENT_OCCUPANT_DECISION"],
+    }
+
+
 def evaluate(
     case: dict[str, Any],
     at: datetime,
@@ -84,11 +139,9 @@ def evaluate(
     lifecycle_evaluator: Callable[[dict[str, Any], datetime], dict[str, Any]],
     recovery_validator: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Prototype emergency layer extracted around the existing lifecycle binder.
+    """Thin emergency binder around the existing lifecycle authority.
 
     Monitoring, traffic switching, restart, secret handling and provider APIs remain external.
-    The prototype only adds emergency-prep and temporary-recovery semantics that the existing
-    lifecycle binder does not currently express.
     """
     if not isinstance(case, dict) or not isinstance(case.get("emergency"), dict):
         raise EmergencyPrototypeError("emergency case required")
@@ -102,13 +155,20 @@ def evaluate(
         raise EmergencyPrototypeError("invalid health state")
     if not _text(health.get("source_ref")) or not _text(health.get("observed_at")) or not _text(health.get("stale_after")):
         raise EmergencyPrototypeError("current health evidence required")
+
+    # Once a failover has actually been applied, the persisted trigger snapshot is
+    # the temporal authority for that recovery. Later primary health samples must
+    # not erase the temporary occupant, recovery debt, or failback prohibition.
+    recovery = emergency.get("recovery")
+    if isinstance(recovery, dict) and recovery.get("applied") is True:
+        return _applied_recovery(case, at, recovery, recovery_validator)
+
     health_at = _time(health["observed_at"], "health.observed_at")
     stale_at = _time(health["stale_after"], "health.stale_after")
     if health_at > at:
         raise EmergencyPrototypeError("health observation cannot be in the future")
     if stale_at <= at or stale_at <= health_at:
         return {"state": "HEALTH_EVIDENCE_STALE", "action": "HUMAN_REVIEW", "promotion_authorized": False}
-
     if state == "HEALTHY":
         return {"state": "HEALTHY", "action": "NONE", "promotion_authorized": False}
     if state == "UNKNOWN":
@@ -123,7 +183,6 @@ def evaluate(
         if blocks:
             return {"state": "DEGRADED", "action": "PREPARE_STANDBY", "blocking_states": blocks, "promotion_authorized": False}
         return {"state": "STANDBY_PREPARED", "action": "NONE", "promotion_authorized": False}
-
     if blocks:
         return {"state": "NO_VERIFIED_FALLBACK", "action": "FAIL_CLOSED_OR_DECLARED_DEGRADED", "blocking_states": blocks, "promotion_authorized": False}
 
@@ -138,63 +197,12 @@ def evaluate(
     }
     base = lifecycle_evaluator(bound, at)
     if base.get("candidate_disposition") != "EMERGENCY_FAILOVER_ELIGIBLE":
-        return {
-            "state": "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE",
-            "action": "NONE",
-            "base_lifecycle": base,
-            "promotion_authorized": False,
-        }
-
-    recovery = emergency.get("recovery")
-    candidate_id = case["candidate"]["candidate_id"]
-    if not isinstance(recovery, dict) or recovery.get("applied") is not True:
-        return {
-            "state": "FAILOVER_ELIGIBLE",
-            "action": "EXTERNAL_FAILOVER",
-            "candidate": candidate_id,
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-            "automatic_failback_authorized": False,
-        }
-    if recovery.get("failback_requested") is True:
-        return {
-            "state": "FAILBACK_BLOCKED_PENDING_DARWIN",
-            "action": "NONE",
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-            "automatic_failback_authorized": False,
-        }
-    if not _text(recovery.get("executor_evidence_ref")) or not _text(recovery.get("applied_at")):
-        raise EmergencyPrototypeError("failover execution evidence required")
-    applied_at = _time(recovery["applied_at"], "recovery.applied_at")
-    if not (health_at < applied_at <= at):
-        raise EmergencyPrototypeError("recovery application time must follow the health observation and not be future")
-    if recovery_validator is None:
-        return {
-            "state": "RECOVERY_VALIDATION_REQUIRED",
-            "action": "POST_DEPLOY_REALITY_GATE",
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-        }
-    validation = recovery_validator(recovery)
-    if not _recovery_validation_ok(validation, candidate_id=candidate_id, applied_at=applied_at, at=at):
-        return {
-            "state": "RECOVERY_NOT_VALIDATED",
-            "action": "RETURN_TO_ANALYSIS",
-            "temporary_occupant": True,
-            "promotion_authorized": False,
-        }
+        return {"state": "FAILOVER_NOT_AUTHORIZED_OR_ELIGIBLE", "action": "NONE", "base_lifecycle": base, "promotion_authorized": False}
     return {
-        "state": "TEMPORARY_RECOVERY_VALIDATED",
-        "action": "CONTINUE_TEMPORARILY",
+        "state": "FAILOVER_ELIGIBLE",
+        "action": "EXTERNAL_FAILOVER",
+        "candidate": case["candidate"]["candidate_id"],
         "temporary_occupant": True,
         "promotion_authorized": False,
         "automatic_failback_authorized": False,
-        "post_deployment_binding": validation["post_deployment_binding"],
-        "recovery_debt": [
-            "DISCOVERY_REFRESH",
-            "ROOT_CAUSE_REVIEW",
-            "METEOR_DARWIN",
-            "PERMANENT_OCCUPANT_DECISION",
-        ],
     }
