@@ -2,7 +2,7 @@
 
 Date: **2026-08-14 JST**
 
-Status: `MERGE_CANDIDATE / NOT_CANONICAL_UNTIL_MERGED`
+Status: `CANONICAL / ACTIVE / MERGED_PR_331`
 
 ## Purpose
 
@@ -97,7 +97,7 @@ Keep external and replaceable:
 ## METEOR disposition
 
 - Existing + `MANUAL_BOUNDED`: `KEEP_CONDITIONALLY` when operator/runbook/RTO satisfy the workload.
-- Structural extraction: `METEOR_SURVIVOR / MERGE_READY_CANDIDATE`.
+- Structural extraction: `PROMOTED / CANONICAL ACTIVE` after destructive METEOR and PR #331 merge.
 - Standalone new engine: `REJECT` because parity does not justify duplicated lifecycle authority and policy drift.
 
 See `EMERGENCY_METEOR_RESULT_2026-08-14.md` for destructive evidence and retained death causes.
