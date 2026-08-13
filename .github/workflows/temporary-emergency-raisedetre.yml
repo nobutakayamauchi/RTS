@@ -21,3 +21,5 @@ jobs:
         run: python experiments/EMERGENCY_RECOVERY_GATE_20260814/test_emergency_prototypes.py -v
       - name: Emergency destructive METEOR
         run: python experiments/EMERGENCY_RECOVERY_GATE_20260814/test_emergency_meteor.py -v
+      - name: Emergency review death regressions
+        run: python experiments/EMERGENCY_RECOVERY_GATE_20260814/test_emergency_review_deaths.py -v
