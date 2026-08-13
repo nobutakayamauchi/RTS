@@ -223,3 +223,19 @@ New work may proceed only as one of:
 - new material evidence that explicitly reopens the inner WITNESS loop.
 
 A desire for more architecture is not, by itself, evidence that the core is incomplete.
+
+## 9. Final repository-head verification
+
+The record-only re-gate commit itself was verified on repository CI.
+
+Final observed material checks on the re-gate head:
+
+- `Event Assist Phoenix Meteor`: **SUCCESS**;
+- `Ultimate Loop Lifecycle Meteor`: **SUCCESS**;
+- `Unicode Guard` including independent pinned Semgrep challenger: **SUCCESS**.
+
+This closes the documentation-head caveat from the earlier evidence set without granting promotion authority.
+
+Final evidence state:
+
+`CORE_COMPLETE_UNDER_CURRENT_EVIDENCE / REPOSITORY_HEAD_GREEN / FEATURE_FREEZE_CANDIDATE`
