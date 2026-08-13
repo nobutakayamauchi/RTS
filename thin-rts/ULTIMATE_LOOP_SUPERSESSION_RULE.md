@@ -26,6 +26,12 @@ A successor is not proven superior by novelty, naming, claimed intelligence, ben
 - real-world destructive cases and materially relevant workloads;
 - whole-life cost, operator burden, safety and resilience.
 
+A successor must demonstrate at least one **material improvement** in the declared mission or materially broader capability. Merely matching ULTIMATE LOOP does not establish supersession.
+
+The comparison must retain inherited hard obligations, known death causes and frozen/material workloads where they remain applicable. A challenger may add stronger tests, but it may not obtain superiority by quietly removing the cases that previously killed weaker designs.
+
+Any material regression or tradeoff must be explicit, evidenced and accepted under the applicable authority; an unacknowledged regression cannot be hidden inside an aggregate score.
+
 The successor does **not** need to copy ULTIMATE LOOP's names, internal loops, agents, tools, implementation, or structure. A radically different method is eligible. Structural similarity is not a survival criterion.
 
 The protected outcome and its material obligations may themselves be challenged or retired through explicit evidence and applicable authority, but a successor may not silently weaken or redefine them merely to appear superior.
@@ -33,6 +39,8 @@ The protected outcome and its material obligations may themselves be challenged 
 `DIFFERENT != INFERIOR`
 
 `NEW != SUPERIOR`
+
+`EQUAL != SUPERIOR`
 
 `CLAIMED SUPERIORITY != PROVEN SUPERIORITY`
 
