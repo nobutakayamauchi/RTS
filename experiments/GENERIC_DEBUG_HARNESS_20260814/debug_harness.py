@@ -2,97 +2,123 @@ from __future__ import annotations
 
 from typing import Any
 
+from .attested_identity_adapter import binding, resolve
+
 
 class DebugEvidenceError(ValueError):
     pass
 
 
-def _established(identity: Any) -> bool:
-    return (
-        isinstance(identity, dict)
-        and identity.get("status") == "ESTABLISHED"
-        and isinstance(identity.get("evidence_ref"), str)
-        and bool(identity["evidence_ref"])
-        and isinstance(identity.get("fingerprint"), str)
-        and bool(identity["fingerprint"])
+def _refs(value: Any) -> bool:
+    return isinstance(value, list) and bool(value) and all(
+        isinstance(item, str) and bool(item.strip()) and item == item.strip()
+        for item in value
     )
 
 
-def evaluate(case: dict[str, Any]) -> dict[str, Any]:
-    identity = case.get("deployment_identity") or {}
-    if not _established(identity):
-        return {"state": "BLOCKED_DEPLOYMENT_IDENTITY", "fix_validated": False}
+def _manifest(rows: Any) -> dict[str, dict[str, Any]]:
+    if not isinstance(rows, list) or not rows:
+        raise DebugEvidenceError("probe_manifest required")
+    out: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"probe_id", "definition_fingerprint", "required"}:
+            raise DebugEvidenceError("probe manifest shape")
+        pid, definition, required = row["probe_id"], row["definition_fingerprint"], row["required"]
+        if not isinstance(pid, str) or not pid or not isinstance(definition, str) or not definition or not isinstance(required, bool):
+            raise DebugEvidenceError("probe manifest values")
+        if pid in out:
+            raise DebugEvidenceError("duplicate probe_id")
+        out[pid] = row
+    return out
 
-    probes = case.get("probes")
-    if not isinstance(probes, list) or not probes:
-        raise DebugEvidenceError("non-empty probes required")
 
-    failed: list[str] = []
-    for probe in probes:
-        if not isinstance(probe, dict):
-            raise DebugEvidenceError("probe must be an object")
-        if probe.get("status") not in {"PASS", "FAIL", "BLOCKED"}:
-            raise DebugEvidenceError("invalid probe status")
-        if not probe.get("probe_id") or not probe.get("evidence_refs"):
-            raise DebugEvidenceError("probe identity and evidence required")
-        if probe.get("deployment_fingerprint") != identity["fingerprint"]:
-            return {
-                "state": "BLOCKED_PROBE_IDENTITY_MISMATCH",
-                "failed_probe_ids": sorted(failed),
-                "blocking_states": [f"PROBE_IDENTITY_MISMATCH:{probe['probe_id']}"],
-                "fix_validated": False,
-            }
-        if probe["status"] == "BLOCKED":
-            return {"state": "BLOCKED_PROBE_EXECUTION", "failed_probe_ids": sorted(failed), "fix_validated": False}
-        if probe["status"] == "FAIL":
-            failed.append(probe["probe_id"])
+def _results(rows: Any, manifest: dict[str, dict[str, Any]], proof: dict[str, Any], label: str) -> dict[str, dict[str, Any]]:
+    if not isinstance(rows, list):
+        raise DebugEvidenceError(f"{label} must be a list")
+    fields = {
+        "probe_id", "definition_fingerprint", "status", "evidence_refs",
+        "deployment_observation_fingerprint", "deployment_expectation_fingerprint",
+        "observation_session_id",
+    }
+    expected = binding(proof)
+    out: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != fields:
+            raise DebugEvidenceError(f"{label} shape")
+        pid = row["probe_id"]
+        if pid not in manifest or pid in out:
+            raise DebugEvidenceError(f"{label} unknown or duplicate probe")
+        if row["definition_fingerprint"] != manifest[pid]["definition_fingerprint"]:
+            raise DebugEvidenceError(f"{label} probe definition mismatch")
+        if row["status"] not in {"PASS", "FAIL", "BLOCKED"} or not _refs(row["evidence_refs"]):
+            raise DebugEvidenceError(f"{label} evidence invalid")
+        actual = (
+            row["deployment_observation_fingerprint"],
+            row["deployment_expectation_fingerprint"],
+            row["observation_session_id"],
+        )
+        if actual != expected:
+            raise DebugEvidenceError(f"{label} deployment binding mismatch")
+        out[pid] = row
+    return out
 
+
+def evaluate(case: Any) -> dict[str, Any]:
+    if not isinstance(case, dict):
+        raise DebugEvidenceError("case object required")
+    manifest = _manifest(case.get("probe_manifest"))
+    initial = resolve(case.get("deployment_identity_bundle"))
+    results = _results(case.get("probe_results"), manifest, initial, "probe_results")
+    required = {pid for pid, row in manifest.items() if row["required"]}
+
+    missing = sorted(required - set(results))
+    if missing:
+        return {"state": "BLOCKED_REQUIRED_PROBE_MISSING", "stable_eligible": False, "fix_validated": False}
+    if any(results[pid]["status"] == "BLOCKED" for pid in required):
+        return {"state": "BLOCKED_PROBE_EXECUTION", "stable_eligible": False, "fix_validated": False}
+
+    failed = sorted(pid for pid in required if results[pid]["status"] == "FAIL")
     if not failed:
-        return {"state": "NO_FAILURE_OBSERVED", "failed_probe_ids": [], "fix_validated": False}
+        return {"state": "DEPLOYMENT_VALIDATED", "stable_eligible": True, "fix_validated": False}
 
-    patch = case.get("patch") or {}
-    if patch.get("applied") is not True:
-        return {"state": "FAILURE_EVIDENCE_READY", "failed_probe_ids": sorted(failed), "fix_validated": False}
+    patch = case.get("patch")
+    if not isinstance(patch, dict) or patch.get("applied") is not True:
+        return {"state": "FAILURE_EVIDENCE_READY", "stable_eligible": False, "fix_validated": False}
 
-    post = patch.get("post_deployment_identity") or {}
-    blockers: list[str] = []
-    if not _established(post):
-        blockers.append("POST_PATCH_IDENTITY_NOT_ESTABLISHED")
+    post = resolve(patch.get("post_deployment_identity_bundle"))
+    replay = _results(patch.get("replay_results"), manifest, post, "replay_results")
+    blockers = [
+        f"FAILED_PROBE_REPLAY_NOT_PASS:{pid}"
+        for pid in failed
+        if pid not in replay or replay[pid]["status"] != "PASS"
+    ]
 
-    replay_results = patch.get("replay_results", [])
-    if not isinstance(replay_results, list):
-        raise DebugEvidenceError("replay_results must be a list")
-    replay: dict[str, dict[str, Any]] = {}
-    for row in replay_results:
-        if not isinstance(row, dict):
-            raise DebugEvidenceError("replay row must be an object")
-        probe_id = row.get("probe_id")
-        if not probe_id or probe_id in replay:
-            raise DebugEvidenceError("replay probe_id missing or duplicate")
-        replay[probe_id] = row
-
-    post_fingerprint = post.get("fingerprint")
-    for probe_id in failed:
-        row = replay.get(probe_id)
-        if not row or row.get("status") != "PASS" or not row.get("evidence_refs"):
-            blockers.append(f"FAILED_PROBE_REPLAY_NOT_PROVEN:{probe_id}")
-        elif row.get("deployment_fingerprint") != post_fingerprint:
-            blockers.append(f"FAILED_PROBE_REPLAY_IDENTITY_MISMATCH:{probe_id}")
-
-    if patch.get("regression_status") != "PASS" or not patch.get("regression_evidence_refs"):
+    reg_manifest = case.get("regression_manifest")
+    regression = patch.get("regression_result")
+    if not isinstance(reg_manifest, dict) or set(reg_manifest) != {"suite_fingerprint"} or not reg_manifest["suite_fingerprint"]:
+        raise DebugEvidenceError("regression manifest invalid")
+    fields = {
+        "suite_fingerprint", "status", "evidence_refs",
+        "deployment_observation_fingerprint", "deployment_expectation_fingerprint",
+        "observation_session_id",
+    }
+    if not isinstance(regression, dict) or set(regression) != fields:
+        raise DebugEvidenceError("regression result invalid")
+    if regression["suite_fingerprint"] != reg_manifest["suite_fingerprint"]:
+        blockers.append("REGRESSION_SUITE_FINGERPRINT_MISMATCH")
+    if regression["status"] != "PASS" or not _refs(regression["evidence_refs"]):
         blockers.append("REGRESSION_NOT_PROVEN")
-    elif patch.get("regression_deployment_fingerprint") != post_fingerprint:
-        blockers.append("REGRESSION_IDENTITY_MISMATCH")
+    if (
+        regression["deployment_observation_fingerprint"],
+        regression["deployment_expectation_fingerprint"],
+        regression["observation_session_id"],
+    ) != binding(post):
+        blockers.append("REGRESSION_DEPLOYMENT_BINDING_MISMATCH")
 
+    ok = not blockers
     return {
-        "state": "FIX_VALIDATED" if not blockers else "PATCH_NOT_VALIDATED",
-        "failed_probe_ids": sorted(failed),
+        "state": "FIX_VALIDATED" if ok else "PATCH_NOT_VALIDATED",
+        "stable_eligible": ok,
+        "fix_validated": ok,
         "blocking_states": sorted(blockers),
-        "fix_validated": not blockers,
-        "invariants": [
-            "CODE_EXISTENCE != RUNTIME_EVIDENCE",
-            "MAPPING != ROOT_CAUSE",
-            "PATCH_APPLIED != FIX_VALIDATED",
-            "RUNTIME_EVIDENCE_MUST_BIND_TO_DEPLOYMENT_FINGERPRINT",
-        ],
     }
