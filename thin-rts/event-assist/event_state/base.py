@@ -238,3 +238,4 @@ def _validate_evidence(case: dict[str, Any], source_idx: dict[str, dict[str, Any
             raise EventStateError(f"evidence {evidence_id} BLOCKED_AUTHORITY conflicts with AUTHORIZED")
     return idx
 
+

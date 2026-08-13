@@ -93,7 +93,7 @@ class CreatorAbsentPhoenixTest(unittest.TestCase):
         banned = set(self.packet["human_priority_contract"]["must_not_require"])
         self.assertIn("original creator memory", banned)
         self.assertIn("original AI conversation", banned)
-        self.assertIn("the original event_state.py implementation", banned)
+        self.assertIn("the original Event Assist binder implementation", banned)
 
     def test_creator_absent_replacement_reconstructs_material_pilot(self):
         result = reconstruct_protected_projection(self.case, self.packet, "2026-08-13T01:30:00Z")

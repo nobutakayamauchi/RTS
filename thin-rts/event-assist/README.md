@@ -6,7 +6,7 @@ Event Assist is **not** an RTS-owned life-management platform.
 
 The surviving custom responsibility is one pure state binder/validator:
 
-`event_state.py`
+`event_state/`
 
 Everything else remains external or already adopted:
 
@@ -23,7 +23,7 @@ Everything else remains external or already adopted:
 Validate one typed event case:
 
 ```bash
-python3 event_state.py goal fixtures/case_b_childbirth_current_sources.json \
+python3 event_state/__init__.py goal fixtures/case_b_childbirth_current_sources.json \
   --at 2026-08-13T01:00:00Z
 ```
 

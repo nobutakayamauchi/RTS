@@ -16,12 +16,12 @@
     "must_not_require": [
       "original creator memory",
       "original AI conversation",
-      "the original event_state.py implementation",
+      "the original Event Assist binder implementation",
       "an RTS-owned database, scheduler, retriever, storage engine, crypto engine, or submission engine"
     ]
   },
   "current_occupant": {
-    "implementation_ref": "repo:thin-rts/event-assist/event_state.py",
+    "implementation_ref": "repo:thin-rts/event-assist/event_state/",
     "implementation_id": "thin-rts-event-state-binder/v0",
     "input_schema": "new-rts-event-case/v0",
     "report_schema": "new-rts-event-case-report/v0"
@@ -36,7 +36,10 @@
     "historical_source_observation_root": "repo:thin-rts/event-assist/fixtures/current-sources/"
   },
   "regeneration_rules": {
-    "event_truth_blocking_states": ["DISPUTED", "UNKNOWN"],
+    "event_truth_blocking_states": [
+      "DISPUTED",
+      "UNKNOWN"
+    ],
     "evidence_gap_statuses": [
       "PARTIAL",
       "MISSING_RECOVERABLE",
@@ -46,11 +49,19 @@
       "UNKNOWN"
     ],
     "authorized_state": "AUTHORIZED",
-    "watch_nonfailure_states": ["NONE", "NOT_APPLICABLE"],
+    "watch_nonfailure_states": [
+      "NONE",
+      "NOT_APPLICABLE"
+    ],
     "watch_failed_delivery_state": "FAILED",
     "deadline_field": "deadline",
     "authority_requirement_field": "authority_required",
-    "submission_document_states": ["SUBMISSION_AUTHORIZED", "SUBMITTED", "RECEIPT", "OUTCOME_OBSERVED"],
+    "submission_document_states": [
+      "SUBMISSION_AUTHORIZED",
+      "SUBMITTED",
+      "RECEIPT",
+      "OUTCOME_OBSERVED"
+    ],
     "pass_classification": "PASS",
     "blocked_classification": "UNKNOWN_OR_BLOCKED"
   },
@@ -71,8 +82,20 @@
     "external_occupants_remain_replaceable": true
   },
   "authority_boundaries": {
-    "packet_may_support": ["reconstruct", "compare", "prepare", "verify"],
-    "packet_does_not_grant": ["collect", "disclose", "submit", "spend", "promote", "production mutation"]
+    "packet_may_support": [
+      "reconstruct",
+      "compare",
+      "prepare",
+      "verify"
+    ],
+    "packet_does_not_grant": [
+      "collect",
+      "disclose",
+      "submit",
+      "spend",
+      "promote",
+      "production mutation"
+    ]
   },
   "regeneration_procedure": [
     "Start from this packet and canonical JSON material, not chat memory.",

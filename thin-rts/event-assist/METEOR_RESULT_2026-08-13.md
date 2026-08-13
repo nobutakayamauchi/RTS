@@ -4,7 +4,7 @@ Timestamp: **2026-08-13 10:02 JST**
 
 Status: `LOCAL_METEOR_SURVIVES / REPOSITORY_CI_REQUIRED`
 
-Candidate: `thin-rts/event-assist/event_state.py`
+Candidate: `thin-rts/event-assist/event_state/`
 
 Frozen rule: workload was not weakened after failure.
 
@@ -56,6 +56,23 @@ Rotated attacks found four more material gaps:
 9. a mutable official URL could support VERIFIED state without a decision-time observation artifact digest.
 
 All four were repaired without expanding responsibility.
+
+## Repository Meteor Round 3 — publication transport death
+
+The first GitHub Actions execution killed the publication path even though the local candidate had passed. The committed `event_state/` blob had been truncated before `validate_case`, so compilation succeeded but 30 of 31 tests errored with a missing public validator surface.
+
+10. `LOCAL_PASS + GIT_OBJECT_EXISTS` was incorrectly treated as proof that the intended source artifact had arrived intact.
+
+Autopsy: `COMMIT_INTEGRITY != INTENT_ARTIFACT_EQUIVALENCE`.
+
+Repair:
+
+- recompose the same logical binder into a bounded `event_state/` package (`base.py` primitives + `rules.py` cross-binding checks + `runtime.py` report/CLI) and republish the complete artifacts;
+- freeze an explicit `SOURCE_MANIFEST.sha256` for the intended Event Assist / PHOENIX publication set;
+- require CI to verify the exact manifest line count and every SHA-256 before executing tests;
+- retain the failed run as an inherited publication-path death.
+
+No product capability was added by this repair.
 
 ## Current test evidence
 

@@ -12,7 +12,7 @@ Assume:
 
 - original creator memory unavailable;
 - original AI conversation unavailable;
-- original `event_state.py` implementation unavailable;
+- original Event Assist binder implementation unavailable;
 - only the Succession Packet, canonical JSON material, and ordinary JSON-capable tooling remain.
 
 Succession Packet:
@@ -21,7 +21,7 @@ Succession Packet:
 
 ## Replacement probe
 
-`test_event_assist_phoenix.py` contains a deliberately independent replacement projection. It does **not** import `event_state.py`.
+`test_event_assist_phoenix.py` contains a deliberately independent replacement projection. It does **not** import the Event Assist binder package.
 
 The replacement reads only packet-declared rules and canonical case material, then reconstructs the protected human-important state:
 

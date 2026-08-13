@@ -22,7 +22,7 @@ A desired feature was not allowed to authorize its own implementation.
 | provider-neutral Tier-0 capture, fresh reconstruction, alternate recovery path | `thin-rts/continuity/` | `KEEP` |
 | Git history / immutable review evidence | Git + GitHub | `EXTERNAL / KEEP` |
 | current official-source retrieval | external search/browser/official portals | `EXTERNALIZE` |
-| scheduler / notifications | external/native scheduler | `EXTERNALIZE` |
+| scheduling / notifications | external/native scheduler | `EXTERNALIZE` |
 | document/PDF/form rendering | external document tooling | `EXTERNALIZE` |
 | AI interpretation / candidate classification | external AI/model occupant | `EXTERNALIZE` |
 | submission, signature, disclosure, spending | authorized human/external action surface | `EXTERNALIZE / AUTHORITY_REQUIRED` |
@@ -77,7 +77,7 @@ The missing capability is therefore **typed binding and mechanical fail-closed v
 
 Candidate occupant:
 
-`thin-rts/event-assist/event_state.py`
+`thin-rts/event-assist/event_state/`
 
 Hard containment:
 
@@ -103,7 +103,7 @@ Its job is only:
 
 ## 5. Counter-DA: "the binder is just old RTS growing back"
 
-Attack: 585 lines of validation code can still become a seed for a new monolith.
+Attack: one bounded state-binding package can still become a seed for a new monolith.
 
 Containment:
 
@@ -122,7 +122,7 @@ A live official URL alone does not preserve what was observed at decision time.
 
 Repair:
 
-For a `VERIFIED  legal/deadline pin or ready-state document, the current official source must also bind:
+For a `VERIFIED` legal/deadline pin or ready-state document, the current official source must also bind:
 
 - a decision-time observed artifact reference;
 - a lowercase SHA-256 digest of that artifact;
@@ -134,7 +134,7 @@ Storage remains Git/Custody/Continuity responsibility. The binder stores only th
 
 `MONOLITHIC_EVENT_ASSIST = DEAD`
 
-`EXISTING_CUSTODY_RECOVERY_SECURITY = REUSE@`
+`EXISTING_CUSTODY_RECOVERY_SECURITY = REUSED`
 
 `GENERIC_EVENT_ENVELOPE = EXTRACTED_FROM_EXISTING_RECORD_MODEL`
 

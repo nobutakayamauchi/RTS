@@ -22,6 +22,12 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Verify frozen publication-intent manifest
+        run: |
+          test "$(wc -l < thin-rts/event-assist/SOURCE_MANIFEST.sha256)" -eq 20
+          test ! -e thin-rts/event-assist/event_state.py
+          sha256sum -c thin-rts/event-assist/SOURCE_MANIFEST.sha256
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -29,7 +35,7 @@ jobs:
 
       - name: Compile bounded binder and tests
         working-directory: thin-rts/event-assist
-        run: python3 -m py_compile event_state.py test_event_state.py test_meteor_event_state.py
+        run: python3 -m py_compile event_state/__init__.py event_state/base.py event_state/rules.py event_state/runtime.py test_event_state.py test_meteor_event_state.py
 
       - name: Run Event Assist base plus Meteor regressions
         working-directory: thin-rts/event-assist
@@ -38,9 +44,9 @@ jobs:
       - name: Exercise frozen and real-pilot goal fixtures
         working-directory: thin-rts/event-assist
         run: |
-          python3 event_state.py goal fixtures/case_m_rental_move_in.json --at 2026-08-13T01:00:00Z > "$RUNNER_TEMP/case-m.json"
-          python3 event_state.py goal fixtures/case_b_childbirth_current_sources.json --at 2026-08-13T01:00:00Z > "$RUNNER_TEMP/case-b.json"
-          python3 event_state.py goal fixtures/pilot_pr319_completion_audit.json --at 2026-08-13T01:30:00Z > "$RUNNER_TEMP/pilot.json"
+          python3 event_state/__init__.py goal fixtures/case_m_rental_move_in.json --at 2026-08-13T01:00:00Z > "$RUNNER_TEMP/case-m.json"
+          python3 event_state/__init__.py goal fixtures/case_b_childbirth_current_sources.json --at 2026-08-13T01:00:00Z > "$RUNNER_TEMP/case-b.json"
+          python3 event_state/__init__.py goal fixtures/pilot_pr319_completion_audit.json --at 2026-08-13T01:30:00Z > "$RUNNER_TEMP/pilot.json"
           python3 - "$RUNNER_TEMP/case-m.json" "$RUNNER_TEMP/case-b.json" "$RUNNER_TEMP/pilot.json" <<'PY'
           import json, sys
           case_m, case_b, pilot = [json.load(open(path, encoding='utf-8')) for path in sys.argv[1:]]
@@ -71,7 +77,6 @@ jobs:
 
   inherited-custody-continuity:
     runs-on: ubuntu-latest
-
     timeout-minutes: 15
     steps:
       - name: Checkout full history
