@@ -1,0 +1,4 @@
+Observed from the Ministry of Health, Labour and Welfare page "出産育児一時金等について" on 2026-08-13.
+Source URL: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/shussan/index.html
+Bounded observation: the page states that the application deadline is within two years from the day after childbirth; eligibility depends on public medical-insurance coverage at childbirth and other stated conditions; and payment routes include direct payment, proxy receipt, and reimbursement depending on circumstances.
+This file is a decision-time observation record, not a substitute for later current-source revalidation.

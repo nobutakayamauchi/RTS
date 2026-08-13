@@ -1,0 +1,4 @@
+Observed from the City of Nagoya page "出生・死亡届" on 2026-08-13.
+Source URL: https://www.city.nagoya.jp/kurashi/todokede/1007825/1007826.html
+Bounded observation: the page states that a birth notification is due within 14 days counted from the date of birth and identifies the responsible municipal counters and required materials.
+This file is a decision-time observation record, not a substitute for later current-source revalidation.

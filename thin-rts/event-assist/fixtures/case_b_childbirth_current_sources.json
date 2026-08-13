@@ -1,0 +1,187 @@
+{
+  "schema": "new-rts-event-case/v0",
+  "event_id": "evt-childbirth",
+  "event_type": "childbirth",
+  "event_truth_state": "CONFIRMED",
+  "event_time": "2026-08-12T09:00:00+09:00",
+  "observed_at": "2026-08-13T00:05:00Z",
+  "event_source_ref": "fixture:synthetic-childbirth-current-source-workload",
+  "sources": [
+    {
+      "source_id": "src-user-context",
+      "source_class": "USER_CONFIRMED_INPUT",
+      "reference": "fixture:user-confirmed-context",
+      "retrieved_at": "2026-08-13T00:04:00Z",
+      "status": "CURRENT_OBSERVED"
+    },
+    {
+      "source_id": "src-official-national",
+      "source_class": "OFFICIAL_PRIMARY",
+      "reference": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/shussan/index.html",
+      "retrieved_at": "2026-08-13T00:05:00Z",
+      "status": "CURRENT_OBSERVED",
+      "stale_after": "2026-08-20T00:05:00Z",
+      "observed_artifact_ref": "repo:thin-rts/event-assist/fixtures/current-sources/mhlw_childbirth_lump_sum_2026-08-13.txt",
+      "observed_sha256": "a4a43374853bd0e4fa204c2ac2496d4dbca4cc049f518d53cf4c1deb688adbd0"
+    },
+    {
+      "source_id": "src-official-local",
+      "source_class": "OFFICIAL_LOCAL",
+      "reference": "https://www.city.nagoya.jp/kodomo/ninshin/1008971/1008973.html?hl=ja",
+      "retrieved_at": "2026-08-13T00:06:00Z",
+      "status": "CURRENT_OBSERVED",
+      "stale_after": "2026-08-20T00:06:00Z",
+      "observed_artifact_ref": "repo:thin-rts/event-assist/fixtures/current-sources/nagoya_child_allowance_2026-08-13.txt",
+      "observed_sha256": "e4e7a6a0be23747eb5b244cbe3ddd541d2250284843418a93eb8f3e1b0cc0267"
+    },
+    {
+      "source_id": "src-news",
+      "source_class": "NEWS_SIGNAL",
+      "reference": "news-fixture:possible-program-change",
+      "retrieved_at": "2026-08-13T00:07:00Z",
+      "status": "UNVERIFIED_SIGNAL"
+    },
+    {
+      "source_id": "src-official-birth-registration",
+      "source_class": "OFFICIAL_LOCAL",
+      "reference": "https://www.city.nagoya.jp/kurashi/todokede/1007825/1007826.html",
+      "retrieved_at": "2026-08-13T00:08:00Z",
+      "status": "CURRENT_OBSERVED",
+      "stale_after": "2026-08-20T00:08:00Z",
+      "observed_artifact_ref": "repo:thin-rts/event-assist/fixtures/current-sources/nagoya_birth_registration_2026-08-13.txt",
+      "observed_sha256": "db446673f5554ffe32d9e1b3b125247d7789db2e3f80b405bbc653492e0ae723"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "fact-residence",
+      "name": "residence_locality",
+      "value": "fixture-locality",
+      "status": "CONFIRMED",
+      "source_ref": "src-user-context",
+      "observed_at": "2026-08-13T00:06:00Z"
+    },
+    {
+      "fact_id": "fact-insurance",
+      "name": "insurance_context",
+      "value": "fixture-insurance",
+      "status": "CONFIRMED",
+      "source_ref": "src-user-context",
+      "observed_at": "2026-08-13T00:06:00Z"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev-event-proof",
+      "evidence_class": "event-supporting-document",
+      "status": "PRESERVED_VERIFIED",
+      "triage": "PRESERVE_HIGH",
+      "source_ref": "src-official-local",
+      "collection_authority": "AUTHORIZED",
+      "preservation_ref": "custody:receipt:childbirth-001",
+      "integrity_state": "CONTENT_INTEGRITY_PASS"
+    }
+  ],
+  "authorities": {
+    "observe": "AUTHORIZED",
+    "collect": "AUTHORIZED",
+    "access": "AUTHORIZED",
+    "transform": "AUTHORIZED",
+    "disclose": "BLOCKED",
+    "submit": "BLOCKED",
+    "promote": "BLOCKED"
+  },
+  "decisions": [
+    {
+      "decision_id": "dec-1",
+      "result": "incident-confirmed-for-workflow",
+      "status": "VERIFIED",
+      "input_refs": [
+        "src-practical"
+      ],
+      "actor_tool": "fixture:operator",
+      "time": "2026-08-13T00:10:00Z",
+      "reason": "The event was explicitly reported and bounded to this workflow."
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "act-benefit-check",
+      "pin_class": "POSSIBLY_ELIGIBLE",
+      "assertion_state": "VERIFIED",
+      "reason": "Current official source identifies a potentially relevant benefit/procedure.",
+      "next_action": "Confirm case-specific eligibility and application path.",
+      "source_refs": [
+        "src-official-national"
+      ],
+      "required_fact_refs": [
+        "fact-insurance"
+      ]
+    },
+    {
+      "action_id": "act-local-deadline",
+      "pin_class": "DEADLINE_SOON",
+      "assertion_state": "VERIFIED",
+      "reason": "Current local official source identifies a time-bounded procedure.",
+      "next_action": "Review the current local procedure before the deadline.",
+      "source_refs": [
+        "src-official-local"
+      ],
+      "required_fact_refs": [
+        "fact-residence"
+      ],
+      "deadline": "2026-08-20T23:59:59+09:00"
+    },
+    {
+      "action_id": "act-news-recheck",
+      "pin_class": "LAW_OR_PROGRAM_CHANGED",
+      "assertion_state": "CANDIDATE",
+      "reason": "News is only a a discovery signal until an official source confirms it.",
+      "next_action": "Recheck current official primary sources.",
+      "source_refs": [
+        "src-news"
+      ]
+    },
+    {
+      "action_id": "act-birth-registration",
+      "pin_class": "DEADLINE_SOON",
+      "assertion_state": "VERIFIED",
+      "reason": "The decision-time official local observation records a time-bounded birth-registration procedure.",
+      "next_action": "Review the current official birth-registration procedure and confirm the case-specific filing deadline.",
+      "source_refs": [
+        "src-official-birth-registration"
+      ],
+      "required_fact_refs": [
+        "fact-residence"
+      ],
+      "deadline": "2026-08-25T23:59:59+09:00"
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "doc-local",
+      "state": "DOCUMENT_READY_DRAFT",
+      "official_source_ref": "src-official-local",
+      "required_fact_refs": [
+        "fact-residence"
+      ],
+      "required_evidence_refs": [
+        "ev-event-proof"
+      ]
+    }
+  ],
+  "watches": [
+    {
+      "watch_id": "watch-local-program",
+      "last_successful_check": "2026-08-13T00:30:00Z",
+      "next_expected_check": "2026-08-13T12:30:00Z",
+      "staleness_threshold_seconds": 86400,
+      "source_set": [
+        "src-official-local"
+      ],
+      "failure_state": "NONE",
+      "notification_delivery_state": "NOT_REQUIRED"
+    }
+  ],
+  "unknowns": []
+}

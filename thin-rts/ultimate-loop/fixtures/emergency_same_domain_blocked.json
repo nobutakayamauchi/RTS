@@ -1,0 +1,36 @@
+{
+  "frame_id": "frame-primary-storage",
+  "current_state": "STABLE",
+  "material_durable": true,
+  "authority": {
+    "promote": "BLOCKED",
+    "failover": "AUTHORIZED"
+  },
+  "trigger": {
+    "type": "DEPENDENCY_FAILURE",
+    "evidence_state": "CURRENT_OBSERVED",
+    "source_ref": "external:provider-outage",
+    "stale_after": "2026-08-14T00:00:00Z",
+    "materiality": "MATERIAL",
+    "failure_domain_scope": "MATERIAL"
+  },
+  "candidate": {
+    "candidate_id": "replica-b",
+    "performance_delta_pct": 0,
+    "replacement_value": "UNKNOWN",
+    "resilience_value": "HIGH",
+    "stability_state": "SURVIVED",
+    "same_frozen_workload": "PASS",
+    "recovery_probe": "PASS",
+    "migration_state": "PASS",
+    "rollback_state": "PASS",
+    "failure_domain_independence": "LABEL_ONLY"
+  },
+  "recovery": {
+    "backup_present": true,
+    "fresh_restore_test": "PASS",
+    "canonical_material": "PASS",
+    "succession_packet": "PASS",
+    "phoenix_test": "PASS"
+  }
+}
