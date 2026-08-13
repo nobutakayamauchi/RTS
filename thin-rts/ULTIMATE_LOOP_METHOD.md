@@ -1,16 +1,24 @@
-# ULTIMATE LOOP — Survival-First Development Method
+# Development Sequence Loop — Ultimate Loop
 
 Timestamp: **2026-08-11 20:29 JST**
 
 Canonical extensions integrated: **2026-08-14 JST**
 
-Status: `CANONICAL / ACTIVE`
+Provisional operational completion: **2026-08-14 JST**
 
-Formal name: **ULTIMATE LOOP**
+Status: `PROVISIONAL_OPERATIONAL / CANONICAL / ACTIVE / SELF_EVOLVING`
 
-ULTIMATE LOOP is a development method for deciding what responsibility deserves to exist, which implementation deserves to occupy it, when that occupant should be replaced, and how the human-important outcome remains reconstructable when implementations, providers, tools, or the original creator disappear.
+Formal name: **Development Sequence Loop**
+
+Common name: **Ultimate Loop**
+
+Current release: **v0.1**
+
+The Development Sequence Loop (commonly **Ultimate Loop**) is a development method for deciding what responsibility deserves to exist, which implementation deserves to occupy it, when that occupant should be replaced, and how the human-important outcome remains reconstructable when implementations, providers, tools, or the original creator disappear.
 
 It is not one framework, runtime, product, provider, or model.
+
+`PROVISIONAL_OPERATIONAL` means the sequence is complete enough to run end-to-end on real work under current evidence. It does **not** mean the method itself is permanently finished. Ultimate Loop is also placed inside its own Movable Frame and may be challenged, recomposed, partially replaced, or superseded by a demonstrably better development sequence.
 
 ## Canonical motto
 
@@ -40,8 +48,9 @@ WISH / PROBLEM / EVENT
 → DEPLOYMENT_VALIDATED / FIX_VALIDATED
 → STABLE CORE / MOVABLE FRAME
 → WATCH
+→ WEEKLY CHALLENGER SWEEP + EVENT TRIGGERS
 → MATERIAL FAILURE / BETTER CHALLENGER / ERA CHANGE
-→ LOOP 3: DARWIN ARENA
+→ LOOP 3: DARWIN ARENA / KNOCKOUT MATCH
 → SURVIVE / RECOMPOSE / PARTIAL REPLACE / FULL REPLACE / DIE
 → PHOENIX LINEAGE PRESERVES MEMORY + REGENERATION CAPABILITY
 → repeat
@@ -57,7 +66,7 @@ Hard rule:
 
 `NO CURRENT LANDSCAPE SWEEP → NO SUPERIORITY CLAIM`
 
-Discovery may use replaceable external search engines, feeds, APIs, GitHub/package registries, browser crawlers, official documentation search, human research, or AI-assisted research. ULTIMATE LOOP does not require one owned crawler.
+Discovery may use replaceable external search engines, feeds, APIs, GitHub/package registries, browser crawlers, official documentation search, human research, or AI-assisted research. Ultimate Loop does not require one owned crawler.
 
 The owned responsibility, when needed, is only a small coverage/provenance/freshness/frontier contract.
 
@@ -146,7 +155,7 @@ Hard invariants:
 
 A clean first deployment that satisfies all required probes may become `DEPLOYMENT_VALIDATED`. A repaired deployment becomes `FIX_VALIDATED` only after verifier-controlled re-identity, exact failed-probe replay, and regression evidence.
 
-## Loop 3 — DARWIN ARENA
+## Loop 3 — DARWIN ARENA / Knockout Match
 
 Question:
 
@@ -164,6 +173,33 @@ Possible results:
 
 No implementation gains a permanent right to exist.
 
+## Weekly self-evolution / Knockout cadence
+
+Ultimate Loop itself is subject to Ultimate Loop.
+
+A **weekly challenger sweep** is the minimum scheduled self-evolution cadence. Once every seven days, refresh the external landscape around the current development sequence and its material occupants.
+
+```text
+WEEKLY TICK
+→ DISCOVERY REFRESH
+→ MATERIAL EXTERNAL CHALLENGER?
+   ├─ NO  → KEEP CURRENT / NO MATCH REQUIRED
+   └─ YES → FREEZE SAME WORKLOAD + KNOWN DEATHS
+            → DA / COUNTER-DA
+            → METEOR / DARWIN KNOCKOUT MATCH
+            → KEEP / STANDBY / PARTIAL REPLACE / FULL REPLACE / REJECT
+```
+
+The weekly tick **does not force a rewrite or a match**. A knockout match occurs only when a material external challenger, materially superior architecture, new failure class, or other credible challenge exists.
+
+A material event does not have to wait for the weekly tick. Critical security evidence, provider failure, major degradation, breaking API/platform change, or another urgent material trigger may open the appropriate Emergency, Discovery, METEOR, or DARWIN path immediately.
+
+The current sequence therefore has two simultaneous truths:
+
+`SEQUENCE v0.1 = PROVISIONALLY COMPLETE ENOUGH TO OPERATE`
+
+`ULTIMATE LOOP = NEVER PERMANENTLY IMMUNE FROM CHALLENGE`
+
 ## WATCH rule
 
 STABLE means stable-by-default, not ignored forever.
@@ -174,13 +210,13 @@ Doing nothing may be the correct outcome.
 
 ## Emergency / recovery rule
 
-Outage, shutdown, compromise, account loss, network loss, corruption, storage loss, or provider disappearance may enter a bounded recovery frame whose objective is minimum viable restoration, not improvement.
+Outage, shutdown, compromise, account loss, network loss, corruption, storage loss, provider disappearance, or material instability may enter the bounded Emergency Recovery / Failover Gate whose objective is minimum viable restoration, not improvement.
 
-Emergency restoration may temporarily proceed without a full discovery sweep when delay would materially worsen safety or recovery. The missing sweep becomes explicit debt, and emergency use alone cannot authorize long-term promotion.
+Emergency restoration may temporarily proceed without a full discovery sweep when delay would materially worsen safety or recovery. The missing sweep becomes explicit Recovery Debt, and emergency use alone cannot authorize long-term promotion or automatic failback.
 
 ## Creator-independent continuity
 
-ULTIMATE LOOP is bounded by **PHOENIX LINEAGE**.
+Ultimate Loop is bounded by **PHOENIX LINEAGE**.
 
 The protected subject is not code, a provider, or the creator. It is the human-important outcome and enough material evidence, state, meaning, decisions, failure history, authority boundaries, and recovery path to reconstruct that outcome using the best currently available means.
 
@@ -211,6 +247,6 @@ Every survivor inherits useful memory of the dead:
 
 ## Method invariant
 
-**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep killing the incumbent when reality changes. Verify the deployed reality with verifier-controlled trust before calling it stable. Preserve the human-important outcome and the memory required to regenerate it.**
+**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep challenging the incumbent when reality changes. Verify the deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome and the memory required to regenerate it.**
 
-That full method is **ULTIMATE LOOP**.
+That full method is formally the **Development Sequence Loop**, commonly called **Ultimate Loop**.
