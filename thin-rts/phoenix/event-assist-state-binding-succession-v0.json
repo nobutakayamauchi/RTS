@@ -1,0 +1,90 @@
+{
+  "schema": "new-rts-succession-packet/v0",
+  "frame_id": "event-assist-state-binding",
+  "status": "CANDIDATE_FOR_PHOENIX_TEST",
+  "human_priority_contract": {
+    "protected_outcome": "A future operator can reconstruct which event facts are known, what evidence is missing, which current-source basis supported time-sensitive actions, whether a watch failed, and which external actions lack authority without relying on the original creator or implementation.",
+    "must_preserve": [
+      "UNKNOWN and disputed event truth",
+      "evidence gaps instead of false completeness",
+      "deadline and source identity",
+      "decision-time official-source observation identity and digest",
+      "watch degradation instead of silent no-change",
+      "analysis/draft versus submission/promotion authority",
+      "decision correction lineage"
+    ],
+    "must_not_require": [
+      "original creator memory",
+      "original AI conversation",
+      "the original event_state.py implementation",
+      "an RTS-owned database, scheduler, retriever, storage engine, crypto engine, or submission engine"
+    ]
+  },
+  "current_occupant": {
+    "implementation_ref": "repo:thin-rts/event-assist/event_state.py",
+    "implementation_id": "thin-rts-event-state-binder/v0",
+    "input_schema": "new-rts-event-case/v0",
+    "report_schema": "new-rts-event-case-report/v0"
+  },
+  "canonical_material": {
+    "format": "UTF-8 JSON",
+    "material_fixture_ref": "repo:thin-rts/event-assist/fixtures/pilot_pr319_completion_audit.json",
+    "frozen_workload_refs": [
+      "repo:thin-rts/event-assist/fixtures/case_m_rental_move_in.json",
+      "repo:thin-rts/event-assist/fixtures/case_b_childbirth_current_sources.json"
+    ],
+    "historical_source_observation_root": "repo:thin-rts/event-assist/fixtures/current-sources/"
+  },
+  "regeneration_rules": {
+    "event_truth_blocking_states": ["DISPUTED", "UNKNOWN"],
+    "evidence_gap_statuses": [
+      "PARTIAL",
+      "MISSING_RECOVERABLE",
+      "MISSING_IRRECOVERABLE",
+      "BLOCKED_AUTHORITY",
+      "BLOCKED_TECHNICAL",
+      "UNKNOWN"
+    ],
+    "authorized_state": "AUTHORIZED",
+    "watch_nonfailure_states": ["NONE", "NOT_APPLICABLE"],
+    "watch_failed_delivery_state": "FAILED",
+    "deadline_field": "deadline",
+    "authority_requirement_field": "authority_required",
+    "submission_document_states": ["SUBMISSION_AUTHORIZED", "SUBMITTED", "RECEIPT", "OUTCOME_OBSERVED"],
+    "pass_classification": "PASS",
+    "blocked_classification": "UNKNOWN_OR_BLOCKED"
+  },
+  "known_death_causes": [
+    "evidence gap present while aggregate case falsely PASSed",
+    "declared-current official source remained trusted beyond declared stale_after",
+    "verified deadline pin had no current official source",
+    "verified user-specific legal pin ignored UNKNOWN applicability fact",
+    "watch referenced a nonexistent source",
+    "required action authority was BLOCKED while aggregate case still PASSed",
+    "past deadline was not surfaced as OVERDUE",
+    "mutable official URL lacked a decision-time observed artifact digest"
+  ],
+  "recovery_and_external_dependencies": {
+    "continuity_contract": "repo:thin-rts/continuity/README.md",
+    "custody_contract": "repo:thin-rts/cloud-custody/README.md",
+    "security_boundary": "repo:thin-rts/security-intake/README.md",
+    "external_occupants_remain_replaceable": true
+  },
+  "authority_boundaries": {
+    "packet_may_support": ["reconstruct", "compare", "prepare", "verify"],
+    "packet_does_not_grant": ["collect", "disclose", "submit", "spend", "promote", "production mutation"]
+  },
+  "regeneration_procedure": [
+    "Start from this packet and canonical JSON material, not chat memory.",
+    "Use any current JSON-capable tool or language; the original Python occupant is optional.",
+    "Apply regeneration_rules to produce the protected blocking-state projection.",
+    "Preserve evidence gaps, watch failures, overdue deadlines, and missing required authority as visible states.",
+    "Do not infer submission or promotion authority from document readiness or from successful reconstruction.",
+    "Replay the frozen workload and inherited known_death_causes.",
+    "Record PASS, FAIL, or UNKNOWN plus the replacement identity and lineage transition."
+  ],
+  "unknowns": [
+    "This packet proves one material frame only; it does not prove creator-independent regeneration of every future RTS frame.",
+    "External provider/device/administrative independence remains an operational-evidence question where declared material."
+  ]
+}
