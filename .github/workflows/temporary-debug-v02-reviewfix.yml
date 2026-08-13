@@ -1,0 +1,20 @@
+name: Temporary Debug v0.2 Review-Fix Regression
+on:
+  pull_request:
+    paths:
+      - 'deployment_identity/**'
+      - 'experiments/GENERIC_DEBUG_HARNESS_20260814/**'
+      - 'tests/test_deployment_identity.py'
+      - '.github/workflows/temporary-debug-v02-reviewfix.yml'
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deployment Identity regression
+        run: python -m unittest discover -s tests -p 'test_deployment_identity.py' -v
+      - name: Debug harness integration regression
+        run: python -m unittest discover -s experiments/GENERIC_DEBUG_HARNESS_20260814 -p 'test_debug_harness.py' -v
