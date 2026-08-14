@@ -130,9 +130,11 @@ ONE SMALL STEP can retain:
 
 ## Fear / risk rule
 
-Fear is not treated as a character flaw or a command to "be brave". Before an unstarted action, `fear_gate.py` can require the feared loss, reversibility, cost of inaction, and a bounded experiment. Earlier gates such as orientation, capacity preservation, invalid goal, measurement repair, external blockers, and material-choice safety review remain dominant.
+Fear is not treated as a character flaw or a command to "be brave". Before an unstarted action, `fear_gate.py` requires the feared loss, an explicitly reversible bounded experiment, cost of inaction, and—when a concrete action exists—an exact binding between that action and the bounded experiment. Earlier gates such as orientation, capacity preservation, invalid goal, measurement repair, external blockers, and material-choice safety review remain dominant.
 
 `UNBOUNDED FEAR != COMMAND TO ACT`
+
+`BOUNDED EXPERIMENT != AUTHORITY FOR A LARGER ACTION`
 
 `BOUNDED REVERSIBLE EXPERIMENT MAY BECOME THE NEXT SMALL STEP`
 
@@ -158,10 +160,10 @@ Use the composed entrypoint for normal execution so acceptance gates are not byp
 
 ```bash
 python guidance.py example_case.json
-python -m unittest -v test_one_small_step.py test_meteor_one_small_step.py test_choice_gate.py test_fear_gate.py test_guidance.py
+python -m unittest -v test_one_small_step.py test_meteor_one_small_step.py test_choice_gate.py test_fear_gate.py test_guidance.py test_review_regressions.py
 ```
 
-The last pre-choice-gate locally replayed repository workload was **25/25 PASS**. The autonomy/choice extension adds dedicated choice-gate and canonical-routing tests before merge.
+Current branch-equivalent pre-merge replay: **39/39 PASS**.
 
 ## Canonical records
 
@@ -172,7 +174,8 @@ The last pre-choice-gate locally replayed repository workload was **25/25 PASS**
 - `METEOR_RESULT_2026-08-14.md` — destructive test record and retained deaths.
 - `METEOR_ADDENDUM_FEAR_GATE_2026-08-14.md` — fear/risk acceptance extension.
 - `METEOR_ADDENDUM_CHOICE_AUTONOMY_2026-08-14.md` — material-choice autonomy/safety extension.
+- `METEOR_ADDENDUM_REVIEW_REGRESSIONS_2026-08-14.md` — Codex review deaths, repairs, and permanent regression memory.
 
 ## Provisional verdict
 
-The current thin evaluator survives the frozen v0 workload under current repository evidence. It is not a complete coaching product, not a universal human evaluation theory, not a universal answer to how to live, and not permanently immune from challenge.
+The current thin evaluator survives the frozen v0 workload under current evidence. It is not a complete coaching product, not a universal human evaluation theory, not a universal answer to how to live, and not permanently immune from challenge.
