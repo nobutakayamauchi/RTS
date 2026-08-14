@@ -1,0 +1,27 @@
+{
+  "case_id": "example-client-outreach",
+  "profile": {
+    "capabilities": ["AI-assisted research", "writing"],
+    "constraints": ["limited time", "low tolerance for synchronous outreach"],
+    "current_state": "working but no qualified client conversations yet"
+  },
+  "resources": ["smartphone", "AI assistant", "public prospect posts"],
+  "brain_dump": [
+    "need income",
+    "do not know whether outreach effort is working",
+    "want a small experiment with a cutoff"
+  ],
+  "capacity": "LIMITED",
+  "goal": {
+    "status": "HYPOTHESIS",
+    "statement": "Create one qualified client conversation",
+    "success_measure": "at least one qualified reply from ten targeted outreach attempts",
+    "metric_validity": "HYPOTHESIS"
+  },
+  "step_plan": {
+    "action": "Send ten targeted, low-friction outreach messages",
+    "expected_signal": "at least one qualified reply",
+    "review_boundary": "after ten messages",
+    "stop_or_change_rule": "if there are zero qualified replies, change target or CTA before increasing volume"
+  }
+}
