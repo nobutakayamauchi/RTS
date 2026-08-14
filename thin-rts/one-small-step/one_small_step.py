@@ -311,7 +311,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             next_kind = "CHOOSE_SMALLEST_MEANINGFUL_STEP"
             phase = "LIGHT"
 
-    if capacity == "MINIMAL" and next_kind in {"CHOOSE_SMALLEST_MEANING_STEP", "ACT_AND_OBSERVE", "TEST_PREVENTION_HYPOTHESIS", "EXPLAIN_REPRODUCE_AND_TRANSFER"}:
+    if capacity == "MINIMAL" and next_kind in {"CHOOSE_SMALLEST_MEANINGFUL_STEP", "ACT_AND_OBSERVE", "TEST_PREVENTION_HYPOTHESIS", "EXPLAIN_REPRODUCE_AND_TRANSFER"}:
         next_kind = "ONE_DECISION_OR_CHECKPOINT"
         reasons.append("Capacity is minimal; reduce the ask to one bounded decision or preservation action.")
 
