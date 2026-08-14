@@ -8,13 +8,18 @@ Status: `PROVISIONAL / PRE-MERGE CANDIDATE`
 
 Provide a bounded guidance/evaluation contract that can take a person from **"I do not know what to do"** toward a meaningful next action while preserving evidence, partial progress, learning, and restartability.
 
-The system is specifically designed not to assume that a person has stable capacity, a correct initial goal, a valid metric, or enough evidence to explain success/failure.
+The system is specifically designed not to assume that a person has stable capacity, a correct initial goal, a valid metric, enough evidence to explain success/failure, or one universally correct way to live.
+
+ONE SMALL STEP does **not** define the right life for a person. It helps make the person's own choices more informed, more reversible where possible, more evidence-aware, and more likely to become choices the person can continue to own as circumstances and values change.
 
 ## 2. Non-goals
 
 v0 is not:
 
 - a universal life planner;
+- a source of a single correct way to live;
+- a system that turns the user's current choice into unquestioned doctrine;
+- a guarantee of a regret-free outcome;
 - a therapist or clinical decision system;
 - an automated employment decision system;
 - a personality classifier;
@@ -36,6 +41,7 @@ ORIENT
 → TEMPORARY_GOAL
 → MEASURE
 → LIGHT
+→ CHOICE_REVIEW WHEN MATERIAL
 → ONE_SMALL_STEP
 → ACT
 → TRACE
@@ -86,6 +92,40 @@ States:
 An invalidated goal reopens pain/need discovery.
 
 The first useful goal may simply reduce the user's most immediate pain or blocker. The system optimizes for movement toward a better state, not loyalty to the first wording of the goal.
+
+## 5.1 Choice autonomy and informed-ownership contract
+
+ONE SMALL STEP must not present a universal answer to how a person should live. Different people may rationally value different gains, accept different losses, and choose different paths under the same external facts.
+
+For a material choice, the system should make visible at minimum:
+
+- the person's stated values or priorities relevant to the choice;
+- expected gains or possibilities;
+- accepted costs or losses;
+- credible alternatives;
+- reversibility;
+- severe or irreversible downside risk;
+- counterevidence or conditions that would justify stopping/changing course.
+
+The canonical decision owner remains the user/human. The system may challenge the reasoning, surface alternatives, identify missing evidence, or refuse to normalize unresolved severe/irreversible harm as an ordinary next step; it does not certify one life path as universally correct.
+
+`USER CHOICE != SYSTEM ENDORSEMENT`
+
+`USER CHOICE != CONFIRMATION-ONLY ANALYSIS`
+
+A previously chosen path remains challengeable. Sunk cost, identity, pride, or earlier commitment do not create authority to continue when material evidence changes.
+
+The system does not promise "no regret." Its narrower objective is to reduce **avoidable regret caused by missing information, hidden trade-offs, unexamined alternatives, or preventable catastrophic downside**, while helping the user retain ownership of the final choice.
+
+### 5.1.1 Safety boundary
+
+Low-consequence, reversible choices must not be buried in a full life-review process.
+
+For material/high-stakes choices, unresolved severe or irreversible harm is not routed as a normal action step. The next step becomes reducing irreversibility, gathering discriminating evidence, finding a smaller bounded experiment, or obtaining qualified external review where the domain requires it.
+
+`AUTONOMY != NORMALIZE CATASTROPHIC RISK`
+
+`SAFETY REVIEW != LIFE DECISION AUTHORITY`
 
 ## 6. Measurement contract
 
@@ -262,7 +302,9 @@ H. stopped and later resumed;
 I. external blocker;
 J. trainer onboarding a learner;
 K. success method being transferred;
-L. organization preventing repeated failure.
+L. organization preventing repeated failure;
+M. material personal choice with different gains/losses depending on the user's values;
+N. high-stakes or irreversible choice with unresolved severe downside risk.
 
 ## 20. Hard invariants
 
@@ -273,6 +315,16 @@ L. organization preventing repeated failure.
 `GOAL != PERMANENT`
 
 `METRIC != TRUTH`
+
+`SYSTEM != UNIVERSAL LIFE AUTHORITY`
+
+`USER CHOICE != SYSTEM ENDORSEMENT`
+
+`CHOICE SUPPORT != CHOICE OWNERSHIP`
+
+`INFORMED CHOICE != GUARANTEED NO REGRET`
+
+`MATERIAL SEVERE/IRREVERSIBLE RISK != NORMAL NEXT STEP`
 
 `FAILURE != EXPERIENCE UNTIL USABLE LEARNING REMAINS`
 
@@ -286,4 +338,4 @@ L. organization preventing repeated failure.
 
 `STOPPED != LOST`
 
-`GOOD EVALUATION -> NEXT STEP OR EXPLICIT PRESERVE/UNKNOWN STATE`
+`GOOD EVALUATION -> NEXT STEP OR EXPLICIT PRESERVE/UNKNOWN/SAFETY STATE`
