@@ -101,9 +101,17 @@ ONE SMALL STEP can retain:
 
 `EFFORT SPENT != PROGRESS PROVEN`
 
+## Fear / risk rule
+
+Fear is not treated as a character flaw or a command to "be brave". Before an unstarted action, `fear_gate.py` can require the feared loss, reversibility, cost of inaction, and a bounded experiment. Earlier gates such as orientation, capacity preservation, invalid goal, measurement repair, and external blockers remain dominant.
+
+`UNBOUNDED FEAR != COMMAND TO ACT`
+
+`BOUNDED REVERSIBLE EXPERIMENT MAY BECOME THE NEXT SMALL STEP`
+
 ## Scope
 
-The v0 core is deliberately small. `one_small_step.py` is a pure evaluator/router. It does not:
+The v0 core is deliberately small. `one_small_step.py` is the pure evaluator/router, `fear_gate.py` adds bounded pre-action risk decomposition, and `guidance.py` is the canonical entrypoint that composes them. They do not:
 
 - provide medical, legal, financial, or employment decisions;
 - diagnose a person;
@@ -118,10 +126,14 @@ AI or human reasoning may supply structured inputs around the evaluator. Externa
 
 ## Run
 
+Use the composed entrypoint for normal execution so acceptance gates are not bypassed:
+
 ```bash
-python one_small_step.py example_case.json
-python -m unittest -v test_one_small_step.py test_meteor_one_small_step.py
+python guidance.py example_case.json
+python -m unittest -v test_one_small_step.py test_meteor_one_small_step.py test_fear_gate.py test_guidance.py
 ```
+
+Current locally replayed repository-intended workload: **25/25 PASS**.
 
 ## Canonical records
 
@@ -129,6 +141,7 @@ python -m unittest -v test_one_small_step.py test_meteor_one_small_step.py
 - `GOAL_RESULT_V0_1.md` — `/goal` scope/destruction result.
 - `DA_COUNTER_DA_2026-08-14.md` — adversarial design review.
 - `METEOR_RESULT_2026-08-14.md` — destructive test record and retained deaths.
+- `METEOR_ADDENDUM_FEAR_GATE_2026-08-14.md` — final fear/risk acceptance extension.
 
 ## Provisional verdict
 
