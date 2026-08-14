@@ -35,17 +35,32 @@ def _evidence_refs(section: dict[str, Any] | None) -> list[str]:
     if not section:
         return []
     refs = section.get("evidence_refs") or []
-    return [str(ref).strip() for ref in refs if str(ref).strip()]
+    return [ref.strip() for ref in refs if isinstance(ref, str) and ref.strip()]
 
 
 def _progress(case: dict[str, Any]) -> dict[str, bool]:
     progress = case.get("progress") or {}
-    return {axis: bool(progress.get(axis)) for axis in PROGRESS_AXES}
+    return {
+        axis: progress.get(axis) if isinstance(progress.get(axis), bool) else False
+        for axis in PROGRESS_AXES
+    }
+
+
+def _invalid_progress_axes(case: dict[str, Any]) -> list[str]:
+    progress = case.get("progress") or {}
+    return [
+        axis
+        for axis in PROGRESS_AXES
+        if axis in progress and not isinstance(progress.get(axis), bool)
+    ]
 
 
 def _success_maturity(attempt: dict[str, Any], goal: dict[str, Any]) -> tuple[str, list[str]]:
     reasons: list[str] = []
-    measure = attempt.get("measure") or goal.get("success_measure")
+    # The goal's success_measure defines what should be observed; it is not proof
+    # that an outcome was actually measured. Gold maturity therefore requires an
+    # observed attempt-level measure.
+    measure = attempt.get("measure")
     explanation = attempt.get("success_explanation")
     reproduction = attempt.get("personal_reproduction") == "VERIFIED"
     transfer = attempt.get("transfer_reproduction") == "VERIFIED"
@@ -69,6 +84,8 @@ def _success_maturity(attempt: dict[str, Any], goal: dict[str, Any]) -> tuple[st
             reasons.append("Transferable success is not yet retained as a reusable method.")
         if level == "SUCCESS_4" and not _nonempty(boundaries):
             reasons.append("A reusable success method needs explicit boundary conditions.")
+        if not _nonempty(measure):
+            reasons.append("A success definition is not observed success evidence; record an attempt-level measure before maturity can advance.")
     return level, reasons
 
 
@@ -130,6 +147,13 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
     if not _nonempty(case_id):
         blocks.append("CASE_ID_MISSING")
 
+    invalid_progress_axes = _invalid_progress_axes(case)
+    if invalid_progress_axes:
+        blocks.append("INVALID_PROGRESS_VALUE")
+        reasons.append(
+            "Progress axes must be JSON booleans; non-boolean values fail closed instead of being coerced by truthiness."
+        )
+
     profile = case.get("profile") or {}
     missing_profile = [field for field in PROFILE_FIELDS if not _nonempty(profile.get(field))]
     resources = case.get("resources") or []
@@ -174,7 +198,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             "progress": _progress(case),
             "blocking_states": sorted(set(blocks)),
             "questions": questions,
-            "reasons": ["A person who does not know what to do starts by making current reality visible, not by inventing a permanent goal."],
+            "reasons": reasons + ["A person who does not know what to do starts by making current reality visible, not by inventing a permanent goal."],
         }
 
     goal = case.get("goal") or {}
@@ -194,7 +218,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             "progress": _progress(case),
             "blocking_states": sorted(set(blocks)),
             "questions": ["What currently hurts or blocks you most, and what better state would reduce that pain?"],
-            "reasons": ["An invalidated goal must not be protected merely because effort has already been invested in it."],
+            "reasons": reasons + ["An invalidated goal must not be protected merely because effort has already been invested in it."],
         }
 
     if not _nonempty(goal.get("statement")):
@@ -208,7 +232,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             "progress": _progress(case),
             "blocking_states": sorted(set(blocks)),
             "questions": ["What is the most immediate pain or problem you want to reduce first?", "What temporary better state would count as relief?"],
-            "reasons": ["The first goal may be wrong. It is a revisable hypothesis, not an identity or permanent commitment."],
+            "reasons": reasons + ["The first goal may be wrong. It is a revisable hypothesis, not an identity or permanent commitment."],
         }
 
     metric_validity = goal.get("metric_validity", "UNKNOWN")
@@ -223,7 +247,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             "progress": _progress(case),
             "blocking_states": sorted(set(blocks)),
             "questions": ["What observable change would mean you are closer to the goal?", "Could this metric improve while the real goal gets worse?"],
-            "reasons": ["Effort cannot be judged as useful or useless until the goal has an observable, challengeable measure."],
+            "reasons": reasons + ["Effort cannot be judged as useful or useless until the goal has an observable, challengeable measure."],
         }
 
     blocker = case.get("external_blocker") or {}
@@ -239,7 +263,7 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
             "progress": _progress(case),
             "blocking_states": sorted(set(blocks + ["EXTERNAL_BLOCKER"])),
             "questions": ["Must this blocker actually be removed to reach the goal?", "Is there a substitute evidence source, bypass, delegation path, or goal reframe?"],
-            "reasons": (["No bypass options have been recorded yet."] if not options else ["External blockage is not evidence of insufficient effort."]),
+            "reasons": reasons + (["No bypass options have been recorded yet."] if not options else ["External blockage is not evidence of insufficient effort."]),
         }
 
     attempt = case.get("attempt") or {}
@@ -315,11 +339,11 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
         next_kind = "ONE_DECISION_OR_CHECKPOINT"
         reasons.append("Capacity is minimal; reduce the ask to one bounded decision or preservation action.")
 
-    classification = "READY_FOR_NEXT_STEP" if not blocks else "REVIEW_REQUIRED"
+    classification = "PASS" if not blocks else "REVIEW_REQUIRED"
     return {
         "schema": "one-small-step-report/v0",
         "case_id": case_id,
-        "classification": classification,
+        "classification": "READY_FOR_NEXT_STEP" if classification == "PASS" else classification,
         "phase": phase,
         "next_step_kind": next_kind,
         "experience_status": experience_status,
