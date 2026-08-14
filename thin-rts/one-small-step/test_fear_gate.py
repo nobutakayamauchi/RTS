@@ -51,6 +51,44 @@ class FearGateTests(unittest.TestCase):
         self.assertEqual(r["phase"], "ONE_SMALL_STEP")
         self.assertEqual(r["next_step_kind"], "ACT_AND_OBSERVE")
 
+    def test_irreversible_fear_experiment_fails_closed(self):
+        r = gate.apply_fear_gate(base(
+            fear={
+                "active": True,
+                "feared_loss": "financial loss",
+                "reversibility": "IRREVERSIBLE",
+                "cost_of_inaction": "missed opportunity",
+                "bounded_experiment": "spend all savings",
+            },
+            step_plan={
+                "action": "spend all savings",
+                "expected_signal": "result",
+                "review_boundary": "after spending",
+                "stop_or_change_rule": "review later",
+            },
+        ), core.evaluate)
+        self.assertEqual(r["phase"], "RISK_BOUNDING")
+        self.assertIn("FEAR_EXPERIMENT_NOT_REVERSIBLE", r["blocking_states"])
+
+    def test_bounded_experiment_cannot_authorize_larger_action(self):
+        r = gate.apply_fear_gate(base(
+            fear={
+                "active": True,
+                "feared_loss": "rejection",
+                "reversibility": "REVERSIBLE",
+                "cost_of_inaction": "no learning signal",
+                "bounded_experiment": "send one email",
+            },
+            step_plan={
+                "action": "spend all savings",
+                "expected_signal": "result",
+                "review_boundary": "after action",
+                "stop_or_change_rule": "review later",
+            },
+        ), core.evaluate)
+        self.assertEqual(r["phase"], "RISK_BOUNDING")
+        self.assertIn("FEAR_EXPERIMENT_ACTION_MISMATCH", r["blocking_states"])
+
 
 if __name__ == "__main__":
     unittest.main()
