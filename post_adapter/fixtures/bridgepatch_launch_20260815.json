@@ -1,0 +1,86 @@
+{
+  "project_name": "BridgePatch",
+  "update_type": "public-launch",
+  "summary": "販売導線の本番スモークで旧Stripe明細名の残留を検出し、専用Price/Payment Linkへ切り替えて再検証しました。",
+  "facts": [
+    {
+      "claim": "BridgePatchは2026-08-15にPUBLIC_SALE_APPROVEDを受け、公開販売状態へ移行しました。",
+      "status": "VERIFIED",
+      "source_ref": "gh-launch",
+      "priority": "critical",
+      "must_keep": true
+    },
+    {
+      "claim": "専用Payment Link v2はliveかつactiveで、公開URLは販売ページのproduction configに設定されています。",
+      "status": "VERIFIED",
+      "source_ref": "stripe-link-v2",
+      "priority": "high"
+    },
+    {
+      "claim": "v2のline itemは「BridgePatch 暫定ツール実装設計書」、数量1、合計10,000円で検証済みです。",
+      "status": "VERIFIED",
+      "source_ref": "stripe-line-v2",
+      "priority": "critical",
+      "must_keep": true
+    },
+    {
+      "claim": "旧Payment Linkは旧商品名がline itemに残っていたためinactive化しました。",
+      "status": "VERIFIED",
+      "source_ref": "stripe-legacy",
+      "priority": "high"
+    },
+    {
+      "claim": "Payment Link差替え後のGitHub Pages buildはhotfix commitに対して成功し、build errorはありませんでした。",
+      "status": "VERIFIED",
+      "source_ref": "pages-build",
+      "priority": "normal"
+    },
+    {
+      "claim": "この更新で顧客への請求やSNSへの自動投稿は実行していません。",
+      "status": "VERIFIED",
+      "source_ref": "goal-boundary",
+      "priority": "low"
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "gh-launch",
+      "kind": "github",
+      "locator": "PR #334 / launch state"
+    },
+    {
+      "id": "stripe-link-v2",
+      "kind": "stripe",
+      "locator": "plink_1U4ewTPYxtfxmKGlnNEYk9Bs"
+    },
+    {
+      "id": "stripe-line-v2",
+      "kind": "stripe",
+      "locator": "v2 payment link line items"
+    },
+    {
+      "id": "stripe-legacy",
+      "kind": "stripe",
+      "locator": "plink_1TCBEnPYxtfxmKGlmuK4Cwqe inactive"
+    },
+    {
+      "id": "pages-build",
+      "kind": "github-pages",
+      "locator": "build 1152796549 / fb66986"
+    },
+    {
+      "id": "goal-boundary",
+      "kind": "goal",
+      "locator": "2026-08-15 launch correction"
+    }
+  ],
+  "audience": "AI開発・業務改善に関心のある事業者",
+  "call_to_action": "BridgePatchでは、まず無料で『この作業は小さく切って直せるか』を確認できます。",
+  "media_refs": [
+    "BridgePatch販売ページ",
+    "Stripe line item検証画面"
+  ],
+  "known_limits": [
+    "公開後の実顧客購入・納品実績はまだこの更新では主張しません。"
+  ]
+}
