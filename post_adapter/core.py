@@ -23,6 +23,37 @@ REQUIRED_FIELDS = (
 
 REVIEW_STATES = {"DRAFT", "REVIEW_REQUIRED", "APPROVED_FOR_COPY", "REJECTED"}
 
+# Replaceable channel-shaping rules. These are adapter policy, not platform truth.
+CONTENT_BUDGET = {
+    "x": {
+        "unit": "unicode_codepoints",
+        "max_per_post": 260,
+    }
+}
+
+FACT_PRIORITY = {
+    "critical": 400,
+    "high": 300,
+    "normal": 200,
+    "low": 100,
+}
+
+OVERFLOW_STRATEGY = {
+    "x": "thread",
+}
+
+CHANNEL_POLICY = {
+    "x": {
+        "content_budget": deepcopy(CONTENT_BUDGET["x"]),
+        "fact_priority": deepcopy(FACT_PRIORITY),
+        "must_keep_fields": ("project_name", "summary", "call_to_action"),
+        "thread_allowed": True,
+        "max_thread_blocks": 6,
+        "overflow_strategy": OVERFLOW_STRATEGY["x"],
+        "cta_placement": "primary",
+    }
+}
+
 Renderer = Callable[[dict], str]
 _ADAPTERS: dict[str, Renderer] = {}
 
@@ -45,12 +76,34 @@ def _source_index(source_refs: list[dict]) -> dict[str, dict]:
     return index
 
 
+def _fact_priority(raw_fact: dict) -> str:
+    priority = raw_fact.get("priority", "normal")
+    if not isinstance(priority, str):
+        raise PostAdapterError("facts[].priority must be a string")
+    priority = priority.strip().lower()
+    if priority not in FACT_PRIORITY:
+        raise PostAdapterError(
+            "facts[].priority must be one of: " + ", ".join(FACT_PRIORITY)
+        )
+    return priority
+
+
+def _fact_must_keep(raw_fact: dict) -> bool:
+    value = raw_fact.get("must_keep", False)
+    if not isinstance(value, bool):
+        raise PostAdapterError("facts[].must_keep must be boolean")
+    return value
+
+
 def normalize_source(source: dict) -> dict:
     """Validate and normalize one development/update source record.
 
     Verified public claims are accepted only when they bind to a declared source
     reference. Everything else is retained as a warning and excluded from the
     publish-ready fact list.
+
+    Channel-shaping hints such as ``priority`` and ``must_keep`` are optional and
+    never weaken evidence requirements.
     """
     if not isinstance(source, dict):
         raise PostAdapterError("source must be an object")
@@ -80,6 +133,8 @@ def normalize_source(source: dict) -> dict:
         claim = _nonempty_text(raw_fact.get("claim"), "facts[].claim")
         status = _nonempty_text(raw_fact.get("status", "UNVERIFIED"), "facts[].status").upper()
         source_ref = raw_fact.get("source_ref")
+        priority = _fact_priority(raw_fact)
+        must_keep = _fact_must_keep(raw_fact)
 
         if status == "VERIFIED" and isinstance(source_ref, str) and source_ref in source_index:
             verified_facts.append(
@@ -87,6 +142,9 @@ def normalize_source(source: dict) -> dict:
                     "claim": claim,
                     "source_ref": source_ref,
                     "status": "VERIFIED",
+                    "priority": priority,
+                    "must_keep": must_keep,
+                    "source_order": position,
                 }
             )
         else:
@@ -122,15 +180,109 @@ def _warning_block(source: dict) -> str:
     )
 
 
+def _measure_content(text: str, budget: dict) -> int:
+    unit = budget.get("unit")
+    if unit != "unicode_codepoints":
+        raise PostAdapterError(f"unsupported content budget unit: {unit}")
+    return len(text)
+
+
+def _join_x_parts(parts: list[str]) -> str:
+    return "\n\n".join(part for part in parts if part)
+
+
+def _rank_x_facts(source: dict) -> list[dict]:
+    priority_map = CHANNEL_POLICY["x"]["fact_priority"]
+    return sorted(
+        source["verified_facts"],
+        key=lambda fact: (
+            -int(fact["must_keep"]),
+            -priority_map[fact["priority"]],
+            fact["source_order"],
+        ),
+    )
+
+
+def _x_posts(source: dict) -> list[str]:
+    """Shape verified claims into budgeted X draft bodies.
+
+    No claim text is truncated or paraphrased here. Priority determines which
+    verified facts get the primary-post budget first; overflow moves to explicit
+    continuation blocks.
+    """
+    policy = CHANNEL_POLICY["x"]
+    budget = policy["content_budget"]
+    max_per_post = budget["max_per_post"]
+    strategy = policy["overflow_strategy"]
+
+    header = f"{source['project_name']}: {source['summary']}"
+    cta = source["call_to_action"]
+    required_primary = [header, cta]
+
+    for value in required_primary:
+        if _measure_content(value, budget) > max_per_post:
+            raise PostAdapterError(
+                "x required field exceeds channel content budget; human rewrite required"
+            )
+
+    primary_facts: list[dict] = []
+    overflow: list[dict] = []
+
+    for fact in _rank_x_facts(source):
+        bullet = f"• {fact['claim']}"
+        if _measure_content(bullet, budget) > max_per_post:
+            raise PostAdapterError(
+                "x fact exceeds channel content budget; human rewrite required"
+            )
+        candidate = _join_x_parts(
+            [header, *[f"• {item['claim']}" for item in primary_facts], bullet, cta]
+        )
+        if _measure_content(candidate, budget) <= max_per_post:
+            primary_facts.append(fact)
+        else:
+            overflow.append(fact)
+
+    primary = _join_x_parts(
+        [header, *[f"• {item['claim']}" for item in primary_facts], cta]
+    )
+    posts = [primary]
+
+    if not overflow:
+        return posts
+
+    if strategy != "thread" or not policy["thread_allowed"]:
+        raise PostAdapterError("x content exceeds budget and thread overflow is disabled")
+
+    current_parts: list[str] = []
+    for fact in overflow:
+        bullet = f"• {fact['claim']}"
+        candidate = _join_x_parts([*current_parts, bullet])
+        if current_parts and _measure_content(candidate, budget) > max_per_post:
+            posts.append(_join_x_parts(current_parts))
+            current_parts = [bullet]
+        else:
+            current_parts.append(bullet)
+    if current_parts:
+        posts.append(_join_x_parts(current_parts))
+
+    if len(posts) > policy["max_thread_blocks"]:
+        raise PostAdapterError(
+            "x overflow exceeds max_thread_blocks; human rewrite required"
+        )
+
+    return posts
+
+
 def render_x(source: dict) -> str:
-    body = [
-        f"{source['project_name']}: {source['summary']}",
-        "",
-        _fact_lines(source, "• "),
-        "",
-        source["call_to_action"],
-    ]
-    return "\n".join(body).strip() + _warning_block(source) + "\n"
+    posts = _x_posts(source)
+    if len(posts) == 1:
+        rendered = posts[0]
+    else:
+        rendered = "\n\n".join(
+            f"[X POST {index}/{len(posts)}]\n{post}"
+            for index, post in enumerate(posts, start=1)
+        )
+    return rendered.strip() + _warning_block(source) + "\n"
 
 
 def render_note(source: dict) -> str:
@@ -217,6 +369,21 @@ def _default_adapters() -> None:
     register_adapter("instagram", render_instagram)
 
 
+def _public_channel_policy(name: str) -> dict | None:
+    policy = CHANNEL_POLICY.get(name)
+    if policy is None:
+        return None
+    return {
+        "content_budget": deepcopy(policy["content_budget"]),
+        "fact_priority": list(policy["fact_priority"]),
+        "must_keep_fields": list(policy["must_keep_fields"]),
+        "thread_allowed": policy["thread_allowed"],
+        "max_thread_blocks": policy["max_thread_blocks"],
+        "overflow_strategy": policy["overflow_strategy"],
+        "cta_placement": policy["cta_placement"],
+    }
+
+
 def build_bundle(
     source: dict,
     *,
@@ -242,8 +409,9 @@ def build_bundle(
     bundle_id = "PA-" + hashlib.sha256(fingerprint_input.encode("utf-8")).hexdigest()[:16].upper()
 
     outputs = {name: renderer(normalized) for name, renderer in _ADAPTERS.items()}
+    x_posts = _x_posts(normalized) if "x" in outputs else []
     manifest = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "bundle_id": bundle_id,
         "project_name": normalized["project_name"],
         "generated_at": generated_at,
@@ -252,6 +420,20 @@ def build_bundle(
         "verification_warnings": normalized["warnings"],
         "human_review_state": review_state,
         "external_publication_performed": False,
+        "channel_policies": {
+            name: policy
+            for name in outputs
+            if (policy := _public_channel_policy(name)) is not None
+        },
+        "channel_metrics": {
+            "x": {
+                "post_blocks": len(x_posts),
+                "max_observed_codepoints": max(
+                    (_measure_content(post, CONTENT_BUDGET["x"]) for post in x_posts),
+                    default=0,
+                ),
+            }
+        } if x_posts else {},
     }
     source_summary = (
         f"# {normalized['project_name']} source summary\n\n"
