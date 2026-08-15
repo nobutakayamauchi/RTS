@@ -1,5 +1,5 @@
 from .core import XArticleEngineError, normalize_brief
-from .terminology import audit_draft, build_generation_packet
+from .deep_readable import audit_draft, build_generation_packet
 
 __all__ = [
     "XArticleEngineError",
