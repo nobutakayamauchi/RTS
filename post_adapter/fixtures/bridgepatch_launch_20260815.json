@@ -6,32 +6,40 @@
     {
       "claim": "BridgePatchは2026-08-15にPUBLIC_SALE_APPROVEDを受け、公開販売状態へ移行しました。",
       "status": "VERIFIED",
-      "source_ref": "gh-launch"
+      "source_ref": "gh-launch",
+      "priority": "critical",
+      "must_keep": true
     },
     {
       "claim": "専用Payment Link v2はliveかつactiveで、公開URLは販売ページのproduction configに設定されています。",
       "status": "VERIFIED",
-      "source_ref": "stripe-link-v2"
+      "source_ref": "stripe-link-v2",
+      "priority": "high"
     },
     {
       "claim": "v2のline itemは「BridgePatch 暫定ツール実装設計書」、数量1、合計10,000円で検証済みです。",
       "status": "VERIFIED",
-      "source_ref": "stripe-line-v2"
+      "source_ref": "stripe-line-v2",
+      "priority": "critical",
+      "must_keep": true
     },
     {
       "claim": "旧Payment Linkは旧商品名がline itemに残っていたためinactive化しました。",
       "status": "VERIFIED",
-      "source_ref": "stripe-legacy"
+      "source_ref": "stripe-legacy",
+      "priority": "high"
     },
     {
       "claim": "Payment Link差替え後のGitHub Pages buildはhotfix commitに対して成功し、build errorはありませんでした。",
       "status": "VERIFIED",
-      "source_ref": "pages-build"
+      "source_ref": "pages-build",
+      "priority": "normal"
     },
     {
       "claim": "この更新で顧客への請求やSNSへの自動投稿は実行していません。",
       "status": "VERIFIED",
-      "source_ref": "goal-boundary"
+      "source_ref": "goal-boundary",
+      "priority": "low"
     }
   ],
   "source_refs": [
