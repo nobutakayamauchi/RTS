@@ -1,0 +1,32 @@
+{
+  "project_name": "RTS Flight Recorder",
+  "update_type": "development",
+  "summary": "Deployment identity is treated separately from code existence before a runtime claim is made.",
+  "facts": [
+    {
+      "claim": "The development rule distinguishes code existence from runtime evidence.",
+      "status": "VERIFIED",
+      "source_ref": "dogfood-001"
+    },
+    {
+      "claim": "Every production deployment is now fixed.",
+      "status": "UNVERIFIED"
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "dogfood-001",
+      "kind": "development-record",
+      "locator": "Deployment Identity dogfood finding"
+    }
+  ],
+  "audience": "AI developers and operators",
+  "call_to_action": "Review the evidence-backed update before treating any implementation as deployed.",
+  "media_refs": [
+    "terminal capture",
+    "architecture diagram"
+  ],
+  "known_limits": [
+    "This fixture demonstrates publication transformation only; it does not establish a production deployment state."
+  ]
+}
