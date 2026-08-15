@@ -1,10 +1,12 @@
 # Post Adapter v0
 
-Status: `HUMAN-REVIEWED DRAFT TRANSFORMER / NO EXTERNAL PUBLISHING`
+Status: `EVIDENCE-SAFE DRAFT TRANSFORMER / /human REQUIRED BEFORE EXTERNAL PUBLICATION`
 
 Post Adapter v0 turns one evidence-bound development/update record into channel-shaped drafts for X, note, GitHub, and Instagram.
 
 It does not log in to those services and does not publish anything.
+
+**Important:** Post Adapter output is structured, evidence-safe draft material. It is not automatically considered natural public copy. Any external-facing X/note copy MUST pass the mandatory `/human` policy in `publication_bridge/HUMAN_STYLE_POLICY.md` before Publication Bridge may hand it to a platform.
 
 ## Why this v0 is thin
 
@@ -16,11 +18,14 @@ one source update
 -> bind factual claims to declared evidence
 -> apply channel policy
 -> transform by channel
--> human review
--> approved-for-copy output
+-> evidence review
+-> APPROVED_FOR_COPY
+-> /human rewrite + factual preservation check
+-> APPROVED_FOR_HANDOFF
+-> Publication Bridge
 ```
 
-Direct posting, OAuth/token storage, scheduling, analytics, auto-replies, and account management are deliberately excluded. They are not necessary to prove whether the transformation layer saves work and preserves claim quality.
+Direct posting, OAuth/token storage, scheduling, analytics, auto-replies, and account management are deliberately excluded.
 
 ## Source contract
 
@@ -71,7 +76,8 @@ Evidence binding and channel shaping are intentionally separate:
 
 ```text
 Evidence Binding = what may be claimed
-CHANNEL_POLICY = how that verified content is shaped for one channel
+CHANNEL_POLICY = how much/where verified material initially goes
+/human = how a real person would actually say it externally
 ```
 
 The current X policy uses:
@@ -96,9 +102,25 @@ max_thread_blocks:
 
 `260` is a conservative internal draft budget, not a permanent claim about X's exact platform counting rules. It belongs to the replaceable adapter policy and can change without rewriting the normalized source contract.
 
-The X primary post reserves room for project/summary, the highest-priority facts that fit, and the CTA. Remaining verified facts move to explicit continuation blocks.
-
 The shaping layer does **not** silently truncate or paraphrase a factual claim. If one required field or verified fact exceeds the configured per-post budget by itself, generation fails closed with a human-rewrite requirement.
+
+## Mandatory `/human` boundary
+
+`APPROVED_FOR_COPY` means only:
+
+> the evidence-safe source is eligible to be rewritten into public copy.
+
+It does **not** mean:
+
+> safe to paste directly into X/note.
+
+Before external handoff, run `/human` according to:
+
+```text
+publication_bridge/HUMAN_STYLE_POLICY.md
+```
+
+The final X/note text is then hash-bound into the bundle. Any later edit invalidates the `/human` pass and Publication Bridge fails closed.
 
 ## Run
 
@@ -108,17 +130,7 @@ From the repository root:
 python -m post_adapter post_adapter/fixtures/example_update.json --out-dir /tmp/post-bundle
 ```
 
-The original included dogfood fixture intentionally contains one unsupported completion claim. The expected result is a generated bundle with `REVIEW_REQUIRED`, while the unsupported claim is excluded from the publish-ready portion of each draft and retained as a warning for the reviewer.
-
-A production-shaped BridgePatch fixture is also retained at:
-
-```text
-post_adapter/fixtures/bridgepatch_launch_20260815.json
-```
-
-It verifies the X budget/priority/thread path without external publication.
-
-For a fully evidence-bound source, a human may explicitly record:
+For a fully evidence-bound source:
 
 ```bash
 python -m post_adapter clean_update.json \
@@ -126,7 +138,15 @@ python -m post_adapter clean_update.json \
   --review-state APPROVED_FOR_COPY
 ```
 
-`APPROVED_FOR_COPY` is rejected when verification warnings remain.
+Then perform `/human` on the external drafts and record the completed pass:
+
+```bash
+python -m publication_bridge.human_gate /tmp/post-bundle \
+  --reviewer /human \
+  --evidence-preserved
+```
+
+Only then may Publication Bridge prepare X/note handoff controls.
 
 ## Output
 
@@ -146,33 +166,19 @@ The manifest always records:
 "external_publication_performed": false
 ```
 
-and now also records the applicable channel policy and X shaping metrics.
-
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -p 'test_post_adapter.py' -v
+python -m unittest discover -s tests -p 'test_publication_bridge.py' -v
 ```
 
-The tests cover:
-
-- four distinct default channel outputs;
-- no external-publication state;
-- unsupported-claim exclusion;
-- fail-closed missing evidence;
-- blocking `APPROVED_FOR_COPY` when warnings remain;
-- clean human approval state;
-- replaceable channel-policy manifest;
-- BridgePatch two-post dogfood under budget;
-- exact preservation of all BridgePatch verified claims;
-- oversized single-claim fail-closed behavior;
-- invalid fact-priority fail-closed behavior;
-- extension with a fifth adapter without changing the normalized source contract.
+Post Adapter tests cover evidence/channel shaping. Publication Bridge tests cover the external `/human` gate, hash binding, user-only handoff, and fail-closed behavior.
 
 ## Extension boundary
 
 A new output channel is a renderer registered against the normalized source contract. It must not require the source record to be rewritten around one platform.
 
-The v0 public boundary remains:
+Any external-facing channel added later inherits the same rule:
 
-> Adapt content; do not publish it.
+> Evidence-safe draft first. `/human` before public handoff. Never silently bypass the humanization boundary.
