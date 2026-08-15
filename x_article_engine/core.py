@@ -10,9 +10,18 @@ class XArticleEngineError(ValueError):
 
 
 ARTICLE_TYPES = {"HOW_TO", "STORY", "CASE_RESULT"}
-OPENING_MODES = {"RELATABLE", "PROOF_FIRST", "CONTRARIAN"}
+OPENING_MODES = {"RELATABLE", "PROOF_FIRST", "CONTRARIAN", "LIVED_PAIN"}
 TOPIC_MODES = {"PROCEDURAL", "HABIT", "RELATIONSHIP", "BUSINESS"}
-PRIMARY_INFO_KINDS = {"EXPERIENCE", "BELIEF", "FAILURE", "CHRONOLOGY", "OPINION"}
+PRIMARY_INFO_KINDS = {
+    "EXPERIENCE",
+    "BELIEF",
+    "FAILURE",
+    "CHRONOLOGY",
+    "OPINION",
+    "PAIN",
+    "ORIGIN",
+}
+LIVED_PAIN_KINDS = {"PAIN", "FAILURE", "ORIGIN"}
 
 REQUIRED_FIELDS = (
     "offer",
@@ -155,7 +164,7 @@ def _normalize_primary_info(items: object) -> tuple[list[dict], list[str]]:
         kind = _text(raw.get("kind", "EXPERIENCE"), "primary_info[].kind").upper()
         if kind not in PRIMARY_INFO_KINDS:
             raise XArticleEngineError(
-                "primary_info[].kind must be EXPERIENCE, BELIEF, FAILURE, CHRONOLOGY, or OPINION"
+                "primary_info[].kind must be EXPERIENCE, BELIEF, FAILURE, CHRONOLOGY, OPINION, PAIN, or ORIGIN"
             )
         if not isinstance(attested, bool):
             raise XArticleEngineError("primary_info[].attested must be boolean")
@@ -168,6 +177,10 @@ def _normalize_primary_info(items: object) -> tuple[list[dict], list[str]]:
                 f"primary_info {index} excluded because it is not human-attested: {claim}"
             )
     return accepted, warnings
+
+
+def _has_lived_pain(primary_info: list[dict]) -> bool:
+    return any(item["kind"] in LIVED_PAIN_KINDS for item in primary_info)
 
 
 def normalize_brief(source: dict, *, trusted_source_refs: list[dict]) -> dict:
@@ -220,16 +233,23 @@ def normalize_brief(source: dict, *, trusted_source_refs: list[dict]) -> dict:
 
     opening_mode = normalized.get("opening_mode")
     if opening_mode is None:
-        opening_mode = "PROOF_FIRST" if any(
-            item["kind"] in {"RESULT", "CASE_RESULT"} for item in verified
-        ) else "RELATABLE"
+        if any(item["kind"] in {"RESULT", "CASE_RESULT"} for item in verified):
+            opening_mode = "PROOF_FIRST"
+        elif _has_lived_pain(primary_info):
+            opening_mode = "LIVED_PAIN"
+        else:
+            opening_mode = "RELATABLE"
     opening_mode = _text(opening_mode, "opening_mode").upper()
     if opening_mode not in OPENING_MODES:
         raise XArticleEngineError(
-            "opening_mode must be RELATABLE, PROOF_FIRST, or CONTRARIAN"
+            "opening_mode must be RELATABLE, PROOF_FIRST, CONTRARIAN, or LIVED_PAIN"
         )
     if opening_mode == "PROOF_FIRST" and not verified:
         raise XArticleEngineError("PROOF_FIRST requires verified evidence")
+    if opening_mode == "LIVED_PAIN" and not _has_lived_pain(primary_info):
+        raise XArticleEngineError(
+            "LIVED_PAIN requires human-attested PAIN, FAILURE, or ORIGIN primary_info"
+        )
     normalized["opening_mode"] = opening_mode
 
     normalized["review_state"] = "REVIEW_REQUIRED" if normalized["warnings"] else "DRAFT"
@@ -250,14 +270,67 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
         shape = "Use concrete business logic, scope, trade-offs, and reproducible reasoning."
 
     if brief["article_type"] == "HOW_TO":
-        body_pattern = ["conclusion_or_overview", "method", "why_it_works", "stumbling_points", "conditions_and_limits"]
+        body_pattern = [
+            "conclusion_or_overview",
+            "method",
+            "why_it_works",
+            "stumbling_points",
+            "conditions_and_limits",
+        ]
     elif brief["article_type"] == "STORY":
-        body_pattern = ["interesting_destination_or_failure", "previous_state", "turning_point", "what_changed", "lesson", "reader_connection"]
+        body_pattern = [
+            "interesting_destination_or_failure",
+            "previous_state",
+            "turning_point",
+            "what_changed",
+            "lesson",
+            "reader_connection",
+        ]
     else:
-        body_pattern = ["before", "after", "what_changed", "why_it_worked", "reproduction_conditions"]
+        body_pattern = [
+            "before",
+            "after",
+            "what_changed",
+            "why_it_worked",
+            "reproduction_conditions",
+        ]
+
+    lived_pain_anchors = [
+        item for item in brief["verified_primary_info"] if item["kind"] in LIVED_PAIN_KINDS
+    ]
+    if brief["opening_mode"] == "LIVED_PAIN":
+        narrative_sequence = [
+            "raw_pain_line",
+            "concrete_scene",
+            "failed_attempt_or_trigger",
+            "friction_loop",
+            "cost_or_stakes",
+            "origin_statement_if_attested",
+            "mechanism",
+            "solution",
+            "reader_bridge",
+            "one_action_today",
+            "single_cta",
+        ]
+        opening_doctrine = (
+            "Show human-attested pain before explaining it. Let the offer emerge as a consequence "
+            "of the problem rather than manufacturing a problem around the offer."
+        )
+    else:
+        narrative_sequence = [
+            "reader_state",
+            "evidence_if_available",
+            "anticipated_objection",
+            "cause",
+            "solution",
+            "stumbling_point",
+            "one_action_today",
+            "single_cta",
+        ]
+        opening_doctrine = "Use the selected opening mode without inventing scene details."
 
     return {
-        "schema_version": "0.2",
+        "schema_version": "0.3",
         "offer": brief["offer"],
         "target": brief["target"],
         "pain": brief["pain"],
@@ -268,26 +341,31 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
         "verified_source_refs": brief["verified_source_refs"],
         "verified_evidence": brief["verified_evidence"],
         "verified_primary_info": brief["verified_primary_info"],
+        "lived_pain_anchors": lived_pain_anchors,
         "narrative": {
             "top_level_order": ["EMOTION", "LOGIC", "EASY_NEXT_ACTION"],
             "body_pattern": body_pattern,
             "depth_layers": ["L1_CONCLUSION", "L2_REASON", "L3_CONDITIONS_EXCEPTIONS"],
-            "sequence": ["reader_state", "evidence_if_available", "anticipated_objection", "cause", "solution", "stumbling_point", "one_action_today", "single_cta"],
+            "sequence": narrative_sequence,
+            "opening_doctrine": opening_doctrine,
             "topic_shape": shape,
         },
         "voice_policy": {
             "preserve_attested_opinion": True,
             "preserve_attested_self_labels": True,
+            "preserve_attested_raw_pain": True,
+            "preserve_colloquial_force": True,
             "hedge_verified_facts": False,
             "generic_filler": "avoid",
             "strong_judgment_rule": "Strong opinions are allowed when they are explicitly human-attested as BELIEF or OPINION; do not convert them into factual guarantees.",
             "concrete_language_rule": "Be vivid and specific using bound evidence and attested primary information; safety must not flatten the writer's voice.",
+            "lived_pain_rule": "Do not sanitize a real frustration line into polite marketing language when LIVED_PAIN is active. Short repeated actions may be used to make a real friction loop felt.",
         },
         "generation_constraints": [
             "Use only verified_evidence for externally checkable facts, prices, timing, scope, and results.",
-            "Use first-person history, failure, emotion, belief, or chronology only from verified_primary_info.",
+            "Use first-person history, failure, emotion, belief, pain, origin, or chronology only from verified_primary_info.",
             "Never invent a number to satisfy a density or title rule; a numberless title is valid.",
-            "Derived arithmetic must be bound as its own verified evidence claim before generation; v0.2 does not auto-authorize new computed numbers.",
+            "Derived arithmetic must be bound as its own verified evidence claim before generation; v0.3 does not auto-authorize new computed numbers.",
             "Do not strengthen commercial or contractual wording beyond the verified claim.",
             "Do not present an invented label as established terminology.",
             "Explain specialist terms inline in plain language.",
@@ -295,7 +373,10 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
             "Give exactly one practical next action and one CTA.",
             "Do not blame or rank the reader.",
             "Natural hybridization is allowed when strong human-attested primary information helps the article, but the selected article_type remains the dominant structure.",
-            "Do not add chronology, job history, customer history, frequency, duration, or role details that are absent from verified_primary_info.",
+            "Do not add chronology, job history, customer history, frequency, duration, role details, dialogue, or emotional intensity that are absent from verified_primary_info.",
+            "When opening_mode is LIVED_PAIN, start from an attested pain/failure/origin anchor rather than a generic summary of the target reader's pain.",
+            "When opening_mode is LIVED_PAIN, show the concrete friction loop before abstracting it into a general lesson.",
+            "When opening_mode is LIVED_PAIN, connect the lived scene to the reader by analogy; do not claim their situation is identical.",
             "The draft is not publishable until /human review passes.",
         ],
         "human_gate": {
@@ -305,6 +386,8 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
                 "Are all first-person details true and mine?",
                 "Are all numbers, prices, timing, results, and scope evidence-bound?",
                 "Did the draft invent emotion, biography, customer outcomes, or certainty?",
+                "If LIVED_PAIN is active, does the opening make the pain felt before explaining it?",
+                "If LIVED_PAIN is active, are every scene detail and emotional line actually mine?",
                 "Does the CTA still match the offer and only ask for one next action?",
                 "Did the rewrite preserve factual and risk boundaries?",
             ],
@@ -370,7 +453,13 @@ def _identity_findings(draft: str, packet: dict) -> list[str]:
 def _commercial_findings(draft: str, packet: dict) -> list[str]:
     normalized_draft = _norm(draft)
     bound = _norm(_commercial_text(packet))
-    return sorted({marker for marker in COMMERCIAL_RISK_MARKERS if marker in normalized_draft and marker not in bound})
+    return sorted(
+        {
+            marker
+            for marker in COMMERCIAL_RISK_MARKERS
+            if marker in normalized_draft and marker not in bound
+        }
+    )
 
 
 def audit_draft(draft: str, packet: dict) -> dict:
@@ -388,13 +477,21 @@ def audit_draft(draft: str, packet: dict) -> dict:
 
     findings = []
     for claim in unbound_numeric:
-        findings.append({"code": "UNBOUND_NUMERIC_CLAIM", "severity": "BLOCK", "detail": claim})
+        findings.append(
+            {"code": "UNBOUND_NUMERIC_CLAIM", "severity": "BLOCK", "detail": claim}
+        )
     for claim in unbound_fuzzy:
-        findings.append({"code": "UNBOUND_FUZZY_QUANT_CLAIM", "severity": "BLOCK", "detail": claim})
+        findings.append(
+            {"code": "UNBOUND_FUZZY_QUANT_CLAIM", "severity": "BLOCK", "detail": claim}
+        )
     for sentence in identity_details:
-        findings.append({"code": "UNBOUND_IDENTITY_DETAIL", "severity": "BLOCK", "detail": sentence})
+        findings.append(
+            {"code": "UNBOUND_IDENTITY_DETAIL", "severity": "BLOCK", "detail": sentence}
+        )
     for marker in strengthened:
-        findings.append({"code": "UNBOUND_STRONG_CLAIM", "severity": "BLOCK", "detail": marker})
+        findings.append(
+            {"code": "UNBOUND_STRONG_CLAIM", "severity": "BLOCK", "detail": marker}
+        )
 
     blocked = any(item["severity"] == "BLOCK" for item in findings)
     return {
