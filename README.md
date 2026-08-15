@@ -8,6 +8,21 @@
 >
 > Final records: [`RTS Development Freeze`](docs/audit/RTS_DEVELOPMENT_FREEZE_2026-08-09.md) · [`Final Abolition Gate`](docs/audit/RTS_FINAL_ABOLITION_GATE_2026-08.md)
 
+## Current service: BridgePatch
+
+RTS itself is frozen, but a current service produced from the surrounding development practice is live:
+
+**[BridgePatch / AI業務レスキュー](https://nobutakayamauchi.github.io/RTS/bridgepatch/)** — 「本格システムを入れるほどではない。でも毎週同じ手作業が痛い」という業務を、一工程だけ小さく切って先に直すサービスです。
+
+- 無料：制作可否の受注適合チェック
+- 10,000円（税込）：持ち出し可能な暫定ツール実装設計書
+- 50,000円（税込）標準：1アクション簡易ツール
+- 問い合わせ: `yamauchi.rts.office@gmail.com`
+
+[販売ページを見る](https://nobutakayamauchi.github.io/RTS/bridgepatch/) / [メールで無料確認](mailto:yamauchi.rts.office@gmail.com?subject=BridgePatch%20%E7%84%A1%E6%96%99%E9%81%A9%E5%90%88%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF)
+
+---
+
 Decision Reconstructability Protocol for AI-accelerated systems.
 
 Acceleration without reconstructability leads to structural collapse.
