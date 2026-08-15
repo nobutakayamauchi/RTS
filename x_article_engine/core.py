@@ -22,7 +22,6 @@ REQUIRED_FIELDS = (
     "article_type",
     "cta",
     "evidence",
-    "source_refs",
 )
 
 NUMERIC_CLAIM_RE = re.compile(
@@ -35,12 +34,7 @@ FUZZY_QUANT_RE = re.compile(
     r"|(?:\d+|[一二三四五六七八九十百千万億〇零]+)倍"
 )
 
-FUZZY_QUANT_MARKERS = (
-    "数年前",
-    "何度も",
-    "大半",
-    "ほとんど",
-)
+FUZZY_QUANT_MARKERS = ("数年前", "何度も", "大半", "ほとんど")
 
 IDENTITY_RISK_MARKERS = (
     "数年前",
@@ -134,9 +128,9 @@ def _normalize_evidence(
             )
         else:
             if source is None:
-                reason = "source_ref is not declared"
+                reason = "source_ref is not declared by trusted ingestion"
             elif not source_verified:
-                reason = "declared source is not VERIFIED"
+                reason = "trusted source is not VERIFIED"
             else:
                 reason = "claim is not VERIFIED"
             warnings.append(f"evidence {index} excluded because {reason}: {claim}")
@@ -156,10 +150,7 @@ def _normalize_primary_info(items: object) -> tuple[list[dict], list[str]]:
         if not isinstance(raw, dict):
             raise XArticleEngineError("primary_info entries must be objects")
         claim = _text(raw.get("claim"), "primary_info[].claim")
-        source_ref = _text(
-            raw.get("source_ref", "human_attestation"),
-            "primary_info[].source_ref",
-        )
+        source_ref = _text(raw.get("source_ref", "human_attestation"), "primary_info[].source_ref")
         attested = raw.get("attested", False)
         kind = _text(raw.get("kind", "EXPERIENCE"), "primary_info[].kind").upper()
         if kind not in PRIMARY_INFO_KINDS:
@@ -170,12 +161,7 @@ def _normalize_primary_info(items: object) -> tuple[list[dict], list[str]]:
             raise XArticleEngineError("primary_info[].attested must be boolean")
         if attested:
             accepted.append(
-                {
-                    "claim": claim,
-                    "source_ref": source_ref,
-                    "attested": True,
-                    "kind": kind,
-                }
+                {"claim": claim, "source_ref": source_ref, "attested": True, "kind": kind}
             )
         else:
             warnings.append(
@@ -184,8 +170,13 @@ def _normalize_primary_info(items: object) -> tuple[list[dict], list[str]]:
     return accepted, warnings
 
 
-def normalize_brief(source: dict) -> dict:
-    """Normalize one X Article brief and bind every usable factual input."""
+def normalize_brief(source: dict, *, trusted_source_refs: list[dict]) -> dict:
+    """Normalize one X Article brief and bind every usable factual input.
+
+    The verified source registry is supplied separately by a trusted ingestion
+    layer. End-user brief JSON cannot make a source trusted by declaring it
+    VERIFIED inside the brief.
+    """
     if not isinstance(source, dict):
         raise XArticleEngineError("source must be an object")
 
@@ -209,7 +200,7 @@ def normalize_brief(source: dict) -> dict:
         )
     normalized["topic_mode"] = topic_mode
 
-    source_index = _normalize_source_refs(normalized["source_refs"])
+    source_index = _normalize_source_refs(trusted_source_refs)
     verified, evidence_warnings = _normalize_evidence(normalized["evidence"], source_index)
     primary_info, primary_warnings = _normalize_primary_info(normalized["primary_info"])
     normalized["verified_source_refs"] = [
@@ -245,9 +236,9 @@ def normalize_brief(source: dict) -> dict:
     return normalized
 
 
-def build_generation_packet(source: dict) -> dict:
+def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) -> dict:
     """Compile a safe, model-agnostic generation packet without publishing."""
-    brief = normalize_brief(source)
+    brief = normalize_brief(source, trusted_source_refs=trusted_source_refs)
 
     if brief["topic_mode"] == "PROCEDURAL":
         shape = "Use steps only where the reader is literally performing a procedure."
@@ -259,30 +250,11 @@ def build_generation_packet(source: dict) -> dict:
         shape = "Use concrete business logic, scope, trade-offs, and reproducible reasoning."
 
     if brief["article_type"] == "HOW_TO":
-        body_pattern = [
-            "conclusion_or_overview",
-            "method",
-            "why_it_works",
-            "stumbling_points",
-            "conditions_and_limits",
-        ]
+        body_pattern = ["conclusion_or_overview", "method", "why_it_works", "stumbling_points", "conditions_and_limits"]
     elif brief["article_type"] == "STORY":
-        body_pattern = [
-            "interesting_destination_or_failure",
-            "previous_state",
-            "turning_point",
-            "what_changed",
-            "lesson",
-            "reader_connection",
-        ]
+        body_pattern = ["interesting_destination_or_failure", "previous_state", "turning_point", "what_changed", "lesson", "reader_connection"]
     else:
-        body_pattern = [
-            "before",
-            "after",
-            "what_changed",
-            "why_it_worked",
-            "reproduction_conditions",
-        ]
+        body_pattern = ["before", "after", "what_changed", "why_it_worked", "reproduction_conditions"]
 
     return {
         "schema_version": "0.2",
@@ -300,16 +272,7 @@ def build_generation_packet(source: dict) -> dict:
             "top_level_order": ["EMOTION", "LOGIC", "EASY_NEXT_ACTION"],
             "body_pattern": body_pattern,
             "depth_layers": ["L1_CONCLUSION", "L2_REASON", "L3_CONDITIONS_EXCEPTIONS"],
-            "sequence": [
-                "reader_state",
-                "evidence_if_available",
-                "anticipated_objection",
-                "cause",
-                "solution",
-                "stumbling_point",
-                "one_action_today",
-                "single_cta",
-            ],
+            "sequence": ["reader_state", "evidence_if_available", "anticipated_objection", "cause", "solution", "stumbling_point", "one_action_today", "single_cta"],
             "topic_shape": shape,
         },
         "voice_policy": {
@@ -317,20 +280,14 @@ def build_generation_packet(source: dict) -> dict:
             "preserve_attested_self_labels": True,
             "hedge_verified_facts": False,
             "generic_filler": "avoid",
-            "strong_judgment_rule": (
-                "Strong opinions are allowed when they are explicitly human-attested "
-                "as BELIEF or OPINION; do not convert them into factual guarantees."
-            ),
-            "concrete_language_rule": (
-                "Be vivid and specific using bound evidence and attested primary "
-                "information; safety must not flatten the writer's voice."
-            ),
+            "strong_judgment_rule": "Strong opinions are allowed when they are explicitly human-attested as BELIEF or OPINION; do not convert them into factual guarantees.",
+            "concrete_language_rule": "Be vivid and specific using bound evidence and attested primary information; safety must not flatten the writer's voice.",
         },
         "generation_constraints": [
             "Use only verified_evidence for externally checkable facts, prices, timing, scope, and results.",
             "Use first-person history, failure, emotion, belief, or chronology only from verified_primary_info.",
             "Never invent a number to satisfy a density or title rule; a numberless title is valid.",
-            "Derived arithmetic is allowed only when every operand is verified and the derivation is explicit.",
+            "Derived arithmetic must be bound as its own verified evidence claim before generation; v0.2 does not auto-authorize new computed numbers.",
             "Do not strengthen commercial or contractual wording beyond the verified claim.",
             "Do not present an invented label as established terminology.",
             "Explain specialist terms inline in plain language.",
@@ -361,7 +318,7 @@ def build_generation_packet(source: dict) -> dict:
 
 
 def _bound_text(packet: dict) -> str:
-    chunks: list[str] = [packet["offer"], packet["target"], packet["pain"], packet["cta"]]
+    chunks = [packet["offer"], packet["target"], packet["pain"], packet["cta"]]
     chunks.extend(item["claim"] for item in packet["verified_evidence"])
     chunks.extend(item["claim"] for item in packet["verified_primary_info"])
     return "\n".join(chunks)
@@ -394,16 +351,12 @@ def _fuzzy_quant_claims(text: str) -> set[str]:
 
 def _sentences(text: str) -> list[str]:
     normalized = _norm(text)
-    return [
-        item.strip()
-        for item in re.split(r"(?<=[。！？!?])|\n+", normalized)
-        if item.strip()
-    ]
+    return [item.strip() for item in re.split(r"(?<=[。！？!?])|\n+", normalized) if item.strip()]
 
 
 def _identity_findings(draft: str, packet: dict) -> list[str]:
     primary = _norm(_primary_text(packet))
-    findings: list[str] = []
+    findings = []
     for sentence in _sentences(draft):
         if not any(marker in sentence for marker in FIRST_PERSON_MARKERS):
             continue
@@ -417,13 +370,7 @@ def _identity_findings(draft: str, packet: dict) -> list[str]:
 def _commercial_findings(draft: str, packet: dict) -> list[str]:
     normalized_draft = _norm(draft)
     bound = _norm(_commercial_text(packet))
-    return sorted(
-        {
-            marker
-            for marker in COMMERCIAL_RISK_MARKERS
-            if marker in normalized_draft and marker not in bound
-        }
-    )
+    return sorted({marker for marker in COMMERCIAL_RISK_MARKERS if marker in normalized_draft and marker not in bound})
 
 
 def audit_draft(draft: str, packet: dict) -> dict:
@@ -433,33 +380,21 @@ def audit_draft(draft: str, packet: dict) -> dict:
         raise XArticleEngineError("packet must be an object")
 
     allowed_numeric = _numeric_claims(_bound_text(packet))
-    observed_numeric = _numeric_claims(draft)
-    unbound_numeric = sorted(observed_numeric - allowed_numeric)
-
+    unbound_numeric = sorted(_numeric_claims(draft) - allowed_numeric)
     allowed_fuzzy = _fuzzy_quant_claims(_bound_text(packet))
-    observed_fuzzy = _fuzzy_quant_claims(draft)
-    unbound_fuzzy = sorted(observed_fuzzy - allowed_fuzzy)
-
+    unbound_fuzzy = sorted(_fuzzy_quant_claims(draft) - allowed_fuzzy)
     identity_details = _identity_findings(draft, packet)
     strengthened = _commercial_findings(draft, packet)
 
-    findings: list[dict] = []
+    findings = []
     for claim in unbound_numeric:
-        findings.append(
-            {"code": "UNBOUND_NUMERIC_CLAIM", "severity": "BLOCK", "detail": claim}
-        )
+        findings.append({"code": "UNBOUND_NUMERIC_CLAIM", "severity": "BLOCK", "detail": claim})
     for claim in unbound_fuzzy:
-        findings.append(
-            {"code": "UNBOUND_FUZZY_QUANT_CLAIM", "severity": "BLOCK", "detail": claim}
-        )
+        findings.append({"code": "UNBOUND_FUZZY_QUANT_CLAIM", "severity": "BLOCK", "detail": claim})
     for sentence in identity_details:
-        findings.append(
-            {"code": "UNBOUND_IDENTITY_DETAIL", "severity": "BLOCK", "detail": sentence}
-        )
+        findings.append({"code": "UNBOUND_IDENTITY_DETAIL", "severity": "BLOCK", "detail": sentence})
     for marker in strengthened:
-        findings.append(
-            {"code": "UNBOUND_STRONG_CLAIM", "severity": "BLOCK", "detail": marker}
-        )
+        findings.append({"code": "UNBOUND_STRONG_CLAIM", "severity": "BLOCK", "detail": marker})
 
     blocked = any(item["severity"] == "BLOCK" for item in findings)
     return {
