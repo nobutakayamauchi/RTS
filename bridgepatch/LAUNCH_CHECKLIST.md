@@ -1,41 +1,71 @@
 # BridgePatch Launch Checklist
 
-Status: `PRELAUNCH / DO NOT PUBLISH OR ANNOUNCE UNTIL HUMAN APPROVAL`
+Status: `PUBLIC_SALE_ACTIVE / PAYMENT_LINK_V2 / PAGES_BUILD_PASSED`
 
-## Already completed in this branch
+## Current production state
 
-- [x] Public contact email fixed to `yamauchi.rts.office@gmail.com`
-- [x] Free consultation CTA bound to the public contact email
-- [x] Existing live Stripe Payment Link identified and reused
-- [x] Stripe product renamed to `BridgePatch 暫定ツール実装設計書`
-- [x] Stripe amount remains JPY 10,000 / one-time / quantity 1
-- [x] Stripe individual name collection enabled and required
-- [x] Stripe business name collection enabled and optional
-- [x] Stripe pre-submit text states product boundary, provision timing, and refund/cancellation boundary
-- [x] Stripe post-payment message points to the public contact email
-- [x] GitHub Pages deployment identity confirmed: `main` repository root -> `https://nobutakayamauchi.github.io/RTS/`
-- [x] Planned BridgePatch public path fixed to `/RTS/bridgepatch/`
-- [x] Terms / privacy / commercial disclosure staged
-- [x] Address and telephone disclosure-on-request wording staged
-- [x] Prepayment follow-up email procedure staged without committing private seller data
+- [x] Founder explicitly stated `PUBLIC_SALE_APPROVED` on 2026-08-15 JST.
+- [x] BridgePatch sales surface merged to `main`.
+- [x] Public URL fixed to `https://nobutakayamauchi.github.io/RTS/bridgepatch/`.
+- [x] Public contact email fixed to `yamauchi.rts.office@gmail.com`.
+- [x] Free consultation CTA uses the public contact email.
+- [x] Terms / privacy / commercial disclosure are present in `bridgepatch/`.
+- [x] Non-public seller address and reachable phone are available outside the public repository for disclosure/prepayment notices.
 
-## Must remain true before public sale
+## Stripe production link v2
 
-- [ ] `bridgepatch/` is merged to `main`
-- [ ] GitHub Pages build succeeds on the merged commit
-- [ ] `https://nobutakayamauchi.github.io/RTS/bridgepatch/` returns the expected BridgePatch page
-- [ ] Free consultation button opens `yamauchi.rts.office@gmail.com`
-- [ ] JPY 10,000 button opens exactly `https://buy.stripe.com/3cI7sN7TG4vb9ie8jV3Nm02`
-- [ ] Checkout visibly shows JPY 10,000 and quantity 1
-- [ ] Checkout visibly shows the service boundary / delivery timing / cancellation-refund text
-- [ ] `tokusho.html`, `terms.html`, `privacy.html` are reachable from the sales page
-- [ ] No `REPLACE_ME`, placeholder email, placeholder URL, test customer, or private seller address/phone appears in public files
-- [ ] Private seller address and telephone are available outside the public repository for disclosure requests and any required prepayment notice
-- [ ] Human reviews the final live pages and explicitly states `PUBLIC_SALE_APPROVED`
+The initially reused legacy Price/Payment Link was rejected during live smoke because its line-item description remained `新規案件 初動フローチャート策定` even after the Product itself had been renamed.
 
-## Do not do before `PUBLIC_SALE_APPROVED`
+That link is no longer production authority.
 
-- Do not announce the product as publicly on sale.
-- Do not send the Payment Link to a real prospect as the finalized public offer.
-- Do not treat a Pages build as legal or commercial approval.
-- Do not place private seller address or phone number in the public repository merely to satisfy an internal placeholder.
+Current canonical payment objects:
+
+```text
+Product: prod_UAWEhRHXtUTaWb
+Product name: BridgePatch 暫定ツール実装設計書
+Price: price_1U4ewGPYxtfxmKGliOKXtIP1
+Payment Link: plink_1U4ewTPYxtfxmKGlnNEYk9Bs
+URL: https://buy.stripe.com/5kQ3cxb5SaTz0LI8jV3Nm0f
+Amount: JPY 10,000
+Quantity: 1
+Adjustable quantity: false
+Tax behavior: inclusive
+Live mode: true
+```
+
+- [x] New dedicated Price created after Product rename.
+- [x] New dedicated Payment Link created from the new Price.
+- [x] Stripe line-item smoke shows `BridgePatch 暫定ツール実装設計書`.
+- [x] Stripe line-item total is JPY 10,000.
+- [x] Individual name is required.
+- [x] Business name is optional.
+- [x] Pre-submit text states product boundary, delivery timing, and cancellation/refund boundary.
+- [x] Post-payment message points to `yamauchi.rts.office@gmail.com`.
+- [x] `bridgepatch/config.js` on `main` points to the v2 URL.
+- [x] GitHub Pages build succeeded for the hotfix commit `fb66986ac60347134ace9f0597871f22ca27e748` with no Pages build error.
+
+## Retired legacy link
+
+```text
+Payment Link: plink_1TCBEnPYxtfxmKGlmuK4Cwqe
+URL: https://buy.stripe.com/3cI7sN7TG4vb9ie8jV3Nm02
+State: INACTIVE
+Reason: retained stale line-item description from the pre-BridgePatch product
+```
+
+Do not reactivate or reintroduce this URL into production configuration.
+
+## Remaining operational checks
+
+These are operations, not launch blockers:
+
+- [ ] When the first real purchase arrives, send the required intake/follow-up email promptly.
+- [ ] If address/phone disclosure is requested, provide the non-public verified values before the customer must decide whether to purchase.
+- [ ] If a prepayment notice is legally required for a specific transaction, send the prepared notice with the required seller/contact/provision information.
+- [ ] Reopen `/goal` if Stripe restrictions, law/policy changes, broken delivery, unsupported claims, or a material product/price/refund change occurs.
+
+## Current verdict
+
+`BRIDGEPATCH_PUBLIC_SALE_ACTIVE`
+
+The payment-link mismatch found during launch smoke is fixed. The v2 Price/Payment Link is the only canonical public checkout path.
