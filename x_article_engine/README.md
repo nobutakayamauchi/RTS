@@ -1,20 +1,14 @@
-# X Article Engine v0
+# X Article Engine v0.2
 
-X Article Engine v0 turns a bounded commercial/article brief into a model-agnostic generation packet, then audits the resulting draft before mandatory `/human` review.
+X Article Engine compiles a bounded commercial/article brief into a model-agnostic generation packet, then audits the resulting draft before mandatory `/human` review.
 
 It does **not** publish to X and it does **not** call an LLM by itself.
 
-## Why this exists
-
-Dogfooding long-form X article generation showed a useful split:
-
-- narrative structure, objection handling, pacing, and CTA shaping can be delegated heavily;
-- facts, numbers, first-person history, customer outcomes, commercial promises, and risk boundaries cannot be left to unconstrained narrative completion.
-
-The v0 architecture is therefore:
+## Architecture
 
 ```text
-Article brief
+Human brief
+  + trusted evidence registry
   -> Narrative plan
   -> Evidence-bound generation packet
   -> model draft
@@ -23,32 +17,48 @@ Article brief
   -> Publication Bridge / manual X Articles handoff
 ```
 
-## Inputs
+The split is deliberate:
 
-Required:
+- narrative structure, objection handling, pacing, and CTA shaping can be delegated heavily;
+- facts, numbers, first-person history, customer outcomes, commercial promises, and risk boundaries cannot be left to unconstrained narrative completion.
+
+## Required brief fields
 
 - `offer`: what is being offered;
 - `target`: one concrete buyer/reader;
-- `pain`: one pre-purchase problem for this article;
+- `pain`: one pre-purchase problem;
 - `primary_info`: first-person material explicitly attested by the human;
 - `article_type`: `HOW_TO`, `STORY`, or `CASE_RESULT`;
 - `cta`: exactly one desired next action;
-- `evidence`: source-bound factual claims.
+- `evidence`: factual claims that refer to trusted source IDs.
 
 Optional:
 
-- `topic_mode`: `PROCEDURAL`, `HABIT`, `RELATIONSHIP`, or `BUSINESS` (default `BUSINESS`);
+- `topic_mode`: `PROCEDURAL`, `HABIT`, `RELATIONSHIP`, or `BUSINESS`;
 - `opening_mode`: `RELATABLE`, `PROOF_FIRST`, or `CONTRARIAN`.
 
-## Core doctrine
+## Trusted evidence boundary
 
-Top-level reader journey:
+`build_generation_packet()` requires `trusted_source_refs` as a separate keyword-only argument.
+
+```python
+packet = build_generation_packet(
+    brief,
+    trusted_source_refs=trusted_registry,
+)
+```
+
+This registry must come from a trusted ingestion/verification layer. A user cannot make a claim trusted merely by adding `{"status": "VERIFIED"}` or a fake `source_refs` field to the article brief.
+
+This is an application trust boundary, not cryptographic proof. If an untrusted caller is allowed to control `trusted_source_refs`, evidence safety is defeated. Do not expose that parameter as ordinary end-user input.
+
+## Narrative doctrine
 
 ```text
 EMOTION -> LOGIC -> EASY_NEXT_ACTION
 ```
 
-Article construction:
+Typical flow:
 
 ```text
 reader state
@@ -61,60 +71,69 @@ reader state
 -> one CTA
 ```
 
-Depth is layered rather than split into separate beginner/advanced articles:
-
-```text
-L1: conclusion
-L2: why
-L3: conditions / exceptions / application
-```
-
-A strong human-attested episode may be used inside a HOW_TO article, and explanation may appear inside a STORY article. The selected article type is the dominant structure, not a rigid cage.
+A strong human-attested episode may appear inside a HOW_TO article. Explanation may appear inside a STORY article. The selected type is the dominant structure, not a cage.
 
 ## Evidence rules
 
-The engine deliberately does **not** require a quota such as “at least five numbers.” If the evidence contains two useful numbers, use two. If it contains none, the article may have none.
+The engine does not require arbitrary density quotas such as “five numbers.” If evidence contains no useful number, a numberless title is valid.
 
-Blocked behavior includes:
+Automated audit now blocks tested classes of:
 
-- inventing plausible durations, percentages, customer counts, or results;
-- inventing first-person chronology, jobs, failures, emotions, or biography;
-- turning “scope/total/timing are agreed before start” into a stronger promise such as “no extra charges can ever occur”;
-- presenting a newly invented label as established technical terminology;
-- using `PROOF_FIRST` or `CASE_RESULT` without the evidence needed to support them.
+- invented Arabic, full-width, and common kanji numeric claims;
+- fuzzy quantitative claims such as `何十時間` when not bound;
+- selected unbound first-person chronology/role details;
+- undeclared or untrusted result sources;
+- `CASE_RESULT` without trusted result evidence;
+- strengthened commercial promises such as unbound extra-fee or refund claims;
+- attempts to override `/human` or publication state from the brief.
 
-Derived arithmetic is acceptable only when every operand is verified and the derivation is explicit.
+Derived arithmetic is not auto-authorized in v0.2. If a computed number is intended for publication, bind that computed claim as verified evidence first.
 
-`audit_draft()` v0 detects unbound Arabic-number claims with high-risk units (money, time, percentages, counts) and several strong commercial/guarantee phrases. It is intentionally conservative and incomplete: semantic truth still requires `/human`.
+## Voice must survive safety
 
-## `/human` is mandatory
+Safety is not permission to flatten the article into compliance sludge.
 
-`/human` is not an AI-smell remover. It is the boundary where the owner verifies identity-bearing material and adds real point of view.
+The generation packet explicitly preserves:
 
-Before handoff, check:
+- human-attested beliefs and opinions;
+- human-attested self-labels such as a personal term already in use;
+- direct, confident wording for verified facts;
+- vivid examples when they are evidence-bound or human-attested.
 
-- Would I actually say this?
-- Are all first-person details true and mine?
-- Are numbers, prices, timing, results, and scope evidence-bound?
-- Did the draft invent emotions, biography, customer outcomes, or certainty?
-- Is there only one CTA?
-- Were factual/risk boundaries preserved while making the writing sound human?
+Strong opinions are allowed. Strong factual guarantees are not invented.
+
+## `/human` remains mandatory
+
+Automated checks are incomplete by design. Semantic truth, subtle biography inflation, implication, tone, and whether the text is genuinely the owner's voice still require `/human`.
+
+Every packet and audit result remains:
+
+```text
+publication_state = BLOCKED_PENDING_HUMAN
+publication_authority = USER_ONLY
+external_publication_performed = False
+```
+
+## DA / counter-DA METEOR
+
+The seven attack vectors and counterexamples are recorded in `DA_METEOR_REPORT.md` and executable regression tests live in `tests/test_x_article_engine_meteor.py`.
+
+The test suite covers:
+
+1. invented numbers;
+2. invented biography;
+3. fake case results;
+4. strengthened commercial promises;
+5. “I say it is true” evidence bypass;
+6. `/human` bypass;
+7. over-sanitization / voice destruction.
 
 ## Usage / credit policy
 
-**Not part of v0.**
+**Not part of the engine.**
 
-Generation quotas, credits, replenishment cadence, and product tiers are business/deployment policy, not article-quality logic. They should be set only after observing:
-
-- actual model cost per article;
-- support/coaching capacity;
-- real customer generation frequency;
-- revision frequency and `/human` workload;
-- abuse/fair-use behavior;
-- desired product tiers.
-
-Do not copy a third-party `5,000 credits` or monthly article allowance into the product simply because the reference implementation uses it.
+Credits, monthly replenishment, generation quotas, coaching limits, and product tiers are business/deployment policy. They should be decided after observing actual model cost, revision rate, `/human` workload, coaching capacity, and customer usage.
 
 ## Publication boundary
 
-This module never performs external publication. X Articles should continue through mandatory `/human` and a user-controlled handoff. Private X APIs, cookies, or session automation are out of scope.
+This module never performs external publication. X Articles continue through mandatory `/human` and a user-controlled handoff. Private X APIs, cookies, or session automation remain out of scope.
