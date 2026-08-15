@@ -1,0 +1,68 @@
+{
+  "project_name": "BridgePatch",
+  "update_type": "販売開始",
+  "summary": "BridgePatchを公開しました。「本格システムを入れるほどではないが、毎週同じ手作業が痛い」業務を、一工程だけ小さく切って先に直すサービスです。",
+  "facts": [
+    {
+      "claim": "まず無料で制作可否を確認できます。",
+      "status": "VERIFIED",
+      "source_ref": "bp-sales-page",
+      "priority": "critical",
+      "must_keep": true
+    },
+    {
+      "claim": "暫定ツール実装設計書は10,000円（税込）で、ツール制作そのものは含みません。",
+      "status": "VERIFIED",
+      "source_ref": "bp-terms",
+      "priority": "critical",
+      "must_keep": true
+    },
+    {
+      "claim": "1アクション簡易ツールは50,000円（税込）を標準とし、開始前に対象範囲・総額・納期を確定します。",
+      "status": "VERIFIED",
+      "source_ref": "bp-terms",
+      "priority": "high",
+      "must_keep": false
+    },
+    {
+      "claim": "人命、医療・介護判断、給与・決済の最終確定など高リスク業務は原則対象外または個別審査です。",
+      "status": "VERIFIED",
+      "source_ref": "bp-terms",
+      "priority": "high",
+      "must_keep": false
+    },
+    {
+      "claim": "販売ページと専用Stripe Payment Linkは本番稼働中です。",
+      "status": "VERIFIED",
+      "source_ref": "bp-live",
+      "priority": "normal",
+      "must_keep": false
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "bp-sales-page",
+      "kind": "github-pages",
+      "locator": "https://nobutakayamauchi.github.io/RTS/bridgepatch/"
+    },
+    {
+      "id": "bp-terms",
+      "kind": "repository-document",
+      "locator": "bridgepatch/terms.html"
+    },
+    {
+      "id": "bp-live",
+      "kind": "github-stripe",
+      "locator": "main bridgepatch/config.js + plink_1U4ewTPYxtfxmKGlnNEYk9Bs"
+    }
+  ],
+  "audience": "毎週繰り返す手作業、転記、集計、確認、下書き作成などに時間を取られている小規模事業者・個人事業主",
+  "call_to_action": "無料チェック: https://nobutakayamauchi.github.io/RTS/bridgepatch/",
+  "known_limits": [
+    "実顧客の購入・納品実績はまだこの販売開始投稿では主張しません。"
+  ],
+  "media_refs": [
+    "BridgePatch販売ページ",
+    "対象業務の例（入力→一つの処理→一つの結果）"
+  ]
+}
