@@ -90,7 +90,7 @@ because v0 has no publication authority or delivery connector.
 ## Tests
 
 ```bash
-python -m unittest -v tests.test_post_adapter
+python -m unittest discover -s tests -p 'test_post_adapter.py' -v
 ```
 
 The tests cover:
