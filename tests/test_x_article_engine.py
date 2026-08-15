@@ -3,6 +3,16 @@ import pytest
 from x_article_engine import XArticleEngineError, audit_draft, build_generation_packet
 
 
+def bridgepatch_sources():
+    return [
+        {
+            "id": "bridgepatch-sales-page",
+            "status": "VERIFIED",
+            "kind": "PUBLIC_PAGE",
+        }
+    ]
+
+
 def bridgepatch_brief(article_type="HOW_TO"):
     return {
         "offer": "BridgePatch。まず無料で適合確認し、必要なら一工程の設計と実装へ進む。",
@@ -19,13 +29,6 @@ def bridgepatch_brief(article_type="HOW_TO"):
         "article_type": article_type,
         "topic_mode": "BUSINESS",
         "cta": "BridgePatchの無料適合確認を使う。",
-        "source_refs": [
-            {
-                "id": "bridgepatch-sales-page",
-                "status": "VERIFIED",
-                "kind": "PUBLIC_PAGE",
-            }
-        ],
         "evidence": [
             {
                 "claim": "暫定ツール実装設計書は10,000円（税込）で、ツール実装は含まない。",
@@ -49,8 +52,15 @@ def bridgepatch_brief(article_type="HOW_TO"):
     }
 
 
+def build(source=None, sources=None):
+    return build_generation_packet(
+        source or bridgepatch_brief(),
+        trusted_source_refs=sources or bridgepatch_sources(),
+    )
+
+
 def test_build_packet_preserves_human_and_evidence_boundaries():
-    packet = build_generation_packet(bridgepatch_brief())
+    packet = build()
     assert packet["schema_version"] == "0.2"
     assert packet["article_type"] == "HOW_TO"
     assert packet["opening_mode"] == "RELATABLE"
@@ -67,26 +77,26 @@ def test_story_requires_human_attested_primary_information():
     source = bridgepatch_brief("STORY")
     source["primary_info"][0]["attested"] = False
     with pytest.raises(XArticleEngineError, match="STORY requires"):
-        build_generation_packet(source)
+        build(source)
 
 
 def test_primary_info_cannot_masquerade_as_result_evidence():
     source = bridgepatch_brief()
     source["primary_info"][0]["kind"] = "CASE_RESULT"
     with pytest.raises(XArticleEngineError, match="primary_info"):
-        build_generation_packet(source)
+        build(source)
 
 
 def test_case_result_requires_verified_result_evidence():
     with pytest.raises(XArticleEngineError, match="CASE_RESULT requires"):
-        build_generation_packet(bridgepatch_brief("CASE_RESULT"))
+        build(bridgepatch_brief("CASE_RESULT"))
 
 
 def test_case_result_accepts_bound_result_evidence():
     source = bridgepatch_brief("CASE_RESULT")
-    source["source_refs"].append(
+    sources = bridgepatch_sources() + [
         {"id": "customer-case-001", "status": "VERIFIED", "kind": "CASE"}
-    )
+    ]
     source["evidence"].append(
         {
             "claim": "確認済みの顧客事例では対象工程が20分から5分になった。",
@@ -95,13 +105,16 @@ def test_case_result_accepts_bound_result_evidence():
             "kind": "CASE_RESULT",
         }
     )
-    packet = build_generation_packet(source)
+    packet = build(source, sources)
     assert packet["article_type"] == "CASE_RESULT"
     assert packet["opening_mode"] == "PROOF_FIRST"
 
 
-def test_undeclared_verified_source_is_not_trusted():
+def test_user_brief_cannot_self_declare_verified_source():
     source = bridgepatch_brief()
+    source["source_refs"] = [
+        {"id": "made-up-source", "status": "VERIFIED", "kind": "CASE"}
+    ]
     source["evidence"].append(
         {
             "claim": "顧客の作業時間が90%減った。",
@@ -110,16 +123,13 @@ def test_undeclared_verified_source_is_not_trusted():
             "kind": "RESULT",
         }
     )
-    packet = build_generation_packet(source)
+    packet = build(source)
     assert packet["review_state"] == "REVIEW_REQUIRED"
     assert all("90%" not in item["claim"] for item in packet["verified_evidence"])
 
 
-def test_unverified_declared_source_is_not_trusted():
+def test_unverified_trusted_registry_source_is_not_trusted():
     source = bridgepatch_brief()
-    source["source_refs"].append(
-        {"id": "rumor", "status": "UNVERIFIED", "kind": "NOTE"}
-    )
     source["evidence"].append(
         {
             "claim": "顧客の作業時間が90%減った。",
@@ -128,13 +138,16 @@ def test_unverified_declared_source_is_not_trusted():
             "kind": "RESULT",
         }
     )
-    packet = build_generation_packet(source)
+    sources = bridgepatch_sources() + [
+        {"id": "rumor", "status": "UNVERIFIED", "kind": "NOTE"}
+    ]
+    packet = build(source, sources)
     assert packet["review_state"] == "REVIEW_REQUIRED"
     assert all("90%" not in item["claim"] for item in packet["verified_evidence"])
 
 
 def test_audit_blocks_invented_numeric_claims():
-    packet = build_generation_packet(bridgepatch_brief())
+    packet = build()
     draft = "毎週2時間かかる作業。設計書は10,000円、実装は50,000円が標準で、通常5営業日。"
     audit = audit_draft(draft, packet)
     assert audit["status"] == "BLOCKED"
@@ -145,14 +158,14 @@ def test_audit_blocks_invented_numeric_claims():
 
 
 def test_audit_normalizes_full_width_digits_before_checking():
-    packet = build_generation_packet(bridgepatch_brief())
+    packet = build()
     audit = audit_draft("毎週２時間かかります。", packet)
     assert audit["status"] == "BLOCKED"
     assert any(item["detail"] == "2時間" for item in audit["findings"])
 
 
 def test_audit_allows_bound_numeric_claims_but_still_requires_human_review():
-    packet = build_generation_packet(bridgepatch_brief())
+    packet = build()
     draft = "設計書は10,000円、実装は50,000円が標準で、通常5営業日です。"
     audit = audit_draft(draft, packet)
     assert audit["status"] == "HUMAN_REVIEW_REQUIRED"
@@ -162,7 +175,7 @@ def test_audit_allows_bound_numeric_claims_but_still_requires_human_review():
 
 
 def test_audit_blocks_strengthened_commercial_promise():
-    packet = build_generation_packet(bridgepatch_brief())
+    packet = build()
     audit = audit_draft("開始後は追加料金が発生しません。", packet)
     assert audit["status"] == "BLOCKED"
     assert any(item["code"] == "UNBOUND_STRONG_CLAIM" for item in audit["findings"])
