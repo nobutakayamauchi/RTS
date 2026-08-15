@@ -4,6 +4,7 @@ import re
 import unicodedata
 
 from . import ai_humanity as _humanity
+from .core import XArticleEngineError
 
 
 LONGFORM_REVIEW_THRESHOLD_CHARS = 2400
@@ -72,9 +73,7 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
 
     article_goal = source.get("article_goal", "QUALIFIED_READER_EDUCATION")
     if not isinstance(article_goal, str) or not article_goal.strip():
-        raise _humanity._deep._terminology._core.XArticleEngineError(
-            "article_goal must be a non-empty string when provided"
-        )
+        raise XArticleEngineError("article_goal must be a non-empty string when provided")
     article_goal = article_goal.strip().upper()
 
     packet["longform_policy"] = {
