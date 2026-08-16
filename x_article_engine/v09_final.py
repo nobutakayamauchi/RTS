@@ -7,7 +7,7 @@ from . import v09_hardened as _hardened
 from . import core as _core
 
 
-# ---- R9: CTA semantics -----------------------------------------------------
+# CTA semantics ---------------------------------------------------------------
 
 FIT_CHECK_ACTION_RE = re.compile(
     r"(?:無料(?:適合確認|制作可否確認)|無料で(?:適合|制作可否)を?確認)"
@@ -21,7 +21,7 @@ FIT_CHECK_NON_ACTION_RE = re.compile(
 )
 
 
-# ---- R10: numeric-boundary + rejected bad-example semantics ---------------
+# Numeric-boundary + rejected bad-example semantics -------------------------
 
 NUMERIC_COMPONENT_CLASS = r"0-9一二三四五六七八九十百千万億兆,.，．"
 
@@ -44,7 +44,7 @@ META_REJECTION_MARKERS = (
 )
 
 
-# ---- R11: numeric-context laundering --------------------------------------
+# Numeric-context laundering -------------------------------------------------
 
 COMMERCIAL_KINDS = {"COMMERCIAL"}
 RESULT_KINDS = {"RESULT", "CASE_RESULT"}
@@ -89,6 +89,45 @@ TIMING_MARKERS = (
     "までに",
     "目安",
 )
+
+
+# Commercial-promise polarity ------------------------------------------------
+
+POSITIVE_PROMISE_PATTERNS = {
+    "REFUND": (
+        re.compile(r"(?:全額|一部)?返金[^。\n]{0,18}(?:します|いたします|できます|可能です|対応します)"),
+    ),
+    "NO_EXTRA_FEE": (
+        re.compile(r"追加料金[^。\n]{0,18}(?:ありません|発生しません|かかりません|不要です)"),
+    ),
+    "GUARANTEE": (
+        re.compile(r"(?:成果|結果|成功)?[^。\n]{0,10}保証[^。\n]{0,16}(?:します|いたします|できます|されます)"),
+    ),
+    "UNLIMITED": (
+        re.compile(r"(?:利用|使用|回数|アクセス)?[^。\n]{0,10}無制限[^。\n]{0,18}(?:です|で利用|で使用|使え|利用でき)"),
+    ),
+    "PERMANENT": (
+        re.compile(r"(?:永続的|永久)[^。\n]{0,20}(?:利用できます|使えます|提供します|アクセスできます|利用可能です)"),
+    ),
+}
+
+NEGATIVE_EVIDENCE_PATTERNS = {
+    "REFUND": (
+        re.compile(r"返金[^。\n]{0,20}(?:行いません|しません|不可|できません|対応しません|対象外)"),
+    ),
+    "NO_EXTRA_FEE": (
+        re.compile(r"追加料金[^。\n]{0,25}(?:発生する|発生します|かかる|必要|場合があります|場合がある)"),
+    ),
+    "GUARANTEE": (
+        re.compile(r"保証[^。\n]{0,25}(?:しません|しない|できません|できない|するものではありません|いたしません)"),
+    ),
+    "UNLIMITED": (
+        re.compile(r"(?:利用|使用|回数|アクセス)?[^。\n]{0,20}(?:上限|制限)[^。\n]{0,20}(?:あります|ある|設定|設け)"),
+    ),
+    "PERMANENT": (
+        re.compile(r"(?:永続的|永久)[^。\n]{0,30}(?:保証しません|保証しない|保証するものではありません|ではありません|ではない)"),
+    ),
+}
 
 
 def _norm(value: str) -> str:
@@ -152,7 +191,7 @@ def _numeric_binding_findings(draft: str, packet: dict) -> list[dict]:
     normalized = _norm(draft)
     findings: list[dict] = []
     seen: set[str] = set()
-    for match in _core.NUMERIC_RE.finditer(normalized):
+    for match in _core.NUMERIC_CLAIM_RE.finditer(normalized):
         token = _core._canonical_numeric(match.group(0), packet)
         if token in seen:
             continue
@@ -211,7 +250,7 @@ def _context_laundering_findings(draft: str, packet: dict) -> list[dict]:
     for sentence in _sentences(draft):
         if _is_meta_rejection(sentence):
             continue
-        for match in _core.NUMERIC_RE.finditer(sentence):
+        for match in _core.NUMERIC_CLAIM_RE.finditer(sentence):
             token = _core._canonical_numeric(match.group(0), packet)
             if not _exact_numeric_bound(token, packet):
                 continue
@@ -242,10 +281,56 @@ def _context_laundering_findings(draft: str, packet: dict) -> list[dict]:
     return findings
 
 
+def _commercial_evidence_text(packet: dict) -> str:
+    return "\n".join(
+        str(item.get("claim", ""))
+        for item in packet.get("verified_evidence", [])
+        if item.get("kind") in {"COMMERCIAL", "POLICY", "SCOPE", "TIMING"}
+    )
+
+
+def _promise_polarity_findings(draft: str, packet: dict) -> list[dict]:
+    evidence = _commercial_evidence_text(packet)
+    findings: list[dict] = []
+
+    for category, positive_patterns in POSITIVE_PROMISE_PATTERNS.items():
+        positive_sentences = [
+            sentence
+            for sentence in _sentences(draft)
+            if any(pattern.search(sentence) for pattern in positive_patterns)
+            and not _is_meta_rejection(sentence)
+            and not _hardened._is_claim_negation(sentence)
+        ]
+        if not positive_sentences:
+            continue
+
+        negative_patterns = NEGATIVE_EVIDENCE_PATTERNS[category]
+        negative_evidence = [
+            sentence
+            for sentence in _sentences(evidence)
+            if any(pattern.search(sentence) for pattern in negative_patterns)
+        ]
+        if not negative_evidence:
+            continue
+
+        for sentence in positive_sentences:
+            findings.append(
+                {
+                    "code": "CONTRADICTS_VERIFIED_COMMERCIAL_TERM",
+                    "severity": "BLOCK",
+                    "detail": category,
+                    "draft_sentence": sentence,
+                    "verified_conflict": negative_evidence[0],
+                }
+            )
+
+    return findings
+
+
 def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) -> dict:
     packet = _hardened.build_generation_packet(source, trusted_source_refs=trusted_source_refs)
     packet["schema_version"] = "0.9"
-    packet["meteor_status"] = "R11_SYNTHESIZED"
+    packet["meteor_status"] = "FINAL_SYNTHESIZED"
     packet["cta_semantics_policy"] = {
         "principle": "Count an action as a CTA when the reader is invited to take it, not merely when its noun appears.",
         "fit_check_examples": [
@@ -264,12 +349,23 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
         "principle": "Exact numeric equality is necessary but not sufficient; obvious commercial/result/timing category changes require review.",
         "deterministic_scope": "Fine-grained semantic equivalence remains a /human responsibility.",
     }
+    packet["commercial_promise_polarity_policy"] = {
+        "principle": "A verified commercial limitation cannot authorize its semantic opposite merely because the same commercial term appears in both sentences.",
+        "blocked_reversals": [
+            "返金しない -> 全額返金する",
+            "追加料金が発生する場合あり -> 追加料金なし",
+            "保証しない -> 保証する",
+            "上限あり -> 無制限",
+            "永続提供を保証しない -> 永続利用できる",
+        ],
+    }
     packet["generation_constraints"].extend(
         [
             "Treat natural continuation language such as '無料適合確認から始められます' as a real CTA for multi-action review.",
             "Never authorize a numeric claim merely because its digits are a substring of a larger verified number.",
             "When risky wording is shown only as an example to reject, determine polarity before auditing it as an asserted claim.",
             "Do not reuse a verified number under a different claim category merely because the digits match exactly.",
+            "Do not reverse a verified commercial limitation, exclusion, conditional fee, no-refund term, no-guarantee term, usage cap, or non-permanence statement into a stronger promise.",
         ]
     )
     packet["human_gate"]["checks"].extend(
@@ -278,6 +374,7 @@ def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) ->
             "数字の根拠が部分一致になっていないか？10,000円の証拠で0円を通すような誤結合がないか？",
             "悪い文章例として引用して否定している断言を、本文の主張として誤認していないか？",
             "同じ数字でも意味を横流ししていないか？価格の数字を売上・節約額・顧客成果へ化けさせていないか？",
+            "販売条件の単語だけ一致して、意味が逆転していないか？『返金しない』を『返金する』、『追加料金あり得る』を『追加料金なし』へ強化していないか？",
         ]
     )
     return packet
@@ -327,6 +424,7 @@ def audit_draft(draft: str, packet: dict) -> dict:
 
     findings.extend(_numeric_binding_findings(draft, packet))
     findings.extend(_context_laundering_findings(draft, packet))
+    findings.extend(_promise_polarity_findings(draft, packet))
 
     deduped: list[dict] = []
     seen: set[tuple[str, str, str]] = set()
