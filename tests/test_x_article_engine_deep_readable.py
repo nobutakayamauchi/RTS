@@ -1,4 +1,4 @@
-from x_article_engine import build_generation_packet
+from x_article_engine.deep_readable import build_generation_packet
 
 
 def sources():
