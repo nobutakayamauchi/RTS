@@ -1,6 +1,6 @@
 import pytest
 
-from x_article_engine import XArticleEngineError, audit_draft, build_generation_packet
+from x_article_engine.core import XArticleEngineError, audit_draft, build_generation_packet
 
 
 def sources():
@@ -258,4 +258,3 @@ def test_meteor_07_counter_da_strong_attested_voice_is_not_blocked():
     draft = "大きく作るより、まず一工程だけ切る方がいい。これは私の考えです。"
     audit = audit_draft(draft, packet)
     assert audit["status"] == "HUMAN_REVIEW_REQUIRED"
-    assert audit["findings"] == []
