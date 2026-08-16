@@ -1,4 +1,4 @@
-from x_article_engine import audit_draft, build_generation_packet
+from x_article_engine.ai_humanity import audit_draft, build_generation_packet
 
 
 def sources():

@@ -1,0 +1,42 @@
+name: X Article Engine METEOR
+
+on:
+  pull_request:
+    paths:
+      - "x_article_engine/**"
+      - "tests/test_x_article_engine*.py"
+      - ".github/workflows/x-article-engine-meteor.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "x_article_engine/**"
+      - "tests/test_x_article_engine*.py"
+      - ".github/workflows/x-article-engine-meteor.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: x-article-engine-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  x-article-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependency
+        run: python -m pip install --upgrade pytest
+
+      - name: Run X Article Engine regression and METEOR suite
+        run: python -m pytest -q tests/test_x_article_engine*.py

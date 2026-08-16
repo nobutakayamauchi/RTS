@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import re
 import unicodedata
 
 from . import core as _core
@@ -220,6 +221,35 @@ def _product_name_findings(draft: str, packet: dict) -> list[dict]:
     return findings
 
 
+def _is_all_katakana_token(value: str) -> bool:
+    return bool(value) and all(
+        ("ァ" <= char <= "ヺ") or char in {"ー", "・"}
+        for char in value
+    )
+
+
+def _is_all_ascii_word_token(value: str) -> bool:
+    return bool(value) and all(char.isascii() and (char.isalnum() or char in {"_", "-"}) for char in value)
+
+
+def _term_first_position(text: str, term: str) -> int:
+    """Find a lexical term occurrence without matching inside a larger same-script token.
+
+    This prevents short glossary terms such as ``ログ`` from firing inside
+    ``プログラム`` or ``ブログ``. If a compound such as ``アクセスログ`` needs its
+    own explanation, it should be listed explicitly as an article-specific term.
+    """
+    if _is_all_katakana_token(term):
+        pattern = re.compile(rf"(?<![ァ-ヺー・]){re.escape(term)}(?![ァ-ヺー・])")
+        match = pattern.search(text)
+        return -1 if match is None else match.start()
+    if _is_all_ascii_word_token(term):
+        pattern = re.compile(rf"(?<![A-Za-z0-9_-]){re.escape(term)}(?![A-Za-z0-9_-])", re.I)
+        match = pattern.search(text)
+        return -1 if match is None else match.start()
+    return text.find(term)
+
+
 def _term_findings(draft: str, packet: dict) -> list[dict]:
     policy = packet.get("terminology_policy") or {}
     if not policy.get("explain_on_first_use"):
@@ -229,7 +259,7 @@ def _term_findings(draft: str, packet: dict) -> list[dict]:
     findings = []
     for item in policy.get("glossary", []):
         term = _norm(item["term"])
-        position = normalized.find(term)
+        position = _term_first_position(normalized, term)
         if position < 0:
             continue
         window = normalized[position : position + EXPLANATION_WINDOW_CHARS]

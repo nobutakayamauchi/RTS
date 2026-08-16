@@ -1,6 +1,6 @@
 import pytest
 
-from x_article_engine import XArticleEngineError, audit_draft, build_generation_packet
+from x_article_engine.core import XArticleEngineError, audit_draft, build_generation_packet
 
 
 def bridgepatch_sources():
@@ -61,7 +61,7 @@ def build(source=None, sources=None):
 
 def test_build_packet_preserves_human_and_evidence_boundaries():
     packet = build()
-    assert packet["schema_version"] == "0.2"
+    assert packet["schema_version"] == "0.3"
     assert packet["article_type"] == "HOW_TO"
     assert packet["opening_mode"] == "RELATABLE"
     assert packet["human_gate"]["required"] is True
