@@ -32,7 +32,8 @@ def _reader_actions(draft: str) -> set[str]:
 
 def build_generation_packet(source: dict, *, trusted_source_refs: list[dict]) -> dict:
     packet = _hardened.build_generation_packet(source, trusted_source_refs=trusted_source_refs)
-    packet["schema_version"] = "0.9-meteor-r9"
+    packet["schema_version"] = "0.9"
+    packet["meteor_round"] = "R9_DOGFOOD_CTA"
     packet["cta_semantics_policy"] = {
         "principle": "Count an action as a CTA when the reader is invited to take it, not merely when the action's noun appears.",
         "fit_check_examples": [
