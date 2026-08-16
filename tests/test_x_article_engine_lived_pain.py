@@ -1,6 +1,6 @@
 import pytest
 
-from x_article_engine import XArticleEngineError, build_generation_packet
+from x_article_engine.core import XArticleEngineError, build_generation_packet
 
 
 def sources():
