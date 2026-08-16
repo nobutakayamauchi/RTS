@@ -36,9 +36,9 @@ def brief():
     }
 
 
-def test_root_points_to_latest_meteor_layer():
+def test_root_points_to_consolidated_v09():
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
-    assert packet["schema_version"] == "0.9-meteor-r5"
+    assert packet["schema_version"] == "0.9"
     assert "strong_language_policy" in packet
     assert "security_content_policy" in packet
     assert "opening_integrity_policy" in packet
