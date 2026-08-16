@@ -33,6 +33,9 @@ HEALTHY
 - `EMERGENCY_USE != PROMOTION`;
 - `SERVICE_AVAILABLE != SERVICE_HEALTHY`;
 - `DEGRADED != FAILED`;
+- `CONTROL_SURFACE_FAILURE != WORKLOAD_FAILURE`;
+- `FAILED CONTROL SURFACE != REQUIRED RECOVERY SURFACE`;
+- `RECOVERY ACTION != RECOVERY VALIDATED`;
 - ordinary degradation/failure requires hysteresis before failover eligibility;
 - `FAILOVER_ELIGIBLE != FAILOVER_EXECUTED`;
 - failover actuation remains external and separately authorized;
@@ -54,6 +57,26 @@ HEALTHY
 This gate does not own or authorize monitoring, DNS/load-balancer changes, service-mesh control, provider SDK actions, restart, secret access, traffic switching, deployment, rollback, promotion or failback.
 
 Existing `lifecycle.py` remains the lifecycle/failover authority owner. The gate may classify evidence and declare an external failover eligible; an authorized external operator/tool performs the action.
+
+## Control Plane Escape before failover
+
+A failed or unusable operator surface does not by itself prove that the protected workload has failed. Before escalating to provider failover, an authorized operator may attempt bounded in-place recovery through an independent control surface under `CONTROL_PLANE_ESCAPE_GATE_2026-08-16.md`.
+
+Typical escalation is:
+
+```text
+FAILED / UNTRUSTWORTHY NORMAL CONTROL SURFACE
+-> ALTERNATE CLI / API / SSH / SERVICE-MANAGER PATH
+-> CAPTURE VOLATILE EVIDENCE WHEN FEASIBLE
+-> NARROW SERVICE / PROCESS RECOVERY
+-> HOST RECOVERY ONLY WHEN REQUIRED
+-> DEPLOYMENT IDENTITY RE-ESTABLISHMENT
+-> POST-DEPLOY REALITY VALIDATION
+```
+
+If in-place control cannot be regained, the workload remains `FAILED`/`UNSAFE`, or the suspected failure domain cannot be trusted, this Emergency Recovery / Failover Gate remains the authority boundary for fallback eligibility.
+
+A restart, process replacement or host reboot is an external actuation. It does not prove recovery, erase root-cause debt, or permanently authorize the alternate control surface.
 
 ## Recovery binding
 
@@ -79,6 +102,8 @@ A temporary recovery carries:
 
 Emergency restoration may shorten the normal comparison path; it may not silently erase the skipped judgment.
 
+If volatile evidence could not be captured before an urgent destructive reset, the missing pre-reset evidence is also retained as explicit recovery/root-cause debt.
+
 ## Externalization boundary
 
 Keep external and replaceable:
@@ -88,6 +113,9 @@ Keep external and replaceable:
 - DNS/load balancers/service meshes;
 - traffic switching;
 - provider APIs;
+- CLIs / SSH / remote operator surfaces;
+- service managers and process supervisors;
+- restart / reboot / recreate mechanisms;
 - secret stores;
 - schedulers;
 - deployment/failover executors.
