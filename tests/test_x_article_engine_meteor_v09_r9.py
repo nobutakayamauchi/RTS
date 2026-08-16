@@ -50,7 +50,8 @@ def codes(result):
 
 def test_r9_schema_and_cta_semantics_policy_present():
     result = packet()
-    assert result["schema_version"] == "0.9-meteor-r9"
+    assert result["schema_version"] == "0.9"
+    assert result["meteor_round"] == "R9_DOGFOOD_CTA"
     assert "cta_semantics_policy" in result
 
 
