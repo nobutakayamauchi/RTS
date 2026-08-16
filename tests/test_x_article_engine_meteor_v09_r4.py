@@ -158,7 +158,7 @@ def test_operational_platform_evasion_instruction_is_blocked():
 
 def test_platform_evasion_discussion_without_howto_is_reviewed():
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
-    result = audit_draft("BAN回避を目的にしたステルス配信という主張がありますが、この記事では推奨しません。", packet)
+    result = audit_draft("BAN回避を目的にしたステルス配信という主張がありますが、この記事では推奨しない方針です。", packet)
     assert "PLATFORM_EVASION_OPERATIONAL_INSTRUCTION" not in codes(result)
     assert "PLATFORM_EVASION_LANGUAGE" in codes(result)
 
