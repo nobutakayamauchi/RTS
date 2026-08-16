@@ -23,6 +23,7 @@ DISCOVERY REFRESH
 → DEPLOYMENT IDENTITY
 → POST-DEPLOY DEBUG / REALITY GATE
 → STABLE / WATCH
+→ CONTROL PLANE ESCAPE WHEN THE NORMAL CONTROL SURFACE FAILS
 → DARWIN KNOCKOUT MATCH WHEN A MATERIAL CHALLENGER EXISTS
 → EMERGENCY RECOVERY WHEN FAILURE/UNSAFE CONDITIONS REQUIRE IT
 → PHOENIX LINEAGE
@@ -35,6 +36,7 @@ DISCOVERY REFRESH
 - `NEW_BUILD_SUPERIORITY_GATE_2026-08-14.md` — bounded new-build permission for irreducible gaps or proven architecture deficits;
 - `POST_DEPLOY_DEBUG_GATE_2026-08-14.md` — deployed-reality verification and regression binding;
 - `EMERGENCY_RECOVERY_GATE_2026-08-14.md` — bounded emergency recovery semantics;
+- `CONTROL_PLANE_ESCAPE_GATE_2026-08-16.md` — candidate control-regain rule: escape a failed operator surface, preserve evidence when feasible, escalate narrowly, then revalidate runtime reality;
 - `lifecycle.py` — lifecycle/failover authority binding;
 - `emergency.py` — thin Emergency Recovery evidence/state binder;
 - associated regression suites — retained death-memory for known failure classes.
@@ -53,9 +55,9 @@ Ultimate Loop itself is therefore an occupant of a Movable Frame: it can survive
 
 ## Externalization boundary
 
-This project intentionally does **not** become a crawler platform, scheduler, database, daemon, model runtime, monitoring platform, traffic switch, deployment engine, backup product, or autonomous promotion system.
+This project intentionally does **not** become a crawler platform, scheduler, database, daemon, model runtime, monitoring platform, traffic switch, deployment engine, backup product, autonomous promotion system, or provider control-plane replacement.
 
-Search/crawling, monitoring, provider APIs, DNS/load balancers/service meshes, schedulers, deployment/failover execution, and other commodity mechanisms remain replaceable external occupants. Ultimate Loop owns the minimum decision/evidence/authority contracts needed to compare and safely use them.
+Search/crawling, monitoring, provider APIs, DNS/load-balancers/service meshes, schedulers, deployment/failover execution, CLIs, SSH, service managers, reboot/recreate mechanisms, and other commodity mechanisms remain replaceable external occupants. Ultimate Loop owns the minimum decision/evidence/authority contracts needed to compare and safely use them.
 
 ## Historical evidence vs current authority
 
@@ -70,6 +72,12 @@ History is preserved; stale experiment labels are not operational authority.
 `BETTER CANDIDATE != AUTHORIZED REPLACEMENT`
 
 `DEPLOYED != OBSERVED_CORRECT`
+
+`FAILED CONTROL SURFACE != REQUIRED RECOVERY SURFACE`
+
+`CONTROL_SURFACE_FAILURE != WORKLOAD_FAILURE`
+
+`RECOVERY ACTION != RECOVERY VALIDATED`
 
 `EMERGENCY_USE != PROMOTION`
 
