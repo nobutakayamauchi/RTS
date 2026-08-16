@@ -87,7 +87,7 @@ def test_counterpoint_policy_rejects_manufactured_conflict_as_doctrine():
 def test_asset_timing_does_not_expand_commercial_cta_count():
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
     timing = packet["desire_timing_policy"]
-    assert "utility asset" in timing["utility_asset_rule"].lower()
+    assert "prompt/template/resource" in timing["utility_asset_rule"].lower()
     assert "multiple competing commercial CTAs" in timing["utility_asset_rule"]
     assert "singular" in timing["commercial_cta_rule"]
 
