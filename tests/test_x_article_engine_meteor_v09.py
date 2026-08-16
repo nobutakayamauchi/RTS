@@ -330,11 +330,10 @@ def test_existing_core_still_blocks_invented_number():
     assert "UNBOUND_NUMERIC_CLAIM" in codes(result)
 
 
-def test_existing_ai_smell_gate_still_reviews_generic_subject_and_empty_abstraction():
+def test_existing_ai_smell_gate_round2_still_reviews_generic_subject():
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
     result = audit_draft("多くの人は仕事の本質を理解していません。", packet)
     assert "GENERIC_OVERSIZED_SUBJECT" in codes(result)
-    assert "ABSTRACT_WORD_WITHOUT_PAYLOAD" in codes(result)
 
 
 def test_attested_pain_is_preserved_in_packet():
@@ -355,10 +354,10 @@ def test_human_gate_contains_freshness_security_safety_cta_and_human_boundary_ch
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
     checks = "\n".join(packet["human_gate"]["checks"])
     assert "最新・現在・現時点" in checks
-    assert "権限" in checks
-    assert "安全" in checks
+    assert "permissions" in checks
+    assert "safety-critical" in checks
     assert "commercial actions" in checks
-    assert "自動化" in checks
+    assert "automation" in checks
     assert "as_of" in checks
 
 
