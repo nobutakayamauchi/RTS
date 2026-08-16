@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: x-article-engine-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   x-article-engine:
     runs-on: ubuntu-latest
