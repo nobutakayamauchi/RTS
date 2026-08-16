@@ -38,10 +38,11 @@ def brief():
 
 def test_root_points_to_latest_meteor_layer():
     packet = build_generation_packet(brief(), trusted_source_refs=sources())
-    assert packet["schema_version"] == "0.9-meteor-r4"
+    assert packet["schema_version"] == "0.9-meteor-r5"
     assert "strong_language_policy" in packet
     assert "security_content_policy" in packet
     assert "opening_integrity_policy" in packet
+    assert "generic_abstract_collision_rule" in packet["anti_ai_smell_policy"]
     assert packet["publication_state"] == "BLOCKED_PENDING_HUMAN"
     assert packet["publication_authority"] == "USER_ONLY"
     assert packet["external_publication_performed"] is False
