@@ -1,5 +1,5 @@
 from .core import XArticleEngineError, normalize_brief
-from .meteor_v09_r9 import audit_draft, build_generation_packet
+from .v09_final import audit_draft, build_generation_packet
 
 __all__ = [
     "XArticleEngineError",
