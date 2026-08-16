@@ -84,37 +84,37 @@ def test_flat_keeps_key_generation_contract_from_stacked_candidate():
     "draft,required_code,expected_status",
     [
         (
-            "Claude Codeを --dangerously-skip-permissions で起動してください。",
+            "BridgePatch（ブリッジパッチ）の記事です。Claude Codeを --dangerously-skip-permissions で起動してください。",
             "UNSAFE_PERMISSION_OR_SECURITY_BYPASS",
             "BLOCKED",
         ),
         (
-            "APIキーをClaudeのプロンプトに貼り付けて送信してください。",
+            "BridgePatch（ブリッジパッチ）の記事です。APIキーをClaudeのプロンプトに貼り付けて送信してください。",
             "SECRET_TRANSFER_TO_MODEL_RISK",
             "BLOCKED",
         ),
         (
-            "これは完全無料で使えます。",
+            "BridgePatch（ブリッジパッチ）は完全無料で使えます。",
             "UNBOUND_ABSOLUTE_FREE_CLAIM",
             "BLOCKED",
         ),
         (
-            "この手順なら完了できます。保証します。",
+            "BridgePatch（ブリッジパッチ）の手順なら完了できます。保証します。",
             "UNBOUND_GUARANTEE_LANGUAGE",
             "BLOCKED",
         ),
         (
-            "多くの人は仕事の本質を理解していません。",
+            "BridgePatch（ブリッジパッチ）の話です。多くの人は仕事の本質を理解していません。",
             "ABSTRACT_WORD_WITHOUT_PAYLOAD",
             "HUMAN_REVIEW_REQUIRED",
         ),
         (
-            "BAN回避を目的にしたステルス配信という主張がありますが、この記事では推奨しません。",
+            "BridgePatch（ブリッジパッチ）の話です。BAN回避を目的にしたステルス配信という主張がありますが、この記事では推奨しません。",
             "PLATFORM_EVASION_LANGUAGE",
             "HUMAN_REVIEW_REQUIRED",
         ),
         (
-            "BAN回避のためにゼロ幅文字を挿入して配信します。",
+            "BridgePatch（ブリッジパッチ）の話です。BAN回避のためにゼロ幅文字を挿入して配信します。",
             "PLATFORM_EVASION_OPERATIONAL_INSTRUCTION",
             "BLOCKED",
         ),
