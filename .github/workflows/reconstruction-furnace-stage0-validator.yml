@@ -1,0 +1,100 @@
+name: Reconstruction Furnace Stage 0 Validator
+
+on:
+  pull_request:
+    paths:
+      - "experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818/**"
+      - ".github/workflows/reconstruction-furnace-stage0-validator.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reconstruction-furnace-stage0-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        split: [c, go]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout experiment branch
+        uses: actions/checkout@v4
+        with:
+          path: rts
+
+      - name: Checkout pinned SWE-bench-Live evaluator
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/SWE-bench-Live
+          ref: 70ec57e852e3f2d195790fe71f553e272c691833
+          path: evaluator
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install datasets -e evaluator/launch
+
+      - name: Record safe resource preflight
+        working-directory: rts/experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818
+        run: |
+          python - <<'PY'
+          import os
+          import stage0_control
+          pages = os.sysconf('SC_PHYS_PAGES')
+          page_size = os.sysconf('SC_PAGE_SIZE')
+          mem_gib = pages * page_size / (1024 ** 3)
+          result = stage0_control.resource_preflight(
+              cpu_count=os.cpu_count() or 1,
+              memory_gib=mem_gib,
+          )
+          print('SAFE_RESOURCE_PREFLIGHT state=' + result['state'])
+          if result['state'] != 'RESOURCE_READY':
+              raise SystemExit(3)
+          PY
+
+      - name: Run sealed 3x gold validation
+        id: validator
+        working-directory: rts/experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818
+        shell: bash
+        run: |
+          set +e
+          python gold_validator.py \
+            --split "${{ matrix.split }}" \
+            --evaluator-root "${{ github.workspace }}/evaluator" \
+            --output-root "${{ runner.temp }}/furnace-stage0" \
+            --max-candidates 4
+          rc=$?
+          echo "validator_rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload solver-safe admission artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: furnace-stage0-${{ matrix.split }}-safe
+          path: ${{ runner.temp }}/furnace-stage0/safe/${{ matrix.split }}/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce validator result
+        if: always()
+        run: |
+          rc="${{ steps.validator.outputs.validator_rc }}"
+          if [ "$rc" = "0" ]; then
+            echo "SAFE_STAGE0_GATE split=${{ matrix.split }} state=ADMITTED"
+            exit 0
+          fi
+          echo "SAFE_STAGE0_GATE split=${{ matrix.split }} state=VALIDATOR_BLOCKED"
+          exit 1
