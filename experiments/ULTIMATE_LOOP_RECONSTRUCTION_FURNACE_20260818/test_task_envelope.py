@@ -57,6 +57,30 @@ class TaskEnvelopeTests(unittest.TestCase):
         self.assertNotIn("alien__example-999", serialized)
         self.assertNotIn("999", serialized)
 
+    def test_public_problem_statement_transport_whitespace_is_normalized(self) -> None:
+        source = copy.deepcopy(self.source)
+        source["problem_statement"] = "\n  Public issue text.\nSecond line.  \n"
+        envelope = mod.sanitize_for_solver(
+            source,
+            opaque_task_id="FURNACE-A-WS",
+            task_valid=True,
+        )
+        self.assertEqual(
+            envelope["problem_statement"],
+            "Public issue text.\nSecond line.",
+        )
+        mod.verify_solver_envelope(envelope)
+
+    def test_blank_public_problem_statement_remains_blocked(self) -> None:
+        source = copy.deepcopy(self.source)
+        source["problem_statement"] = " \n\t "
+        with self.assertRaises(mod.TaskEnvelopeError):
+            mod.sanitize_for_solver(
+                source,
+                opaque_task_id="FURNACE-A-BLANK",
+                task_valid=True,
+            )
+
     def test_unknown_solver_field_fails_closed(self) -> None:
         envelope = mod.sanitize_for_solver(
             self.source,
