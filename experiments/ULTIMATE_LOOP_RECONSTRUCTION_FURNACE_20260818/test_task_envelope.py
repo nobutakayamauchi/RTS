@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import pathlib
+import sys
 import unittest
 
 
@@ -10,6 +11,7 @@ MODULE_PATH = pathlib.Path(__file__).with_name("task_envelope.py")
 spec = importlib.util.spec_from_file_location("reconstruction_furnace_task_envelope", MODULE_PATH)
 assert spec is not None and spec.loader is not None
 mod = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = mod
 spec.loader.exec_module(mod)
 
 
