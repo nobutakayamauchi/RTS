@@ -1,7 +1,7 @@
 {
   "schema_version": "ultimate-loop-reconstruction-furnace/run-manifest-v1",
   "stage": "STAGE0",
-  "status": "SELECTION_FROZEN / GOLD_VALIDATION_PENDING",
+  "status": "SELECTION_FROZEN / TRACE_V2_TORTURE_GREEN / GOLD_VALIDATION_PENDING",
   "dataset_repo": "SWE-bench-Live/MultiLang",
   "dataset_revision": "608f7ae9ab8ea1f9f0d030fe04562cf6bd1a0c8b",
   "evaluator_repo": "microsoft/SWE-bench-Live",
@@ -25,5 +25,19 @@
   },
   "admission_rule": "FIRST_DETERMINISTIC_CANDIDATE_WITH_3_OF_3_GOLD_PASS_PER_SELECTED_SPLIT",
   "task_count_after_admission": 2,
-  "trace_contract": "ultimate-loop-reconstruction-furnace/trace-v1"
+  "trace_contract": "ultimate-loop-reconstruction-furnace/trace-v2",
+  "trace_torture": {
+    "synthetic_concurrency": "8 threads x 250 TOOL_INVOCATION events",
+    "required_properties": [
+      "no event loss",
+      "strict sequence continuity",
+      "monotonic time non-regression",
+      "disk replay equality",
+      "declared event counts equal observed counts",
+      "forbidden benchmark keys rejected",
+      "caller payload mutation cannot rewrite retained trace"
+    ],
+    "local_regression_result": "12/12 PASS",
+    "real_stage0_required": true
+  }
 }
