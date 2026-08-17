@@ -10,9 +10,12 @@ class TaskEnvelopeError(ValueError):
     """Raised when benchmark material cannot be safely exposed to the solver."""
 
 
+class TaskPublicInputError(TaskEnvelopeError):
+    """Raised when a gold-valid task lacks a usable public blind input surface."""
+
+
 SCHEMA_VERSION = "ultimate-loop-reconstruction-furnace/task-envelope-v2"
 
-# Raw benchmark answer/evaluator/validator metadata must never enter solver context.
 FORBIDDEN_KEYS = frozenset(
     {
         "instance_id",
@@ -76,18 +79,13 @@ def _exact_string(value: Any, field: str) -> str:
 
 
 def _normalized_public_string(value: Any, field: str) -> str:
-    """Normalize transport-only edge whitespace on public benchmark text.
-
-    Raw dataset text is allowed to contain leading/trailing newlines or spaces.
-    The solver-visible envelope remains exact and canonical after this boundary.
-    Internal whitespace/content is not rewritten.
-    """
+    """Normalize transport-only edge whitespace on public benchmark text."""
 
     if not isinstance(value, str):
-        raise TaskEnvelopeError(f"{field} must be a string")
+        raise TaskPublicInputError(f"{field} must be a string")
     normalized = value.strip()
     if not normalized:
-        raise TaskEnvelopeError(f"{field} must contain public task text")
+        raise TaskPublicInputError(f"{field} must contain public task text")
     return normalized
 
 
