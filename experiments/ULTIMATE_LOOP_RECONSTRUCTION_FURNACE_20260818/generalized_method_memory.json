@@ -1,0 +1,52 @@
+{
+  "schema_version": "ultimate-loop-reconstruction-furnace/method-memory-v1",
+  "status": "STAGE0_PARTIAL / NO_METHOD_EVOLUTION_AUTHORIZED",
+  "answer_cache_allowed": false,
+  "entries": [
+    {
+      "id": "MM-001",
+      "method": "Reproduce the public failure before implementation whenever the environment permits it.",
+      "source_tasks": ["FURNACE-02-6F812634AF9D173B"],
+      "scope": "repo-agnostic debugging order",
+      "state": "RETAIN"
+    },
+    {
+      "id": "MM-002",
+      "method": "Isolate the smallest likely responsibility surface before widening architecture or cleanup scope.",
+      "source_tasks": ["FURNACE-02-6F812634AF9D173B"],
+      "scope": "repo-agnostic exploration discipline",
+      "state": "RETAIN"
+    },
+    {
+      "id": "MM-003",
+      "method": "Treat public regression success and unseen generalization evidence as separate confidence layers.",
+      "source_tasks": ["FURNACE-02-6F812634AF9D173B"],
+      "scope": "evaluation discipline",
+      "state": "HOLD_CANDIDATE"
+    },
+    {
+      "id": "MM-004",
+      "method": "A sealed hidden evaluation is a terminal score for the frozen candidate, not an iterative debugging oracle.",
+      "source_tasks": ["FURNACE-02-6F812634AF9D173B"],
+      "scope": "benchmark anti-contamination discipline",
+      "state": "RETAIN"
+    }
+  ],
+  "forbidden_carryover": [
+    "repository names as shortcuts",
+    "file paths",
+    "symbols",
+    "issue wording",
+    "task-specific patches",
+    "mention-specific semantics",
+    "hidden test names or outputs",
+    "gold or fixing-PR material"
+  ],
+  "invariant_candidates": [
+    {
+      "statement": "PUBLIC REGRESSION GREEN != UNSEEN GENERALIZATION",
+      "evidence_count": 1,
+      "decision": "HOLD_NOT_PROMOTE"
+    }
+  ]
+}
