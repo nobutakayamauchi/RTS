@@ -1,0 +1,29 @@
+{
+  "schema_version": "ultimate-loop-reconstruction-furnace/run-manifest-v1",
+  "stage": "STAGE0",
+  "status": "SELECTION_FROZEN / GOLD_VALIDATION_PENDING",
+  "dataset_repo": "SWE-bench-Live/MultiLang",
+  "dataset_revision": "608f7ae9ab8ea1f9f0d030fe04562cf6bd1a0c8b",
+  "evaluator_repo": "microsoft/SWE-bench-Live",
+  "evaluator_revision": "70ec57e852e3f2d195790fe71f553e272c691833",
+  "seed_label": "ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_STAGE0",
+  "seed_sha256": "050b40668443f667bcc5eabb7ff6c0ea3db5f2e962ac2178ce8e95d4e9e7921b",
+  "selected_splits": [
+    "c",
+    "go"
+  ],
+  "candidate_selection": "DETERMINISTIC_HASH_ORDER_WITHIN_SPLIT",
+  "candidate_cherry_pick_allowed": false,
+  "gold_validation_runs_required": 3,
+  "gold_validation_passes_required": 3,
+  "solver_dataset_access": false,
+  "solver_gold_access": false,
+  "default_resource_preflight": {
+    "cpu": 4,
+    "memory_gib": 16,
+    "note": "Task-specific requirements may exceed defaults; resource failure is not solver failure."
+  },
+  "admission_rule": "FIRST_DETERMINISTIC_CANDIDATE_WITH_3_OF_3_GOLD_PASS_PER_SELECTED_SPLIT",
+  "task_count_after_admission": 2,
+  "trace_contract": "ultimate-loop-reconstruction-furnace/trace-v1"
+}
