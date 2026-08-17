@@ -10,9 +10,12 @@ class TaskEnvelopeError(ValueError):
     """Raised when benchmark material cannot be safely exposed to the solver."""
 
 
+class TaskPublicInputError(TaskEnvelopeError):
+    """Raised when a gold-valid task lacks a usable public blind input surface."""
+
+
 SCHEMA_VERSION = "ultimate-loop-reconstruction-furnace/task-envelope-v2"
 
-# Raw benchmark answer/evaluator/validator metadata must never enter solver context.
 FORBIDDEN_KEYS = frozenset(
     {
         "instance_id",
@@ -39,8 +42,6 @@ FORBIDDEN_KEYS = frozenset(
     }
 )
 
-# Solver receives only the issue and the identity needed to reconstruct the repo.
-# Sandbox/image/build/evaluation metadata remains runner-side.
 ENVELOPE_KEYS = frozenset(
     {
         "schema_version",
@@ -77,6 +78,17 @@ def _exact_string(value: Any, field: str) -> str:
     return value
 
 
+def _normalized_public_string(value: Any, field: str) -> str:
+    """Normalize transport-only edge whitespace on public benchmark text."""
+
+    if not isinstance(value, str):
+        raise TaskPublicInputError(f"{field} must be a string")
+    normalized = value.strip()
+    if not normalized:
+        raise TaskPublicInputError(f"{field} must contain public task text")
+    return normalized
+
+
 def _sha256_json(value: Any) -> str:
     try:
         encoded = json.dumps(
@@ -100,8 +112,6 @@ def build_validator_provenance(
     gold_validation_runs: int,
     gold_validation_passes: int,
 ) -> ValidatorProvenance:
-    """Build out-of-band provenance without exposing answer-bearing values."""
-
     if not isinstance(source_record, Mapping):
         raise TaskEnvelopeError("source_record mapping required")
     instance_id = _exact_string(source_record.get("instance_id"), "instance_id")
@@ -124,12 +134,7 @@ def sanitize_for_solver(
     task_valid: bool,
     platform: str = "linux",
 ) -> dict[str, Any]:
-    """Return the only benchmark artifact permitted to enter solver context.
-
-    This is an allowlist serializer. It constructs a new object from scratch.
-    Evaluator commands, hidden-test metadata, image identity, raw instance
-    identity, gold material, and validator provenance stay outside the solver.
-    """
+    """Return the only benchmark artifact permitted to enter solver context."""
 
     if not isinstance(source_record, Mapping):
         raise TaskEnvelopeError("source_record mapping required")
@@ -141,7 +146,7 @@ def sanitize_for_solver(
         "task_id": _exact_string(opaque_task_id, "opaque_task_id"),
         "repo": _exact_string(source_record.get("repo"), "repo"),
         "base_commit": _exact_string(source_record.get("base_commit"), "base_commit"),
-        "problem_statement": _exact_string(
+        "problem_statement": _normalized_public_string(
             source_record.get("problem_statement"), "problem_statement"
         ),
         "platform": _exact_string(platform, "platform"),

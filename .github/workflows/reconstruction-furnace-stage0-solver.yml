@@ -1,0 +1,76 @@
+name: Reconstruction Furnace Stage 0 Solver Bridge
+
+on:
+  pull_request:
+    paths:
+      - ".furnace-runtime/**"
+      - ".github/workflows/reconstruction-furnace-stage0-solver.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reconstruction-furnace-solver-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  solver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout experiment
+        uses: actions/checkout@v4
+        with:
+          path: rts
+
+      - name: Checkout pinned evaluator runtime
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/SWE-bench-Live
+          ref: 70ec57e852e3f2d195790fe71f553e272c691833
+          path: evaluator
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install datasets docker typing-extensions
+
+      - name: Execute latest solver request
+        id: solve
+        shell: bash
+        env:
+          PYTHONPATH: ${{ github.workspace }}/evaluator/launch
+        run: |
+          set +e
+          python rts/.furnace-runtime/stage0_solver_runner.py \
+            --request rts/.furnace-runtime/request.json \
+            --output "${{ runner.temp }}/furnace-solver-result.json"
+          rc=$?
+          echo "solver_rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload solver-safe result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: furnace-stage0-solver-safe
+          path: ${{ runner.temp }}/furnace-solver-result.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Report bridge state
+        if: always()
+        run: |
+          rc="${{ steps.solve.outputs.solver_rc }}"
+          if [ "$rc" = "0" ]; then
+            echo "SAFE_SOLVER_BRIDGE state=PASS"
+          else
+            echo "SAFE_SOLVER_BRIDGE state=NONPASS rc=$rc"
+          fi

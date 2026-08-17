@@ -3,13 +3,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import pathlib
 import subprocess
 import sys
 from typing import Any
 
-from datasets import load_dataset
+from datasets import disable_progress_bars, load_dataset
 
 import stage0_control
 import task_envelope
@@ -20,6 +19,7 @@ DATASET_REVISION = "608f7ae9ab8ea1f9f0d030fe04562cf6bd1a0c8b"
 EVALUATOR_REVISION = "70ec57e852e3f2d195790fe71f553e272c691833"
 SEED_SHA256 = "050b40668443f667bcc5eabb7ff6c0ea3db5f2e962ac2178ce8e95d4e9e7921b"
 SPLIT_ORDINAL = {"c": 1, "go": 2}
+SUMMARY_SCHEMA = "ultimate-loop-reconstruction-furnace/validator-summary-v2"
 
 
 class ValidatorError(RuntimeError):
@@ -61,15 +61,18 @@ def _evaluate_once(
         "--overwrite",
         "1",
     ]
-    with log_path.open("wb") as private_log:
-        proc = subprocess.run(
-            command,
-            cwd=evaluator_root,
-            stdout=private_log,
-            stderr=subprocess.STDOUT,
-            check=False,
-            timeout=170 * 60,
-        )
+    try:
+        with log_path.open("wb") as private_log:
+            proc = subprocess.run(
+                command,
+                cwd=evaluator_root,
+                stdout=private_log,
+                stderr=subprocess.STDOUT,
+                check=False,
+                timeout=170 * 60,
+            )
+    except (subprocess.TimeoutExpired, OSError):
+        return False
     if proc.returncode != 0:
         return False
     results_path = output_dir / "results.json"
@@ -89,6 +92,25 @@ def _evaluate_once(
     )
 
 
+def _initial_summary(split: str, max_candidates: int) -> dict[str, Any]:
+    return {
+        "schema_version": SUMMARY_SCHEMA,
+        "stage": "STAGE0",
+        "split": split,
+        "state": "VALIDATION_IN_PROGRESS",
+        "bounded_prefix_size": max_candidates,
+        "candidate_rank": None,
+        "gold_validation_runs": 3,
+        "gold_validation_passes": None,
+        "task_id": None,
+        "dataset_revision": DATASET_REVISION,
+        "evaluator_revision": EVALUATOR_REVISION,
+        "solver_dataset_access": False,
+        "solver_gold_access": False,
+        "candidate_results": [],
+    }
+
+
 def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, max_candidates: int) -> int:
     if split not in SPLIT_ORDINAL:
         raise ValidatorError("Stage 0 validator accepts only frozen c/go splits")
@@ -102,24 +124,13 @@ def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, 
     private_root.mkdir(parents=True, exist_ok=True)
     safe_root.mkdir(parents=True, exist_ok=True)
 
+    safe_summary = _initial_summary(split, max_candidates)
+    _json_dump(safe_root / "validator-summary.json", safe_summary)
+
+    disable_progress_bars()
     dataset = load_dataset(DATASET_REPO, split=split, revision=DATASET_REVISION)
     rows = [dict(row) for row in dataset]
     ordered = stage0_control.candidate_order(rows, split=split, seed_sha256=SEED_SHA256)
-
-    safe_summary: dict[str, Any] = {
-        "schema_version": "ultimate-loop-reconstruction-furnace/validator-summary-v1",
-        "stage": "STAGE0",
-        "split": split,
-        "state": "NO_VALID_IN_BOUNDED_PREFIX",
-        "candidate_rank": None,
-        "gold_validation_runs": 3,
-        "gold_validation_passes": None,
-        "task_id": None,
-        "dataset_revision": DATASET_REVISION,
-        "evaluator_revision": EVALUATOR_REVISION,
-        "solver_dataset_access": False,
-        "solver_gold_access": False,
-    }
 
     for candidate_rank, row in enumerate(ordered[:max_candidates], 1):
         candidate_file = private_root / f"candidate-{candidate_rank:02d}.jsonl"
@@ -152,6 +163,15 @@ def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, 
                 "gold_validation_passes": provenance.gold_validation_passes,
             },
         )
+
+        candidate_safe = {
+            "candidate_rank": candidate_rank,
+            "gold_validation_passes": passes,
+            "state": "GOLD_NOT_REPRODUCIBLE" if not provenance.task_valid else "GOLD_VALID_3_OF_3",
+        }
+        safe_summary["candidate_results"].append(candidate_safe)
+        _json_dump(safe_root / "validator-summary.json", safe_summary)
+
         if not provenance.task_valid:
             continue
 
@@ -160,12 +180,19 @@ def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, 
             seed_sha256=SEED_SHA256,
             ordinal=SPLIT_ORDINAL[split],
         )
-        envelope = task_envelope.sanitize_for_solver(
-            row,
-            opaque_task_id=task_id,
-            task_valid=True,
-            platform="linux",
-        )
+        try:
+            envelope = task_envelope.sanitize_for_solver(
+                row,
+                opaque_task_id=task_id,
+                task_valid=True,
+                platform="linux",
+            )
+        except task_envelope.TaskPublicInputError:
+            candidate_safe["state"] = "GOLD_VALID_BUT_BLIND_INPUT_UNUSABLE"
+            _json_dump(safe_root / "validator-summary.json", safe_summary)
+            continue
+
+        # Any other envelope/integrity failure is a harness defect and must crash.
         task_envelope.verify_solver_envelope(envelope)
         leaked = task_envelope.forbidden_key_scan(envelope)
         if leaked:
@@ -180,6 +207,7 @@ def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, 
             ).encode("utf-8")
         ).hexdigest()
         _json_dump(safe_root / "solver-envelope.json", envelope)
+        candidate_safe["state"] = "ADMITTED_3_OF_3"
         safe_summary.update(
             {
                 "state": "ADMITTED_3_OF_3",
@@ -193,9 +221,24 @@ def run(*, split: str, evaluator_root: pathlib.Path, output_root: pathlib.Path, 
         print(f"SAFE_VALIDATOR_RESULT split={split} state=ADMITTED_3_OF_3 rank={candidate_rank}")
         return 0
 
+    saw_gold_valid = any(
+        row["gold_validation_passes"] == 3 for row in safe_summary["candidate_results"]
+    )
+    safe_summary.update(
+        {
+            "state": (
+                "NO_USABLE_BLIND_TASK_IN_BOUNDED_PREFIX"
+                if saw_gold_valid
+                else "NO_REPRODUCIBLY_VALID_TASK_IN_BOUNDED_PREFIX"
+            ),
+            "candidate_rank": None,
+            "gold_validation_passes": None,
+            "task_id": None,
+        }
+    )
     _json_dump(safe_root / "validator-summary.json", safe_summary)
     print(
-        f"SAFE_VALIDATOR_RESULT split={split} state=NO_VALID_IN_BOUNDED_PREFIX "
+        f"SAFE_VALIDATOR_RESULT split={split} state={safe_summary['state']} "
         f"checked={min(max_candidates, len(ordered))}"
     )
     return 2
