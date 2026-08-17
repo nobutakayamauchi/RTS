@@ -125,7 +125,7 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
                 row["docker_image"],
                 row["instance_id"],
                 platform="linux",
-                command_timeout=10,
+                command_timeout=120,
             )
             _disconnect_network(runtime.container)
             patch = request["patch"]
