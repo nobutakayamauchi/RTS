@@ -7,29 +7,40 @@ from typing import Any, Mapping
 
 
 class TaskEnvelopeError(ValueError):
-    """Raised when a benchmark record cannot be safely exposed to the solver."""
+    """Raised when benchmark material cannot be safely exposed to the solver."""
 
 
-SCHEMA_VERSION = "ultimate-loop-reconstruction-furnace/task-envelope-v1"
+SCHEMA_VERSION = "ultimate-loop-reconstruction-furnace/task-envelope-v2"
 
-# These names must never exist anywhere in the solver-visible envelope.
+# Raw benchmark answer/evaluator/validator metadata must never enter solver context.
 FORBIDDEN_KEYS = frozenset(
     {
+        "instance_id",
+        "pull_number",
+        "issue_numbers",
         "patch",
         "test_patch",
         "hints_text",
         "all_hints_text",
-        "pull_number",
-        "issue_numbers",
         "commit_url",
         "commit_urls",
+        "created_at",
+        "rebuild_cmds",
+        "test_cmds",
+        "print_cmds",
+        "log_parser",
         "FAIL_TO_PASS",
         "PASS_TO_PASS",
-        "log_parser",
+        "docker_image",
+        "source_record_sha256",
+        "source_instance_id_sha256",
+        "gold_validation_runs",
+        "gold_validation_passes",
     }
 )
 
-# Output is constructed from this allowlist; source rows are never copied wholesale.
+# Solver receives only the issue and the identity needed to reconstruct the repo.
+# Sandbox/image/build/evaluation metadata remains runner-side.
 ENVELOPE_KEYS = frozenset(
     {
         "schema_version",
@@ -37,9 +48,6 @@ ENVELOPE_KEYS = frozenset(
         "repo",
         "base_commit",
         "problem_statement",
-        "rebuild_cmds",
-        "test_cmds",
-        "docker_image",
         "platform",
         "task_valid",
         "network_policy",
@@ -67,15 +75,6 @@ def _exact_string(value: Any, field: str) -> str:
     if not isinstance(value, str) or not value or value != value.strip():
         raise TaskEnvelopeError(f"{field} must be a non-empty exact string")
     return value
-
-
-def _string_list(value: Any, field: str) -> list[str]:
-    if not isinstance(value, list) or not value:
-        raise TaskEnvelopeError(f"{field} must be a non-empty list")
-    out: list[str] = []
-    for item in value:
-        out.append(_exact_string(item, field))
-    return out
 
 
 def _sha256_json(value: Any) -> str:
@@ -127,8 +126,9 @@ def sanitize_for_solver(
 ) -> dict[str, Any]:
     """Return the only benchmark artifact permitted to enter solver context.
 
-    This is intentionally an allowlist serializer. It never removes forbidden
-    fields from a copied source row; it constructs a new object from scratch.
+    This is an allowlist serializer. It constructs a new object from scratch.
+    Evaluator commands, hidden-test metadata, image identity, raw instance
+    identity, gold material, and validator provenance stay outside the solver.
     """
 
     if not isinstance(source_record, Mapping):
@@ -136,27 +136,15 @@ def sanitize_for_solver(
     if task_valid is not True:
         raise TaskEnvelopeError("only reproducibly gold-valid tasks may enter the furnace")
 
-    task_id = _exact_string(opaque_task_id, "opaque_task_id")
-    repo = _exact_string(source_record.get("repo"), "repo")
-    base_commit = _exact_string(source_record.get("base_commit"), "base_commit")
-    problem_statement = _exact_string(
-        source_record.get("problem_statement"), "problem_statement"
-    )
-    rebuild_cmds = _string_list(source_record.get("rebuild_cmds"), "rebuild_cmds")
-    test_cmds = _string_list(source_record.get("test_cmds"), "test_cmds")
-    docker_image = _exact_string(source_record.get("docker_image"), "docker_image")
-    normalized_platform = _exact_string(platform, "platform")
-
     envelope = {
         "schema_version": SCHEMA_VERSION,
-        "task_id": task_id,
-        "repo": repo,
-        "base_commit": base_commit,
-        "problem_statement": problem_statement,
-        "rebuild_cmds": rebuild_cmds,
-        "test_cmds": test_cmds,
-        "docker_image": docker_image,
-        "platform": normalized_platform,
+        "task_id": _exact_string(opaque_task_id, "opaque_task_id"),
+        "repo": _exact_string(source_record.get("repo"), "repo"),
+        "base_commit": _exact_string(source_record.get("base_commit"), "base_commit"),
+        "problem_statement": _exact_string(
+            source_record.get("problem_statement"), "problem_statement"
+        ),
+        "platform": _exact_string(platform, "platform"),
         "task_valid": True,
         "network_policy": NETWORK_POLICY,
     }
@@ -173,7 +161,9 @@ def verify_solver_envelope(envelope: Mapping[str, Any]) -> None:
     if keys != ENVELOPE_KEYS:
         extra = sorted(keys - ENVELOPE_KEYS)
         missing = sorted(ENVELOPE_KEYS - keys)
-        raise TaskEnvelopeError(f"solver envelope shape drift: extra={extra} missing={missing}")
+        raise TaskEnvelopeError(
+            f"solver envelope shape drift: extra={extra} missing={missing}"
+        )
     leaked = sorted(keys & FORBIDDEN_KEYS)
     if leaked:
         raise TaskEnvelopeError(f"forbidden benchmark fields leaked: {leaked}")
@@ -190,12 +180,9 @@ def verify_solver_envelope(envelope: Mapping[str, Any]) -> None:
         "repo",
         "base_commit",
         "problem_statement",
-        "docker_image",
         "platform",
     ):
         _exact_string(envelope[field], field)
-    _string_list(envelope["rebuild_cmds"], "rebuild_cmds")
-    _string_list(envelope["test_cmds"], "test_cmds")
 
 
 def forbidden_key_scan(value: Any) -> list[str]:
