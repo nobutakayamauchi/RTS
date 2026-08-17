@@ -25,57 +25,40 @@ class Stage0ControlTests(unittest.TestCase):
         )
         self.assertEqual(manifest.selected_splits, ("c", "go"))
         self.assertFalse(manifest.solver_dataset_access)
-        self.assertEqual(
-            manifest.seed_sha256,
-            "050b40668443f667bcc5eabb7ff6c0ea3db5f2e962ac2178ce8e95d4e9e7921b",
-        )
+        self.assertEqual(manifest.seed_sha256, "050b40668443f667bcc5eabb7ff6c0ea3db5f2e962ac2178ce8e95d4e9e7921b")
 
     def test_candidate_order_is_deterministic_and_gold_agnostic(self) -> None:
-        rows_a = [
-            {"instance_id": "r__x-2", "patch": "gold-two"},
-            {"instance_id": "r__x-1", "patch": "gold-one"},
-        ]
-        rows_b = [
-            {"instance_id": "r__x-2", "patch": "completely-different"},
-            {"instance_id": "r__x-1", "patch": "also-different"},
-        ]
-        order_a = [
-            row["instance_id"]
-            for row in mod.candidate_order(rows_a, split="c", seed_sha256="a" * 64)
-        ]
-        order_b = [
-            row["instance_id"]
-            for row in mod.candidate_order(rows_b, split="c", seed_sha256="a" * 64)
-        ]
+        rows_a = [{"instance_id": "r__x-2", "patch": "gold-two"}, {"instance_id": "r__x-1", "patch": "gold-one"}]
+        rows_b = [{"instance_id": "r__x-2", "patch": "different"}, {"instance_id": "r__x-1", "patch": "also-different"}]
+        order_a = [row["instance_id"] for row in mod.candidate_order(rows_a, split="c", seed_sha256="a" * 64)]
+        order_b = [row["instance_id"] for row in mod.candidate_order(rows_b, split="c", seed_sha256="a" * 64)]
         self.assertEqual(order_a, order_b)
 
     def test_first_valid_is_first_three_of_three_not_cherry_pick(self) -> None:
-        rows = [
-            {"instance_id": "a"},
-            {"instance_id": "b"},
-            {"instance_id": "c"},
-        ]
+        rows = [{"instance_id": "a"}, {"instance_id": "b"}, {"instance_id": "c"}]
         selected = mod.choose_first_valid(rows, {"a": 2, "b": 3, "c": 3})
         self.assertEqual(selected["instance_id"], "b")
 
     def test_missing_validation_in_prefix_fails_closed(self) -> None:
-        rows = [{"instance_id": "a"}, {"instance_id": "b"}]
         with self.assertRaises(mod.FurnaceControlError):
-            mod.choose_first_valid(rows, {"b": 3})
+            mod.choose_first_valid([{"instance_id": "a"}, {"instance_id": "b"}], {"b": 3})
 
-    def test_resource_block_is_not_solver_failure(self) -> None:
+    def test_resource_hard_block_is_not_solver_failure(self) -> None:
         result = mod.resource_preflight(cpu_count=2, memory_gib=8)
         self.assertEqual(result["state"], "RESOURCE_BLOCKED")
         self.assertFalse(result["solver_failure"])
-        self.assertIn("CPU_BELOW_REQUEST", result["blockers"])
-        self.assertIn("MEMORY_BELOW_REQUEST", result["blockers"])
+        self.assertIn("CPU_BELOW_HARD_MIN", result["blockers"])
+        self.assertIn("MEMORY_BELOW_HARD_MIN", result["blockers"])
+
+    def test_nominal_16gb_runner_can_be_ready_with_memory_warning(self) -> None:
+        result = mod.resource_preflight(cpu_count=4, memory_gib=15.0)
+        self.assertEqual(result["state"], "RESOURCE_READY_WITH_WARNING")
+        self.assertEqual(result["blockers"], [])
+        self.assertIn("MEMORY_BELOW_GUIDANCE", result["warnings"])
+        self.assertFalse(result["solver_failure"])
 
     def test_opaque_id_hides_instance_text(self) -> None:
-        task_id = mod.opaque_task_id(
-            instance_id="repo__repo-12345",
-            seed_sha256="b" * 64,
-            ordinal=1,
-        )
+        task_id = mod.opaque_task_id(instance_id="repo__repo-12345", seed_sha256="b" * 64, ordinal=1)
         self.assertNotIn("repo", task_id.lower())
         self.assertNotIn("12345", task_id)
 
