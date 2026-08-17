@@ -1,0 +1,81 @@
+name: Reconstruction Furnace Stage 0 Final Eval
+
+on:
+  pull_request:
+    paths:
+      - ".furnace-final/**"
+      - ".github/workflows/reconstruction-furnace-stage0-final-eval.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reconstruction-furnace-final-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  final-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout frozen candidate branch
+        uses: actions/checkout@v4
+        with:
+          path: rts
+
+      - name: Checkout pinned SWE-bench-Live evaluator
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/SWE-bench-Live
+          ref: 70ec57e852e3f2d195790fe71f553e272c691833
+          path: evaluator
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded evaluator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install datasets docker typing-extensions
+
+      - name: Run one-shot sealed official evaluation
+        id: final
+        shell: bash
+        run: |
+          set +e
+          python rts/.furnace-final/final_evaluator.py \
+            --evaluator-root "${{ github.workspace }}/evaluator" \
+            --request "${{ github.workspace }}/rts/.furnace-runtime/request.json" \
+            --private-root "${{ runner.temp }}/furnace-final-private" \
+            --safe-output "${{ runner.temp }}/furnace-final-safe.json"
+          rc=$?
+          echo "final_rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload safe final verdict only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: furnace-stage0-go-final-safe
+          path: ${{ runner.temp }}/furnace-final-safe.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce final verdict
+        if: always()
+        run: |
+          rc="${{ steps.final.outputs.final_rc }}"
+          if [ "$rc" = "0" ]; then
+            echo "SAFE_FINAL_GATE state=PASS"
+            exit 0
+          fi
+          if [ "$rc" = "1" ]; then
+            echo "SAFE_FINAL_GATE state=FAIL"
+            exit 1
+          fi
+          echo "SAFE_FINAL_GATE state=ERROR"
+          exit 1
