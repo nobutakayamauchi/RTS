@@ -5,8 +5,6 @@
   "candidate_rank": 1,
   "patch": "",
   "commands": [
-    "sapi/cli/php -n -r '$foo = new class { public self $v; }; $foo->v[] = 1;' 2>&1; true",
-    "sapi/cli/php -n -r '$foo = new class { public self $v; }; $ref =& $foo->v; $ref = 0;' 2>&1; true",
-    "sapi/cli/php -n -r '$foo = new class { public self|int $v; }; $foo->v = PHP_INT_MAX; $foo->v++;' 2>&1; true"
+    "grep -n 'zend_type_to_string(.*->type)' Zend/zend_execute.c | grep -E 'prop|info|error_prop'"
   ]
 }
