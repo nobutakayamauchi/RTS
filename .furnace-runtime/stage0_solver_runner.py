@@ -189,6 +189,10 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
 
             for command in request["commands"]:
                 command_result = runtime.send_command(command)
+                if command_result.metadata is None:
+                    result["state"] = "COMMAND_METADATA_MISSING"
+                    _write_result(output_path, result)
+                    return 3
                 exit_code = int(command_result.metadata.exit_code)
                 result["commands"].append(
                     {
@@ -213,12 +217,49 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
                 pass
 
 
+def _safe_uncaught_result(request_path: pathlib.Path) -> dict[str, Any]:
+    task_id = "UNKNOWN_SAFE_TASK"
+    split = "unknown"
+    candidate_rank: int | None = None
+    try:
+        raw = json.loads(request_path.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            maybe_task = raw.get("task_id")
+            maybe_split = raw.get("split")
+            maybe_rank = raw.get("candidate_rank")
+            if isinstance(maybe_task, str) and maybe_task.startswith("FURNACE-"):
+                task_id = maybe_task
+            if maybe_split in SUPPORTED:
+                split = maybe_split
+            if isinstance(maybe_rank, int) and maybe_rank >= 1:
+                candidate_rank = maybe_rank
+    except Exception:
+        pass
+    return {
+        "schema_version": "ultimate-loop-reconstruction-furnace/solver-result-v2",
+        "task_id": task_id,
+        "split": split,
+        "candidate_rank": candidate_rank,
+        "network_policy": "OFFLINE_AFTER_PREPARE",
+        "patch_applied": False,
+        "rebuild": {"required": False, "count": 0, "state": "NOT_RUN"},
+        "commands": [],
+        "state": "BRIDGE_UNCAUGHT_ERROR",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--request", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    return run(pathlib.Path(args.request), pathlib.Path(args.output))
+    request_path = pathlib.Path(args.request)
+    output_path = pathlib.Path(args.output)
+    try:
+        return run(request_path, output_path)
+    except Exception:
+        _write_result(output_path, _safe_uncaught_result(request_path))
+        return 3
 
 
 if __name__ == "__main__":
