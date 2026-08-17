@@ -6,17 +6,15 @@ Parent experiment: #353. Candidate PR: #354.
 
 ## Frozen question
 
-Can the observer retain the material state transitions of Ultimate Loop while the loop is moving quickly, without silently dropping, reordering, fabricating, or contaminating evidence?
+Can the observer retain the material state transitions of Ultimate Loop while the loop is moving quickly, without silently dropping, reordering, fabricating, contaminating, or weakening its own experiment boundary?
 
 This review attacks the observer contract itself before using it to judge Ultimate Loop.
 
-## DA — deaths found in TRACE v1
-
-TRACE v1 was not strong enough to call a run complete.
+## DA — deaths found before real Stage 0
 
 ### Death 1 — presence could masquerade as completeness
 
-The validator required one occurrence of every named event type, but did not require meaningful payloads. A trace containing empty payloads could satisfy the shape of a complete run.
+TRACE v1 required one occurrence of every named event type, but did not require meaningful payloads. A trace containing empty payloads could satisfy the shape of a complete run.
 
 `EVENT NAME EXISTS != MATERIAL EVIDENCE CAPTURED`
 
@@ -56,7 +54,15 @@ A noisy baseline could produce a negative overhead percentage and make the obser
 
 `NOISY NEGATIVE DELTA != NEGATIVE OBSERVER COST`
 
-## Repair — TRACE v2
+### Death 8 — the experiment workflow weakened its own supply-chain boundary
+
+The first green GitHub preflight resolved mutable action tags such as `actions/checkout@v4` and `actions/setup-python@v5`, and checkout retained credentials by default. That is weaker than the repository's existing fail-closed action-pinning discipline and gives the experiment unnecessary mutation/credential surface.
+
+`PINNED BENCHMARK != PINNED EXPERIMENT EXECUTION`
+
+`CONTENTS:READ != CREDENTIALS NEED TO PERSIST`
+
+## Repair — TRACE v2 and workflow hardening
 
 The experiment-local TRACE contract now:
 
@@ -73,9 +79,16 @@ The experiment-local TRACE contract now:
 - clamps negative timing noise to zero reported overhead;
 - supports JSONL replay for captured traces.
 
+The experiment workflows now also:
+
+- pin checkout and Python setup to exact observed commit SHAs;
+- pin the v4 artifact uploader to an exact commit SHA;
+- set `persist-credentials: false` on both RTS and evaluator checkouts;
+- retain `contents: read` as the only declared workflow permission.
+
 ## Counter-DA — attacks retained as regressions
 
-The hardened test set attacks the repair with:
+The hardened TRACE test set attacks the repair with:
 
 1. empty-payload completeness spoof;
 2. declared-vs-observed event count mismatch;
@@ -90,9 +103,13 @@ The hardened test set attacks the repair with:
 11. clean first-pass success with zero fake failure events;
 12. burst capture: 8 concurrent threads x 250 tool events, followed by disk replay and exact sequence/count verification.
 
-Local isolated replay result after repair:
+Isolated TRACE replay after repair:
 
 `12 / 12 PASS`
+
+The first complete GitHub preflight over Stage 0 control, blind envelope, and TRACE regressions produced:
+
+`27 / 27 PASS`
 
 The burst test retains 2,000 concurrent `TOOL_INVOCATION` events with no observed loss in the test process, strict sequence continuity, memory/disk row equality, and a complete replayable trace.
 
