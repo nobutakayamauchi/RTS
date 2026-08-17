@@ -41,17 +41,23 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install validator dependencies
+      - name: Install bounded validator dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install datasets -e evaluator/launch
+          python -m pip install datasets docker typing-extensions
 
       - name: Record safe resource preflight
         working-directory: rts/experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818
+        env:
+          SAFE_ROOT: ${{ runner.temp }}/furnace-stage0/safe/${{ matrix.split }}
+          SPLIT: ${{ matrix.split }}
         run: |
           python - <<'PY'
+          import json
           import os
+          from pathlib import Path
           import stage0_control
+
           pages = os.sysconf('SC_PHYS_PAGES')
           page_size = os.sysconf('SC_PAGE_SIZE')
           mem_gib = pages * page_size / (1024 ** 3)
@@ -59,8 +65,28 @@ jobs:
               cpu_count=os.cpu_count() or 1,
               memory_gib=mem_gib,
           )
-          print('SAFE_RESOURCE_PREFLIGHT state=' + result['state'])
-          if result['state'] != 'RESOURCE_READY':
+          safe = {
+              'schema_version': 'ultimate-loop-reconstruction-furnace/resource-v1',
+              'split': os.environ['SPLIT'],
+              'state': result['state'],
+              'cpu_count': result['cpu_count'],
+              'memory_gib': round(result['memory_gib'], 2),
+              'hard_min_memory_gib': result['hard_min_memory_gib'],
+              'guidance_memory_gib': result['guidance_memory_gib'],
+              'warnings': result['warnings'],
+              'blockers': result['blockers'],
+              'solver_failure': False,
+          }
+          root = Path(os.environ['SAFE_ROOT'])
+          root.mkdir(parents=True, exist_ok=True)
+          (root / 'resource-summary.json').write_text(
+              json.dumps(safe, sort_keys=True, indent=2) + '\n', encoding='utf-8'
+          )
+          print(
+              'SAFE_RESOURCE_PREFLIGHT '
+              f"state={result['state']} cpu={result['cpu_count']} mem_gib={mem_gib:.2f}"
+          )
+          if result['state'] == 'RESOURCE_BLOCKED':
               raise SystemExit(3)
           PY
 
