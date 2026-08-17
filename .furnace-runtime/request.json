@@ -6,6 +6,6 @@
   "patch": "diff --git a/Zend/zend_execute.c b/Zend/zend_execute.c\n--- a/Zend/zend_execute.c\n+++ b/Zend/zend_execute.c\n@@ -6707,7 +6707,7 @@ ZEND_COLD zend_never_inline void zend_verify_property_type_error(const zend_pro\n \t\treturn;\n \t}\n \n-\ttype_str = zend_type_to_string(info->type);\n+\ttype_str = zend_type_to_string_resolved(info->type, info->ce);\n \tzend_type_error(\"Cannot assign %s to property %s::$%s of type %s\",\n \t\tzend_zval_value_name(property),\n \t\tZSTR_VAL(info->ce->name),\n",
   "commands": [
     "git diff --check",
-    "sapi/cli/php -n -r '$foo = new class { public self $v; }; try { $foo->v = 0; } catch (TypeError $e) { echo $e->getMessage(), \\"\\n\\"; }'"
+    "sapi/cli/php -n -r '$foo = new class { public self $v; }; try { $foo->v = 0; } catch (TypeError $e) { echo $e->getMessage(), PHP_EOL; }'"
   ]
 }
