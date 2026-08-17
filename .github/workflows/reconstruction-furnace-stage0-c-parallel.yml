@@ -1,0 +1,60 @@
+name: Reconstruction Furnace Stage 0 C Parallel Validator
+
+on:
+  pull_request:
+    paths:
+      - ".furnace-c-validator/**"
+      - ".github/workflows/reconstruction-furnace-stage0-c-parallel.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-rank:
+    strategy:
+      fail-fast: false
+      matrix:
+        rank: [1, 2, 3, 4]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout validator branch
+        uses: actions/checkout@v4
+        with:
+          path: rts
+
+      - name: Checkout pinned SWE-bench-Live evaluator
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/SWE-bench-Live
+          ref: 70ec57e852e3f2d195790fe71f553e272c691833
+          path: evaluator
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install datasets docker typing-extensions
+
+      - name: Validate deterministic C rank three times
+        working-directory: rts
+        run: |
+          python .furnace-c-validator/rank_validator.py \
+            --rank "${{ matrix.rank }}" \
+            --evaluator-root "${{ github.workspace }}/evaluator" \
+            --output-root "${{ runner.temp }}/furnace-c"
+
+      - name: Upload rank-safe result only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: furnace-stage0-c-rank-${{ matrix.rank }}-safe
+          path: ${{ runner.temp }}/furnace-c/safe/rank-${{ matrix.rank }}/
+          if-no-files-found: error
+          retention-days: 7
