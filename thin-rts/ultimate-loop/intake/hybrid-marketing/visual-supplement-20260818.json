@@ -5,8 +5,8 @@
   "canonical_promotion_authorized": false,
   "source": {
     "kind": "user-provided screenshots of the 143-page Hybrid Marketing deck",
-    "visible_page_markers": [97, 101, 107, 111, 114, 123],
-    "note": "Screenshots include surrounding contiguous panels in addition to the visible page counters. They reinforce selected visual claims; they are not a replacement for the full source PDF."
+    "visible_page_markers": [97, 101, 107, 111, 114, 117, 123, 126, 141],
+    "note": "Screenshots include surrounding contiguous panels in addition to visible page counters. They reinforce selected visual claims; they are not a replacement for the full source. Duplicate screenshots are hash-deduplicated."
   },
   "screenshot_sha256": {
     "DE0EC018-11DF-475B-A665-ADB2D6315E50.png": "59c6961b259d0fcff9248b5ec79978fcc6ccb1f34cf2465c623c9d2760567e31",
@@ -18,21 +18,39 @@
     "E267C423-1739-4D03-9CDE-7BEE441FE61E.jpeg": "80dde0d7360811254edc0e14327d040aa837a231c5eae7ed1ac49e830aa7a724",
     "95BD4E69-40B1-4156-BEDA-85E507DBE335.jpeg": "c356e2f52565599c700a875242aa3b8eddb443c65c0ab114145e63889c3d6d11",
     "84959502-3F8B-4A17-B000-C702B884EC4B.jpeg": "4108c890f347e2aa08d0f9d7d6067f3a7d84bdabf4c64faa490f3145fb6607a0",
-    "CE254147-0D15-4B3A-8261-CFE651729661.jpeg": "f5222b2e350c1e2aac3e12ab4ecd217c0b180b7c1d818ba9a27975acfcdaadfd"
+    "CE254147-0D15-4B3A-8261-CFE651729661.jpeg": "f5222b2e350c1e2aac3e12ab4ecd217c0b180b7c1d818ba9a27975acfcdaadfd",
+    "44436DD7-2421-47B7-A988-61A73452F0C4.jpeg": "002d1f98480b93c8ff801d9d66a900dacda25628b77da81352fb00de1f2a32dd",
+    "5C5404A3-6981-4A3A-B4D7-DA7A06E527F9.jpeg": "b4d2b463e51e8be7e1d5fc9c208c0045b0bcedbb764adefd808098d15d6bbbf2",
+    "FCA4BA7E-40BC-46C0-B723-17A9DAF6D5E2.png": "5b3f771ef9a367db6cbaa939dbe618e4c8980b079ebeaa8960817e85c2e177fc",
+    "1212256F-607B-482A-9689-83D1EE6CE48F.png": "6e87e983187dcfdc1bc5155eae40f21a89cac8907c7b84dfec1fc5dff0e03e40",
+    "85DE26C8-BD56-444A-A316-C43F5E2BA85C.png": "845ba1dcda9c261337075a208ed165ee22c1abc605622f619637fea8fad509ba",
+    "353BF0AA-917A-44BC-AB35-83D18D35FBDE.png": "7c2b6072414316900e4fa5ce195338a9db696d096889dea3b7570a57f02cafc7",
+    "8C4BAD34-4137-42E5-B3AD-E8C3572CBCB8.png": "db055d61f2da7b998cfc7a3deb6be0183b849330cb2752ec197176d83d27b90a"
   },
+  "deduplicated_uploads": [
+    {"uploaded":"E9D14D96-9BB6-4AEE-98A3-E00BC5F6E21F.jpeg","same_as":"84959502-3F8B-4A17-B000-C702B884EC4B.jpeg"},
+    {"uploaded":"9C548827-F2FB-401D-9050-4748464B3E1D.jpeg","same_as":"CE254147-0D15-4B3A-8261-CFE651729661.jpeg"},
+    {"uploaded":"A4700DC7-8755-488D-AFA8-C83905353511.jpeg","same_as":"95BD4E69-40B1-4156-BEDA-85E507DBE335.jpeg"}
+  ],
   "visual_findings": [
     {"id":"V01_INTENTIONAL_ATTRITION","source_observation":"The funnel deliberately routes through both L-step and email even though the list shrinks to about 65%, framing the loss as screening for better-fit customers rather than pure failure.","ultimate_loop_disposition":"REINFORCES_HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY"},
     {"id":"V02_COMMITMENT_LEVERAGE","source_observation":"The material explicitly describes sunk-cost/self-justification effects and a paid closing session as mechanisms that can increase purchase inclination.","ultimate_loop_disposition":"ADVERSARIAL_DEATH_MEMORY_ONLY_REINFORCES_HM_EXT04"},
     {"id":"V03_CHOICE_ARCHITECTURE","source_observation":"The material distinguishes coercion from nudging while preserving an apparent choice path.","ultimate_loop_disposition":"NEW_CHALLENGER_HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION","attack_translation":"A Human Gate cannot be treated as meaningful authorization merely because a click occurred; refusal visibility, material consequence disclosure, current decision state, and system-applied pressure must be evaluated."},
     {"id":"V04_FRONT_EFFECT","source_observation":"The deck argues that presentation/distribution can materially change outcomes even when the underlying product is similar.","ultimate_loop_disposition":"SUPPORT_ONLY_FOR_ADAPTER_AND_END_TO_END_OUTCOME_MODELS"},
     {"id":"V05_PARETO_FOCUS","source_observation":"The deck recommends concentrating effort on a small number of high-leverage factors instead of optimizing everything equally.","ultimate_loop_disposition":"HEURISTIC_ONLY_NOT_AUTHORITY","attack_translation":"Pareto/leverage claims may prioritize work but may not skip unique safety, evidence, or authority obligations."},
-    {"id":"V06_MARKET_OUT_MARKET_SWITCH","source_observation":"The deck explicitly proposes changing the market/reference frame to change perceived price/value comparisons.","ultimate_loop_disposition":"NEW_CHALLENGER_HM_EXT06_REFERENCE_CLASS_FREEZE","attack_translation":"Changing the comparator can change an apparent result without changing the system. Before/after claims therefore remain bound to a frozen reference class and measurement protocol."}
+    {"id":"V06_MARKET_OUT_MARKET_SWITCH","source_observation":"The deck explicitly proposes changing the market/reference frame to change perceived price/value comparisons.","ultimate_loop_disposition":"NEW_CHALLENGER_HM_EXT06_REFERENCE_CLASS_FREEZE","attack_translation":"Changing the comparator can change an apparent result without changing the system. Before/after claims therefore remain bound to a frozen reference class and measurement protocol."},
+    {"id":"V07_SCREENED_BACKEND_SUCCESS","source_observation":"The deck explicitly sells the backend only after multiple screening/education steps and describes the remaining audience as higher-intent or better-fit customers.","ultimate_loop_disposition":"NEW_CHALLENGER_HM_EXT07_SELECTION_LINEAGE_GUARD","attack_translation":"Evidence measured after a deliberate selection funnel is evidence about that selected cohort. It cannot silently become evidence about the original population."},
+    {"id":"V08_STAGE_CHANGES_CUSTOMER_STATE","source_observation":"The deck repeatedly uses education, free value, CTA exposure, payment, fan formation, and prior purchase to change later willingness, expectations, and repeat behavior.","ultimate_loop_disposition":"NEW_CHALLENGER_HM_EXT08_INTERVENTION_HISTORY_BINDING","attack_translation":"Later observations are conditional on the path of prior interventions; post-intervention state is not automatically an intrinsic baseline property."},
+    {"id":"V09_REPEAT_EXPECTATION_DRIFT","source_observation":"Repeated middle-tier purchases are described as capable of increasing expectations for later offers and changing downstream economics.","ultimate_loop_disposition":"REINFORCES_END_TO_END_OBJECTIVE_AND_INTERVENTION_HISTORY","attack_translation":"A locally successful repeated intervention can mutate downstream expectations and therefore must be evaluated against the protected end-to-end outcome."},
+    {"id":"V10_YOUTUBE_3R_AND_PASTOR","source_observation":"The summary shows content selection via Reduce/Reuse/Recycle and a PASTOR-like script sequence.","ultimate_loop_disposition":"SUPPORT_PROFILE_ONLY","attack_translation":"Useful as content-production adapters, not universal Ultimate Loop doctrine."}
   ],
   "hard_boundaries": [
     "CHOICE_PRESENTATION != MEANINGFUL_AUTHORIZATION",
     "SUNK_COST != CURRENT_CONSENT",
     "PARETO_HEURISTIC != AUTHORITY_TO_SKIP_UNIQUE_OBLIGATION",
-    "COMPARATOR_SHIFT != PERFORMANCE_IMPROVEMENT"
+    "COMPARATOR_SHIFT != PERFORMANCE_IMPROVEMENT",
+    "SELECTED_COHORT_EVIDENCE != POPULATION_EVIDENCE",
+    "POST_INTERVENTION_STATE != INTRINSIC_BASELINE_PROPERTY"
   ],
-  "validation": {"workflow_run_id":32118868001,"hybrid_destructive_tests":"20/20 PASS"}
+  "validation": {"status":"PENDING_AFTER_EXT07_EXT08_UPDATE"}
 }
