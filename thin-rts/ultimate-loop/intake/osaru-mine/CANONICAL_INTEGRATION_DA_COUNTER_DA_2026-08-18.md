@@ -108,9 +108,19 @@ The integration deliberately does **not** add new lifecycle states for every gua
 - typed re-entry route;
 - decision-succession state.
 
-`lifecycle.py` consumes applicable blocking states before an otherwise eligible consequential transition. Compatibility is explicit rather than implicit: a workload must declare `integrity_applicability = NOT_APPLICABLE` when the v0.2 envelope genuinely does not apply; `REQUIRED` binds the profile; omission is not treated as N/A.
+`lifecycle.py` consumes applicable blocking states before an otherwise eligible consequential transition. Compatibility is explicit and evidence-bound rather than implicit:
+
+```text
+REQUIRED       -> recognized non-empty profile + PASS
+NOT_APPLICABLE -> verifier/frozen-workload evidence ref required
+UNDECLARED     -> consequential transition blocked
+```
 
 `MISSING APPLICABILITY != NOT_APPLICABLE`
+
+`BARE NOT_APPLICABLE LABEL != BOUND NOT_APPLICABLE`
+
+`REQUIRED EMPTY PROFILE != PASS`
 
 A proven local failure exposes the smallest existing `reentry_route`; uncertain causality returns to `BUILD / ANALYSIS_REOPEN` rather than guessing.
 
@@ -119,28 +129,38 @@ A proven local failure exposes the smallest existing `reentry_route`; uncertain 
 The integration was attacked for the following regressions:
 
 1. **platform creep** — binder must perform no deployment/publication/payment/monitoring action;
-2. **legacy behavior breakage** — old lifecycle fixtures must keep passing through an explicit `NOT_APPLICABLE` compatibility declaration when no v0.2 integrity profile applies;
+2. **legacy behavior breakage** — old lifecycle fixtures must keep passing through an explicit, evidence-bound `NOT_APPLICABLE` compatibility declaration when no v0.2 integrity profile applies;
 3. **global rebuild explosion** — unrelated upstream changes must not stale unrelated artifacts;
 4. **authority weakening** — integrity PASS must never create promotion/failover authority;
 5. **Human Gate overreach** — agency checks apply only when the authority source is explicitly `HUMAN_GATE`;
 6. **PHOENIX conflation** — `PHOENIX_READY` must remain distinct from `DECISION_SUCCESSION_READY`;
 7. **correlation routing** — correlated-only failures must reopen analysis, not jump locally;
 8. **scope laundering** — component/cohort/proxy evidence must not silently establish broader properties;
-9. **applicability omission bypass** — a caller must not bypass all new contracts by omitting the integrity envelope.
+9. **applicability omission bypass** — a caller must not bypass all new contracts by omitting the integrity envelope;
+10. **empty/bare applicability bypass** — `REQUIRED {}` and an unbound `NOT_APPLICABLE` label must not count as proof of applicability.
 
-### Counter-DA finding: omission bypass
+### Counter-DA findings: applicability bypasses
 
-The first green integration still allowed an otherwise eligible transition when the caller supplied no `integrity` profile at all. That was backward-compatible but not fail-closed enough for a canonical v0.2 boundary: a caller that should have been checked could avoid the check by silence.
+The first green integration allowed an otherwise eligible transition when the caller supplied no `integrity` profile at all. That was backward-compatible but not fail-closed enough for a canonical v0.2 boundary.
 
 Killed behavior:
 
 `MISSING INTEGRITY ENVELOPE -> IMPLICIT NOT_APPLICABLE`
 
-Survivor:
+A second diff audit then found two weaker forms of the same attack:
+
+- `REQUIRED` plus an empty `{}` could otherwise become “nothing failed”;
+- `NOT_APPLICABLE` as a bare label could otherwise become a mechanically easy bypass.
+
+Killed behavior:
+
+`EXPLICIT LABEL != PROVEN APPLICABILITY`
+
+Final survivor:
 
 ```text
-REQUIRED       -> profile required and must pass
-NOT_APPLICABLE -> explicit compatibility path
+REQUIRED       -> profile must contain a recognized integrity section and pass
+NOT_APPLICABLE -> applicability evidence ref must bind the N/A decision
 UNDECLARED     -> consequential transition blocked
 ```
 
@@ -148,12 +168,12 @@ This handshake applies at `core freeze`, partial/full replacement, and emergency
 
 ## 6. Contract evidence
 
-GitHub Actions run `32124016493` completed successfully after the applicability-bypass fix.
+GitHub Actions run `32124868048` completed successfully after both applicability-bypass repairs.
 
 Observed test counts from its job log:
 
 - canonical integrity destructive tests: **14/14 PASS**;
-- canonical integrity lifecycle connection tests: **12/12 PASS**;
+- canonical integrity lifecycle connection tests: **14/14 PASS**;
 - existing lifecycle regression tests: **17/17 PASS**;
 - existing METEOR lifecycle death-memory tests: **13/13 PASS**;
 - operator intake regression: **5/5 PASS**;
@@ -170,9 +190,9 @@ DA result:
 
 `CHALLENGER-ONLY MERGE = INSUFFICIENT`
 
-Counter-DA result after minimal canonical connection and omission-bypass repair:
+Counter-DA result after minimal canonical connection and applicability-bypass repairs:
 
-`CURRENT LIFECYCLE + CROSS-CUTTING INTEGRITY CONTRACTS + EXPLICIT APPLICABILITY = SURVIVOR`
+`CURRENT LIFECYCLE + CROSS-CUTTING INTEGRITY CONTRACTS + EVIDENCE-BOUND APPLICABILITY = SURVIVOR`
 
 The integration fills gaps that were not previously explicit/operational:
 
@@ -181,12 +201,12 @@ The integration fills gaps that were not previously explicit/operational:
 - selective stale propagation from upstream decisions to dependent derived artifacts;
 - meaningful Human Gate agency when human choice is the authority source;
 - decision-capability succession distinct from recovery/retrieval;
-- fail-closed applicability so omission cannot silently disable the new contracts.
+- fail-closed applicability so omission, empty REQUIRED envelopes and bare N/A labels cannot silently disable the new contracts.
 
 It does so without adding a new top-level lifecycle or weakening existing authority boundaries in the current regression corpus.
 
 Final merge condition:
 
 1. final PR head CI succeeds with the recorded integration tests;
-2. final diff audit finds no accidental authority expansion, UNKNOWN->PASS conversion, global rebuild requirement, applicability omission bypass, or domain-specific doctrine promoted as universal;
+2. final diff audit finds no accidental authority expansion, UNKNOWN->PASS conversion, global rebuild requirement, applicability bypass, or domain-specific doctrine promoted as universal;
 3. PR head remains mergeable and matches the reviewed SHA.
