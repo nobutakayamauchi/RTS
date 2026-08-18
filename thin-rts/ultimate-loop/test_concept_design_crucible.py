@@ -138,6 +138,127 @@ class ConceptDesignCrucibleTests(unittest.TestCase):
         report = module.evaluate(case)
         self.assertEqual(report["disposition"], "IGNORE_NONMATERIAL_CONTEXT")
 
+    def test_changed_dependency_marks_derived_artifact_stale(self):
+        case = base("CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION")
+        case.update({
+            "dependency_binding_state":"BOUND",
+            "dependency_fields":["target","benefit","offer"],
+            "changed_upstream_fields":["benefit"],
+            "derived_from_upstream_revision":"concept@v1",
+            "current_upstream_revision":"concept@v2",
+            "recomputed_from_current":False,
+            "bounded_revalidation_state":"MISSING",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "STALE_RECOMPUTE_REQUIRED")
+        self.assertIn("STALE_DEPENDENCY:benefit", report["blocking_states"])
+
+    def test_unrelated_upstream_change_does_not_invalidate_artifact(self):
+        case = base("CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION")
+        case.update({
+            "dependency_binding_state":"BOUND",
+            "dependency_fields":["target","benefit"],
+            "changed_upstream_fields":["internal_note"],
+            "derived_from_upstream_revision":"concept@v1",
+            "current_upstream_revision":"concept@v2",
+            "recomputed_from_current":False,
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "CURRENT_UNAFFECTED_BY_DECLARED_CHANGE")
+
+    def test_bounded_revalidation_can_rescue_stale_slice(self):
+        case = base("CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION")
+        case.update({
+            "dependency_binding_state":"BOUND",
+            "dependency_fields":["target","benefit"],
+            "changed_upstream_fields":["benefit"],
+            "derived_from_upstream_revision":"concept@v1",
+            "current_upstream_revision":"concept@v2",
+            "recomputed_from_current":False,
+            "bounded_revalidation_state":"PASS",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "CURRENT_BY_BOUNDED_REVALIDATION")
+
+    def test_unknown_dependency_map_cannot_claim_freshness(self):
+        case = base("CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION")
+        case.update({"dependency_binding_state":"UNKNOWN","dependency_fields":[],"changed_upstream_fields":["target"]})
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "BLOCK_DERIVED_FRESHNESS_CLAIM")
+
+    def test_context_change_forces_policy_reselection(self):
+        case = base("CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION")
+        case.update({
+            "policy_ref":"funnel-policy@A",
+            "applicability_state":"EVIDENCE_BOUND",
+            "frozen_context_ref":"phase@zero-to-one",
+            "current_context_ref":"phase@scale",
+            "policy_reevaluation_state":"MISSING",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "POLICY_RESELECTION_REQUIRED")
+
+    def test_context_bound_policy_can_remain_valid(self):
+        case = base("CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION")
+        case.update({
+            "policy_ref":"funnel-policy@A",
+            "applicability_state":"EVIDENCE_BOUND",
+            "frozen_context_ref":"phase@zero-to-one",
+            "current_context_ref":"phase@zero-to-one",
+            "policy_reevaluation_state":"NOT_NEEDED",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "CONTEXT_BOUND_POLICY_VALID")
+
+    def test_contextual_policy_cannot_claim_universality(self):
+        case = base("CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION")
+        case.update({
+            "policy_ref":"funnel-policy@A",
+            "applicability_state":"UNIVERSAL_ASSERTION",
+            "frozen_context_ref":"phase@A",
+            "current_context_ref":"phase@A",
+            "policy_reevaluation_state":"NOT_NEEDED",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "REJECT_POLICY_OVERGENERALIZATION")
+
+    def test_abstract_success_cannot_refute_specific_failure(self):
+        case = base("CD_EXT07_ABSTRACTION_LEVEL_BINDING")
+        case.update({
+            "evidence_scope":"checkout/http500",
+            "claim_scope":"system/user-value",
+            "scope_relation":"CLAIM_NARROWER_THAN_EVIDENCE",
+            "scope_bridge_validation_state":"MISSING",
+            "proposed_use":"REFUTE_SPECIFIC_FAILURE",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "BLOCK_ABSTRACTION_ESCAPE")
+        self.assertIn("ABSTRACTION_LEVEL_DRIFT", report["blocking_states"])
+
+    def test_narrow_success_cannot_generalize_without_bridge(self):
+        case = base("CD_EXT07_ABSTRACTION_LEVEL_BINDING")
+        case.update({
+            "evidence_scope":"one-adapter/pass",
+            "claim_scope":"all-adapters/system-pass",
+            "scope_relation":"EVIDENCE_NARROWER_THAN_CLAIM",
+            "scope_bridge_validation_state":"MISSING",
+            "proposed_use":"GENERALIZE_SUCCESS",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "BLOCK_ABSTRACTION_ESCAPE")
+
+    def test_validated_scope_bridge_allows_cross_level_claim(self):
+        case = base("CD_EXT07_ABSTRACTION_LEVEL_BINDING")
+        case.update({
+            "evidence_scope":"component-suite",
+            "claim_scope":"subsystem",
+            "scope_relation":"EVIDENCE_NARROWER_THAN_CLAIM",
+            "scope_bridge_validation_state":"PASS",
+            "proposed_use":"SUPPORT",
+        })
+        report = module.evaluate(case)
+        self.assertEqual(report["disposition"], "SCOPE_BOUND_BY_VALIDATED_BRIDGE")
+
 
 if __name__ == "__main__":
     unittest.main()
