@@ -1,4 +1,4 @@
-name: Validate OSARU operator intake
+name: Validate OSARU knowledge intake
 
 on:
   pull_request:
@@ -7,7 +7,10 @@ on:
       - 'thin-rts/ultimate-loop/test_operator_intake.py'
       - 'thin-rts/ultimate-loop/osaru_extension_crucible.py'
       - 'thin-rts/ultimate-loop/test_osaru_extension_crucible.py'
+      - 'thin-rts/ultimate-loop/hybrid_marketing_crucible.py'
+      - 'thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py'
       - 'thin-rts/ultimate-loop/intake/osaru-mine/**'
+      - 'thin-rts/ultimate-loop/intake/hybrid-marketing/**'
       - '.github/workflows/validate-osaru-operator-intake.yml'
   workflow_dispatch:
 
@@ -28,10 +31,14 @@ jobs:
           python -m py_compile thin-rts/ultimate-loop/test_operator_intake.py
           python -m py_compile thin-rts/ultimate-loop/osaru_extension_crucible.py
           python -m py_compile thin-rts/ultimate-loop/test_osaru_extension_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/hybrid_marketing_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py
       - name: Run intake regression tests
         run: python thin-rts/ultimate-loop/test_operator_intake.py
-      - name: Run extension destructive crucible
+      - name: Run OSARU extension destructive crucible
         run: python thin-rts/ultimate-loop/test_osaru_extension_crucible.py
+      - name: Run hybrid marketing destructive crucible
+        run: python thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py
       - name: Validate universal operator pack
         run: |
           python thin-rts/ultimate-loop/operator_intake.py \
