@@ -1,0 +1,64 @@
+{
+  "schema": "ultimate-loop-hybrid-marketing-visual-supplement/v0",
+  "status": "CHALLENGER_EVIDENCE_ONLY_NON_CANONICAL",
+  "authority_effect": "NONE",
+  "canonical_promotion_authorized": false,
+  "source": {
+    "kind": "user-provided screenshots of the 143-page Hybrid Marketing deck",
+    "visible_page_markers": [97, 101, 107, 111, 114, 123],
+    "note": "Screenshots include surrounding contiguous panels in addition to the visible page counters. They reinforce selected visual claims; they are not a replacement for the full source PDF."
+  },
+  "screenshot_sha256": {
+    "DE0EC018-11DF-475B-A665-ADB2D6315E50.png": "59c6961b259d0fcff9248b5ec79978fcc6ccb1f34cf2465c623c9d2760567e31",
+    "36B16003-A4D1-4992-86FE-2BED373E761E.png": "5cbacf16f18ce61d1039e4e08d821880ed6558f38f1510f505aa43eba14fdef2",
+    "BB59636A-F717-4CCB-910E-C9EA09A05A45.png": "2bb71c385eeaf4ad2f744abd61b8101af3c8ff600ac1b4ab704d6bec261ec3f4",
+    "39AFF68E-745E-4FB4-9B7E-A2BFCFA39CBA.png": "f85e07f5c97316bc76c38354f1ab2db2382bb222a142a3cf816effb065c2405b",
+    "F551CA85-AF21-44F1-888E-2689C46169A0.png": "0f4654d83939c86dc08336d22705a91345f120c3c8b04caa46ff01d8c5e39c3b",
+    "61452639-770E-4336-AF99-49421CF32A9E.jpeg": "ffda40145bfb1af6a722e9dc4f0cbc94e8d294d1d70891768867ac1ff7aaf961",
+    "E267C423-1739-4D03-9CDE-7BEE441FE61E.jpeg": "80dde0d7360811254edc0e14327d040aa837a231c5eae7ed1ac49e830aa7a724",
+    "95BD4E69-40B1-4156-BEDA-85E507DBE335.jpeg": "c356e2f52565599c700a875242aa3b8eddb443c65c0ab114145e63889c3d6d11",
+    "84959502-3F8B-4A17-B000-C702B884EC4B.jpeg": "4108c890f347e2aa08d0f9d7d6067f3a7d84bdabf4c64faa490f3145fb6607a0",
+    "CE254147-0D15-4B3A-8261-CFE651729661.jpeg": "f5222b2e350c1e2aac3e12ab4ecd217c0b180b7c1d818ba9a27975acfcdaadfd"
+  },
+  "visual_findings": [
+    {
+      "id": "V01_INTENTIONAL_ATTRITION",
+      "source_observation": "The funnel deliberately routes through both L-step and email even though the list shrinks to about 65%, framing the loss as screening for better-fit customers rather than pure failure.",
+      "ultimate_loop_disposition": "REINFORCES_HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY"
+    },
+    {
+      "id": "V02_COMMITMENT_LEVERAGE",
+      "source_observation": "The material explicitly describes sunk-cost/self-justification effects and a paid closing session as mechanisms that can increase purchase inclination.",
+      "ultimate_loop_disposition": "ADVERSARIAL_DEATH_MEMORY_ONLY_REINFORCES_HM_EXT04"
+    },
+    {
+      "id": "V03_CHOICE_ARCHITECTURE",
+      "source_observation": "The material distinguishes coercion from nudging while preserving an apparent choice path.",
+      "ultimate_loop_disposition": "NEW_CHALLENGER_HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION",
+      "attack_translation": "A Human Gate cannot be treated as meaningful authorization merely because a click occurred; refusal visibility, material consequence disclosure, current decision state, and system-applied pressure must be evaluated."
+    },
+    {
+      "id": "V04_FRONT_EFFECT",
+      "source_observation": "The deck argues that presentation/distribution can materially change outcomes even when the underlying product is similar.",
+      "ultimate_loop_disposition": "SUPPORT_ONLY_FOR_ADAPTER_AND_END_TO_END_OUTCOME_MODELS"
+    },
+    {
+      "id": "V05_PARETO_FOCUS",
+      "source_observation": "The deck recommends concentrating effort on a small number of high-leverage factors instead of optimizing everything equally.",
+      "ultimate_loop_disposition": "HEURISTIC_ONLY_NOT_AUTHORITY",
+      "attack_translation": "Pareto/leverage claims may prioritize work but may not skip unique safety, evidence, or authority obligations."
+    },
+    {
+      "id": "V06_MARKET_OUT_MARKET_SWITCH",
+      "source_observation": "The deck explicitly proposes changing the market/reference frame to change perceived price/value comparisons.",
+      "ultimate_loop_disposition": "NEW_CHALLENGER_HM_EXT06_REFERENCE_CLASS_FREEZE",
+      "attack_translation": "Changing the comparator can change an apparent result without changing the system. Before/after claims therefore remain bound to a frozen reference class and measurement protocol."
+    }
+  ],
+  "hard_boundaries": [
+    "CHOICE_PRESENTATION != MEANINGFUL_AUTHORIZATION",
+    "SUNK_COST != CURRENT_CONSENT",
+    "PARETO_HEURISTIC != AUTHORITY_TO_SKIP_UNIQUE_OBLIGATION",
+    "COMPARATOR_SHIFT != PERFORMANCE_IMPROVEMENT"
+  ]
+}
