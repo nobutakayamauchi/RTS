@@ -27,7 +27,7 @@ The source PDF is available as a full deck. Text extraction and targeted visual 
 - authority cues as evidence of truth;
 - Pareto/80:20 as permission to skip unique evidence, safety, or authority obligations.
 
-## Hard boundaries
+## Hard boundary
 
 `MARKETING EFFECT != EVIDENCE VALIDITY`
 
