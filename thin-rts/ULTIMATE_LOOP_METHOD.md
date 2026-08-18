@@ -64,6 +64,16 @@ Offline/library artifacts may have no live deployment surface. Their workload mu
 
 Ultimate Loop may only act on evidence to the extent that the evidence proves the claimed property for the claimed scope and current lineage.
 
+Before a consequential transition (`core freeze`, `partial/full replacement`, or `emergency failover`) can be authorized, integrity applicability must be explicit:
+
+- `REQUIRED` — bind the applicable integrity profile and pass it;
+- `NOT_APPLICABLE` — explicitly declare that no v0.2 integrity profile applies to this transition;
+- `UNDECLARED` — fail closed for the consequential transition.
+
+`MISSING APPLICABILITY != NOT_APPLICABLE`
+
+A `REQUIRED` declaration without its profile also fails closed. This prevents a caller from bypassing the new contracts merely by omitting the integrity envelope while preserving an explicit compatibility path for genuinely non-applicable workloads.
+
 Canonical boundaries:
 
 - `OBSERVATION != INTERPRETATION`;
@@ -332,6 +342,6 @@ Every survivor inherits useful memory of the dead:
 
 ## Method invariant
 
-**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep evidence bound to what it actually proves. Invalidate only the derived artifacts whose consumed upstream facts changed. Re-enter the smallest existing gate only when causality is proven; otherwise reopen analysis. Keep meaningful human authority separate from system capability. Keep challenging the incumbent when reality changes. Verify deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome, decision boundaries, and memory required to regenerate it.**
+**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep evidence bound to what it actually proves. Invalidate only the derived artifacts whose consumed upstream facts changed. Re-enter the smallest existing gate only when causality is proven; otherwise reopen analysis. Require integrity applicability to be explicit before consequential transitions. Keep meaningful human authority separate from system capability. Keep challenging the incumbent when reality changes. Verify deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome, decision boundaries, and memory required to regenerate it.**
 
 That full method is formally the **Development Sequence Loop**, commonly called **Ultimate Loop**.
