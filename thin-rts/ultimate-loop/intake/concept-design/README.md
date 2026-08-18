@@ -2,7 +2,10 @@
 
 Status: `CHALLENGER_KNOWLEDGE / NON_CANONICAL`
 
-Source: `おさる式コンセプトの極意` Google Slides.
+Sources:
+
+- `おさる式コンセプトの極意` Google Slides.
+- user-provided `コンセプトのエクセル.mp4`, provenance-bound in `concept-worksheet-video-supplement-20260818.json`.
 
 ## Coverage boundary
 
@@ -11,65 +14,89 @@ The public HTML presentation view exposed slide identities for `1..139`, but rec
 - `1..94`: text-recovered and mined.
 - `95..139`: `UNKNOWN` (possibly image-only or otherwise inaccessible in the available view).
 
-No claim of full visual inspection is made. Unknown content is not inferred from neighboring slides.
+The worksheet video is a 70.033333-second, 512x1108, 30fps screen recording. Representative frames were extracted and visually inspected. No OCR-derived truth claim is used.
 
 ## Source structure recovered
 
-The accessible portion repeatedly composes:
+The slide source repeatedly composes:
 
 `demand -> actor-specific advantage -> competitive gap -> target/problem model -> downstream product/outcome -> one core concept -> adapter-specific rendering -> market feedback -> iteration`
 
-Most of this overlaps the existing 100-task OSARU operator pack and the Hybrid Marketing intake. The value of this pack is therefore in the **guards exposed by the overlap**, not in adding a second marketing method.
+The worksheet turns that concept into an explicit dataflow. Visible sections include:
+
+`base strategy inputs -> launch-wide concept -> goal/phase/funnel selection -> prelaunch -> lead magnet -> Why/What/How/Action video structure -> landing page -> offer design`
+
+A separate strategy column stores concrete upstream decisions, and later rows reuse earlier outputs as named inputs. This exposes dependency/staleness failure modes that the slide deck alone did not make as explicit.
 
 ## Surviving challenger deltas
 
 ### 1. Semantic-invariant adapter guard
 
-The source argues for one core concept rendered differently by channel. Generalized:
-
 `ONE SEMANTIC CORE != IDENTICAL PRESENTATION`
 
-This refines the existing canonical-source support contract: protected semantics and provenance stay invariant, while presentation form may change. It is not a new canonical subsystem.
+Protected semantics and provenance stay invariant, while presentation form may change. This refines the existing canonical-source support contract rather than creating a new subsystem.
 
 ### 2. Observation / inference layering
 
-The source distinguishes stated wants from deeper inferred needs and encourages identifying failed prior solutions. That is useful for hypothesis generation but dangerous as evidence doctrine.
-
-Generalized hard boundary:
-
 `OBSERVED SIGNAL != INFERRED LATENT NEED`
 
-Raw observations, interpretations/hypotheses, and independently validated derived facts must remain separately typed. A persuasive or repeated interpretation cannot silently become first-party evidence.
-
-This survives as a possible canonical evidence invariant.
+Raw observations, interpretations/hypotheses, and independently validated derived facts remain separately typed.
 
 ### 3. End-to-end objective binding
 
-The source reverse-designs the upstream concept from the downstream product/outcome. Generalized:
-
 `LOCAL METRIC WIN != END-TO-END OUTCOME WIN`
 
-This mostly reinforces the existing frozen human-important outcome and same-workload comparison rather than creating a new subsystem. It may be `NOT_APPLICABLE` where no downstream surface exists.
+This reinforces the existing frozen human-important outcome and same-workload comparison.
 
 ### 4. Context-conditioned telemetry
 
-The source's feedback loop asks not only whether reaction was positive/negative, but **who** responded to **which wording** and **how**. Generalized:
-
 `AGGREGATE METRIC != UNIFORM EFFECT`
 
-A material evidence-bound cohort/context may invalidate a global diagnosis and require targeted analysis. Arbitrary or tiny post-hoc segmentation cannot veto the aggregate.
+A material evidence-bound cohort/context may invalidate a global diagnosis. Arbitrary or immaterial post-hoc segmentation cannot veto the aggregate.
 
-This survives as a candidate guard for the existing filter-aware telemetry + bottleneck re-entry path.
+### 5. Derived-artifact staleness propagation
 
-## Deliberately rejected as universal doctrine
+The worksheet visibly threads earlier decisions into later assets. Generalized:
+
+`UPSTREAM DECISION CHANGE => DEPENDENT DERIVED ARTIFACT STALE UNTIL RECOMPUTED OR REVALIDATED`
+
+This is field-sensitive, not a demand to rebuild everything. If the changed upstream field is outside a derived artifact's declared dependency set, the artifact stays current. If an affected field changed, the artifact is stale until recomputed from the current upstream revision or boundedly revalidated.
+
+This survives as a strong canonical evidence/control candidate.
+
+### 6. Context-bound policy selection
+
+The worksheet explicitly asks for business phase before selecting a funnel/policy. Generalized:
+
+`CONTEXTUAL POLICY != UNIVERSAL POLICY`
+
+A policy selected for a material maturity/risk/operating context cannot silently become universal doctrine. If the context that selected it changes, the policy is stale until re-evaluated.
+
+This currently looks more like a profile/selection refinement than a wholly new subsystem.
+
+### 7. Abstraction-level binding
+
+The worksheet includes an explicit concept abstraction-level check. Generalized:
+
+`ABSTRACT SUCCESS != REFUTATION OF CONCRETE FAILURE`
+
+and
+
+`NARROW EVIDENCE != BROADER CLAIM WITHOUT SCOPE BRIDGE`
+
+A broad statement such as “the system works” cannot erase a concrete checkout failure, while one passing component cannot establish whole-system correctness without validated coverage. This overlaps construct-validity/context guards but adds a useful anti-evasion scope check.
+
+## Support-only / deliberately rejected as universal doctrine
 
 - specific social-platform preferences;
 - fixed concept/copy formulas;
+- Why/What/How/Action as mandatory for all workloads;
+- fixed launch/funnel patterns;
 - fixed high-ticket product assumptions;
 - story/authority as proof of factual correctness;
 - inferred latent needs treated as observed customer facts;
 - persuasive claims that a prior solution is causally wrong without independent evidence;
-- universal targeting or messaging rules.
+- universal targeting, funnel, or messaging rules.
 
 ## Hard invariants retained
 
@@ -80,5 +107,11 @@ This survives as a candidate guard for the existing filter-aware telemetry + bot
 `AGGREGATE != UNIFORM`
 
 `LOCAL OPTIMUM != PROTECTED OUTCOME`
+
+`UPSTREAM CHANGE != DOWNSTREAM FRESHNESS`
+
+`CONTEXTUAL POLICY != UNIVERSAL POLICY`
+
+`ABSTRACT SUCCESS != REFUTATION OF CONCRETE FAILURE`
 
 `CONTRACT METEOR PASS != CANONICAL PROMOTION`
