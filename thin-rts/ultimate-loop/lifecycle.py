@@ -41,6 +41,8 @@ DEFAULT_POLICY = {
     "full_replace_delta_pct": 30.0,
 }
 
+VALID_INTEGRITY_APPLICABILITY = {"REQUIRED", "NOT_APPLICABLE"}
+
 
 def _parse_time(value: str) -> datetime:
     if not isinstance(value, str) or not value.strip():
@@ -235,10 +237,19 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
     if current_state not in VALID_STATES:
         blocks.append("INVALID_CURRENT_STATE")
 
-    integrity_report = integrity.evaluate(case.get("integrity"))
+    applicability = case.get("integrity_applicability", "UNDECLARED")
+    integrity_profile = case.get("integrity")
+    if applicability not in VALID_INTEGRITY_APPLICABILITY | {"UNDECLARED"}:
+        blocks.append("INVALID_INTEGRITY_APPLICABILITY")
+        reasons.append("Integrity applicability must be REQUIRED or NOT_APPLICABLE before a consequential transition.")
+    if applicability == "REQUIRED" and integrity_profile is None:
+        blocks.append("REQUIRED_INTEGRITY_PROFILE_MISSING")
+        reasons.append("A workload that declares integrity REQUIRED must bind the applicable integrity evidence instead of omitting the profile.")
+
+    integrity_report = integrity.evaluate(integrity_profile)
     blocks.extend(integrity_report["blocking_states"])
     reasons.extend(integrity_report["reasons"])
-    integrity_blocked = integrity_report["classification"] != "PASS"
+    integrity_blocked = integrity_report["classification"] != "PASS" or "REQUIRED_INTEGRITY_PROFILE_MISSING" in blocks or "INVALID_INTEGRITY_APPLICABILITY" in blocks
 
     watch_action = _trigger_action(case, at, blocks, reasons)
     recovery_state = _recovery_state(case, blocks, reasons)
@@ -246,15 +257,28 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
         case, watch_action, recovery_state, blocks, reasons
     )
 
+    authority = case.get("authority") or {}
+    core_transition_ready = (
+        current_state == "BUILD"
+        and case.get("core_acceptance") == "PASS"
+        and _authorized(authority, "promote")
+        and not (case.get("material_durable") is True and recovery_state not in {"RECOVERABLE", "PHOENIX_READY"})
+    )
+    consequential_transition_ready = transition_authorized or core_transition_ready
+
+    if consequential_transition_ready and applicability == "UNDECLARED":
+        blocks.append("INTEGRITY_APPLICABILITY_UNDECLARED")
+        reasons.append("A consequential transition cannot treat missing integrity applicability as NOT_APPLICABLE. Declare REQUIRED or NOT_APPLICABLE explicitly.")
+        integrity_blocked = True
+
     if integrity_report["reentry_route"] == "ANALYSIS_REOPEN" and case.get("candidate"):
         disposition = "BLOCKED_PENDING_INTEGRITY_REVIEW"
         transition_authorized = False
     elif integrity_blocked and transition_authorized:
         disposition = "INTEGRITY_BLOCKED"
         transition_authorized = False
-        reasons.append("A technically eligible transition cannot proceed while applicable evidence, freshness, or Human Gate integrity is blocked.")
+        reasons.append("A technically eligible transition cannot proceed while applicable evidence, freshness, Human Gate integrity, or applicability binding is blocked.")
 
-    authority = case.get("authority") or {}
     next_state = current_state if current_state in VALID_STATES else "BUILD"
 
     if integrity_report["reentry_route"] == "ANALYSIS_REOPEN":
@@ -265,7 +289,7 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
                 blocks.append("DURABLE_CORE_RECOVERY_NOT_PROVEN")
                 reasons.append("A materially durable core cannot freeze while recovery remains unproven.")
             elif integrity_blocked:
-                reasons.append("Core acceptance cannot freeze a durable state while applicable integrity evidence is blocked.")
+                reasons.append("Core acceptance cannot freeze a durable state while applicable integrity or applicability evidence is blocked.")
             elif _authorized(authority, "promote"):
                 next_state = "STABLE"
             else:
@@ -304,6 +328,7 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
         "candidate_disposition": disposition,
         "transition_authorized": transition_authorized,
         "recovery_state": recovery_state,
+        "integrity_applicability_state": applicability,
         "reentry_route": integrity_report["reentry_route"],
         "evidence_integrity_state": integrity_report["evidence_state"],
         "derived_artifact_freshness_state": integrity_report["freshness_state"],
