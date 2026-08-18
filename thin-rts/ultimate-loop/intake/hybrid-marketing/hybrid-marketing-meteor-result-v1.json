@@ -1,0 +1,23 @@
+{
+  "schema":"ultimate-loop-hybrid-marketing-meteor-result/v0",
+  "frame_id":"ultimate-loop-method/hybrid-marketing-deltas-v1",
+  "status":"CONTRACT_METEOR_COMPLETE_UNDER_CURRENT_REPOSITORY_EVIDENCE",
+  "authority_effect":"NONE",
+  "canonical_promotion_authorized":false,
+  "source_page_coverage":"143/143",
+  "results":[
+    {"extension_id":"HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY","verdict":"CANONICAL_EXTENSION_CANDIDATE_AS_EXT03_GUARD","canonical_candidate":true},
+    {"extension_id":"HM_EXT02_EVIDENCE_CONSTRUCT_VALIDITY","verdict":"CANONICAL_EXTENSION_CANDIDATE","canonical_candidate":true},
+    {"extension_id":"HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT","verdict":"STANDBY_RESEARCH","canonical_candidate":false},
+    {"extension_id":"HM_EXT04_COMMITMENT_CONTAMINATION_GUARD","verdict":"HARD_INVARIANT_CANDIDATE_UNDER_AUTHORITY_GATE","canonical_candidate":false}
+  ],
+  "repository_validation_expected":{"hybrid_extension_destructive_tests":"13/13 PASS"},
+  "hard_invariants":[
+    "SUNK_COST != CURRENT_CONSENT",
+    "PAST_COMMITMENT != CURRENT_AUTHORITY",
+    "GATE_PASS != UNMEASURED_PROPERTY",
+    "LOW_STAGE_CONVERSION != BOTTLENECK_WITHOUT_STAGE_SEMANTICS",
+    "SEQUENCE_SPEED != AUTHORITY_TO_SKIP_UNIQUE_OBLIGATION"
+  ],
+  "next_gate":"Real same-workload validation of filter-aware EXT03 routing and cross-domain proxy-evidence failures before any canonical patch. Short-circuit remains research-only until missing-obligation attacks are exercised on real workloads."
+}
