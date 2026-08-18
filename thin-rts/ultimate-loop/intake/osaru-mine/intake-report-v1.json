@@ -1,0 +1,30 @@
+{
+  "blocking_states": [],
+  "candidate_extension_count": 5,
+  "candidate_extension_ids": [
+    "EXT01_FIRST_PARTY_SIGNAL_BINDING",
+    "EXT02_CANONICAL_SOURCE_COMPILER",
+    "EXT03_BOTTLENECK_REENTRY_ROUTING",
+    "EXT04_SCALE_PROOF_GATE",
+    "EXT05_DECISION_CAPABILITY_SUCCESSION"
+  ],
+  "canonical_promotion_authorized": false,
+  "classification": "PASS",
+  "operator_count": 20,
+  "pack_id": "osaru-mine-universal-operators-v1",
+  "reasons": [],
+  "schema": "ultimate-loop-knowledge-intake-report/v0",
+  "source_task_coverage_complete": true,
+  "source_task_coverage_count": 100,
+  "disposition": "ADMIT_AS_CHALLENGER_KNOWLEDGE",
+  "validation_evidence": {
+    "local_unit_tests": "5 PASS",
+    "tested_conditions": [
+      "valid pack admitted without promotion authority",
+      "self-authorization blocked",
+      "100-task coverage required",
+      "domain-specific literal leakage blocked",
+      "unknown operator references blocked"
+    ]
+  }
+}
