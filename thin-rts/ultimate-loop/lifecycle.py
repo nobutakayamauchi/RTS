@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import integrity
+
 VALID_STATES = {
     "BUILD",
     "STABLE",
@@ -143,8 +145,6 @@ def _candidate_disposition(
     if not candidate:
         return "NONE", False
 
-    # A trigger that is unknown, stale, or otherwise untrusted must dominate any
-    # attractive candidate score. Candidate evidence cannot repair the trigger.
     if watch_action == "INNER_LOOP_REOPEN":
         reasons.append("Candidate comparison is suspended until the unknown trigger is re-modeled by the inner loop.")
         return "BLOCKED_PENDING_INNER_REVIEW", False
@@ -212,7 +212,6 @@ def _candidate_disposition(
 
         return "INCUMBENT_SURVIVES", False
 
-    # No fully survived candidate may become primary. Preserve useful losers when warranted.
     if resilience_value == "HIGH" and recovery_probe == "PASS":
         reasons.append("Candidate is not promotion-ready but is useful as a bounded fallback.")
         return "STANDBY", False
@@ -236,20 +235,37 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
     if current_state not in VALID_STATES:
         blocks.append("INVALID_CURRENT_STATE")
 
+    integrity_report = integrity.evaluate(case.get("integrity"))
+    blocks.extend(integrity_report["blocking_states"])
+    reasons.extend(integrity_report["reasons"])
+    integrity_blocked = integrity_report["classification"] != "PASS"
+
     watch_action = _trigger_action(case, at, blocks, reasons)
     recovery_state = _recovery_state(case, blocks, reasons)
     disposition, transition_authorized = _candidate_disposition(
         case, watch_action, recovery_state, blocks, reasons
     )
 
+    if integrity_report["reentry_route"] == "ANALYSIS_REOPEN" and case.get("candidate"):
+        disposition = "BLOCKED_PENDING_INTEGRITY_REVIEW"
+        transition_authorized = False
+    elif integrity_blocked and transition_authorized:
+        disposition = "INTEGRITY_BLOCKED"
+        transition_authorized = False
+        reasons.append("A technically eligible transition cannot proceed while applicable evidence, freshness, or Human Gate integrity is blocked.")
+
     authority = case.get("authority") or {}
     next_state = current_state if current_state in VALID_STATES else "BUILD"
 
-    if current_state == "BUILD":
+    if integrity_report["reentry_route"] == "ANALYSIS_REOPEN":
+        next_state = "BUILD"
+    elif current_state == "BUILD":
         if case.get("core_acceptance") == "PASS":
             if case.get("material_durable") is True and recovery_state not in {"RECOVERABLE", "PHOENIX_READY"}:
                 blocks.append("DURABLE_CORE_RECOVERY_NOT_PROVEN")
                 reasons.append("A materially durable core cannot freeze while recovery remains unproven.")
+            elif integrity_blocked:
+                reasons.append("Core acceptance cannot freeze a durable state while applicable integrity evidence is blocked.")
             elif _authorized(authority, "promote"):
                 next_state = "STABLE"
             else:
@@ -288,6 +304,12 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
         "candidate_disposition": disposition,
         "transition_authorized": transition_authorized,
         "recovery_state": recovery_state,
+        "reentry_route": integrity_report["reentry_route"],
+        "evidence_integrity_state": integrity_report["evidence_state"],
+        "derived_artifact_freshness_state": integrity_report["freshness_state"],
+        "human_gate_integrity_state": integrity_report["human_gate_state"],
+        "decision_succession_state": integrity_report["decision_succession_state"],
+        "decision_succession_blocking_states": integrity_report["decision_succession_blocking_states"],
         "blocking_states": sorted(set(blocks)),
         "reasons": reasons,
     }
