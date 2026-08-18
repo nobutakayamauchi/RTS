@@ -1,0 +1,87 @@
+{
+  "schema": "ultimate-loop-concept-worksheet-video-supplement/v0",
+  "status": "CHALLENGER_EVIDENCE_ONLY_NON_CANONICAL",
+  "authority_effect": "NONE",
+  "canonical_promotion_authorized": false,
+  "source": {
+    "kind": "user-provided screen-recording MP4 of the concept worksheet",
+    "uploaded_name": "コンセプトのエクセル.mp4",
+    "sha256": "1b5ddc7616a229d52543efffea67103ac6394a6d344cb60f8456ec62ba38580e",
+    "duration_seconds": 70.033333,
+    "video_width": 512,
+    "video_height": 1108,
+    "frame_rate": 30,
+    "inspection_method": "representative frame extraction plus direct visual inspection; no OCR-derived truth claim"
+  },
+  "observed_structure": [
+    {
+      "section": "STEP1",
+      "theme": "base strategy inputs",
+      "visible_fields": [
+        "商品・サービス名称",
+        "ターゲットの現状（悩み）",
+        "ターゲットの理想の未来（ベネフィット）",
+        "独自の解決策（手段）"
+      ]
+    },
+    {
+      "section": "STEP2",
+      "theme": "launch-wide concept design",
+      "visible_fields": [
+        "仮タイトル",
+        "ターゲットが抱える問題/不満",
+        "最大のベネフィット",
+        "なぜあなたから学ぶべきか",
+        "なぜ今か",
+        "コンセプトの抽象度確認"
+      ]
+    },
+    {
+      "section": "STEP3",
+      "theme": "funnel selection and goals",
+      "visible_fields": [
+        "数値ゴール",
+        "事業フェーズ",
+        "フェーズに応じたファネル選択",
+        "D-Day"
+      ]
+    },
+    {
+      "section": "STEP4-8",
+      "theme": "prelaunch, lead magnet, video-seminar, landing-page and offer composition",
+      "observed_pattern": "later rows repeatedly consume outputs from earlier rows through named strategy fields and prompt placeholders"
+    }
+  ],
+  "control_findings": [
+    {
+      "id": "CW01_EXPLICIT_DATAFLOW",
+      "source_observation": "The worksheet has separate columns for section, item, explanation, and the user's concrete strategy, while downstream rows reference earlier strategy outputs as named inputs.",
+      "ultimate_loop_disposition": "NEW_CHALLENGER_CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION",
+      "attack_translation": "If an upstream decision changes, downstream artifacts that consumed that field become stale until recomputed or boundedly revalidated."
+    },
+    {
+      "id": "CW02_PHASE_DEPENDENT_POLICY",
+      "source_observation": "The worksheet explicitly asks for business phase before selecting among funnel patterns.",
+      "ultimate_loop_disposition": "NEW_CHALLENGER_CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION",
+      "attack_translation": "A control policy selected for one material context cannot silently become universal, and a context change requires policy re-evaluation."
+    },
+    {
+      "id": "CW03_ABSTRACTION_CHECK",
+      "source_observation": "The concept-design section explicitly contains an abstraction-level check before later artifacts are generated.",
+      "ultimate_loop_disposition": "NEW_CHALLENGER_CD_EXT07_ABSTRACTION_LEVEL_BINDING",
+      "attack_translation": "A broad success statement cannot erase a concrete failure, and narrow evidence cannot establish a broader claim without a validated scope bridge."
+    },
+    {
+      "id": "CW04_STRUCTURED_WHY_WHAT_HOW_ACTION",
+      "source_observation": "Video-seminar and landing-page sections use repeated Why/What/How/Action structure.",
+      "ultimate_loop_disposition": "SUPPORT_PROFILE_ONLY",
+      "attack_translation": "Useful as a completeness template, not universal Ultimate Loop doctrine."
+    }
+  ],
+  "hard_boundaries": [
+    "UPSTREAM_CHANGE => DEPENDENT_DERIVED_ARTIFACT_STALE_UNTIL_REVALIDATED",
+    "CONTEXTUAL_POLICY != UNIVERSAL_POLICY",
+    "ABSTRACT_SUCCESS != REFUTATION_OF_CONCRETE_FAILURE",
+    "NARROW_EVIDENCE != BROADER_CLAIM_WITHOUT_SCOPE_BRIDGE"
+  ]
+}
