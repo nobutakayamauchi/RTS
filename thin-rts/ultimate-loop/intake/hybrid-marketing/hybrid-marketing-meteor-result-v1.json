@@ -11,7 +11,15 @@
     {"extension_id":"HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT","verdict":"STANDBY_RESEARCH","canonical_candidate":false},
     {"extension_id":"HM_EXT04_COMMITMENT_CONTAMINATION_GUARD","verdict":"HARD_INVARIANT_CANDIDATE_UNDER_AUTHORITY_GATE","canonical_candidate":false}
   ],
-  "repository_validation_expected":{"hybrid_extension_destructive_tests":"13/13 PASS"},
+  "repository_validation": {
+    "workflow":"Validate OSARU knowledge intake",
+    "workflow_run_id":32116596623,
+    "conclusion":"SUCCESS",
+    "hybrid_extension_destructive_tests":"13/13 PASS",
+    "osaru_extension_destructive_tests":"PASS",
+    "operator_intake_regression":"PASS",
+    "universal_pack_validation":"PASS"
+  },
   "hard_invariants":[
     "SUNK_COST != CURRENT_CONSENT",
     "PAST_COMMITMENT != CURRENT_AUTHORITY",
