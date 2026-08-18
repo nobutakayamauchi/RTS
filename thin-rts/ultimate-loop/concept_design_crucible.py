@@ -10,6 +10,9 @@ EXTENSIONS = {
     "CD_EXT02_OBSERVATION_INFERENCE_LAYERING",
     "CD_EXT03_END_TO_END_OBJECTIVE_BINDING",
     "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY",
+    "CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION",
+    "CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION",
+    "CD_EXT07_ABSTRACTION_LEVEL_BINDING",
 }
 
 
@@ -130,6 +133,95 @@ def _ext04(case: dict[str, Any], blocks: list[str], reasons: list[str]) -> str:
     return "ANALYSIS_REOPEN"
 
 
+def _ext05(case: dict[str, Any], blocks: list[str], reasons: list[str]) -> str:
+    dependency_state = case.get("dependency_binding_state", "UNKNOWN")
+    dependency_fields = set(case.get("dependency_fields") or [])
+    changed_fields = set(case.get("changed_upstream_fields") or [])
+    derived_from = case.get("derived_from_upstream_revision")
+    current = case.get("current_upstream_revision")
+    recomputed = case.get("recomputed_from_current") is True
+    bounded_revalidation = case.get("bounded_revalidation_state", "UNKNOWN")
+
+    if dependency_state != "BOUND" or not dependency_fields:
+        blocks.append("DERIVATION_DEPENDENCY_UNBOUND")
+        reasons.append("A derived artifact cannot prove freshness when the upstream fields it depends on are unknown.")
+        return "BLOCK_DERIVED_FRESHNESS_CLAIM"
+
+    impacted = sorted(dependency_fields & changed_fields)
+    if not impacted:
+        reasons.append("The upstream revision changed, but no declared dependency field used by this artifact changed.")
+        return "CURRENT_UNAFFECTED_BY_DECLARED_CHANGE"
+
+    if derived_from == current and recomputed:
+        return "CURRENT_DERIVATION_BOUND"
+
+    if bounded_revalidation == "PASS":
+        reasons.append("A stale derivation may remain usable only when the affected dependency slice is explicitly revalidated against the current upstream revision.")
+        return "CURRENT_BY_BOUNDED_REVALIDATION"
+
+    blocks.extend(f"STALE_DEPENDENCY:{field}" for field in impacted)
+    reasons.append("Changing an upstream decision invalidates downstream artifacts that consumed that field until they are recomputed or explicitly revalidated.")
+    return "STALE_RECOMPUTE_REQUIRED"
+
+
+def _ext06(case: dict[str, Any], blocks: list[str], reasons: list[str]) -> str:
+    policy = case.get("policy_ref")
+    applicability = case.get("applicability_state", "UNKNOWN")
+    frozen_context = case.get("frozen_context_ref")
+    current_context = case.get("current_context_ref")
+    reevaluated = case.get("policy_reevaluation_state", "UNKNOWN")
+
+    if not policy or not frozen_context or not current_context:
+        blocks.append("POLICY_OR_CONTEXT_BINDING_MISSING")
+        return "ANALYSIS_REOPEN"
+
+    if applicability == "UNIVERSAL_ASSERTION":
+        blocks.append("CONTEXTUAL_POLICY_OVERGENERALIZED")
+        reasons.append("A policy selected for one maturity/risk/operating context cannot silently become universal doctrine.")
+        return "REJECT_POLICY_OVERGENERALIZATION"
+
+    if frozen_context != current_context and reevaluated != "PASS":
+        blocks.append("POLICY_CONTEXT_CHANGED_WITHOUT_REEVALUATION")
+        reasons.append("When the material context that selected a control policy changes, the policy must be re-evaluated before reuse.")
+        return "POLICY_RESELECTION_REQUIRED"
+
+    if applicability == "EVIDENCE_BOUND" and (frozen_context == current_context or reevaluated == "PASS"):
+        return "CONTEXT_BOUND_POLICY_VALID"
+
+    return "ANALYSIS_REOPEN"
+
+
+def _ext07(case: dict[str, Any], blocks: list[str], reasons: list[str]) -> str:
+    evidence_scope = case.get("evidence_scope")
+    claim_scope = case.get("claim_scope")
+    scope_relation = case.get("scope_relation", "UNKNOWN")
+    bridge = case.get("scope_bridge_validation_state", "UNKNOWN")
+    use = case.get("proposed_use", "SUPPORT")
+
+    if not evidence_scope or not claim_scope:
+        blocks.append("SCOPE_BINDING_MISSING")
+        return "BLOCK_SCOPE_CLAIM"
+
+    if scope_relation == "MATCH":
+        return "SCOPE_BOUND_CLAIM"
+
+    if scope_relation in {"EVIDENCE_NARROWER_THAN_CLAIM", "CLAIM_NARROWER_THAN_EVIDENCE"}:
+        if bridge == "PASS":
+            reasons.append("Cross-level use is allowed only because an explicit validated bridge binds the concrete and abstract scopes.")
+            return "SCOPE_BOUND_BY_VALIDATED_BRIDGE"
+        blocks.append("ABSTRACTION_LEVEL_DRIFT")
+        if use in {"REFUTE_SPECIFIC_FAILURE", "GENERALIZE_SUCCESS", "PROMOTE"}:
+            reasons.append("A broad success statement cannot erase a concrete failure, and a narrow success cannot establish a broader system property without coverage evidence.")
+            return "BLOCK_ABSTRACTION_ESCAPE"
+        return "ANALYSIS_REOPEN"
+
+    if scope_relation == "UNRELATED":
+        blocks.append("UNRELATED_SCOPE_EVIDENCE")
+        return "BLOCK_SCOPE_CLAIM"
+
+    return "ANALYSIS_REOPEN"
+
+
 def evaluate(case: dict[str, Any]) -> dict[str, Any]:
     blocks, reasons = _base(case)
     extension_id = case.get("extension_id")
@@ -141,6 +233,12 @@ def evaluate(case: dict[str, Any]) -> dict[str, Any]:
         disposition = _ext03(case, blocks, reasons)
     elif extension_id == "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY":
         disposition = _ext04(case, blocks, reasons)
+    elif extension_id == "CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION":
+        disposition = _ext05(case, blocks, reasons)
+    elif extension_id == "CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION":
+        disposition = _ext06(case, blocks, reasons)
+    elif extension_id == "CD_EXT07_ABSTRACTION_LEVEL_BINDING":
+        disposition = _ext07(case, blocks, reasons)
     else:
         disposition = "REJECT_UNKNOWN_EXTENSION"
 
