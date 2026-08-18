@@ -64,6 +64,10 @@ class Tests(unittest.TestCase):
         r = self.run_case("HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT", downstream_preconditions_state="PASS", authority_state="AUTHORIZED", skip_reason="TIME_PRESSURE_ONLY", remaining_stages=[])
         self.assertEqual(r["disposition"], "NO_SHORT_CIRCUIT")
 
+    def test_pareto_heuristic_cannot_skip_unique_obligation(self):
+        r = self.run_case("HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT", downstream_preconditions_state="PASS", authority_state="AUTHORIZED", skip_reason="PARETO_HEURISTIC_ONLY", remaining_stages=[])
+        self.assertEqual(r["disposition"], "NO_SHORT_CIRCUIT")
+
     def test_sunk_cost_not_consent(self):
         r = self.run_case("HM_EXT04_COMMITMENT_CONTAMINATION_GUARD", historical_commitment={"present": True, "type": "payment"}, proposed_inference="CONSENT", current_explicit_state="MISSING")
         self.assertEqual(r["disposition"], "BLOCK_INFERENCE")
@@ -75,6 +79,33 @@ class Tests(unittest.TestCase):
     def test_current_explicit_state_governs(self):
         r = self.run_case("HM_EXT04_COMMITMENT_CONTAMINATION_GUARD", historical_commitment={"present": True, "type": "effort"}, proposed_inference="CONSENT", current_explicit_state="EXPLICIT_CURRENT")
         self.assertEqual(r["disposition"], "CURRENT_STATE_GOVERNS")
+
+    def test_human_gate_with_visible_decline_and_no_pressure_is_valid(self):
+        r = self.run_case("HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION", gate_requires_human_choice=True, decline_path_state="VISIBLE_AND_ACTIONABLE", material_consequence_disclosure_state="PASS", current_decision_state="EXPLICIT_CURRENT", system_applied_pressure=[])
+        self.assertEqual(r["disposition"], "HUMAN_GATE_AGENCY_BOUND")
+
+    def test_hidden_decline_path_blocks_human_gate_validity(self):
+        r = self.run_case("HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION", gate_requires_human_choice=True, decline_path_state="HIDDEN", material_consequence_disclosure_state="PASS", current_decision_state="EXPLICIT_CURRENT", system_applied_pressure=[])
+        self.assertEqual(r["disposition"], "BLOCK_HUMAN_GATE_VALIDITY")
+        self.assertIn("MEANINGFUL_DECLINE_PATH_MISSING", r["blocking_states"])
+
+    def test_sunk_cost_pressure_cannot_validate_human_gate(self):
+        r = self.run_case("HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION", gate_requires_human_choice=True, decline_path_state="VISIBLE_AND_ACTIONABLE", material_consequence_disclosure_state="PASS", current_decision_state="EXPLICIT_CURRENT", system_applied_pressure=["SUNK_COST_LEVERAGE"])
+        self.assertEqual(r["disposition"], "BLOCK_HUMAN_GATE_VALIDITY")
+        self.assertIn("AGENCY_PRESSURE:SUNK_COST_LEVERAGE", r["blocking_states"])
+
+    def test_reference_class_shift_cannot_fake_improvement(self):
+        r = self.run_case("HM_EXT06_REFERENCE_CLASS_FREEZE", comparison_claim="IMPROVED", frozen_reference_class_ref="benchmark@v1", current_reference_class_ref="premium-market@v2", measurement_protocol_state="PASS", reference_change_authority="AUTHORIZED_NEW_FRAME", paired_old_reference_evidence="MISSING")
+        self.assertEqual(r["disposition"], "BLOCK_COMPARISON_CLAIM")
+        self.assertIn("REFERENCE_CLASS_SHIFT_CONTAMINATES_DELTA", r["blocking_states"])
+
+    def test_same_reference_class_supports_bounded_comparison(self):
+        r = self.run_case("HM_EXT06_REFERENCE_CLASS_FREEZE", comparison_claim="IMPROVED", frozen_reference_class_ref="benchmark@v1", current_reference_class_ref="benchmark@v1", measurement_protocol_state="PASS", reference_change_authority="NOT_NEEDED", paired_old_reference_evidence="PASS")
+        self.assertEqual(r["disposition"], "REFERENCE_CLASS_BOUND")
+
+    def test_authorized_new_reference_starts_new_baseline_only(self):
+        r = self.run_case("HM_EXT06_REFERENCE_CLASS_FREEZE", comparison_claim="NEW_FRAME_BASELINE", frozen_reference_class_ref="market-A@v1", current_reference_class_ref="market-B@v1", measurement_protocol_state="PASS", reference_change_authority="AUTHORIZED_NEW_FRAME", paired_old_reference_evidence="MISSING")
+        self.assertEqual(r["disposition"], "NEW_REFERENCE_BASELINE_ONLY")
 
 
 if __name__ == "__main__":
