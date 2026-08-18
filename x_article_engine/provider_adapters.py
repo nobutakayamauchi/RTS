@@ -8,10 +8,20 @@ from .core import XArticleEngineError
 from .plain import PLAIN_PROFILE_ID, build_plain_generation_view
 
 
+# Custom adapters receive the sanitized Plain generation view, never the raw packet.
 AdapterCompiler = Callable[[dict, str, int], dict]
 
 ADAPTER_CONTRACT_VERSION = "0.1"
 ADAPTER_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{2,63}$")
+
+_SECRET_LITERAL_PATTERNS = (
+    re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b", re.I),
+    re.compile(r"\bAIza[0-9A-Za-z_-]{30,}\b"),
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b", re.I),
+    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{20,}\b", re.I),
+    re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+)
+_REDACTION_MARKERS = ("REDACTED", "EXAMPLE", "PLACEHOLDER", "DUMMY", "XXXX")
 
 # Provider-neutral system boundary. Article/user material is never interpolated here.
 # This is deliberate prompt-injection containment: dynamic content remains user data.
@@ -74,17 +84,30 @@ def _validate_plain_packet(packet: object) -> dict:
     return packet
 
 
-def _render_user_payload(packet: dict) -> str:
-    view = build_plain_generation_view(packet)
-    return json.dumps(
+def _assert_no_secret_literals(serialized_view: str) -> None:
+    for pattern in _SECRET_LITERAL_PATTERNS:
+        for match in pattern.finditer(serialized_view):
+            token = match.group(0).upper()
+            if any(marker in token for marker in _REDACTION_MARKERS):
+                continue
+            # Never repeat the suspected secret in the exception/log surface.
+            raise XArticleEngineError(
+                "provider adapter blocked a credential-like literal; redact it before model transmission"
+            )
+
+
+def _render_user_payload(view: dict) -> str:
+    serialized = json.dumps(
         view,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
     )
+    _assert_no_secret_literals(serialized)
+    return serialized
 
 
-def _openai_responses(packet: dict, model: str, max_output_tokens: int) -> dict:
+def _openai_responses(view: dict, model: str, max_output_tokens: int) -> dict:
     return {
         "model": model,
         "instructions": PLAIN_SYSTEM_INSTRUCTIONS,
@@ -94,7 +117,7 @@ def _openai_responses(packet: dict, model: str, max_output_tokens: int) -> dict:
                 "content": [
                     {
                         "type": "input_text",
-                        "text": _render_user_payload(packet),
+                        "text": _render_user_payload(view),
                     }
                 ],
             }
@@ -105,7 +128,7 @@ def _openai_responses(packet: dict, model: str, max_output_tokens: int) -> dict:
     }
 
 
-def _anthropic_messages(packet: dict, model: str, max_output_tokens: int) -> dict:
+def _anthropic_messages(view: dict, model: str, max_output_tokens: int) -> dict:
     return {
         "model": model,
         "max_tokens": max_output_tokens,
@@ -116,7 +139,7 @@ def _anthropic_messages(packet: dict, model: str, max_output_tokens: int) -> dic
                 "content": [
                     {
                         "type": "text",
-                        "text": _render_user_payload(packet),
+                        "text": _render_user_payload(view),
                     }
                 ],
             }
@@ -124,7 +147,7 @@ def _anthropic_messages(packet: dict, model: str, max_output_tokens: int) -> dic
     }
 
 
-def _gemini_generate_content(packet: dict, model: str, max_output_tokens: int) -> dict:
+def _gemini_generate_content(view: dict, model: str, max_output_tokens: int) -> dict:
     # REST-shaped request body. Keep model-specific sampling defaults untouched.
     return {
         "model": model,
@@ -134,7 +157,7 @@ def _gemini_generate_content(packet: dict, model: str, max_output_tokens: int) -
         "contents": [
             {
                 "role": "user",
-                "parts": [{"text": _render_user_payload(packet)}],
+                "parts": [{"text": _render_user_payload(view)}],
             }
         ],
         "generationConfig": {"maxOutputTokens": max_output_tokens},
@@ -159,7 +182,7 @@ def register_adapter(name: str, compiler: AdapterCompiler) -> None:
 
     There is intentionally no automatic plugin import/discovery. New adapters are
     opt-in at the call site so an installed package cannot silently gain prompt or
-    credential authority.
+    credential authority. The compiler receives only the allowlisted Plain view.
     """
     if not isinstance(name, str) or not ADAPTER_NAME_RE.fullmatch(name):
         raise XArticleEngineError(
@@ -183,6 +206,12 @@ def build_provider_request(
     checked_packet = _validate_plain_packet(packet)
     checked_model = _validate_model(model)
     checked_tokens = _validate_max_output_tokens(max_output_tokens)
+    safe_view = build_plain_generation_view(checked_packet)
+
+    # Scan before handing data to any built-in or custom adapter.
+    _assert_no_secret_literals(
+        json.dumps(safe_view, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    )
 
     compiler = _BUILTIN_ADAPTERS.get(adapter) or _CUSTOM_ADAPTERS.get(adapter)
     if compiler is None:
@@ -190,7 +219,7 @@ def build_provider_request(
             f"unknown adapter {adapter!r}; available: {', '.join(available_adapters())}"
         )
 
-    request = compiler(checked_packet, checked_model, checked_tokens)
+    request = compiler(safe_view, checked_model, checked_tokens)
     if not isinstance(request, dict):
         raise XArticleEngineError("adapter compiler must return an object")
     return request
