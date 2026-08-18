@@ -44,6 +44,20 @@ Evidence integrity, dependency freshness, Human Gate agency, decision-succession
 
 `integrity.py` owns no deployment, publication, payment, promotion, diagnosis, or external action. It binds evidence and exposes fail-closed routing/validity results. `lifecycle.py` remains the transition binder.
 
+## Integrity applicability handshake
+
+Before a consequential lifecycle transition can be authorized, the caller must explicitly bind whether the v0.2 integrity envelope applies:
+
+- `integrity_applicability = REQUIRED` — the applicable integrity profile must be present and pass;
+- `integrity_applicability = NOT_APPLICABLE` — the workload explicitly declares that no v0.2 integrity profile applies;
+- omitted / `UNDECLARED` — the consequential transition fails closed.
+
+`MISSING APPLICABILITY != NOT_APPLICABLE`
+
+`REQUIRED WITHOUT PROFILE != PASS`
+
+This preserves compatibility through an explicit N/A path while preventing omission from becoming a bypass. The handshake gates `core freeze`, partial/full replacement, and emergency failover; it does not invent a new lifecycle state.
+
 ## Typed re-entry
 
 When failure stage **and causality** are externally proven, the smallest existing gate may be selected:
@@ -129,6 +143,8 @@ History is preserved; stale experiment labels are not operational authority.
 `RECOVERY != DECISION SUCCESSION`
 
 `UPSTREAM CHANGE != DOWNSTREAM FRESHNESS`
+
+`MISSING APPLICABILITY != NOT_APPLICABLE`
 
 `CORRELATION != ROOT CAUSE`
 
