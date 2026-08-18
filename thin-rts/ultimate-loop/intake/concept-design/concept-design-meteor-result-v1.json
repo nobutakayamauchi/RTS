@@ -19,55 +19,13 @@
     }
   },
   "results": [
-    {
-      "extension_id": "CD_EXT01_SEMANTIC_INVARIANT_ADAPTER_GUARD",
-      "verdict": "COMPOSE_AS_EXISTING_CANONICAL_SOURCE_SUPPORT_REFINEMENT",
-      "canonical_candidate": false,
-      "killed_claim": "Every adapter should look or speak the same to preserve one concept.",
-      "survivor": "Only declared protected semantics and provenance are invariant; presentation may vary by adapter."
-    },
-    {
-      "extension_id": "CD_EXT02_OBSERVATION_INFERENCE_LAYERING",
-      "verdict": "CANONICAL_EVIDENCE_INVARIANT_CANDIDATE",
-      "canonical_candidate": true,
-      "killed_claim": "A plausible deeper need, motive, or causal explanation can be stored as if the user directly said it.",
-      "survivor": "Raw observation, interpretation/hypothesis, and independently validated derived fact must remain separately typed and provenance-bound."
-    },
-    {
-      "extension_id": "CD_EXT03_END_TO_END_OBJECTIVE_BINDING",
-      "verdict": "REINFORCE_EXISTING_FROZEN_OUTCOME_GUARD",
-      "canonical_candidate": false,
-      "killed_claim": "A local metric improvement can authorize promotion despite downstream protected-outcome regression.",
-      "survivor": "Local wins cannot override the frozen human-important outcome, but workloads without a downstream surface may mark the profile NOT_APPLICABLE."
-    },
-    {
-      "extension_id": "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY",
-      "verdict": "CANONICAL_EXTENSION_CANDIDATE_AS_TELEMETRY_GUARD",
-      "canonical_candidate": true,
-      "killed_claim": "An aggregate pass implies the effect is acceptable for every material context, or any tiny post-hoc segment may veto the aggregate.",
-      "survivor": "Material evidence-bound contexts/cohorts may block a global diagnosis and force targeted analysis; arbitrary or immaterial post-hoc segmentation cannot."
-    },
-    {
-      "extension_id": "CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION",
-      "verdict": "CANONICAL_EVIDENCE_CONTROL_CANDIDATE",
-      "canonical_candidate": true,
-      "killed_claim": "A downstream artifact remains current merely because it still exists or previously passed review after an upstream decision changed.",
-      "survivor": "A derived artifact is revision-bound to the upstream fields it consumed. A material dependency change makes it stale until recomputed from the current revision or boundedly revalidated; unrelated upstream changes do not force global rebuild."
-    },
-    {
-      "extension_id": "CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION",
-      "verdict": "CONDITIONAL_PROFILE_REFINEMENT",
-      "canonical_candidate": false,
-      "killed_claim": "A control or workflow policy selected for one maturity/risk/operating context can silently become universal or remain valid after the selecting context changes.",
-      "survivor": "Policy applicability remains context-bound. Material context changes require policy re-evaluation, but this composes as a profile/selection refinement rather than a new universal subsystem."
-    },
-    {
-      "extension_id": "CD_EXT07_ABSTRACTION_LEVEL_BINDING",
-      "verdict": "COMPOSE_WITH_EVIDENCE_CONSTRUCT_VALIDITY_SCOPE_REFINEMENT",
-      "canonical_candidate": false,
-      "killed_claim": "A broad success statement may erase a concrete failure, or narrow evidence may establish a broader property without validated coverage.",
-      "survivor": "Evidence and claims remain scope-bound. Cross-level claims require an explicit validated scope bridge. This is retained as a refinement of construct-validity/context guards rather than a separate canonical subsystem."
-    }
+    {"extension_id":"CD_EXT01_SEMANTIC_INVARIANT_ADAPTER_GUARD","verdict":"COMPOSE_AS_EXISTING_CANONICAL_SOURCE_SUPPORT_REFINEMENT","canonical_candidate":false,"killed_claim":"Every adapter should look or speak the same to preserve one concept.","survivor":"Only declared protected semantics and provenance are invariant; presentation may vary by adapter."},
+    {"extension_id":"CD_EXT02_OBSERVATION_INFERENCE_LAYERING","verdict":"CANONICAL_EVIDENCE_INVARIANT_CANDIDATE","canonical_candidate":true,"killed_claim":"A plausible deeper need, motive, or causal explanation can be stored as if the user directly said it.","survivor":"Raw observation, interpretation/hypothesis, and independently validated derived fact must remain separately typed and provenance-bound."},
+    {"extension_id":"CD_EXT03_END_TO_END_OBJECTIVE_BINDING","verdict":"REINFORCE_EXISTING_FROZEN_OUTCOME_GUARD","canonical_candidate":false,"killed_claim":"A local metric improvement can authorize promotion despite downstream protected-outcome regression.","survivor":"Local wins cannot override the frozen human-important outcome, but workloads without a downstream surface may mark the profile NOT_APPLICABLE."},
+    {"extension_id":"CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY","verdict":"CANONICAL_EXTENSION_CANDIDATE_AS_TELEMETRY_GUARD","canonical_candidate":true,"killed_claim":"An aggregate pass implies the effect is acceptable for every material context, or any tiny post-hoc segment may veto the aggregate.","survivor":"Material evidence-bound contexts/cohorts may block a global diagnosis and force targeted analysis; arbitrary or immaterial post-hoc segmentation cannot."},
+    {"extension_id":"CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION","verdict":"CANONICAL_EVIDENCE_CONTROL_CANDIDATE","canonical_candidate":true,"killed_claim":"A downstream artifact remains current merely because it still exists or previously passed review after an upstream decision changed.","survivor":"A derived artifact is revision-bound to the upstream fields it consumed. A material dependency change makes it stale until recomputed from the current revision or boundedly revalidated; unrelated upstream changes do not force global rebuild."},
+    {"extension_id":"CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION","verdict":"CONDITIONAL_PROFILE_REFINEMENT","canonical_candidate":false,"killed_claim":"A control or workflow policy selected for one maturity/risk/operating context can silently become universal or remain valid after the selecting context changes.","survivor":"Policy applicability remains context-bound. Material context changes require policy re-evaluation, but this composes as a profile/selection refinement rather than a new universal subsystem."},
+    {"extension_id":"CD_EXT07_ABSTRACTION_LEVEL_BINDING","verdict":"COMPOSE_WITH_EVIDENCE_CONSTRUCT_VALIDITY_SCOPE_REFINEMENT","canonical_candidate":false,"killed_claim":"A broad success statement may erase a concrete failure, or narrow evidence may establish a broader property without validated coverage.","survivor":"Evidence and claims remain scope-bound. Cross-level claims require an explicit validated scope bridge. This is retained as a refinement of construct-validity/context guards rather than a separate canonical subsystem."}
   ],
   "death_memory": [
     "OBSERVED SIGNAL != INFERRED LATENT NEED",
