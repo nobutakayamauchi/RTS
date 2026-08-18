@@ -108,7 +108,9 @@ The integration deliberately does **not** add new lifecycle states for every gua
 - typed re-entry route;
 - decision-succession state.
 
-`lifecycle.py` consumes applicable blocking states before an otherwise eligible consequential transition. Legacy workloads without the new optional evidence profiles retain their existing behavior.
+`lifecycle.py` consumes applicable blocking states before an otherwise eligible consequential transition. Compatibility is explicit rather than implicit: a workload must declare `integrity_applicability = NOT_APPLICABLE` when the v0.2 envelope genuinely does not apply; `REQUIRED` binds the profile; omission is not treated as N/A.
+
+`MISSING APPLICABILITY != NOT_APPLICABLE`
 
 A proven local failure exposes the smallest existing `reentry_route`; uncertain causality returns to `BUILD / ANALYSIS_REOPEN` rather than guessing.
 
@@ -117,22 +119,41 @@ A proven local failure exposes the smallest existing `reentry_route`; uncertain 
 The integration was attacked for the following regressions:
 
 1. **platform creep** — binder must perform no deployment/publication/payment/monitoring action;
-2. **legacy behavior breakage** — old lifecycle fixtures must keep passing when no new profile applies;
+2. **legacy behavior breakage** — old lifecycle fixtures must keep passing through an explicit `NOT_APPLICABLE` compatibility declaration when no v0.2 integrity profile applies;
 3. **global rebuild explosion** — unrelated upstream changes must not stale unrelated artifacts;
 4. **authority weakening** — integrity PASS must never create promotion/failover authority;
 5. **Human Gate overreach** — agency checks apply only when the authority source is explicitly `HUMAN_GATE`;
 6. **PHOENIX conflation** — `PHOENIX_READY` must remain distinct from `DECISION_SUCCESSION_READY`;
 7. **correlation routing** — correlated-only failures must reopen analysis, not jump locally;
-8. **scope laundering** — component/cohort/proxy evidence must not silently establish broader properties.
+8. **scope laundering** — component/cohort/proxy evidence must not silently establish broader properties;
+9. **applicability omission bypass** — a caller must not bypass all new contracts by omitting the integrity envelope.
+
+### Counter-DA finding: omission bypass
+
+The first green integration still allowed an otherwise eligible transition when the caller supplied no `integrity` profile at all. That was backward-compatible but not fail-closed enough for a canonical v0.2 boundary: a caller that should have been checked could avoid the check by silence.
+
+Killed behavior:
+
+`MISSING INTEGRITY ENVELOPE -> IMPLICIT NOT_APPLICABLE`
+
+Survivor:
+
+```text
+REQUIRED       -> profile required and must pass
+NOT_APPLICABLE -> explicit compatibility path
+UNDECLARED     -> consequential transition blocked
+```
+
+This handshake applies at `core freeze`, partial/full replacement, and emergency failover. It does not block observation-only states or invent a new lifecycle stage.
 
 ## 6. Contract evidence
 
-GitHub Actions run `32123514294` completed successfully after canonical integration wiring.
+GitHub Actions run `32124016493` completed successfully after the applicability-bypass fix.
 
 Observed test counts from its job log:
 
 - canonical integrity destructive tests: **14/14 PASS**;
-- canonical integrity lifecycle connection tests: **9/9 PASS**;
+- canonical integrity lifecycle connection tests: **12/12 PASS**;
 - existing lifecycle regression tests: **17/17 PASS**;
 - existing METEOR lifecycle death-memory tests: **13/13 PASS**;
 - operator intake regression: **5/5 PASS**;
@@ -149,9 +170,9 @@ DA result:
 
 `CHALLENGER-ONLY MERGE = INSUFFICIENT`
 
-Counter-DA result after minimal canonical connection:
+Counter-DA result after minimal canonical connection and omission-bypass repair:
 
-`CURRENT LIFECYCLE + CROSS-CUTTING INTEGRITY CONTRACTS = SURVIVOR`
+`CURRENT LIFECYCLE + CROSS-CUTTING INTEGRITY CONTRACTS + EXPLICIT APPLICABILITY = SURVIVOR`
 
 The integration fills gaps that were not previously explicit/operational:
 
@@ -159,12 +180,13 @@ The integration fills gaps that were not previously explicit/operational:
 - evidence scope/lineage integrity across selection/intervention/reference/abstraction changes;
 - selective stale propagation from upstream decisions to dependent derived artifacts;
 - meaningful Human Gate agency when human choice is the authority source;
-- decision-capability succession distinct from recovery/retrieval.
+- decision-capability succession distinct from recovery/retrieval;
+- fail-closed applicability so omission cannot silently disable the new contracts.
 
 It does so without adding a new top-level lifecycle or weakening existing authority boundaries in the current regression corpus.
 
 Final merge condition:
 
 1. final PR head CI succeeds with the recorded integration tests;
-2. final diff audit finds no accidental authority expansion, UNKNOWN->PASS conversion, global rebuild requirement, or domain-specific doctrine promoted as universal;
+2. final diff audit finds no accidental authority expansion, UNKNOWN->PASS conversion, global rebuild requirement, applicability omission bypass, or domain-specific doctrine promoted as universal;
 3. PR head remains mergeable and matches the reviewed SHA.
