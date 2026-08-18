@@ -6,6 +6,6 @@
   "patch": "",
   "commands": [
     "test -x sapi/cli/php && sapi/cli/php -v | head -2",
-    "printf '%s\\n' '<?php' '$foo = new class {' '    public self $v;' '};' '$foo->v = 0;' > /tmp/furnace-repro.php; set +e; sapi/cli/php /tmp/furnace-repro.php > /tmp/furnace-repro.out 2>&1; rc=$?; cat /tmp/furnace-repro.out; echo REPRO_EXIT=$rc; exit 0"
+    "printf '%s\\n' '<?php' '$foo = new class {' '    public self $v;' '};' '$foo->v = 0;' > /tmp/furnace-repro.php; ulimit -c 0; set +e; timeout 10s sapi/cli/php /tmp/furnace-repro.php > /tmp/furnace-repro.out 2>&1; rc=$?; cat /tmp/furnace-repro.out; echo REPRO_EXIT=$rc; exit 0"
   ]
 }
