@@ -1,0 +1,41 @@
+{
+  "schema":"ultimate-loop-hybrid-marketing-meteor-result/v0",
+  "frame_id":"ultimate-loop-method/hybrid-marketing-deltas-v1",
+  "status":"CONTRACT_METEOR_COMPLETE_UNDER_CURRENT_REPOSITORY_EVIDENCE",
+  "authority_effect":"NONE",
+  "canonical_promotion_authorized":false,
+  "source_page_coverage":"143/143 source available; targeted screenshot provenance bound separately",
+  "results":[
+    {"extension_id":"HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY","verdict":"CANONICAL_EXTENSION_CANDIDATE_AS_EXT03_GUARD","canonical_candidate":true},
+    {"extension_id":"HM_EXT02_EVIDENCE_CONSTRUCT_VALIDITY","verdict":"CANONICAL_EXTENSION_CANDIDATE","canonical_candidate":true},
+    {"extension_id":"HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT","verdict":"STANDBY_RESEARCH","canonical_candidate":false},
+    {"extension_id":"HM_EXT04_COMMITMENT_CONTAMINATION_GUARD","verdict":"HARD_INVARIANT_CANDIDATE_UNDER_AUTHORITY_GATE","canonical_candidate":false},
+    {"extension_id":"HM_EXT05_HUMAN_GATE_AGENCY_PRESERVATION","verdict":"HARD_INVARIANT_CANDIDATE_UNDER_HUMAN_GATE","canonical_candidate":false},
+    {"extension_id":"HM_EXT06_REFERENCE_CLASS_FREEZE","verdict":"CANONICAL_EVIDENCE_REFINEMENT_CANDIDATE","canonical_candidate":true},
+    {"extension_id":"HM_EXT07_SELECTION_LINEAGE_GUARD","verdict":"CANONICAL_EVIDENCE_REFINEMENT_CANDIDATE","canonical_candidate":true},
+    {"extension_id":"HM_EXT08_INTERVENTION_HISTORY_BINDING","verdict":"CANONICAL_EVIDENCE_INVARIANT_CANDIDATE","canonical_candidate":true}
+  ],
+  "repository_validation": {
+    "workflow":"Validate OSARU knowledge intake",
+    "workflow_run_id":32119707756,
+    "conclusion":"SUCCESS",
+    "hybrid_extension_destructive_tests":"26/26 PASS",
+    "osaru_extension_destructive_tests":"15/15 PASS",
+    "concept_design_destructive_tests":"12/12 PASS",
+    "operator_intake_regression":"5/5 PASS",
+    "universal_pack_validation":"PASS"
+  },
+  "hard_invariants":[
+    "SUNK_COST != CURRENT_CONSENT",
+    "PAST_COMMITMENT != CURRENT_AUTHORITY",
+    "GATE_PASS != UNMEASURED_PROPERTY",
+    "LOW_STAGE_CONVERSION != BOTTLENECK_WITHOUT_STAGE_SEMANTICS",
+    "SEQUENCE_SPEED != AUTHORITY_TO_SKIP_UNIQUE_OBLIGATION",
+    "PARETO_HEURISTIC != AUTHORITY_TO_SKIP_UNIQUE_OBLIGATION",
+    "CHOICE_PRESENTATION != MEANINGFUL_AUTHORIZATION",
+    "COMPARATOR_SHIFT != PERFORMANCE_IMPROVEMENT",
+    "SELECTED_COHORT_EVIDENCE != POPULATION_EVIDENCE",
+    "POST_INTERVENTION_STATE != INTRINSIC_BASELINE_PROPERTY"
+  ],
+  "next_gate":"Real same-workload validation of filter/context-aware bottleneck routing, selected-cohort generalization failures, intervention-history contamination, cross-domain proxy-evidence failures, Human Gate agency preservation, and frozen-reference comparison claims before any canonical patch. Short-circuit remains research-only."
+}

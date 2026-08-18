@@ -1,0 +1,41 @@
+{
+  "schema":"ultimate-loop-hybrid-marketing-workload/v0",
+  "frame_id":"ultimate-loop-method/hybrid-marketing-deltas-v1",
+  "status":"FROZEN_FOR_DA_COUNTER_DA_AND_CONTRACT_METEOR",
+  "authority_effect":"NONE",
+  "required_invariants":[
+    "UNKNOWN remains UNKNOWN",
+    "CAPABILITY != AUTHORITY",
+    "CORRELATION != ROOT CAUSE",
+    "HISTORICAL COMMITMENT != CURRENT CONSENT OR AUTHORITY",
+    "OPTIONAL STAGE != SKIPPABLE UNTIL UNIQUE OBLIGATIONS ARE PROVEN SATISFIED OR NOT_APPLICABLE",
+    "BUSINESS CONVERSION METRICS CANNOT OUTRANK SAFETY OR CORRECTNESS"
+  ],
+  "tests":[
+    {
+      "extension_id":"HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY",
+      "workload":"Compare a deliberate rejection stage with a broken pass-through stage at the same low transition rate.",
+      "win_condition":"Does not label intentional, evidence-backed rejection as a bottleneck, while still detecting low throughput on a transform/pass-through stage.",
+      "reject_if":"Low conversion is automatically called healthy filtering, or downstream quality claims are accepted without evidence."
+    },
+    {
+      "extension_id":"HM_EXT02_EVIDENCE_CONSTRUCT_VALIDITY",
+      "workload":"Present gates that measure one property but claim a different downstream property, plus a directly measured control.",
+      "win_condition":"Blocks unsupported proxy claims while allowing direct or separately validated mappings.",
+      "reject_if":"A convenient proxy is silently promoted to fit, safety, consent, authority, or correctness evidence."
+    },
+    {
+      "extension_id":"HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT",
+      "workload":"Attempt to skip intermediate stages under both fully satisfied and partially unsatisfied evidence/authority conditions.",
+      "win_condition":"Allows only evidence-complete optional-stage bypass and blocks any skip with a unique unsatisfied obligation.",
+      "reject_if":"Speed, candidate attractiveness, sunk cost, or time pressure can bypass a required gate."
+    },
+    {
+      "extension_id":"HM_EXT04_COMMITMENT_CONTAMINATION_GUARD",
+      "workload":"Use prior payment, time spent, clicks, and previous approval to infer current consent/authority/fit, then compare with explicit current confirmation.",
+      "win_condition":"Historical commitment cannot authorize or validate a current consequential action; explicit current state governs.",
+      "reject_if":"Past investment can substitute for current consent, authority, validity, or fit."
+    }
+  ],
+  "promotion_rule":"Contract survival only creates a candidate. No canonical promotion without real same-workload evidence and existing Human Gate authority."
+}

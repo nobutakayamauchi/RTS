@@ -1,0 +1,75 @@
+name: Validate OSARU knowledge intake
+
+on:
+  pull_request:
+    paths:
+      - 'thin-rts/ULTIMATE_LOOP_METHOD.md'
+      - 'thin-rts/phoenix/ultimate-loop-lifecycle-succession-v0.json'
+      - 'thin-rts/ultimate-loop/README.md'
+      - 'thin-rts/ultimate-loop/lifecycle.py'
+      - 'thin-rts/ultimate-loop/integrity.py'
+      - 'thin-rts/ultimate-loop/test_lifecycle.py'
+      - 'thin-rts/ultimate-loop/test_meteor_lifecycle.py'
+      - 'thin-rts/ultimate-loop/test_integrity.py'
+      - 'thin-rts/ultimate-loop/test_integrity_lifecycle.py'
+      - 'thin-rts/ultimate-loop/operator_intake.py'
+      - 'thin-rts/ultimate-loop/test_operator_intake.py'
+      - 'thin-rts/ultimate-loop/osaru_extension_crucible.py'
+      - 'thin-rts/ultimate-loop/test_osaru_extension_crucible.py'
+      - 'thin-rts/ultimate-loop/hybrid_marketing_crucible.py'
+      - 'thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py'
+      - 'thin-rts/ultimate-loop/concept_design_crucible.py'
+      - 'thin-rts/ultimate-loop/test_concept_design_crucible.py'
+      - 'thin-rts/ultimate-loop/intake/osaru-mine/**'
+      - 'thin-rts/ultimate-loop/intake/hybrid-marketing/**'
+      - 'thin-rts/ultimate-loop/intake/concept-design/**'
+      - '.github/workflows/validate-osaru-operator-intake.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile validators, canonical binders and tests
+        run: |
+          python -m py_compile thin-rts/ultimate-loop/integrity.py
+          python -m py_compile thin-rts/ultimate-loop/lifecycle.py
+          python -m py_compile thin-rts/ultimate-loop/test_integrity.py
+          python -m py_compile thin-rts/ultimate-loop/test_integrity_lifecycle.py
+          python -m py_compile thin-rts/ultimate-loop/test_lifecycle.py
+          python -m py_compile thin-rts/ultimate-loop/test_meteor_lifecycle.py
+          python -m py_compile thin-rts/ultimate-loop/operator_intake.py
+          python -m py_compile thin-rts/ultimate-loop/test_operator_intake.py
+          python -m py_compile thin-rts/ultimate-loop/osaru_extension_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/test_osaru_extension_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/hybrid_marketing_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/concept_design_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/test_concept_design_crucible.py
+      - name: Run canonical integrity destructive tests
+        run: python thin-rts/ultimate-loop/test_integrity.py
+      - name: Run canonical integrity lifecycle connection tests
+        run: python thin-rts/ultimate-loop/test_integrity_lifecycle.py
+      - name: Run existing lifecycle regression tests
+        run: python thin-rts/ultimate-loop/test_lifecycle.py
+      - name: Run existing METEOR lifecycle death-memory tests
+        run: python thin-rts/ultimate-loop/test_meteor_lifecycle.py
+      - name: Run intake regression tests
+        run: python thin-rts/ultimate-loop/test_operator_intake.py
+      - name: Run OSARU extension destructive crucible
+        run: python thin-rts/ultimate-loop/test_osaru_extension_crucible.py
+      - name: Run hybrid marketing destructive crucible
+        run: python thin-rts/ultimate-loop/test_hybrid_marketing_crucible.py
+      - name: Run concept design destructive crucible
+        run: python thin-rts/ultimate-loop/test_concept_design_crucible.py
+      - name: Validate universal operator pack
+        run: |
+          python thin-rts/ultimate-loop/operator_intake.py \
+            thin-rts/ultimate-loop/intake/osaru-mine/universal-operators-v1.json

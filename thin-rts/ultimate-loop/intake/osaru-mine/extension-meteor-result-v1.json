@@ -1,0 +1,69 @@
+{
+  "schema": "ultimate-loop-extension-meteor-result/v0",
+  "frame_id": "ultimate-loop-method/osaru-mine-extensions-v1",
+  "status": "CONTRACT_METEOR_COMPLETE_UNDER_CURRENT_REPOSITORY_EVIDENCE",
+  "authority_effect": "NONE",
+  "canonical_promotion_authorized": false,
+  "evidence_scope": "CONTRACT_METEOR_ONLY_NOT_REAL_WORLD_UTILITY_PROOF",
+  "source_task_coverage": 100,
+  "original_extension_count": 5,
+  "canonical_candidate_count": 2,
+  "canonical_candidate_ids": [
+    "EXT03_BOTTLENECK_REENTRY_ROUTING",
+    "EXT05_DECISION_CAPABILITY_SUCCESSION"
+  ],
+  "results": [
+    {
+      "extension_id": "EXT01_FIRST_PARTY_SIGNAL_BINDING",
+      "verdict": "DEMOTE_TO_CONDITIONAL_EVIDENCE_PROFILE",
+      "killed_claim": "First-party evidence is a universal Ultimate Loop gate.",
+      "survivor": "When a real human/user/operator surface materially matters, direct bound evidence may be typed separately; otherwise NOT_APPLICABLE.",
+      "canonical_candidate": false
+    },
+    {
+      "extension_id": "EXT02_CANONICAL_SOURCE_COMPILER",
+      "verdict": "DEMOTE_TO_NONCANONICAL_SUPPORT_CONTRACT",
+      "killed_claim": "Ultimate Loop should own a general publication/compiler platform.",
+      "survivor": "A bounded source-to-adapter contract may preserve fact fingerprints, provenance, and private-field non-disclosure.",
+      "canonical_candidate": false
+    },
+    {
+      "extension_id": "EXT03_BOTTLENECK_REENTRY_ROUTING",
+      "verdict": "CANONICAL_EXTENSION_CANDIDATE",
+      "killed_claim": "A weak metric or correlation may directly identify root cause and local re-entry.",
+      "survivor": "Externally proven failure-stage evidence may be bound to the smallest existing gate; uncertain causality reopens analysis.",
+      "canonical_candidate": true
+    },
+    {
+      "extension_id": "EXT04_SCALE_PROOF_GATE",
+      "verdict": "DEMOTE_TO_CONDITIONAL_SCALE_PROFILE",
+      "killed_claim": "Nothing may scale until a local loop is proven.",
+      "survivor": "Safety/correctness dominate; locally proven loops may scale behind guardrails and scale-dependent behavior may use bounded authorized probes.",
+      "canonical_candidate": false
+    },
+    {
+      "extension_id": "EXT05_DECISION_CAPABILITY_SUCCESSION",
+      "verdict": "CANONICAL_PHOENIX_EXTENSION_CANDIDATE",
+      "killed_claim": "Retrieval or reconstruction proves successor competence and authority.",
+      "survivor": "Creator-absent held-out decision tests, authority compliance, escalation behavior, and canonical material are required together.",
+      "canonical_candidate": true
+    }
+  ],
+  "repository_validation": {
+    "workflow": "Validate OSARU operator intake",
+    "workflow_run_id": 32105162964,
+    "compile": "PASS",
+    "operator_intake_regression": "PASS",
+    "extension_destructive_tests": "15/15 PASS",
+    "universal_pack_validation": "PASS"
+  },
+  "hard_invariants": [
+    "DA/COUNTER-DA SURVIVOR != CANONICAL",
+    "CONTRACT METEOR PASS != REAL-WORLD SAME-WORKLOAD WIN",
+    "CAPABILITY != AUTHORITY",
+    "CORRELATION != ROOT CAUSE",
+    "RETRIEVAL != DECISION COMPETENCE",
+    "BUSINESS METRIC != SAFETY/CORRECTNESS OVERRIDE"
+  ],
+  "next_gate": "Real same-workload evidence for EXT03 and a creator-absent held-out succession exercise for EXT05 before any canonical promotion proposal."
+}

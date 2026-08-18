@@ -1,0 +1,71 @@
+{
+  "schema": "ultimate-loop-source-map/v0",
+  "pack_id": "osaru-concept-design-v1",
+  "status": "CHALLENGER_KNOWLEDGE / NON_CANONICAL",
+  "authority_effect": "NONE",
+  "sources": [
+    {
+      "title": "おさる式コンセプトの極意",
+      "url": "https://docs.google.com/presentation/d/1fitqI8W3FcKuij81WTHK5__O3qdT_nFU9JYJTxMxo_0/edit?usp=drivesdk",
+      "declared_slide_count": 139,
+      "text_recovered_slides": "1-94",
+      "unknown_slides": "95-139",
+      "unknown_reason": "HTML presentation view exposed slide identities but no recoverable text for these slides; image-only or inaccessible content remains UNKNOWN.",
+      "coverage_claim": "94 TEXT-RECOVERED / 45 UNKNOWN; no claim of full visual inspection"
+    },
+    {
+      "title": "コンセプトのエクセル",
+      "kind": "user-provided screen-recording MP4",
+      "sha256": "1b5ddc7616a229d52543efffea67103ac6394a6d344cb60f8456ec62ba38580e",
+      "duration_seconds": 70.033333,
+      "inspection": "representative frame extraction and direct visual inspection",
+      "provenance_file": "concept-worksheet-video-supplement-20260818.json"
+    }
+  ],
+  "source_sections": [
+    {"slides":"2-14","theme":"concept as the shared decision foundation; AI accelerates execution but does not choose the governing concept"},
+    {"slides":"15-30","theme":"start from observed demand and recurring demand patterns rather than creator preference"},
+    {"slides":"31-45","theme":"extract actor-specific advantage from story, values, recurring behavior and overcome-experience"},
+    {"slides":"46-53","theme":"use competitor analysis to locate an unserved position rather than imitate surface features"},
+    {"slides":"54-64","theme":"target resolution; distinguish stated wants from inferred deeper needs; identify previously failed solutions"},
+    {"slides":"65-74","theme":"compose demand, uniqueness, position and target into an upstream concept connected to the downstream product/outcome"},
+    {"slides":"75-83","theme":"one semantic core, multiple channel-specific representations"},
+    {"slides":"84-90","theme":"publish hypotheses, observe who responded to which wording, analyze, deepen winners and retest weak variants"},
+    {"slides":"91-94","theme":"summary and execution prompt"},
+    {"worksheet":"STEP1","theme":"base strategy inputs: product/service, target current problem, desired future, unique solution"},
+    {"worksheet":"STEP2","theme":"launch-wide concept: title, problem, benefit, why-you, why-now, abstraction check"},
+    {"worksheet":"STEP3","theme":"numeric goal, business phase, phase-dependent funnel/policy selection, D-Day"},
+    {"worksheet":"STEP4-8","theme":"downstream prelaunch, lead magnet, video, landing-page and offer artifacts repeatedly consume named upstream strategy outputs"}
+  ],
+  "known_overlap": [
+    "OP02_DISCOVER_REALITY",
+    "OP03_EXTRACT_PRIVATE_KNOWLEDGE",
+    "OP05_SCORE_SIGNAL",
+    "OP06_LOCATE_VALUE_GAP",
+    "OP07_FORM_FALSIFIABLE_HYPOTHESIS",
+    "OP11_COMPILE_FROM_CANONICAL_SOURCE",
+    "OP13_OBSERVE_AND_ATTRIBUTE",
+    "OP14_DIAGNOSE_BOTTLENECK",
+    "HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY",
+    "HM_EXT02_EVIDENCE_CONSTRUCT_VALIDITY"
+  ],
+  "candidate_deltas": [
+    "CD_EXT01_SEMANTIC_INVARIANT_ADAPTER_GUARD",
+    "CD_EXT02_OBSERVATION_INFERENCE_LAYERING",
+    "CD_EXT03_END_TO_END_OBJECTIVE_BINDING",
+    "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY",
+    "CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION",
+    "CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION",
+    "CD_EXT07_ABSTRACTION_LEVEL_BINDING"
+  ],
+  "rejected_as_universal_doctrine": [
+    "named-platform preference",
+    "fixed marketing formulas",
+    "Why/What/How/Action as a mandatory universal sequence",
+    "fixed funnel choice",
+    "high-ticket product assumptions",
+    "authority or personal story as proof of factual correctness",
+    "latent customer needs inferred from persuasion theory as observed fact",
+    "claims that one targeting or messaging strategy is universal"
+  ]
+}

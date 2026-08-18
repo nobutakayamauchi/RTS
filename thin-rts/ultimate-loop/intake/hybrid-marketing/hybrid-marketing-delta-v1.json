@@ -1,0 +1,64 @@
+{
+  "schema": "ultimate-loop-knowledge-delta/v0",
+  "pack_id": "hybrid-marketing-143p-delta-v1",
+  "status": "CHALLENGER_KNOWLEDGE / NON_CANONICAL",
+  "authority_effect": "NONE",
+  "source": {
+    "name": "Hybrid Marketing supplementary slide deck",
+    "page_count": 143,
+    "page_coverage": "143/143 visually scanned and text-assisted",
+    "source_sha256": "cdaa7f48a66960acb21f52149055ca7f4795b556afa4a6a3806ae5b2984fdee7",
+    "derivation": "Marketing/channel/price literals stripped; general control, evidence, filtering, routing, and authority implications extracted. Manipulative sunk-cost claims are retained only as adversarial evidence, never as recommended doctrine."
+  },
+  "sections": [
+    {"pages":"1-17","topic":"long-horizon customer quality and staged funnel","classification":"SUPPORT_PROFILE"},
+    {"pages":"18-32","topic":"choose medium from outcome and information/trust requirements rather than raw reach","classification":"SUPPORT_PROFILE"},
+    {"pages":"33-40","topic":"entry-point packaging and A/B testing","classification":"KNOWN_OPERATOR_EVIDENCE"},
+    {"pages":"41-53","topic":"structured message sequence and retention-sensitive opening","classification":"ADAPTER_PROFILE"},
+    {"pages":"54-64","topic":"purpose-first topic choice plus reduce/reuse/recycle of source material","classification":"KNOWN_OPERATOR_EVIDENCE"},
+    {"pages":"65-84","topic":"delivery/nonverbal/authority cues and script construction","classification":"ADAPTER_PROFILE_WITH_EVIDENCE_WARNING"},
+    {"pages":"85-107","topic":"education, screening, deliberate friction, repeated CTA, paid closing","classification":"MIXED: THREE CHALLENGER GAPS + MANIPULATION DEATH_MEMORY"},
+    {"pages":"109-118","topic":"front-load useful value before asking for high commitment","classification":"SUPPORT_PROFILE"},
+    {"pages":"119-138","topic":"pricing, product portfolio, LTV and operational burden","classification":"BUSINESS_PROFILE_NOT_CANONICAL"},
+    {"pages":"139-143","topic":"summary","classification":"NO_NEW_DELTA"}
+  ],
+  "adversarial_invariants": [
+    "SUNK_COST != CURRENT_CONSENT",
+    "PAST_COMMITMENT != CURRENT_AUTHORITY",
+    "FRICTION != QUALIFICATION_UNLESS_THE_MEASURED_CONSTRUCT_MATCHES_THE_CLAIM",
+    "SMALL_PAYMENT_CAPABILITY != LARGE_PURCHASE_FIT",
+    "AUTHORITY_SIGNAL != TRUTH",
+    "LOW_STAGE_CONVERSION != BOTTLENECK_WHEN_INTENTIONAL_FILTERING_IS_PROVEN",
+    "HIGH_RETENTION != OUTCOME_CORRECTNESS",
+    "REACH_OR_FOLLOWER_GROWTH != CHANNEL_FIT",
+    "PRICE != VALUE",
+    "FREE_VALUE != CONSENT_TO_FUTURE_SALE"
+  ],
+  "candidate_extensions": [
+    {
+      "id":"HM_EXT01_FILTER_AWARE_STAGE_TELEMETRY",
+      "claim":"A stage must declare whether it is a FILTER, TRANSFORM, or PASS_THROUGH stage before low throughput can be called a bottleneck.",
+      "source_pages":[14,15,16,94,95,96],
+      "risk":"Could excuse real failure by calling every loss intentional filtering."
+    },
+    {
+      "id":"HM_EXT02_EVIDENCE_CONSTRUCT_VALIDITY",
+      "claim":"A gate pass may claim only properties it directly measures, unless a proxy relationship to the claimed property is separately validated.",
+      "source_pages":[104,105,106,131,132,133,134,135],
+      "risk":"Could add excessive formalism to simple gates."
+    },
+    {
+      "id":"HM_EXT03_EVIDENCE_SATISFIED_SHORT_CIRCUIT",
+      "claim":"When downstream prerequisites, authority, and every unique evidence/safety obligation are already satisfied, optional intermediate stages may be bypassed rather than executed for sequence purity.",
+      "source_pages":[97,98,99,100,101,102],
+      "risk":"A speed optimization may silently skip a unique obligation."
+    },
+    {
+      "id":"HM_EXT04_COMMITMENT_CONTAMINATION_GUARD",
+      "claim":"Past time, effort, money, clicks, or prior approvals must never be treated as current consent, validity, authority, or fit.",
+      "source_pages":[11,12,13,95,104,106],
+      "risk":"May duplicate stale-approval and capability-vs-authority rules unless it catches a distinct historical-commitment failure class."
+    }
+  ],
+  "canonical_promotion_authorized": false
+}

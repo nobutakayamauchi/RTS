@@ -1,0 +1,56 @@
+{
+  "schema": "ultimate-loop-challenger-workload/v0",
+  "frame_id": "ultimate-loop-method/osaru-mine-extensions-v1",
+  "status": "FROZEN_FOR_DA_COUNTER_DA_AND_METEOR",
+  "authority_effect": "NONE",
+  "subject": "Five possible Ultimate Loop extensions derived from the 100-task OSARU MINE universal operator extraction.",
+  "incumbent": "Development Sequence Loop / Ultimate Loop v0.1",
+  "required_invariants": [
+    "NO CURRENT LANDSCAPE SWEEP -> NO SUPERIORITY CLAIM",
+    "BETTER CANDIDATE != AUTHORIZED REPLACEMENT",
+    "DEPLOYED != OBSERVED_CORRECT",
+    "PATCH APPLIED != FIX VALIDATED",
+    "UNKNOWN remains UNKNOWN",
+    "Existing Human Gates and authority boundaries cannot be weakened",
+    "Operators may be NOT_APPLICABLE when the frozen workload has no corresponding surface"
+  ],
+  "decision_space": [
+    "KEEP_CURRENT",
+    "COMPOSE_EXTENSION",
+    "STANDBY_RESEARCH",
+    "REJECT_EXTENSION"
+  ],
+  "same_workload_tests": [
+    {
+      "extension_id": "EXT01_FIRST_PARTY_SIGNAL_BINDING",
+      "workload": "Product/request decision with both current user evidence and external discovery evidence.",
+      "win_condition": "Reduces false-confidence or mis-prioritization without forcing first-party evidence onto inapplicable offline/library workloads.",
+      "reject_if": "Creates a mandatory customer-contact gate for workloads where no human/user surface exists."
+    },
+    {
+      "extension_id": "EXT02_CANONICAL_SOURCE_COMPILER",
+      "workload": "One canonical evidence record rendered into two independent public/operational adapters.",
+      "win_condition": "Single canon mutation rebuilds both adapters with no factual drift, provenance loss, or private-field leakage.",
+      "reject_if": "Requires Ultimate Loop to own a general publishing platform, crawler, database, or channel runtime."
+    },
+    {
+      "extension_id": "EXT03_BOTTLENECK_REENTRY_ROUTING",
+      "workload": "Inject distinct failures into discovery, implementation, deployment, and post-deploy metric stages.",
+      "win_condition": "Routes each failure to the smallest justified existing gate while preserving UNKNOWN when causality is not proven.",
+      "reject_if": "Routing labels root cause from correlation or bypasses DA/METEOR authority."
+    },
+    {
+      "extension_id": "EXT04_SCALE_PROOF_GATE",
+      "workload": "Compare bounded scaling before vs after local loop proof for a reversible workload.",
+      "win_condition": "Materially reduces cost-of-failure/operator burden without blocking scale-dependent learning.",
+      "reject_if": "The gate blocks experiments whose behavior only emerges at scale or lets business metrics outrank safety/correctness."
+    },
+    {
+      "extension_id": "EXT05_DECISION_CAPABILITY_SUCCESSION",
+      "workload": "A successor handles held-out operational decisions using only canonical material and declared authority.",
+      "win_condition": "Successor decisions, escalation, and authority compliance remain within accepted tolerance without creator intervention.",
+      "reject_if": "Knowledge retrieval quality is treated as authority or competence proof."
+    }
+  ],
+  "promotion_rule": "No extension becomes canonical from this packet. Each must survive same-workload evidence, DA/Counter-DA, and the existing promotion authority path."
+}

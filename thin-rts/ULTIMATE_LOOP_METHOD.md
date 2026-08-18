@@ -2,7 +2,7 @@
 
 Timestamp: **2026-08-11 20:29 JST**
 
-Canonical extensions integrated: **2026-08-14 JST**
+Canonical extensions integrated: **2026-08-14 JST; integrity/re-entry integration 2026-08-18 JST**
 
 Provisional operational completion: **2026-08-14 JST**
 
@@ -12,7 +12,7 @@ Formal name: **Development Sequence Loop**
 
 Common name: **Ultimate Loop**
 
-Current release: **v0.1**
+Current release: **v0.2**
 
 The Development Sequence Loop (commonly **Ultimate Loop**) is a development method for deciding what responsibility deserves to exist, which implementation deserves to occupy it, when that occupant should be replaced, and how the human-important outcome remains reconstructable when implementations, providers, tools, or the original creator disappear.
 
@@ -56,7 +56,100 @@ WISH / PROBLEM / EVENT
 → repeat
 ```
 
+The sequence above remains the lifecycle. **Evidence integrity, derived-artifact freshness, authority integrity, and typed re-entry are cross-cutting contracts, not additional top-level stages.** They constrain claims and transitions wherever applicable without forcing every workload through irrelevant gates.
+
 Offline/library artifacts may have no live deployment surface. Their workload must explicitly declare the equivalent verification boundary instead of fabricating runtime evidence.
+
+## Cross-cutting Integrity / Re-entry contract
+
+Ultimate Loop may only act on evidence to the extent that the evidence proves the claimed property for the claimed scope and current lineage.
+
+Before a consequential transition (`core freeze`, `partial/full replacement`, or `emergency failover`) can be authorized, integrity applicability must be explicit and evidence-bound:
+
+- `REQUIRED` — bind a profile containing at least one recognized integrity section and pass the applicable checks;
+- `NOT_APPLICABLE` — bind the N/A decision to verifier-controlled or frozen-workload applicability evidence through an evidence reference;
+- `UNDECLARED` — fail closed for the consequential transition.
+
+`MISSING APPLICABILITY != NOT_APPLICABLE`
+
+`BARE NOT_APPLICABLE LABEL != BOUND NOT_APPLICABLE`
+
+`REQUIRED EMPTY PROFILE != PASS`
+
+A missing/empty `REQUIRED` profile and a bare `NOT_APPLICABLE` label both fail closed at a consequential transition. This prevents a caller from bypassing the contracts by omission, by an empty envelope, or by an unbound N/A label while preserving an evidence-bound compatibility path for genuinely non-applicable workloads.
+
+Canonical boundaries:
+
+- `OBSERVATION != INTERPRETATION`;
+- `GATE_PASS != UNMEASURED_PROPERTY`;
+- `COMPARATOR_SHIFT != PERFORMANCE_IMPROVEMENT`;
+- `SELECTED_COHORT_EVIDENCE != POPULATION_EVIDENCE`;
+- `POST_INTERVENTION_STATE != INTRINSIC_BASELINE_PROPERTY`;
+- `AGGREGATE_METRIC != UNIFORM_EFFECT`;
+- `ABSTRACT_SUCCESS != REFUTATION_OF_CONCRETE_FAILURE`;
+- `NARROW_EVIDENCE != BROADER_CLAIM_WITHOUT_SCOPE_BRIDGE`.
+
+A proxy relationship, cross-cohort generalization, cross-level claim, causal interpretation, or changed reference frame requires its own validated bridge. UNKNOWN or missing bridge evidence remains UNKNOWN and cannot become PASS because the candidate is attractive.
+
+### Derived-artifact freshness
+
+Generated or derived artifacts are revision-bound to the upstream fields they actually consumed.
+
+`UPSTREAM CHANGE != DOWNSTREAM FRESHNESS`
+
+When a material upstream field changes, each dependent artifact that consumed that field becomes `STALE` until either:
+
+1. it is recomputed from the current upstream revision; or
+2. the affected dependency slice is explicitly and boundedly revalidated against the current revision.
+
+Unrelated upstream changes do **not** invalidate an artifact. Ultimate Loop therefore invalidates the smallest proven dependency slice rather than forcing a global rebuild.
+
+A stale artifact cannot be used as current evidence for promotion, deployment, publication, failover, or another consequential transition.
+
+### Typed smallest-gate re-entry
+
+A bad result does not authorize a global rewrite, and a correlation does not authorize a local root-cause claim.
+
+`CORRELATION != ROOT CAUSE`
+
+When the failure stage and causality are externally established, Ultimate Loop routes to the smallest existing re-entry gate:
+
+```text
+DISCOVERY          → DISCOVERY_REFRESH
+IMPLEMENTATION     → DA_COUNTER_DA
+DEPLOYMENT         → DEPLOYMENT_IDENTITY
+POST_DEPLOY_METRIC → POST_DEPLOY_DEBUG
+UNKNOWN/CORRELATED → ANALYSIS_REOPEN
+```
+
+The re-entry binder owns **routing only**. It does not diagnose causality. If stage or causality is unproven, analysis reopens rather than guessing the smallest gate.
+
+### Human Gate agency
+
+`CAPABILITY != AUTHORITY`
+
+When a consequential authority claim is explicitly sourced from a Human Gate, the gate is meaningful only when the current human can actually refuse it.
+
+`CHOICE PRESENTATION != MEANINGFUL AUTHORIZATION`
+
+A Human Gate sourced authorization must bind, at minimum:
+
+- a visible and actionable decline path;
+- material-consequence disclosure;
+- a current explicit decision;
+- no deceptive default, prechecked approval, hidden refusal, sunk-cost leverage, social coercion, or unrelated penalty for refusal imposed by the system.
+
+This does not require every authority mechanism to use a UI. It constrains authority claims that identify a human choice as their source.
+
+### Decision succession is distinct from recovery
+
+PHOENIX regeneration/recovery and successor decision competence are related but different claims.
+
+`RETRIEVAL != DECISION COMPETENCE`
+
+`RECOVERY != DECISION SUCCESSION`
+
+A decision-succession-ready profile requires canonical material plus creator-absent held-out decisions, authority-boundary compliance, and correct escalation/UNKNOWN behavior. Passing this profile grants no new authority; it only proves bounded decision capability under the tested scope.
 
 ## Gate 0 — Current landscape discovery
 
@@ -113,7 +206,7 @@ Materialize the strongest existing/external composition and the smallest justifi
 
 Comparison may include quality/capability, performance/efficiency, reliability, operator burden, security/privacy, maintainability, cost, migration/rollback, dependency/provider risk, recoverability, evidence maturity, and PHOENIX implications.
 
-A benchmark win alone is not enough. A challenger cannot win by deleting inherited safety, durability, evidence, authority, or recovery requirements.
+A benchmark win alone is not enough. A challenger cannot win by deleting inherited safety, durability, evidence, authority, recovery, integrity, or current-derived-artifact requirements.
 
 Possible outcomes include `KEEP`, `PARTIAL REPLACE`, `FULL REPLACE`, `STANDBY`, and `REJECT`.
 
@@ -132,7 +225,7 @@ DEPLOY / PUBLISH
 → EXPECTED vs OBSERVED
 → EVIDENCE BINDING
 → FAILURE ANALYSIS
-→ AUTHORIZED PATCH / CHANGE
+→ TYPED RE-ENTRY OR AUTHORIZED PATCH / CHANGE
 → DEPLOYMENT RE-IDENTITY
 → EXACT FAILED-PROBE REPLAY
 → REGRESSION
@@ -151,9 +244,9 @@ Hard invariants:
 - post-change Deployment Identity must be genuinely new: reusing the initial observation fingerprint or observation session cannot validate a change;
 - temporal order must be proven: `INITIAL_OBSERVATION < CHANGE_APPLIED < POST_CHANGE_OBSERVATION`;
 - `PATCH APPLIED != FIX VALIDATED`;
-- blocked or missing required evidence fails closed.
+- blocked, stale, scope-invalid, or missing required evidence fails closed.
 
-A clean first deployment that satisfies all required probes may become `DEPLOYMENT_VALIDATED`. A repaired deployment becomes `FIX_VALIDATED` only after verifier-controlled re-identity, exact failed-probe replay, and regression evidence.
+A clean first deployment that satisfies all required probes may become `DEPLOYMENT_VALIDATED`. A repaired deployment becomes `FIX_VALIDATED` only after verifier-controlled re-identity, exact failed-probe replay, regression evidence, and applicable integrity/freshness checks.
 
 ## Loop 3 — DARWIN ARENA / Knockout Match
 
@@ -196,7 +289,7 @@ A material event does not have to wait for the weekly tick. Critical security ev
 
 The current sequence therefore has two simultaneous truths:
 
-`SEQUENCE v0.1 = PROVISIONALLY COMPLETE ENOUGH TO OPERATE`
+`SEQUENCE v0.2 = PROVISIONALLY COMPLETE ENOUGH TO OPERATE`
 
 `ULTIMATE LOOP = NEVER PERMANENTLY IMMUNE FROM CHALLENGE`
 
@@ -208,6 +301,8 @@ WATCH observes material changes in models/LLMs, libraries, APIs, algorithms, OSS
 
 Doing nothing may be the correct outcome.
 
+A material upstream revision, reference-class change, intervention-history change, cohort-selection change, or newly discovered scope mismatch may also reopen only the affected evidence/artifact slice rather than the entire system.
+
 ## Emergency / recovery rule
 
 Outage, shutdown, compromise, account loss, network loss, corruption, storage loss, provider disappearance, or material instability may enter the bounded Emergency Recovery / Failover Gate whose objective is minimum viable restoration, not improvement.
@@ -218,7 +313,7 @@ Emergency restoration may temporarily proceed without a full discovery sweep whe
 
 Ultimate Loop is bounded by **PHOENIX LINEAGE**.
 
-The protected subject is not code, a provider, or the creator. It is the human-important outcome and enough material evidence, state, meaning, decisions, failure history, authority boundaries, and recovery path to reconstruct that outcome using the best currently available means.
+The protected subject is not code, a provider, or the creator. It is the human-important outcome and enough material evidence, state, meaning, decisions, failure history, authority boundaries, dependency lineage, and recovery path to reconstruct that outcome using the best currently available means.
 
 `IMPLEMENTATION MAY DIE`
 
@@ -228,7 +323,9 @@ The protected subject is not code, a provider, or the creator. It is the human-i
 
 `CREATOR MAY BE ABSENT`
 
-but the lineage needed to determine what mattered, what failed, what must be preserved, and how to rebuild must survive.
+but the lineage needed to determine what mattered, what failed, what must be preserved, what derived material is stale, and how to rebuild must survive.
+
+PHOENIX readiness proves bounded regeneration/recovery capability under its tested contract. Decision succession is reported separately and cannot be inferred from retrieval or regeneration alone.
 
 ## Memory rule
 
@@ -238,7 +335,9 @@ Every survivor inherits useful memory of the dead:
 - failure/autopsy records;
 - rejected and near-winning alternatives;
 - unresolved UNKNOWNs;
-- authority boundaries;
+- authority boundaries and applicable Human Gate provenance;
+- evidence scope/reference/cohort/intervention lineage;
+- derived-artifact dependency and revision lineage;
 - evidence/recovery requirements;
 - migration assumptions;
 - predecessor lineage.
@@ -247,6 +346,6 @@ Every survivor inherits useful memory of the dead:
 
 ## Method invariant
 
-**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep challenging the incumbent when reality changes. Verify the deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome and the memory required to regenerate it.**
+**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep evidence bound to what it actually proves. Invalidate only the derived artifacts whose consumed upstream facts changed. Re-enter the smallest existing gate only when causality is proven; otherwise reopen analysis. Require integrity applicability to be explicit and evidence-bound before consequential transitions. Keep meaningful human authority separate from system capability. Keep challenging the incumbent when reality changes. Verify deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome, decision boundaries, and memory required to regenerate it.**
 
 That full method is formally the **Development Sequence Loop**, commonly called **Ultimate Loop**.

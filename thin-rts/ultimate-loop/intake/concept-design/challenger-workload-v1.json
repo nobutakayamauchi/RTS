@@ -1,0 +1,42 @@
+{
+  "schema": "ultimate-loop-concept-design-challenger-workload/v0",
+  "frame_id": "ultimate-loop-method/concept-design-deltas-v1",
+  "status": "FROZEN_FOR_DA_COUNTER_DA_AND_CONTRACT_METEOR",
+  "authority_effect": "NONE",
+  "required_invariants": [
+    "UNKNOWN remains UNKNOWN",
+    "OBSERVED SIGNAL != INFERRED LATENT NEED",
+    "LOCAL METRIC WIN != END-TO-END OUTCOME WIN",
+    "AGGREGATE METRIC != UNIFORM EFFECT",
+    "ADAPTER FREEDOM != AUTHORITY TO MUTATE CORE SEMANTICS",
+    "PERSUASIVE NARRATIVE != CAUSAL EVIDENCE",
+    "Existing Human Gates cannot be weakened"
+  ],
+  "tests": [
+    {
+      "extension_id": "CD_EXT01_SEMANTIC_INVARIANT_ADAPTER_GUARD",
+      "workload": "Render one evidence-bound core claim into materially different channel/UI adapters.",
+      "win_condition": "Adapters may change form, length and emphasis while protected semantic claims remain equivalent and provenance stays bound.",
+      "reject_if": "It freezes presentation style as semantics or permits a derived adapter to mutate the protected claim."
+    },
+    {
+      "extension_id": "CD_EXT02_OBSERVATION_INFERENCE_LAYERING",
+      "workload": "A user states an observable want while an analyst/model infers a deeper latent need.",
+      "win_condition": "Raw observation, interpretation and validated fact remain typed separately; inference can guide a probe but cannot masquerade as first-party evidence.",
+      "reject_if": "Repeated or persuasive inference is allowed to become observed fact without independent validation."
+    },
+    {
+      "extension_id": "CD_EXT03_END_TO_END_OBJECTIVE_BINDING",
+      "workload": "An upstream stage metric improves while the frozen downstream protected outcome degrades.",
+      "win_condition": "Local optimization cannot promote a change that materially worsens the protected end-to-end outcome, unless the downstream relation is explicitly NOT_APPLICABLE.",
+      "reject_if": "It creates a mandatory downstream business/product dependency for workloads that have no such downstream surface."
+    },
+    {
+      "extension_id": "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY",
+      "workload": "Aggregate metrics hide opposite outcomes across material cohorts/contexts.",
+      "win_condition": "A material evidence-bound context can block a global diagnosis and force targeted analysis without encouraging arbitrary post-hoc segmentation.",
+      "reject_if": "Any tiny or invented segment can veto the aggregate, or segmentation is used without predeclared/materiality evidence."
+    }
+  ],
+  "promotion_rule": "No challenger becomes canonical from contract tests. Same-workload evidence and existing promotion authority remain mandatory."
+}

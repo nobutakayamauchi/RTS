@@ -12,6 +12,8 @@ def base_case():
         "frame_id": "frame-llm-router",
         "current_state": "STABLE",
         "material_durable": True,
+        "integrity_applicability": "NOT_APPLICABLE",
+        "integrity_applicability_evidence_ref": "workload:legacy-lifecycle-no-v0.2-integrity-surface",
         "authority": {"promote": "BLOCKED", "failover": "BLOCKED"},
         "policy": {
             "observe_delta_pct": 5,

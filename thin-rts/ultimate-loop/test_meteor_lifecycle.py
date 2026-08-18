@@ -11,6 +11,8 @@ def valid_replacement_case():
     return {
         "frame_id": "frame-core-capability",
         "current_state": "STABLE",
+        "integrity_applicability": "NOT_APPLICABLE",
+        "integrity_applicability_evidence_ref": "workload:meteor-legacy-no-v0.2-integrity-surface",
         "authority": {"promote": "AUTHORIZED", "failover": "BLOCKED"},
         "policy": {"observe_delta_pct": 5, "meteor_delta_pct": 15, "full_replace_delta_pct": 30},
         "trigger": {
