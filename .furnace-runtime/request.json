@@ -9,6 +9,6 @@
     "sed -n '840,900p' Zend/zend_execute.c",
     "sed -n '1040,1105p' Zend/zend_execute.c",
     "sed -n '1380,1530p' Zend/zend_compile.c",
-    "grep -R -n -E 'zend_type_to_string\((prop|info|error_prop)->type\)' Zend/*.c | head -200"
+    "grep -n 'zend_type_to_string' Zend/zend_execute.c | grep -E 'prop->type|info->type|error_prop->type'"
   ]
 }
