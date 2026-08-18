@@ -54,7 +54,7 @@ This reinforces the existing frozen human-important outcome and same-workload co
 
 A material evidence-bound cohort/context may invalidate a global diagnosis. Arbitrary or immaterial post-hoc segmentation cannot veto the aggregate.
 
-### 5. Derived-artifact staleness propagation
+### 5. Derived-artifact staleness propagation — strong candidate
 
 The worksheet visibly threads earlier decisions into later assets. Generalized:
 
@@ -62,9 +62,9 @@ The worksheet visibly threads earlier decisions into later assets. Generalized:
 
 This is field-sensitive, not a demand to rebuild everything. If the changed upstream field is outside a derived artifact's declared dependency set, the artifact stays current. If an affected field changed, the artifact is stale until recomputed from the current upstream revision or boundedly revalidated.
 
-This survives as a strong canonical evidence/control candidate.
+Contract METEOR currently retains this as a **canonical evidence/control candidate**, not an adopted rule.
 
-### 6. Context-bound policy selection
+### 6. Context-bound policy selection — profile refinement
 
 The worksheet explicitly asks for business phase before selecting a funnel/policy. Generalized:
 
@@ -72,9 +72,9 @@ The worksheet explicitly asks for business phase before selecting a funnel/polic
 
 A policy selected for a material maturity/risk/operating context cannot silently become universal doctrine. If the context that selected it changes, the policy is stale until re-evaluated.
 
-This currently looks more like a profile/selection refinement than a wholly new subsystem.
+This remains a conditional profile/selection refinement rather than a new canonical subsystem.
 
-### 7. Abstraction-level binding
+### 7. Abstraction-level binding — compose with construct validity
 
 The worksheet includes an explicit concept abstraction-level check. Generalized:
 
@@ -84,7 +84,9 @@ and
 
 `NARROW EVIDENCE != BROADER CLAIM WITHOUT SCOPE BRIDGE`
 
-A broad statement such as “the system works” cannot erase a concrete checkout failure, while one passing component cannot establish whole-system correctness without validated coverage. This overlaps construct-validity/context guards but adds a useful anti-evasion scope check.
+A broad statement such as “the system works” cannot erase a concrete checkout failure, while one passing component cannot establish whole-system correctness without validated coverage. Cross-level claims require an explicit validated scope bridge.
+
+This is retained as a refinement of evidence construct-validity/context guards rather than a separate canonical subsystem.
 
 ## Support-only / deliberately rejected as universal doctrine
 
