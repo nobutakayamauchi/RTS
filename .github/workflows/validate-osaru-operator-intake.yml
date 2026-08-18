@@ -1,0 +1,32 @@
+name: Validate OSARU operator intake
+
+on:
+  pull_request:
+    paths:
+      - 'thin-rts/ultimate-loop/operator_intake.py'
+      - 'thin-rts/ultimate-loop/test_operator_intake.py'
+      - 'thin-rts/ultimate-loop/intake/osaru-mine/**'
+      - '.github/workflows/validate-osaru-operator-intake.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile validator and tests
+        run: |
+          python -m py_compile thin-rts/ultimate-loop/operator_intake.py
+          python -m py_compile thin-rts/ultimate-loop/test_operator_intake.py
+      - name: Run intake regression tests
+        run: python thin-rts/ultimate-loop/test_operator_intake.py
+      - name: Validate universal operator pack
+        run: |
+          python thin-rts/ultimate-loop/operator_intake.py \
+            thin-rts/ultimate-loop/intake/osaru-mine/universal-operators-v1.json
