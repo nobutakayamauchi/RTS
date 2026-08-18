@@ -5,6 +5,8 @@ on:
     paths:
       - 'thin-rts/ultimate-loop/operator_intake.py'
       - 'thin-rts/ultimate-loop/test_operator_intake.py'
+      - 'thin-rts/ultimate-loop/osaru_extension_crucible.py'
+      - 'thin-rts/ultimate-loop/test_osaru_extension_crucible.py'
       - 'thin-rts/ultimate-loop/intake/osaru-mine/**'
       - '.github/workflows/validate-osaru-operator-intake.yml'
   workflow_dispatch:
@@ -20,12 +22,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile validator and tests
+      - name: Compile validators and tests
         run: |
           python -m py_compile thin-rts/ultimate-loop/operator_intake.py
           python -m py_compile thin-rts/ultimate-loop/test_operator_intake.py
+          python -m py_compile thin-rts/ultimate-loop/osaru_extension_crucible.py
+          python -m py_compile thin-rts/ultimate-loop/test_osaru_extension_crucible.py
       - name: Run intake regression tests
         run: python thin-rts/ultimate-loop/test_operator_intake.py
+      - name: Run extension destructive crucible
+        run: python thin-rts/ultimate-loop/test_osaru_extension_crucible.py
       - name: Validate universal operator pack
         run: |
           python thin-rts/ultimate-loop/operator_intake.py \
