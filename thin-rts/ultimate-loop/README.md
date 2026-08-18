@@ -48,15 +48,17 @@ Evidence integrity, dependency freshness, Human Gate agency, decision-succession
 
 Before a consequential lifecycle transition can be authorized, the caller must explicitly bind whether the v0.2 integrity envelope applies:
 
-- `integrity_applicability = REQUIRED` — the applicable integrity profile must be present and pass;
-- `integrity_applicability = NOT_APPLICABLE` — the workload explicitly declares that no v0.2 integrity profile applies;
+- `integrity_applicability = REQUIRED` — the profile must contain at least one recognized integrity section and the applicable checks must pass;
+- `integrity_applicability = NOT_APPLICABLE` — the N/A decision must carry an `integrity_applicability_evidence_ref` bound to verifier-controlled or frozen-workload applicability evidence;
 - omitted / `UNDECLARED` — the consequential transition fails closed.
 
 `MISSING APPLICABILITY != NOT_APPLICABLE`
 
-`REQUIRED WITHOUT PROFILE != PASS`
+`BARE NOT_APPLICABLE LABEL != BOUND NOT_APPLICABLE`
 
-This preserves compatibility through an explicit N/A path while preventing omission from becoming a bypass. The handshake gates `core freeze`, partial/full replacement, and emergency failover; it does not invent a new lifecycle state.
+`REQUIRED EMPTY PROFILE != PASS`
+
+This preserves compatibility through an explicit, evidence-bound N/A path while preventing omission, an empty REQUIRED envelope, or a bare N/A label from becoming a bypass. The handshake gates `core freeze`, partial/full replacement, and emergency failover; it does not invent a new lifecycle state.
 
 ## Typed re-entry
 
@@ -145,6 +147,10 @@ History is preserved; stale experiment labels are not operational authority.
 `UPSTREAM CHANGE != DOWNSTREAM FRESHNESS`
 
 `MISSING APPLICABILITY != NOT_APPLICABLE`
+
+`BARE NOT_APPLICABLE LABEL != BOUND NOT_APPLICABLE`
+
+`REQUIRED EMPTY PROFILE != PASS`
 
 `CORRELATION != ROOT CAUSE`
 
