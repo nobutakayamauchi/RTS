@@ -64,15 +64,19 @@ Offline/library artifacts may have no live deployment surface. Their workload mu
 
 Ultimate Loop may only act on evidence to the extent that the evidence proves the claimed property for the claimed scope and current lineage.
 
-Before a consequential transition (`core freeze`, `partial/full replacement`, or `emergency failover`) can be authorized, integrity applicability must be explicit:
+Before a consequential transition (`core freeze`, `partial/full replacement`, or `emergency failover`) can be authorized, integrity applicability must be explicit and evidence-bound:
 
-- `REQUIRED` — bind the applicable integrity profile and pass it;
-- `NOT_APPLICABLE` — explicitly declare that no v0.2 integrity profile applies to this transition;
+- `REQUIRED` — bind a profile containing at least one recognized integrity section and pass the applicable checks;
+- `NOT_APPLICABLE` — bind the N/A decision to verifier-controlled or frozen-workload applicability evidence through an evidence reference;
 - `UNDECLARED` — fail closed for the consequential transition.
 
 `MISSING APPLICABILITY != NOT_APPLICABLE`
 
-A `REQUIRED` declaration without its profile also fails closed. This prevents a caller from bypassing the new contracts merely by omitting the integrity envelope while preserving an explicit compatibility path for genuinely non-applicable workloads.
+`BARE NOT_APPLICABLE LABEL != BOUND NOT_APPLICABLE`
+
+`REQUIRED EMPTY PROFILE != PASS`
+
+A missing/empty `REQUIRED` profile and a bare `NOT_APPLICABLE` label both fail closed at a consequential transition. This prevents a caller from bypassing the contracts by omission, by an empty envelope, or by an unbound N/A label while preserving an evidence-bound compatibility path for genuinely non-applicable workloads.
 
 Canonical boundaries:
 
@@ -126,7 +130,7 @@ The re-entry binder owns **routing only**. It does not diagnose causality. If st
 
 When a consequential authority claim is explicitly sourced from a Human Gate, the gate is meaningful only when the current human can actually refuse it.
 
-`CHOICE_PRESENTATION != MEANINGFUL_AUTHORIZATION`
+`CHOICE PRESENTATION != MEANINGFUL AUTHORIZATION`
 
 A Human Gate sourced authorization must bind, at minimum:
 
@@ -342,6 +346,6 @@ Every survivor inherits useful memory of the dead:
 
 ## Method invariant
 
-**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep evidence bound to what it actually proves. Invalidate only the derived artifacts whose consumed upstream facts changed. Re-enter the smallest existing gate only when causality is proven; otherwise reopen analysis. Require integrity applicability to be explicit before consequential transitions. Keep meaningful human authority separate from system capability. Keep challenging the incumbent when reality changes. Verify deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome, decision boundaries, and memory required to regenerate it.**
+**Search the current reality before claiming superiority. Kill the need. Kill the implementation. Keep evidence bound to what it actually proves. Invalidate only the derived artifacts whose consumed upstream facts changed. Re-enter the smallest existing gate only when causality is proven; otherwise reopen analysis. Require integrity applicability to be explicit and evidence-bound before consequential transitions. Keep meaningful human authority separate from system capability. Keep challenging the incumbent when reality changes. Verify deployed reality with verifier-controlled trust before calling it stable. Recover capability before permanent promotion in emergencies. Preserve the human-important outcome, decision boundaries, and memory required to regenerate it.**
 
 That full method is formally the **Development Sequence Loop**, commonly called **Ultimate Loop**.
