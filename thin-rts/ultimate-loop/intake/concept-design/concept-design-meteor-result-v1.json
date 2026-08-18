@@ -88,7 +88,8 @@
     "osaru_extension_destructive_tests": "15/15 PASS",
     "hybrid_marketing_destructive_tests": "26/26 PASS",
     "concept_design_destructive_tests": "22/22 PASS",
-    "universal_operator_pack_validation": "PASS"
+    "universal_operator_pack_validation": "PASS",
+    "scope_note": "This run validates contract logic and regression behavior only; it is not real-world same-workload proof."
   },
   "next_gate": "Use real same-workload attacks before any canonical patch: mutate upstream decisions after downstream artifacts were generated and verify selective stale propagation; change material operating context and verify policy reselection without universalizing profiles; attempt abstraction escape across component/subsystem/system evidence. Continue attacks on observation/inference layering and context-conditioned telemetry. Contract METEOR success alone does not authorize canonical promotion."
 }
