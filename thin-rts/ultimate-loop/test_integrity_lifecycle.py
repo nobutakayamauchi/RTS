@@ -11,6 +11,7 @@ def base_case():
         "frame_id": "frame-integrity-connection",
         "current_state": "STABLE",
         "material_durable": True,
+        "integrity_applicability": "NOT_APPLICABLE",
         "authority": {"promote": "AUTHORIZED", "failover": "BLOCKED"},
         "policy": {"observe_delta_pct": 5, "meteor_delta_pct": 15, "full_replace_delta_pct": 30},
         "recovery": {
@@ -35,15 +36,45 @@ def base_case():
     }
 
 
+def require_integrity(case):
+    case["integrity_applicability"] = "REQUIRED"
+    return case
+
+
 class IntegrityLifecycleTests(unittest.TestCase):
-    def test_legacy_path_remains_eligible_when_integrity_profile_absent(self):
+    def test_explicit_not_applicable_preserves_legacy_eligible_path(self):
         report = lifecycle.evaluate(base_case(), AT)
         self.assertEqual(report["candidate_disposition"], "FULL_REPLACEMENT_ELIGIBLE")
         self.assertTrue(report["transition_authorized"])
-        self.assertEqual(report["reentry_route"], "NONE")
+        self.assertEqual(report["integrity_applicability_state"], "NOT_APPLICABLE")
+
+    def test_undeclared_applicability_blocks_eligible_promotion(self):
+        case = base_case()
+        case.pop("integrity_applicability")
+        report = lifecycle.evaluate(case, AT)
+        self.assertEqual(report["candidate_disposition"], "INTEGRITY_BLOCKED")
+        self.assertFalse(report["transition_authorized"])
+        self.assertIn("INTEGRITY_APPLICABILITY_UNDECLARED", report["blocking_states"])
+
+    def test_required_profile_cannot_be_omitted(self):
+        case = require_integrity(base_case())
+        report = lifecycle.evaluate(case, AT)
+        self.assertEqual(report["candidate_disposition"], "INTEGRITY_BLOCKED")
+        self.assertFalse(report["transition_authorized"])
+        self.assertIn("REQUIRED_INTEGRITY_PROFILE_MISSING", report["blocking_states"])
+
+    def test_undeclared_applicability_blocks_core_freeze(self):
+        case = base_case()
+        case.pop("candidate")
+        case.pop("integrity_applicability")
+        case["current_state"] = "BUILD"
+        case["core_acceptance"] = "PASS"
+        report = lifecycle.evaluate(case, AT)
+        self.assertEqual(report["next_state"], "BUILD")
+        self.assertIn("INTEGRITY_APPLICABILITY_UNDECLARED", report["blocking_states"])
 
     def test_invalid_human_gate_blocks_otherwise_eligible_promotion(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case["integrity"] = {"human_gate": {
             "source": "HUMAN_GATE",
             "decline_path_state": "HIDDEN",
@@ -57,7 +88,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertIn("MEANINGFUL_DECLINE_PATH_MISSING", report["blocking_states"])
 
     def test_stale_derived_artifact_blocks_otherwise_eligible_promotion(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case["integrity"] = {"derived_artifacts": [{
             "id": "deployment-manifest",
             "dependency_binding_state": "BOUND",
@@ -74,7 +105,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertEqual(report["derived_artifact_freshness_state"], "STALE")
 
     def test_unrelated_upstream_change_does_not_block_promotion(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case["integrity"] = {"derived_artifacts": [{
             "id": "deployment-manifest",
             "dependency_binding_state": "BOUND",
@@ -89,7 +120,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertTrue(report["transition_authorized"])
 
     def test_evidence_scope_failure_blocks_promotion(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case["integrity"] = {"evidence": {
             "measured_properties": ["component_pass"],
             "claimed_properties": ["system_correct"],
@@ -100,7 +131,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertFalse(report["transition_authorized"])
 
     def test_uncertain_failure_causality_reopens_analysis(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case["integrity"] = {"failure_evidence": {"stage": "POST_DEPLOY_METRIC", "causality_state": "CORRELATED_ONLY"}}
         report = lifecycle.evaluate(case, AT)
         self.assertEqual(report["reentry_route"], "ANALYSIS_REOPEN")
@@ -108,7 +139,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertFalse(report["transition_authorized"])
 
     def test_proven_post_deploy_failure_exposes_smallest_reentry_route(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case.pop("candidate")
         case["integrity"] = {"failure_evidence": {"stage": "POST_DEPLOY_METRIC", "causality_state": "PROVEN"}}
         report = lifecycle.evaluate(case, AT)
@@ -116,7 +147,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertEqual(report["current_state"], "STABLE")
 
     def test_phoenix_ready_is_not_decision_succession_ready(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case.pop("candidate")
         case["integrity"] = {"decision_succession": {
             "canonical_material_state": "PASS",
@@ -131,7 +162,7 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertEqual(report["decision_succession_state"], "NOT_READY")
 
     def test_decision_succession_can_be_ready_without_changing_authority(self):
-        case = base_case()
+        case = require_integrity(base_case())
         case.pop("candidate")
         case["integrity"] = {"decision_succession": {
             "canonical_material_state": "PASS",
