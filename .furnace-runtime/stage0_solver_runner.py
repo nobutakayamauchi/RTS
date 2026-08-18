@@ -6,7 +6,6 @@ import hashlib
 import io
 import json
 import pathlib
-import sys
 from typing import Any
 
 from datasets import disable_progress_bars, load_dataset
@@ -95,6 +94,14 @@ def _redact_output(text: str, row: dict[str, Any]) -> str:
     return redacted
 
 
+def _write_result(output_path: pathlib.Path, result: dict[str, Any]) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
     request = _load_request(request_path)
     split = request["split"]
@@ -110,35 +117,82 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
     private_log = io.StringIO()
     runtime = None
     result: dict[str, Any] = {
-        "schema_version": "ultimate-loop-reconstruction-furnace/solver-result-v1",
+        "schema_version": "ultimate-loop-reconstruction-furnace/solver-result-v2",
         "task_id": request["task_id"],
         "split": split,
         "candidate_rank": rank,
         "network_policy": "OFFLINE_AFTER_PREPARE",
         "patch_applied": False,
+        "rebuild": {"required": False, "count": 0, "state": "NOT_RUN"},
         "commands": [],
     }
 
     try:
         with contextlib.redirect_stdout(private_log), contextlib.redirect_stderr(private_log):
-            runtime = SetupRuntime.from_launch_image(
-                row["docker_image"],
-                row["instance_id"],
-                platform="linux",
-                command_timeout=10,
-            )
-            _disconnect_network(runtime.container)
+            try:
+                runtime = SetupRuntime.from_launch_image(
+                    row["docker_image"],
+                    row["instance_id"],
+                    platform="linux",
+                    command_timeout=120,
+                )
+                _disconnect_network(runtime.container)
+            except Exception:
+                result["state"] = "RUNTIME_PREPARE_FAILED"
+                _write_result(output_path, result)
+                return 3
+
             patch = request["patch"]
             if patch:
-                if not runtime.apply_patch(patch, verbose=False):
+                try:
+                    applied = runtime.apply_patch(patch, verbose=False)
+                except Exception:
+                    result["state"] = "PATCH_BRIDGE_ERROR"
+                    _write_result(output_path, result)
+                    return 3
+                if not applied:
                     result["state"] = "PATCH_APPLY_FAILED"
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
-                    output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                    _write_result(output_path, result)
                     return 2
                 result["patch_applied"] = True
 
+                rebuild_cmds = row.get("rebuild_cmds") or []
+                if not isinstance(rebuild_cmds, list) or not all(
+                    isinstance(command, str) and command.strip()
+                    for command in rebuild_cmds
+                ):
+                    result["state"] = "REBUILD_METADATA_INVALID"
+                    _write_result(output_path, result)
+                    return 3
+                result["rebuild"] = {
+                    "required": bool(rebuild_cmds),
+                    "count": len(rebuild_cmds),
+                    "state": "RUNNING" if rebuild_cmds else "NOT_REQUIRED",
+                }
+                for rebuild_index, rebuild_command in enumerate(rebuild_cmds, 1):
+                    rebuild_result = runtime.send_command(rebuild_command)
+                    rebuild_exit = int(rebuild_result.metadata.exit_code)
+                    if rebuild_exit != 0:
+                        result["rebuild"] = {
+                            "required": True,
+                            "count": len(rebuild_cmds),
+                            "state": "FAIL",
+                            "failed_index": rebuild_index,
+                            "exit_code": rebuild_exit,
+                            "output": _redact_output(rebuild_result.output, row),
+                        }
+                        result["state"] = "REBUILD_FAILED"
+                        _write_result(output_path, result)
+                        return 2
+                if rebuild_cmds:
+                    result["rebuild"]["state"] = "PASS"
+
             for command in request["commands"]:
                 command_result = runtime.send_command(command)
+                if command_result.metadata is None:
+                    result["state"] = "COMMAND_METADATA_MISSING"
+                    _write_result(output_path, result)
+                    return 3
                 exit_code = int(command_result.metadata.exit_code)
                 result["commands"].append(
                     {
@@ -149,13 +203,11 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
                 )
                 if exit_code != 0:
                     result["state"] = "COMMAND_FAILED"
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
-                    output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                    _write_result(output_path, result)
                     return 1
 
             result["state"] = "PASS"
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            _write_result(output_path, result)
             return 0
     finally:
         if runtime is not None:
@@ -165,12 +217,49 @@ def run(request_path: pathlib.Path, output_path: pathlib.Path) -> int:
                 pass
 
 
+def _safe_uncaught_result(request_path: pathlib.Path) -> dict[str, Any]:
+    task_id = "UNKNOWN_SAFE_TASK"
+    split = "unknown"
+    candidate_rank: int | None = None
+    try:
+        raw = json.loads(request_path.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            maybe_task = raw.get("task_id")
+            maybe_split = raw.get("split")
+            maybe_rank = raw.get("candidate_rank")
+            if isinstance(maybe_task, str) and maybe_task.startswith("FURNACE-"):
+                task_id = maybe_task
+            if maybe_split in SUPPORTED:
+                split = maybe_split
+            if isinstance(maybe_rank, int) and maybe_rank >= 1:
+                candidate_rank = maybe_rank
+    except Exception:
+        pass
+    return {
+        "schema_version": "ultimate-loop-reconstruction-furnace/solver-result-v2",
+        "task_id": task_id,
+        "split": split,
+        "candidate_rank": candidate_rank,
+        "network_policy": "OFFLINE_AFTER_PREPARE",
+        "patch_applied": False,
+        "rebuild": {"required": False, "count": 0, "state": "NOT_RUN"},
+        "commands": [],
+        "state": "BRIDGE_UNCAUGHT_ERROR",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--request", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    return run(pathlib.Path(args.request), pathlib.Path(args.output))
+    request_path = pathlib.Path(args.request)
+    output_path = pathlib.Path(args.output)
+    try:
+        return run(request_path, output_path)
+    except Exception:
+        _write_result(output_path, _safe_uncaught_result(request_path))
+        return 3
 
 
 if __name__ == "__main__":
