@@ -1,4 +1,4 @@
-# Development Sequence Loop — Ultimate Loop v0.1
+# Development Sequence Loop — Ultimate Loop v0.2
 
 Status: `PROVISIONAL_OPERATIONAL / CANONICAL_INDEX / ACTIVE / SELF_EVOLVING`
 
@@ -29,15 +29,64 @@ DISCOVERY REFRESH
 → repeat
 ```
 
+Evidence integrity, dependency freshness, Human Gate agency, decision-succession evidence, and typed smallest-gate re-entry are **cross-cutting contracts** over this sequence, not extra top-level stages.
+
 ## Active canonical responsibilities
 
 - `DISCOVERY_REFRESH_GATE_2026-08-14.md` — current landscape evidence before superiority claims;
 - `NEW_BUILD_SUPERIORITY_GATE_2026-08-14.md` — bounded new-build permission for irreducible gaps or proven architecture deficits;
 - `POST_DEPLOY_DEBUG_GATE_2026-08-14.md` — deployed-reality verification and regression binding;
 - `EMERGENCY_RECOVERY_GATE_2026-08-14.md` — bounded emergency recovery semantics;
-- `lifecycle.py` — lifecycle/failover authority binding;
+- `integrity.py` — side-effect-free evidence-scope/lineage, derived-artifact freshness, Human Gate agency, decision-succession, and typed re-entry binder;
+- `lifecycle.py` — lifecycle/failover authority binding plus the canonical connection surface for applicable integrity results;
 - `emergency.py` — thin Emergency Recovery evidence/state binder;
-- associated regression suites — retained death-memory for known failure classes.
+- associated regression suites — retained death-memory for known failure classes and connection regressions.
+
+`integrity.py` owns no deployment, publication, payment, promotion, diagnosis, or external action. It binds evidence and exposes fail-closed routing/validity results. `lifecycle.py` remains the transition binder.
+
+## Typed re-entry
+
+When failure stage **and causality** are externally proven, the smallest existing gate may be selected:
+
+```text
+DISCOVERY          → DISCOVERY_REFRESH
+IMPLEMENTATION     → DA_COUNTER_DA
+DEPLOYMENT         → DEPLOYMENT_IDENTITY
+POST_DEPLOY_METRIC → POST_DEPLOY_DEBUG
+UNKNOWN/CORRELATED → ANALYSIS_REOPEN
+```
+
+`CORRELATION != ROOT CAUSE`
+
+The router does not diagnose causality and does not create transition authority.
+
+## Integrity / freshness boundaries
+
+`OBSERVATION != INTERPRETATION`
+
+`GATE_PASS != UNMEASURED_PROPERTY`
+
+`SELECTED_COHORT_EVIDENCE != POPULATION_EVIDENCE`
+
+`POST_INTERVENTION_STATE != INTRINSIC_BASELINE_PROPERTY`
+
+`ABSTRACT_SUCCESS != REFUTATION_OF_CONCRETE_FAILURE`
+
+`UPSTREAM_CHANGE != DOWNSTREAM_FRESHNESS`
+
+Only derived artifacts whose declared consumed upstream fields changed become stale. A stale artifact must be recomputed or boundedly revalidated before consequential reuse.
+
+When authority is explicitly sourced from a Human Gate:
+
+`CHOICE_PRESENTATION != MEANINGFUL_AUTHORIZATION`
+
+A visible refusal path, consequence disclosure, current explicit decision, and non-coercive choice architecture are required.
+
+PHOENIX recovery readiness and decision succession are separately reported:
+
+`RECOVERY != DECISION SUCCESSION`
+
+`RETRIEVAL != DECISION COMPETENCE`
 
 ## Weekly self-evolution cadence
 
@@ -55,7 +104,7 @@ Ultimate Loop itself is therefore an occupant of a Movable Frame: it can survive
 
 This project intentionally does **not** become a crawler platform, scheduler, database, daemon, model runtime, monitoring platform, traffic switch, deployment engine, backup product, or autonomous promotion system.
 
-Search/crawling, monitoring, provider APIs, DNS/load balancers/service meshes, schedulers, deployment/failover execution, and other commodity mechanisms remain replaceable external occupants. Ultimate Loop owns the minimum decision/evidence/authority contracts needed to compare and safely use them.
+Search/crawling, monitoring, provider APIs, DNS/load-balancers/service-meshes, schedulers, deployment/failover execution, and other commodity mechanisms remain replaceable external occupants. Ultimate Loop owns the minimum decision/evidence/authority contracts needed to compare and safely use them.
 
 ## Historical evidence vs current authority
 
@@ -76,6 +125,12 @@ History is preserved; stale experiment labels are not operational authority.
 `BACKUP EXISTS != RECOVERABLE`
 
 `RECOVERY PROVEN != CREATOR-INDEPENDENT REGENERATION PROVEN`
+
+`RECOVERY != DECISION SUCCESSION`
+
+`UPSTREAM CHANGE != DOWNSTREAM FRESHNESS`
+
+`CORRELATION != ROOT CAUSE`
 
 `NEW EXISTS != CHALLENGE REQUIRED`
 
