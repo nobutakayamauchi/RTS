@@ -12,6 +12,7 @@ def base_case():
         "frame_id": "frame-llm-router",
         "current_state": "STABLE",
         "material_durable": True,
+        "integrity_applicability": "NOT_APPLICABLE",
         "authority": {"promote": "BLOCKED", "failover": "BLOCKED"},
         "policy": {
             "observe_delta_pct": 5,
