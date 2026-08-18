@@ -12,6 +12,7 @@ def base_case():
         "current_state": "STABLE",
         "material_durable": True,
         "integrity_applicability": "NOT_APPLICABLE",
+        "integrity_applicability_evidence_ref": "workload:frozen-no-v0.2-integrity-surface",
         "authority": {"promote": "AUTHORIZED", "failover": "BLOCKED"},
         "policy": {"observe_delta_pct": 5, "meteor_delta_pct": 15, "full_replace_delta_pct": 30},
         "recovery": {
@@ -38,6 +39,7 @@ def base_case():
 
 def require_integrity(case):
     case["integrity_applicability"] = "REQUIRED"
+    case.pop("integrity_applicability_evidence_ref", None)
     return case
 
 
@@ -47,6 +49,14 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertEqual(report["candidate_disposition"], "FULL_REPLACEMENT_ELIGIBLE")
         self.assertTrue(report["transition_authorized"])
         self.assertEqual(report["integrity_applicability_state"], "NOT_APPLICABLE")
+
+    def test_bare_not_applicable_label_cannot_bypass_integrity(self):
+        case = base_case()
+        case.pop("integrity_applicability_evidence_ref")
+        report = lifecycle.evaluate(case, AT)
+        self.assertEqual(report["candidate_disposition"], "INTEGRITY_BLOCKED")
+        self.assertFalse(report["transition_authorized"])
+        self.assertIn("NOT_APPLICABLE_EVIDENCE_REF_MISSING", report["blocking_states"])
 
     def test_undeclared_applicability_blocks_eligible_promotion(self):
         case = base_case()
@@ -62,6 +72,14 @@ class IntegrityLifecycleTests(unittest.TestCase):
         self.assertEqual(report["candidate_disposition"], "INTEGRITY_BLOCKED")
         self.assertFalse(report["transition_authorized"])
         self.assertIn("REQUIRED_INTEGRITY_PROFILE_MISSING", report["blocking_states"])
+
+    def test_required_empty_profile_cannot_pass(self):
+        case = require_integrity(base_case())
+        case["integrity"] = {}
+        report = lifecycle.evaluate(case, AT)
+        self.assertEqual(report["candidate_disposition"], "INTEGRITY_BLOCKED")
+        self.assertFalse(report["transition_authorized"])
+        self.assertIn("REQUIRED_INTEGRITY_SECTION_MISSING", report["blocking_states"])
 
     def test_undeclared_applicability_blocks_core_freeze(self):
         case = base_case()
