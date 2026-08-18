@@ -12,6 +12,8 @@
     "NEW_EXISTS != CHALLENGE_REQUIRED",
     "BACKUP_EXISTS != RECOVERABLE",
     "RECOVERY_PROVEN != CREATOR_INDEPENDENT_REGENERATION_PROVEN",
+    "RECOVERY != DECISION_SUCCESSION",
+    "RETRIEVAL != DECISION_COMPETENCE",
     "IMPLEMENTED != PERMANENT",
     "UNKNOWN_TRIGGER != GUESSED_TRANSITION",
     "FAILURE_DOMAIN_LABEL != FAILURE_DOMAIN_INDEPENDENCE_EVIDENCE"
@@ -49,18 +51,31 @@
     "failure_domain": "When the triggering failure domain is material, a fallback requires VERIFIED independence evidence; labels alone are insufficient.",
     "recovery": "backup_present alone is insufficient; fresh_restore_test PASS plus canonical_material PASS is required for RECOVERABLE.",
     "phoenix": "A Succession Packet without a Phoenix Test is RECOVERABLE at most, not PHOENIX_READY.",
+    "decision_succession": "PHOENIX_READY is regeneration/recovery evidence, not successor decision competence. DECISION_SUCCESSION_READY requires canonical material, creator-absent held-out decisions, authority-boundary compliance and escalation/UNKNOWN discipline; it grants no additional authority.",
     "unknown_event": "An unmodeled trigger reopens BUILD / inner design review rather than inventing a transition."
+  },
+  "decision_succession_evidence": {
+    "reported_separately_from_phoenix_ready": true,
+    "required": [
+      "canonical_material_state=PASS",
+      "held_out_decision_state=PASS",
+      "authority_compliance_state=PASS",
+      "escalation_state=PASS",
+      "creator_intervention=false"
+    ],
+    "authority_effect": "NONE"
   },
   "canonical_workloads": [
     "../ultimate-loop/fixtures/small_gain_standby.json",
     "../ultimate-loop/fixtures/emergency_same_domain_blocked.json",
     "../ultimate-loop/fixtures/core_freeze_phoenix_ready.json"
   ],
-  "authority_boundary": "Regeneration, comparison and validation do not authorize deployment, promotion, disclosure, spending, submission or other material external action.",
+  "authority_boundary": "Regeneration, comparison, integrity validation and decision-succession evidence do not authorize deployment, promotion, disclosure, spending, submission or other material external action.",
   "lineage": {
     "method": "../ULTIMATE_LOOP_METHOD.md",
     "darwin": "../MOVABLE_FRAME_DARWIN_ARENA_SPEC.md",
     "phoenix": "../PHOENIX_LINEAGE_CONTINUITY_SPEC.md",
-    "prototype": "../ultimate-loop/lifecycle.py"
+    "lifecycle": "../ultimate-loop/lifecycle.py",
+    "integrity": "../ultimate-loop/integrity.py"
   }
 }
