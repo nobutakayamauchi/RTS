@@ -42,6 +42,13 @@ DEFAULT_POLICY = {
 }
 
 VALID_INTEGRITY_APPLICABILITY = {"REQUIRED", "NOT_APPLICABLE"}
+INTEGRITY_PROFILE_SECTIONS = {
+    "failure_evidence",
+    "evidence",
+    "derived_artifacts",
+    "human_gate",
+    "decision_succession",
+}
 
 
 def _parse_time(value: str) -> datetime:
@@ -238,18 +245,15 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
         blocks.append("INVALID_CURRENT_STATE")
 
     applicability = case.get("integrity_applicability", "UNDECLARED")
+    applicability_ref = case.get("integrity_applicability_evidence_ref")
     integrity_profile = case.get("integrity")
     if applicability not in VALID_INTEGRITY_APPLICABILITY | {"UNDECLARED"}:
         blocks.append("INVALID_INTEGRITY_APPLICABILITY")
         reasons.append("Integrity applicability must be REQUIRED or NOT_APPLICABLE before a consequential transition.")
-    if applicability == "REQUIRED" and integrity_profile is None:
-        blocks.append("REQUIRED_INTEGRITY_PROFILE_MISSING")
-        reasons.append("A workload that declares integrity REQUIRED must bind the applicable integrity evidence instead of omitting the profile.")
 
     integrity_report = integrity.evaluate(integrity_profile)
     blocks.extend(integrity_report["blocking_states"])
     reasons.extend(integrity_report["reasons"])
-    integrity_blocked = integrity_report["classification"] != "PASS" or "REQUIRED_INTEGRITY_PROFILE_MISSING" in blocks or "INVALID_INTEGRITY_APPLICABILITY" in blocks
 
     watch_action = _trigger_action(case, at, blocks, reasons)
     recovery_state = _recovery_state(case, blocks, reasons)
@@ -266,10 +270,28 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
     )
     consequential_transition_ready = transition_authorized or core_transition_ready
 
-    if consequential_transition_ready and applicability == "UNDECLARED":
-        blocks.append("INTEGRITY_APPLICABILITY_UNDECLARED")
-        reasons.append("A consequential transition cannot treat missing integrity applicability as NOT_APPLICABLE. Declare REQUIRED or NOT_APPLICABLE explicitly.")
-        integrity_blocked = True
+    applicability_blocks: list[str] = []
+    if consequential_transition_ready:
+        if applicability == "UNDECLARED":
+            applicability_blocks.append("INTEGRITY_APPLICABILITY_UNDECLARED")
+            reasons.append("A consequential transition cannot treat missing integrity applicability as NOT_APPLICABLE. Declare REQUIRED or NOT_APPLICABLE explicitly.")
+        elif applicability == "NOT_APPLICABLE" and not applicability_ref:
+            applicability_blocks.append("NOT_APPLICABLE_EVIDENCE_REF_MISSING")
+            reasons.append("NOT_APPLICABLE must be bound to verifier-controlled or frozen-workload applicability evidence; a bare label is not enough.")
+        elif applicability == "REQUIRED":
+            if not isinstance(integrity_profile, dict):
+                applicability_blocks.append("REQUIRED_INTEGRITY_PROFILE_MISSING")
+                reasons.append("A workload that declares integrity REQUIRED must bind the applicable integrity evidence instead of omitting the profile.")
+            elif not any(section in integrity_profile for section in INTEGRITY_PROFILE_SECTIONS):
+                applicability_blocks.append("REQUIRED_INTEGRITY_SECTION_MISSING")
+                reasons.append("An empty or unrecognized REQUIRED integrity profile cannot satisfy the applicability contract.")
+
+    blocks.extend(applicability_blocks)
+    integrity_blocked = (
+        integrity_report["classification"] != "PASS"
+        or bool(applicability_blocks)
+        or "INVALID_INTEGRITY_APPLICABILITY" in blocks
+    )
 
     if integrity_report["reentry_route"] == "ANALYSIS_REOPEN" and case.get("candidate"):
         disposition = "BLOCKED_PENDING_INTEGRITY_REVIEW"
@@ -329,6 +351,7 @@ def evaluate(case: dict[str, Any], at: datetime) -> dict[str, Any]:
         "transition_authorized": transition_authorized,
         "recovery_state": recovery_state,
         "integrity_applicability_state": applicability,
+        "integrity_applicability_evidence_ref": applicability_ref,
         "reentry_route": integrity_report["reentry_route"],
         "evidence_integrity_state": integrity_report["evidence_state"],
         "derived_artifact_freshness_state": integrity_report["freshness_state"],
