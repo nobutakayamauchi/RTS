@@ -1,6 +1,6 @@
 # OSARU MINE → Ultimate Loop intake
 
-Status: `CHALLENGER_KNOWLEDGE / NON_CANONICAL`
+Status: `CHALLENGER_KNOWLEDGE / NON_CANONICAL / CONTRACT_METEOR_ATTACKED`
 
 This directory contains a **derived operator pack**, not a copy of the original 100-task business roadmap and not a canonical modification of Ultimate Loop.
 
@@ -71,13 +71,49 @@ A valid pack returns:
 
 ## Candidate deltas exposed to Ultimate Loop
 
-The pack proposes five things for DA / Counter-DA / METEOR testing, not automatic adoption:
+The pack originally proposed five things for DA / Counter-DA / METEOR testing, not automatic adoption:
 
 1. **First-party signal binding** — distinguish direct user/operator evidence from external discovery evidence.
 2. **Canonical-source compiler** — one evidence-bound canon can rebuild many replaceable adapters without factual drift.
 3. **Bottleneck re-entry routing** — route a weak metric to the smallest affected gate instead of globally rewriting.
 4. **Scale-proof gate** — do not multiply traffic/spend/automation before a bounded loop is proven.
 5. **Decision-capability succession** — creator-independent operation requires tested reasoning/authority transfer, not only backups or reconstruction.
+
+## Contract METEOR result — 2026-08-18
+
+The five proposals were destructively attacked under the frozen workload. They did **not** survive unchanged.
+
+```text
+EXT01 First-party signal binding
+  -> DEMOTE_TO_CONDITIONAL_EVIDENCE_PROFILE
+
+EXT02 Canonical-source compiler
+  -> DEMOTE_TO_NONCANONICAL_SUPPORT_CONTRACT
+
+EXT03 Bottleneck re-entry routing
+  -> CANONICAL_EXTENSION_CANDIDATE
+
+EXT04 Scale-proof gate
+  -> DEMOTE_TO_CONDITIONAL_SCALE_PROFILE
+
+EXT05 Decision-capability succession
+  -> CANONICAL_PHOENIX_EXTENSION_CANDIDATE
+```
+
+Detailed evidence:
+
+- `DA_COUNTER_DA_METEOR_RESULT_2026-08-18.md`
+- `extension-meteor-result-v1.json`
+- `../../osaru_extension_crucible.py`
+- `../../test_osaru_extension_crucible.py`
+
+Repository destructive suite currently contains 15 attacks around self-authorization, applicability, fact drift, private leakage, false root-cause routing, unsafe scaling, and retrieval/competence confusion.
+
+The result is intentionally narrow:
+
+`5 PROPOSALS -> 2 POSSIBLE CANONICAL DELTAS + 3 WORKLOAD/SUPPORT PROFILES`
+
+No extension is canonically promoted by this result.
 
 ## DA
 
@@ -104,3 +140,5 @@ Current answer:
 `SOURCE KNOWLEDGE ADMITTED != ULTIMATE LOOP MODIFIED`
 
 `CHALLENGER EXTENSION LOOKS GOOD != PROMOTION AUTHORIZED`
+
+`CONTRACT METEOR PASS != REAL-WORLD SAME-WORKLOAD WIN`
