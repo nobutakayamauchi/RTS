@@ -17,7 +17,7 @@
   ],
   "repository_validation": {
     "workflow":"Validate OSARU knowledge intake",
-    "workflow_run_id":32119493823,
+    "workflow_run_id":32119707756,
     "conclusion":"SUCCESS",
     "hybrid_extension_destructive_tests":"26/26 PASS",
     "osaru_extension_destructive_tests":"15/15 PASS",
