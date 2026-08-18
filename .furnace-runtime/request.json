@@ -5,6 +5,10 @@
   "candidate_rank": 1,
   "patch": "",
   "commands": [
-    "grep -n 'zend_type_to_string(.*->type)' Zend/zend_execute.c | grep -E 'prop|info|error_prop'"
+    "sed -n '2110,2210p' Zend/zend_execute.c",
+    "grep -R -n -E 'zend_type_to_string_resolved|zend_type_to_string.*scope|zend_type_to_string_ex' Zend | head -120",
+    "grep -R -n 'resolve_class_name' Zend | head -120",
+    "grep -R -n -E 'anonymous class|class@anonymous' Zend/tests tests 2>/dev/null | head -120",
+    "grep -n -E 'zend_assign_to_typed_prop|typed_prop|error_prop' Zend/zend_execute.c | head -120"
   ]
 }
