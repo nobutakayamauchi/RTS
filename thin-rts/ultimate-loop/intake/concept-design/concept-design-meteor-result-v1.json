@@ -5,10 +5,18 @@
   "authority_effect": "NONE",
   "canonical_promotion_authorized": false,
   "source_coverage": {
-    "declared_slides": 139,
-    "text_recovered": "1-94",
-    "unknown": "95-139",
-    "claim": "No full-visual-coverage claim; unknown remains unknown."
+    "slides": {
+      "declared": 139,
+      "text_recovered": "1-94",
+      "unknown": "95-139",
+      "claim": "No full-visual-coverage claim; unknown remains unknown."
+    },
+    "worksheet_video": {
+      "duration_seconds": 70.033333,
+      "sha256": "1b5ddc7616a229d52543efffea67103ac6394a6d344cb60f8456ec62ba38580e",
+      "inspection": "representative frame extraction plus direct visual inspection",
+      "provenance_file": "concept-worksheet-video-supplement-20260818.json"
+    }
   },
   "results": [
     {
@@ -38,6 +46,27 @@
       "canonical_candidate": true,
       "killed_claim": "An aggregate pass implies the effect is acceptable for every material context, or any tiny post-hoc segment may veto the aggregate.",
       "survivor": "Material evidence-bound contexts/cohorts may block a global diagnosis and force targeted analysis; arbitrary or immaterial post-hoc segmentation cannot."
+    },
+    {
+      "extension_id": "CD_EXT05_DERIVED_ARTIFACT_STALENESS_PROPAGATION",
+      "verdict": "CANONICAL_EVIDENCE_CONTROL_CANDIDATE",
+      "canonical_candidate": true,
+      "killed_claim": "A downstream artifact remains current merely because it still exists or previously passed review after an upstream decision changed.",
+      "survivor": "A derived artifact is revision-bound to the upstream fields it consumed. A material dependency change makes it stale until recomputed from the current revision or boundedly revalidated; unrelated upstream changes do not force global rebuild."
+    },
+    {
+      "extension_id": "CD_EXT06_CONTEXT_BOUND_POLICY_SELECTION",
+      "verdict": "CONDITIONAL_PROFILE_REFINEMENT",
+      "canonical_candidate": false,
+      "killed_claim": "A control or workflow policy selected for one maturity/risk/operating context can silently become universal or remain valid after the selecting context changes.",
+      "survivor": "Policy applicability remains context-bound. Material context changes require policy re-evaluation, but this composes as a profile/selection refinement rather than a new universal subsystem."
+    },
+    {
+      "extension_id": "CD_EXT07_ABSTRACTION_LEVEL_BINDING",
+      "verdict": "COMPOSE_WITH_EVIDENCE_CONSTRUCT_VALIDITY_SCOPE_REFINEMENT",
+      "canonical_candidate": false,
+      "killed_claim": "A broad success statement may erase a concrete failure, or narrow evidence may establish a broader property without validated coverage.",
+      "survivor": "Evidence and claims remain scope-bound. Cross-level claims require an explicit validated scope bridge. This is retained as a refinement of construct-validity/context guards rather than a separate canonical subsystem."
     }
   ],
   "death_memory": [
@@ -45,10 +74,21 @@
     "PERSUASIVE EXPLANATION != CAUSAL EVIDENCE",
     "AGGREGATE METRIC != UNIFORM EFFECT",
     "LOCAL OPTIMUM != PROTECTED END-TO-END OUTCOME",
-    "ONE SEMANTIC CORE != IDENTICAL PRESENTATION"
+    "ONE SEMANTIC CORE != IDENTICAL PRESENTATION",
+    "UPSTREAM CHANGE != DOWNSTREAM FRESHNESS",
+    "CONTEXTUAL POLICY != UNIVERSAL POLICY",
+    "ABSTRACT SUCCESS != REFUTATION OF CONCRETE FAILURE",
+    "NARROW EVIDENCE != BROADER CLAIM WITHOUT SCOPE BRIDGE"
   ],
-  "repository_validation_expected": {
-    "concept_design_destructive_tests": "12/12 PASS"
+  "repository_validation": {
+    "workflow": "Validate OSARU knowledge intake",
+    "workflow_run_id": 32120860846,
+    "conclusion": "SUCCESS",
+    "operator_intake_regression": "5/5 PASS",
+    "osaru_extension_destructive_tests": "15/15 PASS",
+    "hybrid_marketing_destructive_tests": "26/26 PASS",
+    "concept_design_destructive_tests": "22/22 PASS",
+    "universal_operator_pack_validation": "PASS"
   },
-  "next_gate": "Attack observation/inference layering across user research, runtime diagnosis, and legal/operational evidence; attack context-conditioned telemetry on real multi-cohort or multi-environment failures. No canonical patch before same-workload evidence."
+  "next_gate": "Use real same-workload attacks before any canonical patch: mutate upstream decisions after downstream artifacts were generated and verify selective stale propagation; change material operating context and verify policy reselection without universalizing profiles; attempt abstraction escape across component/subsystem/system evidence. Continue attacks on observation/inference layering and context-conditioned telemetry. Contract METEOR success alone does not authorize canonical promotion."
 }
