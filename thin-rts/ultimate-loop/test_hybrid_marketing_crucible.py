@@ -107,6 +107,33 @@ class Tests(unittest.TestCase):
         r = self.run_case("HM_EXT06_REFERENCE_CLASS_FREEZE", comparison_claim="NEW_FRAME_BASELINE", frozen_reference_class_ref="market-A@v1", current_reference_class_ref="market-B@v1", measurement_protocol_state="PASS", reference_change_authority="AUTHORIZED_NEW_FRAME", paired_old_reference_evidence="MISSING")
         self.assertEqual(r["disposition"], "NEW_REFERENCE_BASELINE_ONLY")
 
+    def test_selected_cohort_cannot_claim_population_without_transport(self):
+        r = self.run_case("HM_EXT07_SELECTION_LINEAGE_GUARD", evidence_cohort_ref="screened-good-fit@v1", claim_population_ref="all-inbound@v1", selection_history_state="BOUND", claim_scope="POPULATION_GENERALIZATION", transportability_state="UNVALIDATED")
+        self.assertEqual(r["disposition"], "BLOCK_POPULATION_GENERALIZATION")
+        self.assertIn("SELECTED_COHORT_NOT_POPULATION_EVIDENCE", r["blocking_states"])
+
+    def test_selected_cohort_claim_can_remain_cohort_bound(self):
+        r = self.run_case("HM_EXT07_SELECTION_LINEAGE_GUARD", evidence_cohort_ref="screened-good-fit@v1", claim_population_ref="all-inbound@v1", selection_history_state="BOUND", claim_scope="COHORT_ONLY", transportability_state="UNVALIDATED")
+        self.assertEqual(r["disposition"], "BOUND_TO_SELECTED_COHORT")
+
+    def test_validated_transport_can_bound_generalization(self):
+        r = self.run_case("HM_EXT07_SELECTION_LINEAGE_GUARD", evidence_cohort_ref="screened-good-fit@v1", claim_population_ref="all-inbound@v1", selection_history_state="BOUND", claim_scope="POPULATION_GENERALIZATION", transportability_state="VALIDATED")
+        self.assertEqual(r["disposition"], "GENERALIZATION_BOUND_TO_VALIDATED_TRANSPORT")
+
+    def test_post_intervention_state_is_not_intrinsic_property(self):
+        r = self.run_case("HM_EXT08_INTERVENTION_HISTORY_BINDING", intervention_history_state="BOUND", claim_type="INTRINSIC_PROPERTY", causal_identification_state="UNVALIDATED", history_match_state="MISSING")
+        self.assertEqual(r["disposition"], "BLOCK_CAUSAL_OR_INTRINSIC_CLAIM")
+        self.assertIn("INTERVENTION_CONTAMINATES_INTRINSIC_OR_CAUSAL_CLAIM", r["blocking_states"])
+
+    def test_post_intervention_observation_can_be_history_bound(self):
+        r = self.run_case("HM_EXT08_INTERVENTION_HISTORY_BINDING", intervention_history_state="BOUND", claim_type="STATE_AFTER_INTERVENTION", causal_identification_state="UNVALIDATED", history_match_state="MISSING")
+        self.assertEqual(r["disposition"], "BOUND_TO_INTERVENTION_HISTORY")
+
+    def test_different_intervention_paths_need_matched_history(self):
+        r = self.run_case("HM_EXT08_INTERVENTION_HISTORY_BINDING", intervention_history_state="BOUND", claim_type="PATH_COMPARISON", causal_identification_state="UNVALIDATED", history_match_state="MISSING")
+        self.assertEqual(r["disposition"], "BLOCK_PATH_COMPARISON")
+        self.assertIn("INTERVENTION_HISTORY_NOT_COMPARABLE", r["blocking_states"])
+
 
 if __name__ == "__main__":
     unittest.main()
