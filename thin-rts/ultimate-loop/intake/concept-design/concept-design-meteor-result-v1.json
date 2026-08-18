@@ -1,0 +1,54 @@
+{
+  "schema": "ultimate-loop-concept-design-meteor-result/v0",
+  "frame_id": "ultimate-loop-method/concept-design-deltas-v1",
+  "status": "CONTRACT_METEOR_COMPLETE_UNDER_CURRENT_REPOSITORY_EVIDENCE",
+  "authority_effect": "NONE",
+  "canonical_promotion_authorized": false,
+  "source_coverage": {
+    "declared_slides": 139,
+    "text_recovered": "1-94",
+    "unknown": "95-139",
+    "claim": "No full-visual-coverage claim; unknown remains unknown."
+  },
+  "results": [
+    {
+      "extension_id": "CD_EXT01_SEMANTIC_INVARIANT_ADAPTER_GUARD",
+      "verdict": "COMPOSE_AS_EXISTING_CANONICAL_SOURCE_SUPPORT_REFINEMENT",
+      "canonical_candidate": false,
+      "killed_claim": "Every adapter should look or speak the same to preserve one concept.",
+      "survivor": "Only declared protected semantics and provenance are invariant; presentation may vary by adapter."
+    },
+    {
+      "extension_id": "CD_EXT02_OBSERVATION_INFERENCE_LAYERING",
+      "verdict": "CANONICAL_EVIDENCE_INVARIANT_CANDIDATE",
+      "canonical_candidate": true,
+      "killed_claim": "A plausible deeper need, motive, or causal explanation can be stored as if the user directly said it.",
+      "survivor": "Raw observation, interpretation/hypothesis, and independently validated derived fact must remain separately typed and provenance-bound."
+    },
+    {
+      "extension_id": "CD_EXT03_END_TO_END_OBJECTIVE_BINDING",
+      "verdict": "REINFORCE_EXISTING_FROZEN_OUTCOME_GUARD",
+      "canonical_candidate": false,
+      "killed_claim": "A local metric improvement can authorize promotion despite downstream protected-outcome regression.",
+      "survivor": "Local wins cannot override the frozen human-important outcome, but workloads without a downstream surface may mark the profile NOT_APPLICABLE."
+    },
+    {
+      "extension_id": "CD_EXT04_CONTEXT_CONDITIONED_TELEMETRY",
+      "verdict": "CANONICAL_EXTENSION_CANDIDATE_AS_TELEMETRY_GUARD",
+      "canonical_candidate": true,
+      "killed_claim": "An aggregate pass implies the effect is acceptable for every material context, or any tiny post-hoc segment may veto the aggregate.",
+      "survivor": "Material evidence-bound contexts/cohorts may block a global diagnosis and force targeted analysis; arbitrary or immaterial post-hoc segmentation cannot."
+    }
+  ],
+  "death_memory": [
+    "OBSERVED SIGNAL != INFERRED LATENT NEED",
+    "PERSUASIVE EXPLANATION != CAUSAL EVIDENCE",
+    "AGGREGATE METRIC != UNIFORM EFFECT",
+    "LOCAL OPTIMUM != PROTECTED END-TO-END OUTCOME",
+    "ONE SEMANTIC CORE != IDENTICAL PRESENTATION"
+  ],
+  "repository_validation_expected": {
+    "concept_design_destructive_tests": "12/12 PASS"
+  },
+  "next_gate": "Attack observation/inference layering across user research, runtime diagnosis, and legal/operational evidence; attack context-conditioned telemetry on real multi-cohort or multi-environment failures. No canonical patch before same-workload evidence."
+}
