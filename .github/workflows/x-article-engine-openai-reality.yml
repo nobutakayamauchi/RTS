@@ -1,0 +1,55 @@
+name: X Article Engine OpenAI Reality Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: OpenAI model id
+        required: true
+        default: gpt-5.4
+      max_output_tokens:
+        description: Max output tokens per draft
+        required: true
+        default: "4096"
+
+permissions:
+  contents: read
+
+jobs:
+  tuned-vs-plain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Require OpenAI secret
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not configured as a repository secret." >&2
+            exit 2
+          fi
+
+      - name: Run tuned vs Plain reality gate
+        run: >-
+          python scripts/run_x_article_openai_compare.py
+          --model "${{ inputs.model }}"
+          --max-output-tokens "${{ inputs.max_output_tokens }}"
+          --output artifacts/x_article_openai_plain_comparison.json
+
+      - name: Upload comparison artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: x-article-openai-plain-comparison
+          path: artifacts/x_article_openai_plain_comparison.json
+          if-no-files-found: error
+          retention-days: 14
