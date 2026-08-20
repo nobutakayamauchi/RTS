@@ -1,0 +1,33 @@
+{
+  "trusted_source_refs": [
+    {
+      "id": "official-service-page",
+      "status": "VERIFIED",
+      "kind": "PUBLIC_PAGE"
+    }
+  ],
+  "brief": {
+    "offer": "小規模事業者向けの週次レポート整理サービス。",
+    "target": "複数の表やメモから毎週レポートを手作業でまとめている小規模事業者。",
+    "pain": "情報は揃っているが、転記と確認に手間がかかり、毎週同じ作業を繰り返している。",
+    "primary_info": [
+      {
+        "claim": "私は、まず一つの工程だけを切り出して確認し、その後で対象を広げる方が安全だと考えている。",
+        "source_ref": "human_attestation:opinion",
+        "attested": true,
+        "kind": "OPINION"
+      }
+    ],
+    "article_type": "HOW_TO",
+    "topic_mode": "BUSINESS",
+    "cta": "サービスの説明ページを見る。",
+    "evidence": [
+      {
+        "claim": "公式ページでは、導入前に対象となる作業範囲を確認すると説明している。",
+        "source_ref": "official-service-page",
+        "status": "VERIFIED",
+        "kind": "POLICY"
+      }
+    ]
+  }
+}
