@@ -1,0 +1,128 @@
+name: Reconstruction Furnace Stage 0 Validator
+
+on:
+  pull_request:
+    paths:
+      - "experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818/**"
+      - ".github/workflows/reconstruction-furnace-stage0-validator.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reconstruction-furnace-stage0-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        split: [c, go]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout experiment branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: rts
+          persist-credentials: false
+
+      - name: Checkout pinned SWE-bench-Live evaluator
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: microsoft/SWE-bench-Live
+          ref: 70ec57e852e3f2d195790fe71f553e272c691833
+          path: evaluator
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bounded validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install datasets docker typing-extensions
+
+      - name: Record safe resource preflight
+        working-directory: rts/experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818
+        env:
+          SAFE_ROOT: ${{ runner.temp }}/furnace-stage0/safe/${{ matrix.split }}
+          SPLIT: ${{ matrix.split }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import stage0_control
+
+          pages = os.sysconf('SC_PHYS_PAGES')
+          page_size = os.sysconf('SC_PAGE_SIZE')
+          mem_gib = pages * page_size / (1024 ** 3)
+          result = stage0_control.resource_preflight(
+              cpu_count=os.cpu_count() or 1,
+              memory_gib=mem_gib,
+          )
+          safe = {
+              'schema_version': 'ultimate-loop-reconstruction-furnace/resource-v1',
+              'split': os.environ['SPLIT'],
+              'state': result['state'],
+              'cpu_count': result['cpu_count'],
+              'memory_gib': round(result['memory_gib'], 2),
+              'hard_min_memory_gib': result['hard_min_memory_gib'],
+              'guidance_memory_gib': result['guidance_memory_gib'],
+              'warnings': result['warnings'],
+              'blockers': result['blockers'],
+              'solver_failure': False,
+          }
+          root = Path(os.environ['SAFE_ROOT'])
+          root.mkdir(parents=True, exist_ok=True)
+          (root / 'resource-summary.json').write_text(
+              json.dumps(safe, sort_keys=True, indent=2) + '\n', encoding='utf-8'
+          )
+          print(
+              'SAFE_RESOURCE_PREFLIGHT '
+              f"state={result['state']} cpu={result['cpu_count']} mem_gib={mem_gib:.2f}"
+          )
+          if result['state'] == 'RESOURCE_BLOCKED':
+              raise SystemExit(3)
+          PY
+
+      - name: Run sealed 3x gold validation
+        id: validator
+        working-directory: rts/experiments/ULTIMATE_LOOP_RECONSTRUCTION_FURNACE_20260818
+        shell: bash
+        run: |
+          set +e
+          python gold_validator.py \
+            --split "${{ matrix.split }}" \
+            --evaluator-root "${{ github.workspace }}/evaluator" \
+            --output-root "${{ runner.temp }}/furnace-stage0" \
+            --max-candidates 4
+          rc=$?
+          echo "validator_rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload solver-safe admission artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: furnace-stage0-${{ matrix.split }}-safe
+          path: ${{ runner.temp }}/furnace-stage0/safe/${{ matrix.split }}/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce validator result
+        if: always()
+        run: |
+          rc="${{ steps.validator.outputs.validator_rc }}"
+          if [ "$rc" = "0" ]; then
+            echo "SAFE_STAGE0_GATE split=${{ matrix.split }} state=ADMITTED"
+            exit 0
+          fi
+          echo "SAFE_STAGE0_GATE split=${{ matrix.split }} state=VALIDATOR_BLOCKED"
+          exit 1
