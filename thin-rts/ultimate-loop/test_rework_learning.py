@@ -36,6 +36,7 @@ class ReworkLearningTests(unittest.TestCase):
         self.assertEqual(report["next_mode"], "ASSIST_ACTIVE")
         self.assertTrue(report["difficult_zone"])
         self.assertFalse(report["evidence_policy"]["historical_evidence_used"])
+        self.assertEqual(report["active_scope"], "bank-checkout|ssh|runtime-check")
         self.assertIn("CONVERGE_TO_SINGLE_TERMINAL", report["assist_actions"])
         self.assertIn("SPLIT_LONG_COMMANDS", report["assist_actions"])
 
@@ -54,20 +55,26 @@ class ReworkLearningTests(unittest.TestCase):
         self.assertEqual(report["signal_components"]["historical_hits"], 0)
 
     def test_assist_is_scoped_and_enters_clearing_after_success_tail(self):
+        scope = "bank-checkout|ssh|runtime-check"
         case = {
             "mode": "ASSIST_ACTIVE",
+            "active_scope": scope,
             "events": [
                 event(1, markers=["MULTI_TAB"]),
                 event(2, outcome="SUCCESS", markers=[], from_step="RUN", to_step="DONE"),
                 event(3, outcome="SUCCESS", markers=[], from_step="RUN", to_step="DONE"),
+                event(4, task="unrelated", source="ui", operation="form", markers=["PASTE_FAILURE"]),
             ],
         }
         report = rework_learning.evaluate(case)
+        self.assertEqual(report["active_scope"], scope)
         self.assertEqual(report["next_mode"], "CLEARING")
 
     def test_clearing_returns_to_observe_after_stable_success(self):
+        scope = "bank-checkout|ssh|runtime-check"
         case = {
             "mode": "CLEARING",
+            "active_scope": scope,
             "events": [
                 event(1, outcome="SUCCESS", markers=[], from_step="RUN", to_step="DONE"),
                 event(2, outcome="SUCCESS", markers=[], from_step="RUN", to_step="DONE"),
@@ -101,6 +108,26 @@ class ReworkLearningTests(unittest.TestCase):
         }
         report = rework_learning.evaluate(case)
         self.assertEqual(report["next_mode"], "OBSERVE")
+
+    def test_meteor_unrelated_scopes_cannot_pool_weak_signals(self):
+        case = {
+            "mode": "OBSERVE",
+            "events": [
+                event(1, task="a", source="ssh", operation="x", markers=["MULTI_TAB"]),
+                event(2, task="b", source="ui", operation="y", markers=["PASTE_FAILURE"]),
+                event(3, task="c", source="browser", operation="z", markers=["COMMAND_RETRY"]),
+            ],
+        }
+        report = rework_learning.evaluate(case)
+        self.assertEqual(report["next_mode"], "OBSERVE")
+        self.assertFalse(report["difficult_zone"])
+        self.assertEqual(len(report["scope_reports"]), 3)
+
+    def test_missing_scope_identity_fails_closed(self):
+        broken = event(1)
+        broken["operation"] = ""
+        with self.assertRaises(ValueError):
+            rework_learning.evaluate({"mode": "OBSERVE", "events": [broken]})
 
 
 if __name__ == "__main__":
