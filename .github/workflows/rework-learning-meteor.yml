@@ -1,0 +1,24 @@
+name: Rework Learning Meteor
+
+on:
+  pull_request:
+    paths:
+      - 'thin-rts/ultimate-loop/rework_learning.py'
+      - 'thin-rts/ultimate-loop/test_rework_learning.py'
+      - 'thin-rts/ultimate-loop/REWORK_LEARNING_DA_COUNTER_DA_2026-08-21.md'
+      - '.github/workflows/rework-learning-meteor.yml'
+  workflow_dispatch:
+
+jobs:
+  meteor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile prototype
+        run: python -m py_compile thin-rts/ultimate-loop/rework_learning.py thin-rts/ultimate-loop/test_rework_learning.py
+      - name: Run frozen METEOR regression workload
+        working-directory: thin-rts/ultimate-loop
+        run: python -m unittest -v test_rework_learning.py
