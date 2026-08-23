@@ -132,3 +132,29 @@ If the task is a fix:
 
 If the task is implementation:
 - follow spec and acceptance criteria
+
+---
+
+## Ultimate Loop shared runtime adapter
+
+This repository may use the host-installed shared Ultimate Loop Codex runtime, but the shared runtime does not reopen RTS development.
+
+When the user writes `/goal` or explicitly asks to run Ultimate Loop:
+
+1. read `docs/CANONICAL_INDEX.md` first;
+2. read `docs/audit/RTS_DEVELOPMENT_FREEZE_2026-08-09.md` and `docs/audit/RTS_FINAL_ABOLITION_GATE_2026-08.md` before proposing implementation;
+3. treat the repository's current state as `FROZEN / ENDED` unless an explicit human decision authorizes a bounded reopening;
+4. use the shared `ultimate-loop` skill and explicit custom roles only as an analysis/verification mechanism within that boundary;
+5. do not vendor or duplicate the shared Ultimate Loop skill/custom-role files into RTS merely to enable `/goal`.
+
+Hard rules:
+
+- `/goal` != automatic development restart;
+- historical capability != current authority to modify;
+- a new idea, external capability, or benchmark result is a WATCH/DARWIN trigger candidate, not automatic permission to resume implementation;
+- if the correct bounded result is KEEP/FROZEN/NO-CHANGE, stop there instead of inventing work;
+- any material reopening must identify the exact frozen invariant being reconsidered, the new evidence that changes the prior decision, the permitted change surface, and the fresh Reality Gate;
+- `REPOSITORY_IMPLEMENTED != CODEX_RUNTIME_VALIDATED`;
+- `PROMPT NON-MUTATION != TECHNICAL READ-ONLY`.
+
+Repository-local freeze and canonical records override generic global runtime guidance.
