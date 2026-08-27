@@ -1,0 +1,42 @@
+name: FRZ-000017 Sync F Fix Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000017-bounded-probe-executor-v1
+    paths:
+      - .github/workflows/frz-000017-sync-f-fix-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000017-bounded-probe-executor-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Merge current F branch
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git fetch origin feature/frz-000016-adaptive-engine-profiler-v1
+          git merge --no-edit origin/feature/frz-000016-adaptive-engine-profiler-v1
+      - name: Verify F cap and G tests
+        run: |
+          python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+          python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Push synchronized stack
+        run: git push origin HEAD:feature/frz-000017-bounded-probe-executor-v1
