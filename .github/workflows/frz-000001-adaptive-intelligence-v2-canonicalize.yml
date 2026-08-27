@@ -136,7 +136,7 @@ jobs:
           out.write_text(json.dumps({'children': items}, ensure_ascii=False, indent=2) + '\n')
           print(json.dumps(items, ensure_ascii=False, indent=2))
           PY
-          python -m freezer.cli rebuild
+          python -m freezer.cli reindex
           python -m freezer.cli verify
           python -m freezer.build_assessment verify
           git config user.name 'github-actions[bot]'
