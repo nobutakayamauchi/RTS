@@ -1,0 +1,99 @@
+name: FRZ-000022 Revalidation Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000022-exhausted-ai-human-escalation-gate-v1
+    paths:
+      - .github/workflows/frz-000022-revalidation-once.yml
+  workflow_dispatch:
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000022-exhausted-ai-human-escalation-gate-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Re-run live I-J-K0 and classify human-escalation eligibility
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          from official_docs_intake import build_intake_report
+          from semantic_claim_refinement import refine_intake_report
+          from review_necessity_triage import triage_refinement_report, verify_triage_report
+
+          cases = [
+              ('openai','gpt-5.6','api','https://developers.openai.com/api/docs/guides/latest-model.md'),
+              ('anthropic','claude-fable-5','claude-api','https://platform.claude.com/docs/en/about-claude/models/overview.md'),
+              ('google','gemini-3.7','gemini-api','https://ai.google.dev/gemini-api/docs/models'),
+          ]
+
+          rows=[]
+          summary=Counter()
+          for provider,generation,surface,url in cases:
+              i=build_intake_report({
+                  'provider':provider,'product_surface':surface,'generation':generation,
+                  'captured_at':'2026-08-28T00:00:00Z','query_terms':[generation],
+                  'explicit_urls':[url],'max_documents':1,
+              })
+              j=refine_intake_report(i)
+              k=triage_refinement_report(j)
+              verify_triage_report(k, refinement_report=j)
+              for r in k['records']:
+                  da=r['da']; cda=r['counter_da']
+                  paths=sorted(set(da.get('problem_solving_paths',[])+cda.get('problem_solving_paths',[])))
+                  old=r['classification']
+                  if old == 'REVIEW_BLOCKED':
+                      new='REVIEW_BLOCKED'; reason='upstream blocked/stale'
+                  elif paths:
+                      # There is a concrete AI-side action/verification route. It has not been exhausted.
+                      new='AI_CONTINUE'; reason='concrete problem-solving/revalidation path remains'
+                  elif old in ('HUMAN_LATER','DEFER_LOW_VALUE'):
+                      # Evidence is retained and can be rechecked on source/model identity change.
+                      new='WAIT_SAFE_DEFER'; reason='no immediate material dead-end; bounded recheck remains'
+                  elif old == 'HUMAN_NOW':
+                      # No explicit exhaustion evidence exists in the current pipeline.
+                      new='HUMAN_CANDIDATE'; reason='material K0 finding but no remaining path and no proven exhaustion evidence'
+                  else:
+                      new='HUMAN_CANDIDATE'; reason='unclassified unresolved path; human escalation not yet authorized'
+
+                  summary[(provider,new)] += 1
+                  summary[('TOTAL',new)] += 1
+                  rows.append({
+                      'provider':provider,
+                      'record_id':r['record_id'],
+                      'old_classification':old,
+                      'new_disposition':new,
+                      'reason':reason,
+                      'anchor':r['anchor'],
+                      'impact':max(da.get('impact',0),cda.get('impact',0)),
+                      'causal_reach':max(da.get('causal_reach',0),cda.get('causal_reach',0)),
+                      'perspective_gap':r.get('perspective_gap'),
+                      'problem_solving_paths':paths,
+                      'exhaustion_evidence':'NOT_PROVIDED',
+                  })
+
+          assert len(rows)==76, len(rows)
+          assert sum(1 for r in rows if r['new_disposition']=='HUMAN_NOW')==0
+          out={'summary':{f'{p}:{d}':n for (p,d),n in sorted(summary.items())},'records':rows}
+          Path('frz000022-revalidation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(out['summary'],ensure_ascii=False,indent=2))
+          print('HUMAN_CANDIDATES')
+          for r in rows:
+              if r['new_disposition']=='HUMAN_CANDIDATE':
+                  print(json.dumps(r,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frz000022-revalidation
+          path: frz000022-revalidation.json
