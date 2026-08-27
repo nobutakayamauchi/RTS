@@ -1,0 +1,72 @@
+{
+  "title": "Compact Active + Restart Surface v1",
+  "type": "feature",
+  "status": "FROZEN",
+  "summary": "常時ロードする指示面を小さく保ち、条件付き知識を再接続可能に外出ししつつ、新しいAIが全履歴を読まず安全に継続できるRestart Surfaceを定義・検証する。",
+  "original_problem": "長期運用でAGENTS・handoff・reconstructionが肥大化すると、毎回の再読コストが増え、逆に圧縮しすぎると重要な判断・禁止事項・restart anchorが失われる。",
+  "why_it_matters": "常駐context負荷を下げながら復元性を維持できれば、Codexの新規推論余力と継続性を同時に上げられる。",
+  "reason_frozen": "active surfaceとrestart-item registerの最小契約、reopen条件、restart-equivalence試験を個別Preflightで固定するまで実装しない。",
+  "preserved_value": [
+    "small always-loaded authority/safety/router surface",
+    "conditional reconnect triggers",
+    "traceable moved knowledge",
+    "current goal/source/commit/branch identity",
+    "changed/verified/unresolved/rollback/do-not-touch/next-authorized-action restart state",
+    "reopen-full-history condition",
+    "active-load burden measurement",
+    "restart-equivalence validation"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 4,
+    "risk_reduction": 4,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "親000001がDECOMPOSE_REQUIREDとして確定している",
+    "restart必須項目の固定denominatorを定義できる",
+    "圧縮後もsource pointerから深い履歴へ再接続できる"
+  ],
+  "negative_triggers": [
+    "文字数削減だけを成功条件にする",
+    "UNKNOWNや禁止事項を圧縮で消す",
+    "full historyを削除する",
+    "restartability未検証の要約を完了状態として扱う"
+  ],
+  "dependencies": [
+    "current goal / task state identity",
+    "decision/evidence source pointers",
+    "reconstruction/handoff path",
+    "Selective Recall childとの最小interface"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000001 Adaptive Intelligence v2 reassessment",
+    "shin4141/agents-md-compactor@7679dceddc7213433f885d5054db50213460d266",
+    "shin4141/output-surface-integrity@5aa086171309bf83604360f0ea9fbcb169bbe921",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6 docs/context_compression.md"
+  ],
+  "possible_destinations": [
+    "RTS reconstruction/handoff layer",
+    "Ultimate Loop active instruction router"
+  ],
+  "estimated_hours": {
+    "minimum": 8,
+    "maximum": 16
+  },
+  "tags": [
+    "context-compression",
+    "restartability",
+    "handoff",
+    "active-surface",
+    "reconstruction",
+    "codex-efficiency"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL"
+}
