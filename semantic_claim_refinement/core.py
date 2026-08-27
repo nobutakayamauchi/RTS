@@ -39,6 +39,8 @@ class SemanticRule:
     kind: str
     semantic_value: dict[str, Any]
     patterns: tuple[str, ...]
+    capture_pattern: str | None = None
+    capture_key: str | None = None
 
 
 DEFAULT_RULES: tuple[SemanticRule, ...] = (
@@ -128,6 +130,56 @@ DEFAULT_RULES: tuple[SemanticRule, ...] = (
             r"\b(?:concurrent|simultaneous) requests?\b",
         ),
     ),
+    SemanticRule(
+        "model_identity.naming_scheme.v1",
+        "model_identity",
+        "naming_scheme",
+        "CONTRACT",
+        {"change": "DOCUMENTED"},
+        (r"\b(?:introduces? )?(?:a )?new naming scheme\b",),
+    ),
+    SemanticRule(
+        "reasoning.context_selector.v1",
+        "reasoning",
+        "reasoning_context_selector",
+        "CONTRACT",
+        {"selector": "reasoning.context"},
+        (r"\breasoning\.context\b.{0,80}\b(?:select|choose|behavior)\b",),
+    ),
+    SemanticRule(
+        "state.reasoning_across_calls.v1",
+        "state",
+        "reasoning_state_across_calls",
+        "CAPABILITY",
+        {"support": "DOCUMENTED", "scope": "ACROSS_CALLS"},
+        (r"\bpreserve reasoning across calls\b",),
+    ),
+    SemanticRule(
+        "reasoning.pro_mode.v1",
+        "reasoning",
+        "pro_mode",
+        "CAPABILITY",
+        {"support": "DOCUMENTED", "mode": "PRO"},
+        (r"\bpro mode\b",),
+    ),
+    SemanticRule(
+        "limits.output_tokens_up_to.v1",
+        "limits",
+        "max_output_tokens",
+        "LIMIT",
+        {"dimension": "OUTPUT_TOKENS"},
+        (r"\bsupport(?:s)? up to\s+[0-9][0-9,.]*\s*[kKmM]?\s+output tokens?\b",),
+        capture_pattern=r"\bsupport(?:s)? up to\s+([0-9][0-9,.]*\s*[kKmM]?)\s+output tokens?\b",
+        capture_key="max_tokens",
+    ),
+    SemanticRule(
+        "response.model_metadata_fields.v1",
+        "response_schema",
+        "model_metadata_fields",
+        "CONTRACT",
+        {"fields": ["max_input_tokens", "max_tokens", "capabilities"]},
+        (r"\bresponse includes\b.{0,240}\bmax_input_tokens\b.{0,120}\bmax_tokens\b.{0,120}\bcapabilities\b",),
+    ),
 )
 
 
@@ -145,12 +197,20 @@ def _semantic_matches(anchor: str, rules: tuple[SemanticRule, ...]) -> list[Sema
 
 def _claim_for(rule: SemanticRule, anchor: str) -> dict[str, Any]:
     digest = _sha256_text(anchor)
+    value = copy.deepcopy(rule.semantic_value)
+    if rule.capture_pattern is not None:
+        if not rule.capture_key:
+            raise RefinementError(f"capture_key missing for {rule.rule_id}")
+        match = re.search(rule.capture_pattern, anchor, re.IGNORECASE)
+        if match is None or match.lastindex is None:
+            raise RefinementError(f"semantic capture failed for {rule.rule_id}")
+        value[rule.capture_key] = match.group(1).replace(",", "").replace(" ", "").lower()
     return {
         "claim_id": "j_" + _sha256_text(f"{rule.rule_id}|{anchor}")[:20],
         "area": rule.area,
         "key": rule.key,
         "kind": rule.kind,
-        "value": copy.deepcopy(rule.semantic_value),
+        "value": value,
         "anchor": anchor,
         "extraction_method": METHOD,
         "refinement_rule_id": rule.rule_id,
