@@ -51,6 +51,12 @@ class AdaptiveEngineProfilerTests(unittest.TestCase):
         self.assertEqual(plan["execution"], "NOT_PERFORMED")
         self.assertEqual(plan["authority"]["execution_authority"], "NONE")
 
+    def test_probe_plan_honors_single_probe_cap(self):
+        plan = plan_probe_matrix(ENGINE, "coding", max_probes=1)
+        self.assertEqual(plan["probe_count"], 1)
+        self.assertEqual(len(plan["probes"]), 1)
+        self.assertEqual(plan["probes"][0]["probe_id"], "baseline")
+
     def test_hidden_reasoning_and_raw_text_are_rejected(self):
         row = obs(1)
         row["chain_of_thought"] = "secret"

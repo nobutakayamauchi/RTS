@@ -350,6 +350,8 @@ def plan_probe_matrix(
     ]
     seen = {_canonical(baseline)}
     for field, value in variations:
+        if len(probes) >= max_probes:
+            break
         candidate = dict(baseline)
         candidate[field] = value
         fingerprint = _canonical(candidate)
@@ -361,8 +363,6 @@ def plan_probe_matrix(
             "changed_dimension": field,
             "config": candidate,
         })
-        if len(probes) >= max_probes:
-            break
     return {
         "engine": engine,
         "engine_key": key,
