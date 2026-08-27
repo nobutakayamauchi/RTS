@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T09:38:09Z",
+  "generated_at": "2026-08-27T09:51:06Z",
   "count": 18,
   "items": [
     {
@@ -413,10 +413,10 @@
     },
     {
       "item_id": "RTS-FRZ-000018",
-      "version": 3,
+      "version": 5,
       "title": "Model Transition Intelligence + Architecture Contract Diff v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 84.59,
       "estimated_hours": {
         "minimum": 12,
@@ -435,7 +435,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-27T09:38:09Z"
+      "updated_at": "2026-08-27T09:51:06Z"
     }
   ]
 }
