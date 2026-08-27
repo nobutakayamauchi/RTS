@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T09:51:06Z",
-  "count": 18,
+  "generated_at": "2026-08-27T10:46:14Z",
+  "count": 19,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -436,6 +436,33 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T09:51:06Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000019",
+      "version": 5,
+      "title": "Official Docs Intake + Claim Extraction Adapter v1",
+      "type": "architecture",
+      "status": "COMPLETED",
+      "priority_score": 86.89,
+      "estimated_hours": {
+        "minimum": 10,
+        "maximum": 20
+      },
+      "tags": [
+        "adaptive-intelligence-v4",
+        "official-docs",
+        "provider-adapter",
+        "bounded-fetch",
+        "claim-extraction",
+        "provenance",
+        "transition-intelligence",
+        "openai",
+        "anthropic",
+        "google"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T10:46:13Z"
     }
   ]
 }

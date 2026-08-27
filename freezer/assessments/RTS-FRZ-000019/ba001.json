@@ -1,0 +1,92 @@
+{
+  "assessor": "RTS governed build assessment — Official Docs Intake + Claim Extraction Adapter v1",
+  "rationale": "H already owns deterministic old/new documentation comparison and fail-closed residual-change coverage, but it deliberately excludes source discovery/fetch and claim extraction. I adds only the missing upstream intake adapter: bounded provider allowlists, official index discovery, HTTPS fetch with redirect revalidation, deterministic text normalization, exact-anchor conservative claim extraction, coverage audit, and H-compatible bundle construction. It does not infer hidden model architecture, call model APIs, mutate runtime routing, or grant execution/profile/promotion authority.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 13,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "transition evidence bundle validate_source validate_claim",
+      "exact provenance content_sha256",
+      "external seed source validation",
+      "bounded network provider adapter"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "model_transition_intelligence/",
+        "ref": "f2774705e97cc8f6a19f2f416b3af451bef0a2c8",
+        "kind": "code",
+        "reuse_mode": "DIRECT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 5,
+        "notes": "Directly validate emitted transition-evidence-bundle/v1 against H schema and reuse exact claim/source boundaries."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "external_seed_corpus/",
+        "ref": "f2774705e97cc8f6a19f2f416b3af451bef0a2c8",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse exact external provenance, reference-only evidence, and non-authorizing semantics."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "selective_recall/",
+        "ref": "f2774705e97cc8f6a19f2f416b3af451bef0a2c8",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse bounded output/freshness/fail-closed patterns."
+      }
+    ],
+    "gaps": [
+      "No component currently discovers and fetches provider official documentation into immutable H-compatible evidence bundles.",
+      "No component currently performs conservative exact-anchor contract claim extraction with an explicit coverage audit."
+    ]
+  },
+  "risks": [
+    "Provider documentation hosts and redirects can change.",
+    "HTML pages can contain navigation/script noise that creates false claim signals.",
+    "Keyword extraction can overclassify marketing language or underclassify novel contract wording.",
+    "Unbounded discovery can become a crawler and create cost/load risk.",
+    "Partial fetch failures can be mistaken for complete evidence.",
+    "A valid documentation claim can still differ from actual model behavior and must remain a hypothesis."
+  ],
+  "assessment_id": "RTS-BA-000019-001",
+  "item_id": "RTS-FRZ-000019",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "a02220429d9df2f7b540479a0af7057c8eed69ebce605431349aae855e3ca33b",
+  "derived": {
+    "benefit_score": 94.0,
+    "cost_score": 40.0,
+    "reuse_score": 61.54,
+    "decision_score": 72.93,
+    "reuse_hours_saved": 8.0,
+    "net_hours": 12.0,
+    "time_saved_ratio": 0.6154,
+    "implementation_efficiency": 1.08,
+    "cost_effectiveness": 7.83,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T10:33:57Z"
+}
