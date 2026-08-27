@@ -1,0 +1,103 @@
+{
+  "assessor": "RTS governed build assessment — Adaptive Engine Profiler v1",
+  "rationale": "A-E already provide recall, restart, resumable learning, observability and external-pattern boundaries. F reuses those constraints to add a small offline/read-only model-behavior profiler: bounded probe planning, observable outcome aggregation, engine-change fail-safe, domain profiles and drift detection. No provider calls or autonomous profile application are introduced in v1.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 14,
+    "integration_hours": 2,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "selective recall non authority",
+      "restart surface provenance",
+      "intelligence compiler checkpoint",
+      "reuse metrics unknown measured estimated",
+      "external seed claim boundary"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "selective_recall/",
+        "ref": "db1b08052c9d203a1ff75b37ec37c0f5107caded",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse routing-is-not-authority, freshness and bounded-recall invariants."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "intelligence_compiler/",
+        "ref": "db1b08052c9d203a1ff75b37ec37c0f5107caded",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse resumable/failure-isolated learning boundary; profiler output remains a candidate artifact."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "reuse_metrics/",
+        "ref": "db1b08052c9d203a1ff75b37ec37c0f5107caded",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse MISSING!=0 and MEASURED!=ESTIMATED claim-boundary conventions."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "external_seed_corpus/",
+        "ref": "db1b08052c9d203a1ff75b37ec37c0f5107caded",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse provenance-rich candidate/non-Canon boundary for learned engine behavior."
+      }
+    ],
+    "gaps": [
+      "No current RTS layer treats model-generation changes as behavior drift and reconstructs operating policy from bounded observations.",
+      "No current RTS planner creates a capped one-dimension-at-a-time experiment matrix for context/recall/autonomy/reasoning/tool strategy."
+    ]
+  },
+  "risks": [
+    "Small samples can overfit a model profile.",
+    "Repeated runs of one task can masquerade as independent evidence.",
+    "A faster variant can look attractive while success quality worsens.",
+    "Model identity changes can silently invalidate an old profile.",
+    "Telemetry can tempt collection of hidden reasoning or prompt bodies.",
+    "An advisory profile can be mistaken for execution authority."
+  ],
+  "assessment_id": "RTS-BA-000016-001",
+  "item_id": "RTS-FRZ-000016",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "592e5fa85671bf39b5699cbf5d9f98928b333c8c2a3e31fc012f8e6aa2291168",
+  "derived": {
+    "benefit_score": 94.0,
+    "cost_score": 42.11,
+    "reuse_score": 64.29,
+    "decision_score": 73.98,
+    "reuse_hours_saved": 9.0,
+    "net_hours": 11.0,
+    "time_saved_ratio": 0.6429,
+    "implementation_efficiency": 1.27,
+    "cost_effectiveness": 8.55,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T08:40:23Z"
+}

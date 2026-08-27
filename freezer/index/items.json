@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T08:06:21Z",
-  "count": 15,
+  "generated_at": "2026-08-27T08:40:32Z",
+  "count": 16,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -359,6 +359,31 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T08:06:21Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000016",
+      "version": 5,
+      "title": "Adaptive Engine Profiler v1",
+      "type": "architecture",
+      "status": "COMPLETED",
+      "priority_score": 86.23,
+      "estimated_hours": {
+        "minimum": 10,
+        "maximum": 20
+      },
+      "tags": [
+        "adaptive-intelligence-v3",
+        "engine-profiler",
+        "model-behavior",
+        "drift-detection",
+        "bounded-probes",
+        "conservative-fallback",
+        "codex-efficiency",
+        "self-adaptation"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T08:40:32Z"
     }
   ]
 }
