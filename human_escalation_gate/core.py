@@ -321,6 +321,12 @@ def evaluate_escalation_report(
                     raise HumanEscalationError(
                         f"finding {index}: evidence route {route_id!r} was not an active or newly opened route"
                     )
+            closeable_routes = set(active_routes) | set(row["opened_routes"])
+            unknown_closures = [closed for closed in row["closed_routes"] if closed not in closeable_routes]
+            if unknown_closures:
+                raise HumanEscalationError(
+                    f"finding {index}: cannot close routes that were never active: {unknown_closures}"
+                )
             for closed in row["closed_routes"]:
                 active_routes = [route for route in active_routes if route != closed]
             for opened in row["opened_routes"]:
