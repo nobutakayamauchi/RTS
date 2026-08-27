@@ -1,0 +1,76 @@
+name: Validate FRZ-000014 Reuse Metrics v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000014-reuse-efficiency-knowledge-debt-metrics-v1
+    paths:
+      - reuse_metrics/**
+      - metrics/reuse_events.json
+      - metrics/reuse_report.json
+      - tests/test_reuse_metrics.py
+      - tests/test_reuse_metrics_da.py
+      - freezer/**
+      - .github/workflows/frz-000014-reuse-metrics-v1.yml
+  pull_request:
+    paths:
+      - reuse_metrics/**
+      - metrics/reuse_events.json
+      - metrics/reuse_report.json
+      - tests/test_reuse_metrics.py
+      - tests/test_reuse_metrics_da.py
+      - freezer/**
+      - .github/workflows/frz-000014-reuse-metrics-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify committed metrics report
+        run: python -m reuse_metrics verify --report metrics/reuse_report.json
+      - name: Run D baseline and DA
+        run: python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+      - name: Regress completed Child C
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress completed Child B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress completed Child A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Assert completed stack boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          def cur(i):
+              p=json.loads((root/'freezer/items'/i/'current.json').read_text())
+              return json.loads((root/p['path']).read_text())
+          for i in ('RTS-FRZ-000011','RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014'):
+              x=cur(i)
+              assert x['status']=='COMPLETED', x
+          e=cur('RTS-FRZ-000015')
+          assert e['status']=='FROZEN' and e['build_authority']=='NOT_APPROVED', e
+          active=[]
+          for p in (root/'freezer/items').glob('RTS-FRZ-*/current.json'):
+              x=cur(p.parent.name)
+              if x['status']=='IN_PROGRESS': active.append(x['item_id'])
+          assert active==[], active
+          print('A-D completed; E frozen; WIP clear')
+          PY
