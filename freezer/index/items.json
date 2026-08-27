@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T09:10:05Z",
-  "count": 17,
+  "generated_at": "2026-08-27T09:51:06Z",
+  "count": 18,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -410,6 +410,32 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T09:10:04Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000018",
+      "version": 5,
+      "title": "Model Transition Intelligence + Architecture Contract Diff v1",
+      "type": "architecture",
+      "status": "COMPLETED",
+      "priority_score": 84.59,
+      "estimated_hours": {
+        "minimum": 12,
+        "maximum": 24
+      },
+      "tags": [
+        "adaptive-intelligence-v4",
+        "model-transition",
+        "architecture-contract-diff",
+        "official-docs",
+        "semantic-diff",
+        "behavior-hypothesis",
+        "probe-routing",
+        "provider-neutral",
+        "self-adaptation"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T09:51:06Z"
     }
   ]
 }
