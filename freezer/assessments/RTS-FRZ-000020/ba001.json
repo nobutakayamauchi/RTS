@@ -1,0 +1,90 @@
+{
+  "assessor": "RTS governed build assessment — Semantic Claim Refinement v1",
+  "rationale": "I safely discovers and lexically extracts official documentation but intentionally leaves novel contract wording as REVIEW_REQUIRED. J adds a bounded repository-local refinement layer that maps only exact source sentences onto a controlled semantic alias ontology. It does not call providers, infer hidden architecture, verify behavior, mutate runtime routing, or grant authority. The main reuse is I's exact-anchor/audit contract plus H's bundle validator.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 12,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "official docs ambiguous extraction exact anchor",
+      "transition evidence bundle validate claim",
+      "non authorizing semantic refinement"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "official_docs_intake/",
+        "ref": "b20556a16272ed3c8916f475b6fd6c010d0f7bda",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 5,
+        "notes": "Reuse normalized source text, exact-anchor lexical claims, ambiguity hashes, intake fingerprint and H-valid bundle boundary."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "model_transition_intelligence/",
+        "ref": "b20556a16272ed3c8916f475b6fd6c010d0f7bda",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse claim schema, supported contract areas and strict bundle validation."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000019_2026-08-27.md",
+        "ref": "b20556a16272ed3c8916f475b6fd6c010d0f7bda",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse live-smoke ambiguity baseline and destructive DA lessons."
+      }
+    ],
+    "gaps": [
+      "No component currently reduces I REVIEW_REQUIRED blocks using a controlled semantic ontology while preserving exact anchors and uncertainty.",
+      "No current verifier explicitly prevents negation reversal or multi-rule semantic ambiguity during review reduction."
+    ]
+  },
+  "risks": [
+    "Semantic aliases can overgeneralize provider wording.",
+    "Negated or exception clauses can be mistaken for positive support.",
+    "One sentence may legitimately refer to multiple contract areas and should remain reviewable if classification is not unique.",
+    "Reducing review count can become a vanity metric if unresolved high-risk text is silently hidden.",
+    "Upstream ambiguity truncation can create false completeness."
+  ],
+  "assessment_id": "RTS-BA-000020-001",
+  "item_id": "RTS-FRZ-000020",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "aed494fb1314f541d11f963d28c34566d825376cae2835029425c6bf9ea951c9",
+  "derived": {
+    "benefit_score": 91.5,
+    "cost_score": 44.44,
+    "reuse_score": 75.0,
+    "decision_score": 74.91,
+    "reuse_hours_saved": 9.0,
+    "net_hours": 10.0,
+    "time_saved_ratio": 0.75,
+    "implementation_efficiency": 1.2,
+    "cost_effectiveness": 9.15,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T11:39:13Z"
+}

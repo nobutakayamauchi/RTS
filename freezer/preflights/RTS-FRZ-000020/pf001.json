@@ -1,0 +1,78 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Semantic Claim Refinement v1",
+  "rationale": "Repository-local deterministic postprocessing of an already-valid I report only. J may add exact-anchor UNVERIFIED claim classifications from a controlled ontology and recompute review coverage. It does not fetch network data, call a model, modify raw source content, mutate H/F/G runtime behavior, or grant authority. Ambiguity, negation, truncation and ontology conflicts fail closed.",
+  "affected_boundaries": [
+    "new semantic_claim_refinement package",
+    "controlled semantic alias registry",
+    "I report postprocessing and review-coverage audit",
+    "H bundle revalidation after added claims",
+    "focused DA and full A-J regression",
+    "RTS-FRZ-000020 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "A-I are COMPLETED.",
+    "I reports retain source content, exact claims and ambiguous anchor hashes.",
+    "H validate_bundle rejects malformed claim/bundle structures.",
+    "Docs claims remain UNVERIFIED and non-authorizing."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No existing intake report, transition report, profile, memory, FREEZER history or runtime configuration is mutated in place."
+  },
+  "external_interfaces": [
+    "repository-local I intake report object",
+    "deterministic semantic refinement report",
+    "refined H-compatible transition-evidence-bundle/v1",
+    "no network/provider/model interface in v1"
+  ],
+  "approval_changes": [
+    "none; semantic refinement grants no execution/profile-application/promotion authority",
+    "review reduction is evidence-processing only and cannot apply H/F/G decisions"
+  ],
+  "public_documents": [
+    "none"
+  ],
+  "regression_tests": [
+    "J baseline + destructive DA/Counter-DA",
+    "I official docs intake regression",
+    "H transition intelligence regression",
+    "G/F/E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "semantic aliases must map only to H-supported areas and claim kinds",
+    "exact source anchors must remain unchanged",
+    "negative/exception language must never be auto-promoted as positive support",
+    "multi-match ontology results remain REVIEW_REQUIRED",
+    "upstream ambiguous_findings_truncated prevents full READY state",
+    "original intake fingerprint must be preserved"
+  ],
+  "rollback_boundary": "Drop the J branch or revert semantic_claim_refinement files and FRZ-000020 append-only versions; A-I remain untouched.",
+  "completion_conditions": [
+    "unique controlled semantic aliases can convert eligible ambiguous anchors into exact-anchor UNVERIFIED claims",
+    "negated statements remain unresolved",
+    "multi-rule semantic matches remain unresolved",
+    "unmatched text remains REVIEW_REQUIRED",
+    "upstream ambiguity truncation can never produce READY_FOR_H",
+    "existing lexical claims are not duplicated",
+    "refined bundle passes H validate_bundle",
+    "all authority fields remain NONE",
+    "A-J regressions and FREEZER verify pass"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "v1 controlled aliases will reduce only a subset of real provider ambiguity",
+    "provider wording evolves and registry updates still require evidence-backed review",
+    "review count reduction is not itself correctness evidence"
+  ],
+  "preflight_id": "RTS-PF-000020-001",
+  "item_id": "RTS-FRZ-000020",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "9fab45aa64a6dcac77a016fee5e88710122f68f8e539618409dc1456a05719d7",
+  "created_at": "2026-08-27T11:39:13Z"
+}
