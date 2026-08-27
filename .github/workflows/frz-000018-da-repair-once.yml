@@ -41,17 +41,23 @@ jobs:
               raise SystemExit(f'marker mismatch: {s.count(old)}')
           p.write_text(s.replace(old,new))
           PY
-      - name: Tighten fixture anchor to full documented change
+      - name: Tighten fixture anchors to full documented changes
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('tests/test_model_transition_intelligence.py')
           s=p.read_text()
-          old='claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended")'
-          new='claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended; avoid overspecification.")'
-          if s.count(old)!=1:
-              raise SystemExit(f'fixture marker mismatch: {s.count(old)}')
-          p.write_text(s.replace(old,new))
+          replacements = {
+              'claim("i1", "instructions", "instruction_guidance", "CONTRACT", "detailed", "Detailed instructions are recommended")':
+              'claim("i1", "instructions", "instruction_guidance", "CONTRACT", "detailed", "Detailed instructions are recommended.")',
+              'claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended")':
+              'claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended; avoid overspecification.")',
+          }
+          for old,new in replacements.items():
+              if s.count(old)!=1:
+                  raise SystemExit(f'fixture marker mismatch: {old} -> {s.count(old)}')
+              s=s.replace(old,new)
+          p.write_text(s)
           PY
       - name: Counter-DA and focused regression
         run: |
