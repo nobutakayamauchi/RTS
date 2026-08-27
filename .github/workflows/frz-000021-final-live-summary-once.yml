@@ -1,0 +1,58 @@
+name: FRZ-000021 Final Live Summary Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000021-human-review-necessity-da-v1
+    paths:
+      - .github/workflows/frz-000021-final-live-summary-once.yml
+  workflow_dispatch:
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000021-human-review-necessity-da-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Summarize current live triage
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          from official_docs_intake import build_intake_report
+          from semantic_claim_refinement import refine_intake_report
+          from review_necessity_triage import triage_refinement_report
+
+          cases=[
+            ('openai','gpt-5.6','api','https://developers.openai.com/api/docs/guides/latest-model.md'),
+            ('anthropic','claude-fable-5','claude-api','https://platform.claude.com/docs/en/about-claude/models/overview.md'),
+            ('google','gemini-3.7','gemini-api','https://ai.google.dev/gemini-api/docs/models'),
+          ]
+          total=Counter(); paths=Counter(); reasons=Counter(); gaps=0
+          for provider,generation,surface,url in cases:
+            i=build_intake_report({'provider':provider,'product_surface':surface,'generation':generation,'captured_at':'2026-08-27T12:54:00Z','query_terms':[generation],'explicit_urls':[url],'max_documents':1})
+            j=refine_intake_report(i); k=triage_refinement_report(j)
+            c=Counter(r['classification'] for r in k['records'])
+            pg=sum(1 for r in k['records'] if r['perspective_gap']>=2)
+            print('PROVIDER',provider,'I_AMBIG',i['audit']['ambiguous_block_count'],'J_RESOLVED',j['audit']['resolved_count'],'J_UNRESOLVED',len(j['audit']['unresolved']),'NOW',c['HUMAN_NOW'],'LATER',c['HUMAN_LATER'],'DEFER',c['DEFER_LOW_VALUE'],'BLOCKED',c['REVIEW_BLOCKED'],'GAP',pg)
+            total['I_AMBIG']+=i['audit']['ambiguous_block_count']; total['J_RESOLVED']+=j['audit']['resolved_count']; total['J_UNRESOLVED']+=len(j['audit']['unresolved'])
+            for x in ('HUMAN_NOW','HUMAN_LATER','DEFER_LOW_VALUE','REVIEW_BLOCKED'): total[x]+=c[x]
+            gaps+=pg
+            for r in k['records']:
+              for p in r['da'].get('causal_paths',[]): paths[p]+=1
+              for reason in r.get('human_review_reason_codes',[]): reasons[reason]+=1
+            for r in k['records']:
+              if 'breaking changes' in r['anchor'].lower():
+                print('BREAKING_CHANGE',provider,r['classification'],'impact',r['da']['impact'],'causal',r['da']['causal_reach'],'gap',r['perspective_gap'],'paths',r['da']['causal_paths'])
+          print('TOTAL',dict(total)); print('GAPS',gaps); print('PATHS',paths.most_common()); print('REASONS',reasons.most_common())
+          assert total['J_UNRESOLVED']==76, total
+          assert total['HUMAN_NOW'] < total['J_UNRESOLVED']
+          assert total['DEFER_LOW_VALUE'] > 0
+          PY
