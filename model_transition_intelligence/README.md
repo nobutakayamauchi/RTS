@@ -52,3 +52,7 @@ Conflicting official claims, digest/provenance failures, or changed official tex
 ## Authority
 
 H never grants execution, profile-application, or promotion authority. Even at S3 it preserves historical profiles as evidence and only blocks their direct reuse until F/G revalidation.
+
+## Completion boundary
+
+`RTS-FRZ-000018` is complete only as this deterministic comparison/gating layer. Provider-specific document discovery, crawling, claim extraction, actual model execution, and runtime policy mutation are separate future boundaries. Completion does not claim those capabilities already exist.
