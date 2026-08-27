@@ -1,0 +1,72 @@
+{
+  "assessor": "RTS governed build assessment — Child C incremental resumable intelligence compiler",
+  "expected_effect": {
+    "confidence": 4,
+    "impact": 5,
+    "recurrence": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "strategic_fit": 5
+  },
+  "github_scan": {
+    "assets": [
+      {
+        "estimated_hours_saved": 4,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse provenance, fail-closed validation, lifecycle non-authority.",
+        "path": "selective_recall/",
+        "ref": "825d2a2b398ab128fed7c3f8920393de0e75999d",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "ADAPT"
+      },
+      {
+        "estimated_hours_saved": 3,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse deterministic bounded state, source identity, restart-safe semantics.",
+        "path": "restart_surface/",
+        "ref": "825d2a2b398ab128fed7c3f8920393de0e75999d",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "ADAPT"
+      },
+      {
+        "estimated_hours_saved": 2,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse append-only governance, WIP=1, assessment/preflight and verification.",
+        "path": "freezer/",
+        "ref": "825d2a2b398ab128fed7c3f8920393de0e75999d",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      }
+    ],
+    "gaps": [
+      "No repository-local compiler currently guarantees raw-first persistence plus independent chunk checkpoints.",
+      "No current learning loop proves successful chunks survive later failure/quarantine."
+    ],
+    "performed": true,
+    "queries": [
+      "outcome learning checkpoints resume quarantine idempotency",
+      "selective recall lifecycle provenance",
+      "restart surface raw evidence"
+    ],
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ]
+  },
+  "implementation": {
+    "from_scratch_hours": 14,
+    "integration_hours": 2,
+    "unknown_buffer_hours": 1,
+    "validation_hours": 3
+  },
+  "rationale": "Child C is bounded to repository-local raw-first learning compilation. Completed task outcome/evidence is persisted before compilation; observations are chunked deterministically; successful chunks checkpoint independently; failed chunks retry then quarantine without invalidating completed main work; differential reevaluation is explicit and proposal-only.",
+  "risks": [
+    "Learning failure could incorrectly roll back completed task state.",
+    "Retry could recompute successful chunks.",
+    "A poison chunk could block the entire queue.",
+    "Full-corpus reevaluation could become the accidental default.",
+    "Proposal output could be mistaken for applied promotion."
+  ]
+}

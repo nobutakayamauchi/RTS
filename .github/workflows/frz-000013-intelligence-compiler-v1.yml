@@ -1,0 +1,65 @@
+name: Validate FRZ-000013 Intelligence Compiler v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000013-incremental-resumable-intelligence-compiler-v1
+    paths:
+      - intelligence_compiler/**
+      - intelligence/compiler_sample/**
+      - tests/test_intelligence_compiler.py
+      - tests/test_intelligence_compiler_da.py
+      - freezer/items/RTS-FRZ-000013/**
+      - .github/workflows/frz-000013-intelligence-compiler-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000013-incremental-resumable-intelligence-compiler-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify committed compiler sample
+        run: python -m intelligence_compiler verify --store intelligence/compiler_sample
+      - name: Run C baseline and DA
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress completed Child B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress completed Child A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Assert completed stack boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          def cur(i):
+              p=json.loads((root/'freezer/items'/i/'current.json').read_text())
+              return json.loads((root/p['path']).read_text())
+          for i in ('RTS-FRZ-000011','RTS-FRZ-000012','RTS-FRZ-000013'):
+              assert cur(i)['status']=='COMPLETED', cur(i)
+          for i in ('RTS-FRZ-000014','RTS-FRZ-000015'):
+              x=cur(i)
+              assert x['status']=='FROZEN' and x['build_authority']=='NOT_APPROVED', x
+          active=[]
+          for p in (root/'freezer/items').glob('RTS-FRZ-*/current.json'):
+              x=cur(p.parent.name)
+              if x['status']=='IN_PROGRESS': active.append(x['item_id'])
+          assert active==[], active
+          print('A+B+C completed; D-E frozen; WIP clear')
+          PY

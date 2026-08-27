@@ -1,0 +1,84 @@
+{
+  "title": "Incremental / Resumable Intelligence Compiler v1",
+  "type": "architecture",
+  "status": "SELECTED",
+  "summary": "完了済み本体タスクのraw outcome/evidenceを先に保存し、その後の知能化をchunk・checkpoint・resume・retry/quarantine・差分再評価で行う非ブロッキングな学習コンパイラ。",
+  "original_problem": "経験量が増えるほど知能化処理自体が重くなり、一部失敗で全学習結果を失ったり、同じ巨大単位を再実行して推論・ツール・時間を浪費する危険がある。",
+  "why_it_matters": "賢くなるほど進化処理が重くなって止まる逆説を潰し、長期地層を実運用可能にする中核になる。",
+  "reason_frozen": "checkpoint identity、idempotency、chunk ownership、quarantine解除条件、raw evidenceとのfingerprint linkageを個別Preflightで固定するまで実装しない。",
+  "preserved_value": [
+    "raw-first durable persistence",
+    "bounded chunking",
+    "independent checkpoint commits",
+    "resume from first incomplete chunk",
+    "failed chunk retry or quarantine",
+    "successful chunk preservation",
+    "differential reevaluation of affected decisions only",
+    "full-corpus recompilation requires explicit reason",
+    "learning failure never invalidates completed main work",
+    "idempotent repeated execution"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 3,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 4,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "親000001がDECOMPOSE_REQUIREDとして確定している",
+    "raw outcome/evidenceのdurable identityが確立している",
+    "chunk/checkpoint状態をrepository-localに再現可能に保存できる",
+    "既存Outcome Learningへのproposal-only出口を維持できる"
+  ],
+  "negative_triggers": [
+    "知能化前にraw evidenceを捨てる",
+    "一部chunk失敗で全体をrollbackする",
+    "同じoversized work unitを無変更で反復する",
+    "コンパイラがSkillを自己承認・自己適用する",
+    "background処理がactive product goalを無断でpreemptする"
+  ],
+  "dependencies": [
+    "Outcome Evidence fingerprints",
+    "checkpoint / manifest rules",
+    "Outcome Learning proposal flow",
+    "Skill Regression / Human Review / Promotion Preview",
+    "Selective Recall lifecycle records"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000001 Adaptive Intelligence v2 reassessment",
+    "openclaw/openclaw#125722",
+    "openclaw/openclaw#129927",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6"
+  ],
+  "possible_destinations": [
+    "RTS adaptive-intelligence compiler",
+    "Ultimate Loop post-outcome distillation lane"
+  ],
+  "estimated_hours": {
+    "minimum": 14,
+    "maximum": 28
+  },
+  "tags": [
+    "adaptive-intelligence-v2-child",
+    "incremental-learning",
+    "resumable",
+    "checkpoint",
+    "quarantine",
+    "failure-isolation",
+    "idempotency",
+    "self-evolution"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "item_id": "RTS-FRZ-000013",
+  "version": 2,
+  "created_at": "2026-08-27T06:21:54Z",
+  "updated_at": "2026-08-27T07:37:07Z",
+  "supersedes": "v001"
+}

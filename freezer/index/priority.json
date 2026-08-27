@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T07:28:06Z",
-  "count": 4,
+  "generated_at": "2026-08-27T07:37:13Z",
+  "count": 3,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -36,31 +36,6 @@
       "build_authority": "NOT_APPROVED",
       "preflight_state": "DECOMPOSE_REQUIRED",
       "updated_at": "2026-08-27T06:21:53Z"
-    },
-    {
-      "item_id": "RTS-FRZ-000013",
-      "version": 1,
-      "title": "Incremental / Resumable Intelligence Compiler v1",
-      "type": "architecture",
-      "status": "FROZEN",
-      "priority_score": 77.7,
-      "estimated_hours": {
-        "minimum": 14,
-        "maximum": 28
-      },
-      "tags": [
-        "adaptive-intelligence-v2-child",
-        "incremental-learning",
-        "resumable",
-        "checkpoint",
-        "quarantine",
-        "failure-isolation",
-        "idempotency",
-        "self-evolution"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
     },
     {
       "item_id": "RTS-FRZ-000014",
