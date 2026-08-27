@@ -260,11 +260,19 @@ def _da_case(anchor: str) -> dict[str, Any]:
     docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS)
 
     if signals:
-        impact = max(signal.impact for signal in signals)
-        causal = max(signal.causal_reach for signal in signals)
-        factors = [signal.signal_id for signal in signals]
-        paths = sorted({path for signal in signals for path in signal.causal_paths})
         explicit = any(signal.explicit_contract and signal.impact >= 3 for signal in signals)
+        if (pure_noise or docs_link) and not explicit:
+            impact, causal, factors, paths = 0, 0, ["non_actionable_surface"], []
+        elif marketing and not explicit:
+            impact = min(2, max(signal.impact for signal in signals))
+            causal = min(2, max(signal.causal_reach for signal in signals))
+            factors = ["marketing_positioning_with_bounded_signal"] + [signal.signal_id for signal in signals]
+            paths = sorted({path for signal in signals for path in signal.causal_paths})
+        else:
+            impact = max(signal.impact for signal in signals)
+            causal = max(signal.causal_reach for signal in signals)
+            factors = [signal.signal_id for signal in signals]
+            paths = sorted({path for signal in signals for path in signal.causal_paths})
     elif marketing:
         impact, causal, factors, paths, explicit = 1, 1, ["marketing_only"], [], False
     elif pure_noise or docs_link:
@@ -571,12 +579,13 @@ def verify_triage_report(report: dict[str, Any], *, refinement_report: dict[str,
                 raise ReviewTriageError("explicit contract signal was deferred")
             if int(gap) >= 2:
                 raise ReviewTriageError("material perspective disagreement was deferred")
-        if int(da["causal_reach"]) >= 4 and classification != "HUMAN_NOW":
-            raise ReviewTriageError("high causal reach must be HUMAN_NOW")
-        if int(da["impact"]) >= 4 and classification != "HUMAN_NOW":
-            raise ReviewTriageError("high impact must be HUMAN_NOW")
-        if int(gap) >= 2 and max(int(da["human_review_importance"]), int(counter["human_review_importance"])) >= 3 and classification != "HUMAN_NOW":
-            raise ReviewTriageError("material high-value perspective gap must be HUMAN_NOW")
+        if classification != "REVIEW_BLOCKED":
+            if int(da["causal_reach"]) >= 4 and classification != "HUMAN_NOW":
+                raise ReviewTriageError("high causal reach must be HUMAN_NOW")
+            if int(da["impact"]) >= 4 and classification != "HUMAN_NOW":
+                raise ReviewTriageError("high impact must be HUMAN_NOW")
+            if int(gap) >= 2 and max(int(da["human_review_importance"]), int(counter["human_review_importance"])) >= 3 and classification != "HUMAN_NOW":
+                raise ReviewTriageError("material high-value perspective gap must be HUMAN_NOW")
 
     audit = report.get("audit")
     if not isinstance(audit, dict):
