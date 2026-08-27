@@ -1,0 +1,80 @@
+name: Validate FRZ-000020 Semantic Claim Refinement v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000020-semantic-claim-refinement-v1
+    paths:
+      - semantic_claim_refinement/**
+      - tests/test_semantic_claim_refinement.py
+      - tests/test_semantic_claim_refinement_da.py
+      - freezer/**
+      - thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000020_2026-08-27.md
+      - .github/workflows/frz-000020-semantic-claim-refinement-v1.yml
+  pull_request:
+    paths:
+      - semantic_claim_refinement/**
+      - tests/test_semantic_claim_refinement.py
+      - tests/test_semantic_claim_refinement_da.py
+      - freezer/**
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run J baseline and destructive DA / Counter-DA
+        run: python -m unittest tests.test_semantic_claim_refinement tests.test_semantic_claim_refinement_da -v
+      - name: Regress I
+        run: python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+      - name: Regress H
+        run: python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+      - name: Regress G
+        run: python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+      - name: Regress F
+        run: python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+      - name: Regress E
+        run: python -m unittest tests.test_external_seed_corpus tests.test_external_seed_corpus_da -v
+      - name: Regress D
+        run: python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+      - name: Regress C
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Assert A-I complete and J lifecycle valid
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          for n in range(11,20):
+              item=current(f'RTS-FRZ-{n:06d}')
+              assert item['status']=='COMPLETED', item
+          j=current('RTS-FRZ-000020')
+          assert j['status'] in {'IN_PROGRESS','VERIFIED','COMPLETED'}, j
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              row=current(p.parent.name)
+              if row['status']=='IN_PROGRESS': active.append(row['item_id'])
+          assert active in (['RTS-FRZ-000020'], []), active
+          print('A-I complete; J lifecycle valid')
+          PY
