@@ -8,6 +8,7 @@ on:
       - selective_recall/**
       - memory/recall_registry.json
       - tests/test_selective_recall.py
+      - tests/test_selective_recall_da.py
       - .github/workflows/frz-000011-selective-recall-v1.yml
   workflow_dispatch:
 
@@ -49,6 +50,11 @@ jobs:
         run: |
           set -euxo pipefail
           python -m unittest tests.test_selective_recall -v
+
+      - name: Run Selective Recall DA attacks
+        run: |
+          set -euxo pipefail
+          python -m unittest tests.test_selective_recall_da -v
 
       - name: Run existing FREEZER regression suite
         run: |
