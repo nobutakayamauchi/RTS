@@ -1,0 +1,83 @@
+{
+  "title": "Reuse Efficiency + Knowledge Debt Metrics v1",
+  "type": "feature",
+  "status": "VERIFIED",
+  "summary": "RTS側の知能再利用、再計算回避、Human介入、再開負荷、未消化知能作業をprovider-side cache指標と分離して計測する。",
+  "original_problem": "現状は成果成功率だけでは、過去知能が実際に再利用されたのか、Codexが同じ探索を再計算したのか、人間の操縦技能がどれだけ必要だったのかを定量化できない。provider cache hitとRTS-side reuseも混同しやすい。",
+  "why_it_matters": "Decision-OS/RTSが人間のCodex操作技能をどれだけ資産化できたかを観測し、最適化を勘ではなく比較可能な指標で進められる。",
+  "reason_frozen": "各metricのdenominator、event source、unknown/missing handling、claim boundaryを定義し、観測が実行挙動を変えないread-only計測から始められるまで実装しない。",
+  "preserved_value": [
+    "decision_reuse_rate",
+    "failure_reuse_rate",
+    "retrieval_precision",
+    "retrieval_changed_next_action_rate",
+    "novel_reasoning_ratio",
+    "recompute_avoidance_rate",
+    "retry_avoidance_count",
+    "human_intervention_count",
+    "restart_surface_load",
+    "knowledge_debt_count",
+    "promotion_candidate_count",
+    "quarantined_learning_count",
+    "promotion_rollback_count",
+    "provider cache metrics kept separate from RTS reuse metrics"
+  ],
+  "priority": {
+    "impact": 4,
+    "urgency": 3,
+    "strategic_fit": 5,
+    "readiness": 4,
+    "revenue_value": 2,
+    "dependency_value": 4,
+    "risk_reduction": 4,
+    "confidence": 4,
+    "effort": 2,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "親000001がDECOMPOSE_REQUIREDとして確定している",
+    "最低1つのSelective RecallまたはRestart/Compiler経路でevent sourceを観測できる",
+    "missing telemetryをUNKNOWNとして保持できる"
+  ],
+  "negative_triggers": [
+    "cached input ratioをDecision Reuse Rateとして扱う",
+    "文字数削減をtoken削減や時間削減と同一視する",
+    "推定値をMEASUREDとして保存する",
+    "metric最適化がactive goalより優先される"
+  ],
+  "dependencies": [
+    "execution/evidence event identity",
+    "Selective Recall events",
+    "Restart Surface accounting",
+    "Compiler chunk/checkpoint events",
+    "optional provider telemetry"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000001 Adaptive Intelligence v2 reassessment",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6 context/compression accounting patterns"
+  ],
+  "possible_destinations": [
+    "RTS observability / evaluation layer",
+    "Ultimate Loop efficiency dashboard"
+  ],
+  "estimated_hours": {
+    "minimum": 8,
+    "maximum": 16
+  },
+  "tags": [
+    "adaptive-intelligence-v2-child",
+    "metrics",
+    "decision-reuse",
+    "recompute-avoidance",
+    "knowledge-debt",
+    "observability",
+    "cache-separation"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "item_id": "RTS-FRZ-000014",
+  "version": 4,
+  "created_at": "2026-08-27T06:21:54Z",
+  "updated_at": "2026-08-27T07:50:29Z",
+  "supersedes": "v003"
+}

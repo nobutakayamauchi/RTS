@@ -1,0 +1,100 @@
+{
+  "assessor": "RTS governed build assessment — Child D reuse efficiency + knowledge debt metrics",
+  "expected_effect": {
+    "confidence": 5,
+    "impact": 4,
+    "recurrence": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "strategic_fit": 5
+  },
+  "github_scan": {
+    "assets": [
+      {
+        "estimated_hours_saved": 2,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Defines recall/non-authority/freshness boundaries and retrieval event semantics.",
+        "path": "selective_recall/",
+        "ref": "d68f83eea09085972775b94de5f575732aeac5ae",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 2,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Defines restart active-load accounting and non-authority.",
+        "path": "restart_surface/",
+        "ref": "d68f83eea09085972775b94de5f575732aeac5ae",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 3,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Defines quarantine/checkpoint/proposal-only event classes and deterministic validation.",
+        "path": "intelligence_compiler/",
+        "ref": "d68f83eea09085972775b94de5f575732aeac5ae",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 1,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse assessment/preflight/WIP/read-only governance.",
+        "path": "freezer/",
+        "ref": "d68f83eea09085972775b94de5f575732aeac5ae",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      }
+    ],
+    "gaps": [
+      "No current report keeps provider cache in a separate namespace from Decision Reuse Rate.",
+      "No current aggregator preserves missing telemetry as UNKNOWN with denominator/unit claim boundaries."
+    ],
+    "performed": true,
+    "queries": [
+      "selective recall metrics events",
+      "restart surface active load",
+      "compiler quarantine checkpoints metrics"
+    ],
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ]
+  },
+  "implementation": {
+    "from_scratch_hours": 10,
+    "integration_hours": 2,
+    "unknown_buffer_hours": 1,
+    "validation_hours": 3
+  },
+  "rationale": "Child D is a read-only repository-local observability layer over explicit metric events. It keeps RTS reuse metrics separate from provider cache telemetry, preserves UNKNOWN instead of inventing zero, distinguishes MEASURED/ESTIMATED/UNKNOWN, retains units and denominators, and grants no execution or optimization authority. Completed A/B/C provide actual event classes and bounded state patterns to reuse.",
+  "risks": [
+    "Provider cached-input ratio may be mislabeled as decision reuse.",
+    "Missing telemetry may be coerced to zero.",
+    "Estimated values may be presented as measured.",
+    "Character load may be mislabeled as token/time savings.",
+    "Metrics could accidentally become optimization authority."
+  ],
+  "assessment_id": "RTS-BA-000014-001",
+  "item_id": "RTS-FRZ-000014",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "0be69f830a2521ef6ecf636b28f13ef4c203759f1a69a7c2e02325bb4b0e3ad3",
+  "derived": {
+    "benefit_score": 89.0,
+    "cost_score": 50.0,
+    "reuse_score": 80.0,
+    "decision_score": 75.95,
+    "reuse_hours_saved": 8.0,
+    "net_hours": 8.0,
+    "time_saved_ratio": 0.8,
+    "implementation_efficiency": 1.25,
+    "cost_effectiveness": 11.12,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T07:50:25Z"
+}

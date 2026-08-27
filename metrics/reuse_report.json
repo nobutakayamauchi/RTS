@@ -1,0 +1,142 @@
+{
+  "claim_boundaries": {
+    "estimated_is_not_measured": true,
+    "missing_is_unknown_not_zero": true,
+    "provider_cache_is_not_decision_reuse": true,
+    "restart_surface_load_is_chars_not_tokens_or_time": true
+  },
+  "execution_authority": "NONE",
+  "optimization_authority": "NONE",
+  "promotion_authority": "NONE",
+  "provider_cache": {
+    "cached_input_ratio": {
+      "denominator": 4835.0,
+      "measurement_state": "MEASURED",
+      "numerator": 4772.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.9869700103412616
+    }
+  },
+  "rts_reuse_metrics": {
+    "decision_reuse_rate": {
+      "denominator": 5.0,
+      "measurement_state": "MEASURED",
+      "numerator": 3.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.6
+    },
+    "failure_reuse_rate": {
+      "denominator": 4.0,
+      "measurement_state": "MEASURED",
+      "numerator": 2.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.5
+    },
+    "human_intervention_count": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "count",
+      "value": 1.0
+    },
+    "knowledge_debt_count": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "count",
+      "value": 1.0
+    },
+    "novel_reasoning_ratio": {
+      "denominator": null,
+      "measurement_state": "UNKNOWN",
+      "numerator": null,
+      "reason": "MISSING_TELEMETRY",
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": null
+    },
+    "promotion_candidate_count": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "count",
+      "value": 2.0
+    },
+    "promotion_rollback_count": {
+      "denominator": null,
+      "measurement_state": "UNKNOWN",
+      "numerator": null,
+      "reason": "MISSING_TELEMETRY",
+      "source_event_count": 1,
+      "unit": "count",
+      "value": null
+    },
+    "quarantined_learning_count": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "count",
+      "value": 0.0
+    },
+    "recompute_avoidance_rate": {
+      "denominator": 6.0,
+      "measurement_state": "ESTIMATED",
+      "numerator": 3.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.5
+    },
+    "restart_surface_load": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "chars",
+      "value": 820.0
+    },
+    "retrieval_changed_next_action_rate": {
+      "denominator": 5.0,
+      "measurement_state": "ESTIMATED",
+      "numerator": 2.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.4
+    },
+    "retrieval_precision": {
+      "denominator": 5.0,
+      "measurement_state": "MEASURED",
+      "numerator": 4.0,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "ratio",
+      "value": 0.8
+    },
+    "retry_avoidance_count": {
+      "denominator": null,
+      "measurement_state": "MEASURED",
+      "numerator": null,
+      "reason": null,
+      "source_event_count": 1,
+      "unit": "count",
+      "value": 1.0
+    }
+  },
+  "schema_version": 1
+}

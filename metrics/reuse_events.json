@@ -1,0 +1,142 @@
+[
+  {
+    "denominator": 5,
+    "event_id": "d1",
+    "measurement_state": "MEASURED",
+    "metric": "decision_reuse_rate",
+    "numerator": 3,
+    "source_ref": "child-a-retrieval",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": 4,
+    "event_id": "f1",
+    "measurement_state": "MEASURED",
+    "metric": "failure_reuse_rate",
+    "numerator": 2,
+    "source_ref": "child-a-da",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": 5,
+    "event_id": "r1",
+    "measurement_state": "MEASURED",
+    "metric": "retrieval_precision",
+    "numerator": 4,
+    "source_ref": "child-a-retrieval",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": 5,
+    "event_id": "rc1",
+    "measurement_state": "ESTIMATED",
+    "metric": "retrieval_changed_next_action_rate",
+    "numerator": 2,
+    "source_ref": "bounded-sample",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": null,
+    "event_id": "n1",
+    "measurement_state": "UNKNOWN",
+    "metric": "novel_reasoning_ratio",
+    "numerator": null,
+    "source_ref": "provider-not-instrumented",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": 6,
+    "event_id": "ra1",
+    "measurement_state": "ESTIMATED",
+    "metric": "recompute_avoidance_rate",
+    "numerator": 3,
+    "source_ref": "bounded-sample",
+    "unit": "ratio",
+    "value": null
+  },
+  {
+    "denominator": null,
+    "event_id": "retry1",
+    "measurement_state": "MEASURED",
+    "metric": "retry_avoidance_count",
+    "numerator": null,
+    "source_ref": "child-c-checkpoint",
+    "unit": "count",
+    "value": 1
+  },
+  {
+    "denominator": null,
+    "event_id": "human1",
+    "measurement_state": "MEASURED",
+    "metric": "human_intervention_count",
+    "numerator": null,
+    "source_ref": "ultimate-loop",
+    "unit": "count",
+    "value": 1
+  },
+  {
+    "denominator": null,
+    "event_id": "load1",
+    "measurement_state": "MEASURED",
+    "metric": "restart_surface_load",
+    "numerator": null,
+    "source_ref": "child-b-surface",
+    "unit": "chars",
+    "value": 820
+  },
+  {
+    "denominator": null,
+    "event_id": "debt1",
+    "measurement_state": "MEASURED",
+    "metric": "knowledge_debt_count",
+    "numerator": null,
+    "source_ref": "child-c-quarantine",
+    "unit": "count",
+    "value": 1
+  },
+  {
+    "denominator": null,
+    "event_id": "prom1",
+    "measurement_state": "MEASURED",
+    "metric": "promotion_candidate_count",
+    "numerator": null,
+    "source_ref": "child-c-proposals",
+    "unit": "count",
+    "value": 2
+  },
+  {
+    "denominator": null,
+    "event_id": "q1",
+    "measurement_state": "MEASURED",
+    "metric": "quarantined_learning_count",
+    "numerator": null,
+    "source_ref": "child-c-sample",
+    "unit": "count",
+    "value": 0
+  },
+  {
+    "denominator": null,
+    "event_id": "rollback1",
+    "measurement_state": "UNKNOWN",
+    "metric": "promotion_rollback_count",
+    "numerator": null,
+    "source_ref": "not-instrumented",
+    "unit": "count",
+    "value": null
+  },
+  {
+    "denominator": 4835,
+    "event_id": "cache1",
+    "measurement_state": "MEASURED",
+    "metric": "cached_input_ratio",
+    "numerator": 4772,
+    "source_ref": "provider-sample-separate",
+    "unit": "ratio",
+    "value": null
+  }
+]
