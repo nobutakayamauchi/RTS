@@ -121,6 +121,26 @@ class HumanEscalationGateDATests(unittest.TestCase):
         self.assertEqual(report["records"][0]["disposition"], "AI_CONTINUE")
         self.assertIn("PROBE_RUNTIME_REASONING_METADATA", report["records"][0]["residual_routes"])
 
+    def test_escape_search_before_known_route_closure_does_not_prove_exhaustion(self):
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
+        early_search = {
+            "evidence_id": "early-search",
+            "finding_index": 0,
+            "route_id": EXHAUSTION_SEARCH_ROUTE,
+            "probe_fingerprint": fp("early-search-before-close"),
+            "evidence_distinction": "Search for another route before the already-known reasoning.context route has been exhausted.",
+            "outcome": "NON_DISCRIMINATING",
+            "learned_facts": ["No additional route was found at this earlier knowledge state."],
+            "closed_routes": [],
+            "opened_routes": [],
+        }
+        report = evaluate_escalation_report(
+            k0,
+            verification_evidence=[early_search, close_reasoning_route()],
+            human_choices={0: "Pick the residual effective-mode interpretation."},
+        )
+        self.assertEqual(report["records"][0]["disposition"], "HUMAN_CANDIDATE")
+
     def test_non_material_dead_end_does_not_consume_human_now(self):
         k0 = make_k0("New")
         self.assertEqual(k0["records"][0]["classification"], "DEFER_LOW_VALUE")
