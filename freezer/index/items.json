@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T23:17:55Z",
+  "generated_at": "2026-08-27T23:35:40Z",
   "count": 22,
   "items": [
     {
@@ -517,10 +517,10 @@
     },
     {
       "item_id": "RTS-FRZ-000022",
-      "version": 3,
+      "version": 5,
       "title": "Exhausted-AI Human Escalation Gate v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 89.84,
       "estimated_hours": {
         "minimum": 6,
@@ -540,7 +540,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-27T23:17:55Z"
+      "updated_at": "2026-08-27T23:35:40Z"
     }
   ]
 }
