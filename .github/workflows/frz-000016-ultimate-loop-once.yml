@@ -1,0 +1,32 @@
+name: FRZ-000016 Ultimate Loop Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000016-adaptive-engine-profiler-v1
+    paths:
+      - .github/workflows/frz-000016-ultimate-loop-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  ultimate-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000016-adaptive-engine-profiler-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate F runner syntax
+        run: python -m py_compile scripts/run_frz000016_ultimate_loop.py
+      - name: Run Child F Ultimate Loop
+        run: python scripts/run_frz000016_ultimate_loop.py
