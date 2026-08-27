@@ -1,0 +1,338 @@
+name: Recover FRZ-000012 Survivor Once
+
+on:
+  push:
+    branches: [feature/frz-000012-compact-active-restart-surface-v1]
+    paths: [.github/workflows/frz-000012-recover-once.yml]
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000012-compact-active-restart-surface-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Assert remote stayed pre-B after rejected push
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          def cur(i):
+              p=json.loads((root/'freezer/items'/i/'current.json').read_text()); return json.loads((root/p['path']).read_text())
+          assert cur('RTS-FRZ-000011')['status']=='COMPLETED'
+          b=cur('RTS-FRZ-000012'); assert b['version']==1 and b['status']=='FROZEN' and b['build_authority']=='NOT_APPROVED', b
+          for i in ('RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+              x=cur(i); assert x['status']=='FROZEN' and x['build_authority']=='NOT_APPROVED', x
+          print('remote recovery boundary OK')
+          PY
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Materialize B governance inputs
+        run: |
+          mkdir -p docs/implementation/frz000012_inputs
+          cat > docs/implementation/frz000012_inputs/build_assessment_input.json <<'JSON'
+          {
+            "assessor":"RTS governed build assessment — Child B compact active restart surface",
+            "rationale":"Child B is bounded to a repository-local restart representation and validator. It preserves a fixed restart denominator, source pointers, explicit reopen conditions, and non-authority while refusing silent truncation. It composes with completed Child A selective recall rather than copying full history into the active surface.",
+            "expected_effect":{"impact":5,"strategic_fit":5,"revenue_leverage":4,"risk_reduction":4,"recurrence":5,"confidence":4},
+            "implementation":{"from_scratch_hours":14,"integration_hours":2,"validation_hours":3,"unknown_buffer_hours":1},
+            "github_scan":{"performed":true,"repositories":["nobutakayamauchi/RTS"],"queries":["restart reconstruction handoff compact active surface","selective recall provenance freshness","ultimate loop restart recovery"],"assets":[
+              {"repository":"nobutakayamauchi/RTS","path":"selective_recall/","ref":"93c50afb93f6a1045a8c2761ee719f437c78e61f","kind":"code","reuse_mode":"ADAPT","license_status":"OWNED","estimated_hours_saved":4,"notes":"Reuse source containment, Git-blob freshness, and non-authority patterns from completed Child A."},
+              {"repository":"nobutakayamauchi/RTS","path":"thin-rts/ultimate-loop/","ref":"93c50afb93f6a1045a8c2761ee719f437c78e61f","kind":"design","reuse_mode":"REFERENCE","license_status":"OWNED","estimated_hours_saved":3,"notes":"Reuse restart/reconstruction and historical-evidence/current-authority boundaries."},
+              {"repository":"nobutakayamauchi/RTS","path":"freezer/","ref":"93c50afb93f6a1045a8c2761ee719f437c78e61f","kind":"code","reuse_mode":"REFERENCE","license_status":"OWNED","estimated_hours_saved":2,"notes":"Reuse WIP=1, assessment, preflight, append-only lifecycle, and verification governance."}
+            ],"gaps":["No bounded restart-surface package proves fixed-denominator restart equivalence.","No active-surface owner refuses over-budget compaction instead of silently dropping restart-critical state."]},
+            "risks":["Compression could delete UNKNOWN or do-not-touch state.","A compact summary could silently truncate required state.","Stale source pointers could look current.","Restart state could be mistaken for execution authority."]
+          }
+          JSON
+          cat > docs/implementation/frz000012_inputs/preflight_input.json <<'JSON'
+          {
+            "outcome":"PASS","assessor":"RTS implementation preflight — Child B compact active restart surface",
+            "rationale":"Repository-local read-only restart representation with fixed denominator, active-load accounting, exact source freshness, explicit reopen conditions, restart-equivalence validation, bounded Selective Recall handoff, fail-closed over-budget behavior, and no execution/promotion authority.",
+            "affected_boundaries":["restart_surface package","restart/restart_surface.json","focused restart tests","RTS-FRZ-000012 lifecycle records"],
+            "existing_assumptions":["Child A Selective Recall is COMPLETED.","Full history remains stored and is never deleted by compaction.","Git blob identity binds local source freshness.","Restart representation is not authority."],
+            "data_migration":{"required":false,"notes":"No full-history source is rewritten or deleted."},
+            "external_interfaces":["repository-local Python API/CLI only","no network/provider/subprocess/deployment surface"],
+            "approval_changes":["execution_authority=NONE","promotion_authority=NONE","only RTS-FRZ-000012 may enter WIP during this loop"],
+            "public_documents":["restart_surface/README.md","thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000012_2026-08-27.md"],
+            "regression_tests":["fixed restart denominator","restart equivalence","no silent truncation","UNKNOWN preservation","do-not-touch preservation","source freshness","path containment","explicit full-history reopen","bounded selective-recall handoff","non-authority","FREEZER regression"],
+            "hidden_dependencies":["Child A freshness semantics","repository path containment","FREEZER WIP=1","existing full-history source ownership"],
+            "rollback_boundary":"Revert Child B package/sample/tests/docs/lifecycle only; preserve Child A and full-history sources.",
+            "completion_conditions":["Required restart fields survive exactly.","Over-budget surfaces fail closed.","Stale/escaped pointers fail closed.","Equivalence detects required-state loss.","UNKNOWN and do-not-touch survive.","Reopen and selective-recall routes are explicit and non-authorizing.","Focused and FREEZER regressions pass.","B reaches COMPLETED while C-E remain FROZEN/NOT_APPROVED."],
+            "decomposition":{"required":false,"child_candidates":[]},
+            "risks":["Shorter can look successful while losing restart competence.","Future callers could bypass equivalence validation."]
+          }
+          JSON
+          printf '%s\n' '{"build_authority":"APPROVED","status":"SELECTED"}' > docs/implementation/frz000012_inputs/approve_selected.json
+          printf '%s\n' '{"status":"IN_PROGRESS"}' > docs/implementation/frz000012_inputs/start_in_progress.json
+          cat > docs/implementation/FRZ_000012_COMPACT_ACTIVE_RESTART_SURFACE_V1_TASK.md <<'EOF'
+          # FRZ-000012 — Compact Active + Restart Surface v1
+
+          Fixed restart denominator: goal, repo, branch, source commit, changed, verified, unresolved/UNKNOWN, rollback, do-not-touch, next authorized action. Deep history remains behind traceable source pointers. Over-budget state fails closed and is never silently truncated. Restart state never grants execution or promotion authority.
+          EOF
+
+      - name: Govern B to WIP=1
+        run: |
+          set -euxo pipefail
+          python -m freezer.build_assessment create RTS-FRZ-000012 --input docs/implementation/frz000012_inputs/build_assessment_input.json
+          python -m freezer.build_assessment gate RTS-FRZ-000012 > /tmp/g1.json
+          python - <<'PY'
+          import json
+          g=json.load(open('/tmp/g1.json')); assert g['recommendation']=='BUILD_NOW' and g['assessment_state']=='CURRENT' and not g['selection_ready'],g
+          PY
+          python -m freezer.preflight create RTS-FRZ-000012 --input docs/implementation/frz000012_inputs/preflight_input.json
+          python -m freezer.cli revise RTS-FRZ-000012 --input docs/implementation/frz000012_inputs/approve_selected.json
+          python -m freezer.build_assessment gate RTS-FRZ-000012 > /tmp/g2.json
+          python - <<'PY'
+          import json
+          g=json.load(open('/tmp/g2.json')); assert g['preflight_state']=='PASS' and g['recommendation']=='BUILD_NOW' and g['selection_ready'] is True,g
+          PY
+          python -m freezer.cli revise RTS-FRZ-000012 --input docs/implementation/frz000012_inputs/start_in_progress.json
+          python -m freezer.cli reindex
+          python -m freezer.build_assessment reindex
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Materialize B survivor
+        run: |
+          mkdir -p restart_surface restart tests
+          cat > restart_surface/core.py <<'PY'
+          from __future__ import annotations
+          import hashlib, json
+          from pathlib import Path
+          from typing import Any
+
+          class RestartValidationError(ValueError): pass
+          RESTART_FIELDS=('goal','repo','branch','commit','changed','verified','unresolved','rollback','do_not_touch','next_authorized_action')
+          LIST_FIELDS={'changed','verified','unresolved','do_not_touch'}
+          REOPEN_REASONS={'OPERATOR_REQUEST','EQUIVALENCE_MISMATCH','UNRESOLVED_BLOCKER','STALE_SOURCE'}
+          FORBIDDEN_INLINE_KEYS={'full_history','raw_history','transcript','body','content','history_blob'}
+
+          def git_blob_sha_bytes(data: bytes)->str:
+              return hashlib.sha1(f'blob {len(data)}\0'.encode()+data).hexdigest()
+          def _contained(root:Path,rel:str)->Path:
+              p=(root/rel).resolve(); rr=root.resolve()
+              if p!=rr and rr not in p.parents: raise RestartValidationError(f'path escapes repository: {rel}')
+              return p
+          def _active_payload(s:dict[str,Any])->dict[str,Any]: return {k:v for k,v in s.items() if k!='active_load_chars'}
+          def active_load_chars(s:dict[str,Any])->int: return len(json.dumps(_active_payload(s),sort_keys=True,ensure_ascii=False,separators=(',',':')))
+          def _validate_required_state(s:dict[str,Any])->None:
+              for k in RESTART_FIELDS:
+                  if k not in s: raise RestartValidationError(f'missing restart field: {k}')
+              for k in LIST_FIELDS:
+                  if not isinstance(s[k],list) or not all(isinstance(x,str) for x in s[k]): raise RestartValidationError(f'{k} must be list[str]')
+              for k in set(RESTART_FIELDS)-LIST_FIELDS:
+                  if not isinstance(s[k],str) or not s[k]: raise RestartValidationError(f'{k} must be non-empty str')
+              if len(s['commit'])<7: raise RestartValidationError('commit identity too short')
+          def build_surface(repo_root:str|Path,full_state:dict[str,Any],source_refs:list[dict[str,str]],max_active_chars:int=8000)->dict[str,Any]:
+              _validate_required_state(full_state)
+              s={k:full_state[k] for k in RESTART_FIELDS}
+              s.update({'schema_version':1,'source_refs':source_refs,'reopen_conditions':sorted(REOPEN_REASONS),'selective_recall_interface':{'mode':'REQUEST_ONLY','authority':'NONE'},'execution_authority':'NONE','promotion_authority':'NONE'})
+              s['active_load_chars']=active_load_chars(s)
+              if s['active_load_chars']>max_active_chars: raise RestartValidationError(f'active surface over budget: {s["active_load_chars"]}>{max_active_chars}')
+              validate_surface(repo_root,s,max_active_chars); return s
+          def validate_surface(repo_root:str|Path,s:dict[str,Any],max_active_chars:int=8000)->dict[str,Any]:
+              root=Path(repo_root); _validate_required_state(s)
+              if s.get('schema_version')!=1: raise RestartValidationError('schema_version must be 1')
+              if s.get('execution_authority')!='NONE' or s.get('promotion_authority')!='NONE': raise RestartValidationError('restart surface is non-authorizing')
+              if set(s.get('reopen_conditions',[]))!=REOPEN_REASONS: raise RestartValidationError('reopen conditions incomplete')
+              if any(k in s for k in FORBIDDEN_INLINE_KEYS): raise RestartValidationError('deep history cannot be inlined')
+              refs=s.get('source_refs')
+              if not isinstance(refs,list): raise RestartValidationError('source_refs must be list')
+              current=0
+              for ref in refs:
+                  if set(ref)!={'path','git_blob_sha'}: raise RestartValidationError('source ref shape invalid')
+                  p=_contained(root,ref['path'])
+                  if not p.is_file(): raise RestartValidationError(f'missing source: {ref["path"]}')
+                  if git_blob_sha_bytes(p.read_bytes())!=ref['git_blob_sha']: raise RestartValidationError(f'stale source: {ref["path"]}')
+                  current+=1
+              measured=active_load_chars(s)
+              if s.get('active_load_chars')!=measured: raise RestartValidationError('active_load_chars stale')
+              if measured>max_active_chars: raise RestartValidationError(f'active surface over budget: {measured}>{max_active_chars}')
+              return {'valid':True,'active_load_chars':measured,'source_count':len(refs),'current_source_count':current,'execution_authority':'NONE','promotion_authority':'NONE'}
+          def restart_equivalence(full_state:dict[str,Any],s:dict[str,Any])->dict[str,Any]:
+              _validate_required_state(full_state); missing=[]; changed=[]
+              for k in RESTART_FIELDS:
+                  if k not in s: missing.append(k)
+                  elif s[k]!=full_state[k]: changed.append(k)
+              return {'equivalent':not missing and not changed,'denominator':len(RESTART_FIELDS),'matched':len(RESTART_FIELDS)-len(missing)-len(changed),'missing':missing,'changed':changed}
+          def decide_restart(s:dict[str,Any],request:dict[str,Any])->dict[str,Any]:
+              reason=None
+              if request.get('operator_request_full_history'): reason='OPERATOR_REQUEST'
+              elif request.get('equivalence_mismatch'): reason='EQUIVALENCE_MISMATCH'
+              elif request.get('unresolved_blocker'): reason='UNRESOLVED_BLOCKER'
+              elif request.get('stale_source'): reason='STALE_SOURCE'
+              if reason: return {'decision':'REOPEN_FULL_HISTORY','reason':reason,'execution_authority':'NONE','promotion_authority':'NONE'}
+              if request.get('missing_detail'): return {'decision':'SELECTIVE_RECALL','recall_request':{'event':request.get('event','restart_detail_needed'),'scope_tags':request.get('scope_tags',[]),'max_results':1},'execution_authority':'NONE','promotion_authority':'NONE'}
+              return {'decision':'CONTINUE_FROM_SURFACE','execution_authority':'NONE','promotion_authority':'NONE'}
+          PY
+          cat > restart_surface/__init__.py <<'PY'
+          from .core import RestartValidationError, build_surface, validate_surface, restart_equivalence, decide_restart, git_blob_sha_bytes
+          __all__=['RestartValidationError','build_surface','validate_surface','restart_equivalence','decide_restart','git_blob_sha_bytes']
+          PY
+          cat > restart_surface/cli.py <<'PY'
+          import argparse,json
+          from pathlib import Path
+          from .core import validate_surface,decide_restart
+          def main(argv=None):
+              p=argparse.ArgumentParser(); sub=p.add_subparsers(dest='cmd',required=True)
+              v=sub.add_parser('verify'); v.add_argument('--surface',default='restart/restart_surface.json')
+              d=sub.add_parser('decide'); d.add_argument('--surface',default='restart/restart_surface.json'); d.add_argument('--request',required=True)
+              a=p.parse_args(argv); s=json.loads(Path(a.surface).read_text())
+              out=validate_surface(Path('.'),s) if a.cmd=='verify' else decide_restart(s,json.loads(Path(a.request).read_text()))
+              print(json.dumps(out,ensure_ascii=False,indent=2,sort_keys=True))
+          PY
+          printf '%s\n' 'from .cli import main' 'main()' > restart_surface/__main__.py
+          cat > restart_surface/README.md <<'EOF'
+          # Compact Active + Restart Surface v1
+          Repository-local, non-authorizing restart representation with a fixed restart denominator and current source pointers. Required state is never silently truncated to hit the active-load budget.
+
+          `RESTART SURFACE != FULL HISTORY`
+          `COMPACT != DROP UNKNOWN`
+          `RESTART STATE != EXECUTION AUTHORITY`
+          EOF
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from restart_surface import build_surface,git_blob_sha_bytes
+          source=Path('thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000011_2026-08-27.md')
+          state={'goal':'Continue Adaptive Intelligence v2 from completed Child A into bounded Child B verification','repo':'nobutakayamauchi/RTS','branch':'feature/frz-000012-compact-active-restart-surface-v1','commit':'93c50afb93f6a1045a8c2761ee719f437c78e61f','changed':['Child A completed; Child B is the bounded restart-surface child'],'verified':['Child A completed-head validation is green'],'unresolved':['UNKNOWN: cross-project restart equivalence beyond the bounded fixture is not yet claimed'],'rollback':'Revert Child B package/sample/tests/lifecycle only; preserve Child A and full history','do_not_touch':['RTS-FRZ-000011 completed survivor','RTS-FRZ-000013..000015 until separately authorized','existing deep history sources'],'next_authorized_action':'Run Child B verification/DA; reopen deeper history only on explicit condition'}
+          refs=[{'path':str(source),'git_blob_sha':git_blob_sha_bytes(source.read_bytes())}]
+          Path('restart/restart_surface.json').write_text(json.dumps(build_surface(Path('.'),state,refs),ensure_ascii=False,indent=2,sort_keys=True)+'\n')
+          PY
+
+      - name: Install permanent B tests and validate survivor
+        run: |
+          cat > tests/test_restart_surface.py <<'PY'
+          import json,tempfile,unittest
+          from pathlib import Path
+          from restart_surface import RestartValidationError,build_surface,validate_surface,restart_equivalence,decide_restart,git_blob_sha_bytes
+          class RestartSurfaceTests(unittest.TestCase):
+              def state(self): return {'goal':'g','repo':'r','branch':'b','commit':'abcdef123','changed':['c'],'verified':['v'],'unresolved':['UNKNOWN: x'],'rollback':'rollback B','do_not_touch':['A'],'next_authorized_action':'verify'}
+              def refs(self,r): p=r/'source.md'; p.write_text('source\n'); return [{'path':'source.md','git_blob_sha':git_blob_sha_bytes(p.read_bytes())}]
+              def test_committed_surface_valid(self): self.assertTrue(validate_surface(Path('.'),json.loads(Path('restart/restart_surface.json').read_text()))['valid'])
+              def test_fixed_denominator_equivalent(self):
+                  with tempfile.TemporaryDirectory() as td:
+                      r=Path(td); st=self.state(); self.assertTrue(restart_equivalence(st,build_surface(r,st,self.refs(r)))['equivalent'])
+              def test_missing_required_fails(self):
+                  st=self.state(); del st['rollback']
+                  with self.assertRaises(RestartValidationError): build_surface(Path('.'),st,[])
+              def test_stale_source_fails(self):
+                  with tempfile.TemporaryDirectory() as td:
+                      r=Path(td); refs=self.refs(r); s=build_surface(r,self.state(),refs); (r/'source.md').write_text('changed\n')
+                      with self.assertRaises(RestartValidationError): validate_surface(r,s)
+              def test_path_escape_fails(self):
+                  with tempfile.TemporaryDirectory() as td:
+                      r=Path(td); out=r.parent/'outside-restart.md'; out.write_text('x'); refs=[{'path':'../outside-restart.md','git_blob_sha':git_blob_sha_bytes(out.read_bytes())}]
+                      try:
+                          with self.assertRaises(RestartValidationError): build_surface(r,self.state(),refs)
+                      finally: out.unlink(missing_ok=True)
+              def test_non_authority(self):
+                  with tempfile.TemporaryDirectory() as td:
+                      r=Path(td); s=build_surface(r,self.state(),self.refs(r)); self.assertEqual((s['execution_authority'],s['promotion_authority']),('NONE','NONE'))
+              def test_reopen_explicit(self): self.assertEqual(decide_restart({}, {'unresolved_blocker':True})['decision'],'REOPEN_FULL_HISTORY')
+              def test_recall_handoff_bounded(self): self.assertEqual(decide_restart({}, {'missing_detail':True})['recall_request']['max_results'],1)
+              def test_continue_non_authorizing(self): self.assertEqual(decide_restart({}, {})['execution_authority'],'NONE')
+          PY
+          cat > tests/test_restart_surface_da.py <<'PY'
+          import unittest
+          from pathlib import Path
+          from restart_surface import RestartValidationError,build_surface,restart_equivalence,validate_surface
+          class RestartSurfaceDA(unittest.TestCase):
+              def state(self): return {'goal':'g','repo':'r','branch':'b','commit':'abcdef123','changed':['x'],'verified':['y'],'unresolved':['UNKNOWN: deployment identity'],'rollback':'revert B only','do_not_touch':['Child A'],'next_authorized_action':'verify'}
+              def test_do_not_touch_cannot_be_lost(self): self.assertEqual(build_surface(Path('.'),self.state(),[])['do_not_touch'],['Child A'])
+              def test_unknown_cannot_be_erased(self): self.assertIn('UNKNOWN:',build_surface(Path('.'),self.state(),[])['unresolved'][0])
+              def test_overbudget_fails_instead_of_truncating(self):
+                  x=self.state(); x['unresolved']=['UNKNOWN:'+('z'*5000),'SECOND BLOCKER']
+                  with self.assertRaises(RestartValidationError): build_surface(Path('.'),x,[],max_active_chars=500)
+              def test_equivalence_detects_required_loss(self):
+                  s=build_surface(Path('.'),self.state(),[]); s['do_not_touch']=[]; q=restart_equivalence(self.state(),s); self.assertFalse(q['equivalent']); self.assertIn('do_not_touch',q['changed'])
+              def test_inline_full_history_rejected(self):
+                  s=build_surface(Path('.'),self.state(),[]); s['full_history']='too much'
+                  with self.assertRaises(RestartValidationError): validate_surface(Path('.'),s)
+          PY
+          python -m restart_surface verify
+          python -m unittest tests.test_restart_surface -v
+          python -m unittest tests.test_restart_surface_da -v
+          python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Write corrected METEOR evidence and close B
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          run=os.environ['GITHUB_RUN_ID']
+          text=f'''# FRZ-000012 — Compact Active + Restart Surface v1 — METEOR Result
+
+Status: **REPOSITORY_METEOR_SURVIVOR / LOCAL_VERIFICATION_BOUNDARY**
+
+Initial destructive candidate death: GitHub Actions run `33049315043`. It dropped `do_not_touch`, silently failed to reject an over-budget unresolved surface, and failed restart equivalence. Those death classes remain as permanent tests.
+
+Recovery/survivor verification run: `{run}`.
+
+Minimal survivor: fixed restart denominator, current source pointers, exact restart-equivalence, measured active load, fail-closed over-budget behavior, explicit full-history reopen reasons, bounded Selective Recall handoff, and permanent `execution_authority=NONE` / `promotion_authority=NONE`.
+
+Counter-DA proves compact state preserves UNKNOWN and do-not-touch constraints; required-field mutation is detected rather than hidden.
+
+Deployment Identity is not applicable because this is a repository-local library/CLI with no live runtime route. Equivalent verification boundary is committed source + deterministic CLI + current source hashes + destructive tests + FREEZER governance verification.
+'''
+          Path('thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000012_2026-08-27.md').write_text(text)
+          PY
+          printf '%s\n' '{"status":"VERIFIED"}' > /tmp/bv.json
+          python -m freezer.cli revise RTS-FRZ-000012 --input /tmp/bv.json
+          printf '%s\n' '{"status":"COMPLETED"}' > /tmp/bc.json
+          python -m freezer.cli revise RTS-FRZ-000012 --input /tmp/bc.json
+          python -m freezer.cli reindex
+          python -m freezer.build_assessment reindex
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Final post-completion gate
+        run: |
+          python -m restart_surface verify
+          python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+          python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          def cur(i): p=json.loads((root/'freezer/items'/i/'current.json').read_text()); return json.loads((root/p['path']).read_text())
+          assert cur('RTS-FRZ-000011')['status']=='COMPLETED'; assert cur('RTS-FRZ-000012')['status']=='COMPLETED'
+          for i in ('RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+              x=cur(i); assert x['status']=='FROZEN' and x['build_authority']=='NOT_APPROVED',x
+          active=[]
+          for p in (root/'freezer/items').glob('RTS-FRZ-*/current.json'):
+              q=json.loads(p.read_text()); x=json.loads((root/q['path']).read_text())
+              if x['status']=='IN_PROGRESS': active.append(x['item_id'])
+          assert active==[],active
+          print('B survivor ready; C-E untouched')
+          PY
+
+      - name: Commit only non-workflow B survivor
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/implementation/frz000012_inputs docs/implementation/FRZ_000012_COMPACT_ACTIVE_RESTART_SURFACE_V1_TASK.md freezer restart restart_surface tests/test_restart_surface.py tests/test_restart_surface_da.py thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000012_2026-08-27.md
+          if git diff --cached --name-only | grep '^\.github/workflows/'; then echo 'workflow path staged unexpectedly' >&2; exit 1; fi
+          git status --short
+          git commit -m 'feat: complete FRZ-000012 compact restart surface v1'
+          git push origin HEAD:feature/frz-000012-compact-active-restart-surface-v1
