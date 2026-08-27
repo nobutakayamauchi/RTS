@@ -267,6 +267,31 @@ DESCRIPTIVE_CAPABILITY_PATTERNS: tuple[str, ...] = (
     r"\bstudio[- ]quality\b",
 )
 
+EXPECTED_BEHAVIOR_PATTERNS: tuple[str, ...] = (
+    r"\bas expected\b",
+    r"\bexpected behavior\b",
+    r"\bby default\b",
+    r"\bdefault behavior\b",
+    r"\bcontinues? to\b",
+    r"\bremains?\b",
+    r"\bstill supports?\b",
+    r"\bunchanged\b",
+    r"\bnormal(?:ly)?\b",
+)
+
+CHANGE_TRIGGER_PATTERNS: tuple[str, ...] = (
+    r"\bbreaking changes?\b",
+    r"\bmigrat(?:e|es|ed|ion|ing)\b",
+    r"\bdeprecat(?:e|es|ed|ion|ing)\b",
+    r"\bremoved\b",
+    r"\brenamed\b",
+    r"\bnow uses?\b",
+    r"\bchang(?:e|es|ed|ing)\b",
+    r"\bupdat(?:e|es|ed|ing)\b",
+    r"\breplac(?:e|es|ed|ing)\b",
+    r"\bnew default\b",
+)
+
 
 def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
@@ -306,6 +331,40 @@ def _signal_matches(anchor: str) -> list[AttentionSignal]:
     return matched
 
 
+def _expected_behavior_context(anchor: str) -> bool:
+    return _matches_any(anchor, EXPECTED_BEHAVIOR_PATTERNS) and not _matches_any(anchor, CHANGE_TRIGGER_PATTERNS)
+
+
+def _problem_solving_paths(anchor: str, signals: list[AttentionSignal], *, explicit: bool) -> list[str]:
+    if not explicit:
+        return []
+    normative = _matches_any(anchor, NORMATIVE_PATTERNS)
+    operational = _matches_any(anchor, OPERATIONAL_GUIDANCE_PATTERNS)
+    transition = _matches_any(anchor, CHANGE_TRIGGER_PATTERNS)
+    signal_ids = {signal.signal_id for signal in signals}
+    paths: set[str] = set()
+    if "future_breaking_version_transition" in signal_ids:
+        paths.add("SCHEDULE_ENGINE_IDENTITY_REVALIDATION")
+    if "migration_identity" in signal_ids and transition:
+        paths.add("MIGRATE_OR_REMAP_ENGINE_IDENTITY")
+    actionable_contract = normative or operational or transition
+    if not actionable_contract:
+        return sorted(paths)
+    if "execution_topology" in signal_ids:
+        paths.add("REVALIDATE_EXECUTION_STRATEGY")
+    if "reasoning_context_instructions" in signal_ids:
+        paths.add("ADJUST_OR_PROBE_REASONING_CONTEXT")
+    if "state_persistence" in signal_ids:
+        paths.add("ADJUST_OR_PROBE_STATE_STRATEGY")
+    if "tool_contract" in signal_ids:
+        paths.add("ADJUST_OR_PROBE_TOOL_STRATEGY")
+    if "request_response_schema" in signal_ids:
+        paths.add("ADAPT_OR_VERIFY_API_CONTRACT")
+    if "limits_usage" in signal_ids:
+        paths.add("RECALIBRATE_LIMIT_OR_BUDGET")
+    return sorted(paths)
+
+
 def _da_case(anchor: str) -> dict[str, Any]:
     signals = _signal_matches(anchor)
     pure_noise = _matches_any(anchor, PURE_NOISE_PATTERNS) or _looks_like_short_heading(anchor)
@@ -337,6 +396,8 @@ def _da_case(anchor: str) -> dict[str, Any]:
         impact, causal, factors, paths, explicit = 1, 1, ["unclassified_unknown"], [], False
 
     importance = max(impact, causal)
+    expected_behavior = _expected_behavior_context(anchor)
+    solving_paths = _problem_solving_paths(anchor, signals, explicit=bool(explicit))
     return {
         "lens": DA_LENS,
         "impact": impact,
@@ -345,6 +406,9 @@ def _da_case(anchor: str) -> dict[str, Any]:
         "explicit_contract_signal": explicit,
         "factors": factors,
         "causal_paths": paths,
+        "expected_behavior_context": expected_behavior,
+        "problem_solving_paths": solving_paths,
+        "problem_solving_reach": min(5, max(2, causal)) if solving_paths else 0,
         "causal_reach_is_probability": False,
     }
 
@@ -385,10 +449,15 @@ def _counter_da_case(anchor: str) -> dict[str, Any]:
         importance = 0
         reasons = ["no_bounded_operational_signal_found"]
 
+    expected_behavior = _expected_behavior_context(anchor)
+    solving_paths = _problem_solving_paths(anchor, signals, explicit=bool(explicit))
     return {
         "lens": COUNTER_DA_LENS,
         "human_review_importance": max(0, min(5, importance)),
         "reasons": reasons,
+        "expected_behavior_context": expected_behavior,
+        "problem_solving_paths": solving_paths,
+        "problem_solving_reach": min(5, max(2, importance)) if solving_paths else 0,
         "docs_claim_is_not_observed_behavior": True,
     }
 
@@ -398,6 +467,14 @@ def _classify(da: dict[str, Any], counter: dict[str, Any], *, blocked: bool) -> 
         return "REVIEW_BLOCKED", ["UPSTREAM_COMPLETENESS_OR_RECOVERY_BLOCK"]
 
     gap = abs(int(da["human_review_importance"]) - int(counter["human_review_importance"]))
+    da_solving = list(da.get("problem_solving_paths", []))
+    counter_solving = list(counter.get("problem_solving_paths", []))
+    expected_without_solution = bool(da.get("expected_behavior_context")) and bool(counter.get("expected_behavior_context")) and not da_solving and not counter_solving
+    if expected_without_solution:
+        max_importance = max(int(da["human_review_importance"]), int(counter["human_review_importance"]))
+        if max_importance >= 2 or int(da["causal_reach"]) >= 2 or gap >= 2:
+            return "HUMAN_LATER", ["EXPECTED_BEHAVIOR_NO_PROBLEM_SOLVING_PATH"]
+        return "DEFER_LOW_VALUE", ["EXPECTED_BEHAVIOR_NO_PROBLEM_SOLVING_PATH"]
     reasons: list[str] = []
     if int(da["impact"]) >= 4:
         reasons.append("HIGH_IMPACT")
@@ -474,12 +551,18 @@ def triage_refinement_report(refinement_report: dict[str, Any]) -> dict[str, Any
             "explicit_contract_signal": False,
             "factors": ["anchor_not_recovered"],
             "causal_paths": [],
+            "expected_behavior_context": False,
+            "problem_solving_paths": [],
+            "problem_solving_reach": 0,
             "causal_reach_is_probability": False,
         }
         counter = _counter_da_case(anchor) if anchor else {
             "lens": COUNTER_DA_LENS,
             "human_review_importance": 0,
             "reasons": ["anchor_not_recovered"],
+            "expected_behavior_context": False,
+            "problem_solving_paths": [],
+            "problem_solving_reach": 0,
             "docs_claim_is_not_observed_behavior": True,
         }
         gap = abs(int(da["human_review_importance"]) - int(counter["human_review_importance"]))
@@ -525,6 +608,7 @@ def triage_refinement_report(refinement_report: dict[str, Any]) -> dict[str, Any
             "top_causal_paths": sorted(causal_counts.items(), key=lambda item: (-item[1], item[0])),
             "impact_and_causal_reach_are_distinct": True,
             "causal_reach_is_heuristic_not_probability": True,
+            "problem_solving_actionability_is_distinct_from_importance": True,
             "lower_priority_is_not_semantic_correctness": True,
             "automatic_drop_enabled": False,
             "upstream_ambiguous_findings_truncated": bool(audit.get("upstream_ambiguous_findings_truncated")),
@@ -612,6 +696,17 @@ def verify_triage_report(report: dict[str, Any], *, refinement_report: dict[str,
         c_importance = counter.get("human_review_importance")
         if not isinstance(c_importance, int) or not 0 <= c_importance <= 5:
             raise ReviewTriageError("invalid Counter-DA importance")
+        for lens_name, lens in (("DA", da), ("Counter-DA", counter)):
+            if not isinstance(lens.get("expected_behavior_context"), bool):
+                raise ReviewTriageError(f"{lens_name} expected behavior marker missing")
+            solving_paths = lens.get("problem_solving_paths")
+            if not isinstance(solving_paths, list) or any(not isinstance(path, str) or not path for path in solving_paths):
+                raise ReviewTriageError(f"{lens_name} problem-solving paths invalid")
+            solving_reach = lens.get("problem_solving_reach")
+            if not isinstance(solving_reach, int) or not 0 <= solving_reach <= 5:
+                raise ReviewTriageError(f"{lens_name} problem-solving reach invalid")
+            if bool(solving_paths) != bool(solving_reach):
+                raise ReviewTriageError(f"{lens_name} problem-solving path/reach mismatch")
         if da.get("causal_reach_is_probability") is not False:
             raise ReviewTriageError("causal reach cannot masquerade as probability")
 
@@ -635,11 +730,14 @@ def verify_triage_report(report: dict[str, Any], *, refinement_report: dict[str,
             if int(gap) >= 2:
                 raise ReviewTriageError("material perspective disagreement was deferred")
         if classification != "REVIEW_BLOCKED":
-            if int(da["causal_reach"]) >= 4 and classification != "HUMAN_NOW":
+            expected_without_solution = bool(da.get("expected_behavior_context")) and bool(counter.get("expected_behavior_context")) and not da.get("problem_solving_paths") and not counter.get("problem_solving_paths")
+            if expected_without_solution and classification == "HUMAN_NOW":
+                raise ReviewTriageError("expected behavior without a problem-solving path cannot be HUMAN_NOW")
+            if int(da["causal_reach"]) >= 4 and not expected_without_solution and classification != "HUMAN_NOW":
                 raise ReviewTriageError("high causal reach must be HUMAN_NOW")
-            if int(da["impact"]) >= 4 and classification != "HUMAN_NOW":
+            if int(da["impact"]) >= 4 and not expected_without_solution and classification != "HUMAN_NOW":
                 raise ReviewTriageError("high impact must be HUMAN_NOW")
-            if int(gap) >= 2 and max(int(da["human_review_importance"]), int(counter["human_review_importance"])) >= 3 and classification != "HUMAN_NOW":
+            if int(gap) >= 2 and max(int(da["human_review_importance"]), int(counter["human_review_importance"])) >= 3 and not expected_without_solution and classification != "HUMAN_NOW":
                 raise ReviewTriageError("material high-value perspective gap must be HUMAN_NOW")
 
     audit = report.get("audit")
@@ -647,6 +745,8 @@ def verify_triage_report(report: dict[str, Any], *, refinement_report: dict[str,
         raise ReviewTriageError("triage audit missing")
     if audit.get("causal_reach_is_heuristic_not_probability") is not True:
         raise ReviewTriageError("causal reach semantics missing")
+    if audit.get("problem_solving_actionability_is_distinct_from_importance") is not True:
+        raise ReviewTriageError("problem-solving actionability semantics missing")
     if audit.get("automatic_drop_enabled") is not False:
         raise ReviewTriageError("automatic drop must remain disabled")
     if report["status"] == "READY" and any(r.get("classification") == "REVIEW_BLOCKED" for r in records):

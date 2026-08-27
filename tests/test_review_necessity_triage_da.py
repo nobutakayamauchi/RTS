@@ -40,6 +40,21 @@ class ReviewNecessityTriageDATests(unittest.TestCase):
         self.assertEqual(record["classification"], "HUMAN_NOW")
         self.assertGreaterEqual(record["da"]["causal_reach"], 4)
         self.assertTrue(record["da"]["explicit_contract_signal"])
+        self.assertGreater(record["da"]["problem_solving_reach"], 0)
+        self.assertIn("ADJUST_OR_PROBE_REASONING_CONTEXT", record["da"]["problem_solving_paths"])
+
+    def test_expected_execution_behavior_without_problem_solving_path_is_not_human_now(self):
+        j = make_j("The execution runtime remains the same managed planner as expected.")
+        self.assertEqual(j["status"], "REVIEW_REQUIRED")
+        triage = triage_refinement_report(j)
+        record = triage["records"][0]
+        self.assertEqual(record["classification"], "HUMAN_LATER")
+        self.assertGreaterEqual(record["da"]["impact"], 4)
+        self.assertGreaterEqual(record["da"]["causal_reach"], 4)
+        self.assertTrue(record["da"]["expected_behavior_context"])
+        self.assertEqual(record["da"]["problem_solving_reach"], 0)
+        self.assertEqual(record["counter_da"]["problem_solving_reach"], 0)
+        self.assertIn("EXPECTED_BEHAVIOR_NO_PROBLEM_SOLVING_PATH", record["human_review_reason_codes"])
 
     def test_short_catalog_heading_does_not_become_tool_contract(self):
         j = make_j("Tool and agent models")
