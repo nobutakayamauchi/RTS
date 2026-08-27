@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "execution_authority": "NONE",
+  "promotion_authority": "NONE",
+  "records": [
+    {
+      "memory_id": "incident:INC_20260222_1545_Cursor_ContextLoss.md",
+      "source_path": "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
+      "source_git_blob_sha": "42afe13334068f1450f0d936f30d3d89b103300c",
+      "lifecycle_state": "ACTIVE_CANDIDATE",
+      "event_triggers": [
+        "context_loss",
+        "reconstruction_required",
+        "long_session_continuity"
+      ],
+      "scope_tags": [
+        "context",
+        "reconstruction",
+        "coding-agent",
+        "cursor"
+      ],
+      "as_of": "2026-08-27T06:33:09Z",
+      "superseded_by": null,
+      "evidence_refs": [
+        "incidents/INC_20260222_1545_Cursor_ContextLoss.md",
+        "https://x.com/keithwhor/status/2023568333522825458?s=46"
+      ]
+    },
+    {
+      "memory_id": "incident:INC_20260222_1603_ClaudeCode_ContextLoss.md",
+      "source_path": "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
+      "source_git_blob_sha": "797be3c30fc1cdc37e07746efdd50dbb5f3a1c20",
+      "lifecycle_state": "ACTIVE_CANDIDATE",
+      "event_triggers": [
+        "context_loss",
+        "reconstruction_required",
+        "reasoning_continuity_loss"
+      ],
+      "scope_tags": [
+        "context",
+        "reconstruction",
+        "coding-agent",
+        "claude-code"
+      ],
+      "as_of": "2026-08-27T06:33:09Z",
+      "superseded_by": null,
+      "evidence_refs": [
+        "incidents/INC_20260222_1603_ClaudeCode_ContextLoss.md",
+        "https://x.com/giladvdn/status/2024062412656148895?s=46"
+      ]
+    }
+  ]
+}
