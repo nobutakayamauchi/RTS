@@ -1,0 +1,42 @@
+{
+  "active_load_chars": 1275,
+  "branch": "feature/frz-000012-compact-active-restart-surface-v1",
+  "changed": [
+    "Child A selective recall is completed; Child B restart-surface work is the only active child"
+  ],
+  "commit": "93c50afb93f6a1045a8c2761ee719f437c78e61f",
+  "do_not_touch": [
+    "RTS-FRZ-000011 completed survivor",
+    "RTS-FRZ-000013..000015 until separately authorized",
+    "existing deep history sources"
+  ],
+  "execution_authority": "NONE",
+  "goal": "Continue Adaptive Intelligence v2 from completed Child A into bounded Child B verification",
+  "next_authorized_action": "Run Child B verification/DA; reopen deeper history only on an explicit reopen condition",
+  "promotion_authority": "NONE",
+  "reopen_conditions": [
+    "EQUIVALENCE_MISMATCH",
+    "OPERATOR_REQUEST",
+    "STALE_SOURCE",
+    "UNRESOLVED_BLOCKER"
+  ],
+  "repo": "nobutakayamauchi/RTS",
+  "rollback": "Revert Child B package/sample/tests/lifecycle only; preserve Child A and existing full history",
+  "schema_version": 1,
+  "selective_recall_interface": {
+    "authority": "NONE",
+    "mode": "REQUEST_ONLY"
+  },
+  "source_refs": [
+    {
+      "git_blob_sha": "782c66a274a3b2f387c09839a821a29ab6a2ba84",
+      "path": "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000011_2026-08-27.md"
+    }
+  ],
+  "unresolved": [
+    "UNKNOWN: cross-project restart equivalence beyond the bounded fixture is not yet claimed"
+  ],
+  "verified": [
+    "Child A completed-head validation is green"
+  ]
+}

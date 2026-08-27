@@ -1,0 +1,89 @@
+{
+  "assessor": "RTS governed build assessment — Child B compact active restart surface",
+  "rationale": "Child B is bounded to a repository-local restart representation and validator. It preserves a fixed restart denominator, source pointers, explicit reopen conditions, and non-authority while refusing silent truncation. It composes with completed Child A selective recall rather than copying full history into the active surface.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 4,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 14,
+    "integration_hours": 2,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "restart reconstruction handoff compact active surface",
+      "selective recall provenance freshness",
+      "ultimate loop restart recovery"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "selective_recall/",
+        "ref": "93c50afb93f6a1045a8c2761ee719f437c78e61f",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Reuse source containment, Git-blob freshness, and non-authority patterns from completed Child A."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "thin-rts/ultimate-loop/",
+        "ref": "93c50afb93f6a1045a8c2761ee719f437c78e61f",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse restart/reconstruction and historical-evidence/current-authority boundaries."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/",
+        "ref": "93c50afb93f6a1045a8c2761ee719f437c78e61f",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse append-only lifecycle, WIP=1, assessment, preflight, and verification governance."
+      }
+    ],
+    "gaps": [
+      "No current bounded restart-surface package proves fixed-denominator restart equivalence.",
+      "No current active-surface owner refuses over-budget compaction instead of silently dropping restart-critical state."
+    ]
+  },
+  "risks": [
+    "Compression could delete UNKNOWN or do-not-touch state.",
+    "A compact summary could silently exceed its budget or truncate required state.",
+    "Stale source pointers could make a restart surface look current.",
+    "Restart state could be mistaken for execution authority."
+  ],
+  "assessment_id": "RTS-BA-000012-001",
+  "item_id": "RTS-FRZ-000012",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "9c996bd8e82d6abeb635bbd9109dbb6c9a3c7f280098f5aa3cf7154e95765265",
+  "derived": {
+    "benefit_score": 91.25,
+    "cost_score": 42.11,
+    "reuse_score": 64.29,
+    "decision_score": 72.46,
+    "reuse_hours_saved": 9.0,
+    "net_hours": 11.0,
+    "time_saved_ratio": 0.6429,
+    "implementation_efficiency": 1.27,
+    "cost_effectiveness": 8.3,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T07:28:02Z"
+}

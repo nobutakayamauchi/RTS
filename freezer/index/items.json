@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T07:06:08Z",
+  "generated_at": "2026-08-27T07:28:06Z",
   "count": 15,
   "items": [
     {
@@ -265,10 +265,10 @@
     },
     {
       "item_id": "RTS-FRZ-000012",
-      "version": 1,
+      "version": 5,
       "title": "Compact Active + Restart Surface v1",
       "type": "feature",
-      "status": "FROZEN",
+      "status": "COMPLETED",
       "priority_score": 80.82,
       "estimated_hours": {
         "minimum": 8,
@@ -283,9 +283,9 @@
         "reconstruction",
         "codex-efficiency"
       ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T07:28:06Z"
     },
     {
       "item_id": "RTS-FRZ-000013",
