@@ -1,0 +1,34 @@
+{
+  "children": [
+    {
+      "item_id": "RTS-FRZ-000011",
+      "title": "Selective Recall + Memory Lifecycle v1",
+      "status": "FROZEN",
+      "build_authority": "NOT_APPROVED"
+    },
+    {
+      "item_id": "RTS-FRZ-000012",
+      "title": "Compact Active + Restart Surface v1",
+      "status": "FROZEN",
+      "build_authority": "NOT_APPROVED"
+    },
+    {
+      "item_id": "RTS-FRZ-000013",
+      "title": "Incremental / Resumable Intelligence Compiler v1",
+      "status": "FROZEN",
+      "build_authority": "NOT_APPROVED"
+    },
+    {
+      "item_id": "RTS-FRZ-000014",
+      "title": "Reuse Efficiency + Knowledge Debt Metrics v1",
+      "status": "FROZEN",
+      "build_authority": "NOT_APPROVED"
+    },
+    {
+      "item_id": "RTS-FRZ-000015",
+      "title": "External Transition Pattern Seed Corpus v1",
+      "status": "FROZEN",
+      "build_authority": "NOT_APPROVED"
+    }
+  ]
+}

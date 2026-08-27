@@ -26,13 +26,52 @@ class BuildAssessmentTests(unittest.TestCase):
     def isolated_root(self, temp_dir: str) -> Path:
         root = Path(temp_dir)
         shutil.copytree(self.repo_root / "freezer", root / "freezer")
-        pointer_path = (
-            root
-            / "freezer"
-            / "items"
-            / "RTS-FRZ-000007"
-            / "current.json"
+
+        # Unit tests exercise the original FREEZER seed contract, not whatever
+        # lifecycle state the live repository has reached. Reconstruct that
+        # seed deterministically so append-only production evolution cannot
+        # silently change test preconditions.
+        parent_dir = root / "freezer" / "items" / "RTS-FRZ-000001"
+        seed_path = parent_dir / "v001.json"
+        seed = json.loads(seed_path.read_text(encoding="utf-8"))
+        for version_path in parent_dir.glob("v*.json"):
+            if version_path.name != "v001.json":
+                version_path.unlink()
+        (parent_dir / "current.json").write_text(
+            json.dumps(
+                {
+                    "item_id": "RTS-FRZ-000001",
+                    "current_version": 1,
+                    "path": "freezer/items/RTS-FRZ-000001/v001.json",
+                    "updated_at": seed["updated_at"],
+                },
+                ensure_ascii=False,
+                indent=2,
+            ) + "\n",
+            encoding="utf-8",
         )
+        for state_dir in ("assessments", "preflights"):
+            target = root / "freezer" / state_dir / "RTS-FRZ-000001"
+            if target.exists():
+                shutil.rmtree(target)
+
+        # Adaptive-intelligence v2 children are production state, not seed
+        # fixtures. Remove them by semantic tag rather than hard-coded IDs.
+        items_root = root / "freezer" / "items"
+        for current in list(items_root.glob("RTS-FRZ-*/current.json")):
+            pointer = json.loads(current.read_text(encoding="utf-8"))
+            item_path = root / pointer["path"]
+            item = json.loads(item_path.read_text(encoding="utf-8"))
+            if "adaptive-intelligence-v2-child" not in item.get("tags", []):
+                continue
+            item_id = item["item_id"]
+            shutil.rmtree(current.parent)
+            for state_dir in ("assessments", "preflights"):
+                target = root / "freezer" / state_dir / item_id
+                if target.exists():
+                    shutil.rmtree(target)
+
+        pointer_path = root / "freezer" / "items" / "RTS-FRZ-000007" / "current.json"
         if pointer_path.exists():
             pointer = json.loads(pointer_path.read_text(encoding="utf-8"))
             learning_path = root / pointer["path"]

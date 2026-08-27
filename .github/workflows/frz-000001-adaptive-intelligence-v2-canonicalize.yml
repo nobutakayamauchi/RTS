@@ -1,0 +1,148 @@
+name: Canonicalize FRZ-000001 Adaptive Intelligence v2
+
+on:
+  push:
+    branches:
+      - feature/frz-000001-adaptive-intelligence-v2
+    paths:
+      - .github/workflows/frz-000001-adaptive-intelligence-v2-canonicalize.yml
+      - docs/implementation/frz000001_v2_inputs/**
+      - docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_EXECUTION_TASK.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frz-000001-adaptive-intelligence-v2-canonicalize
+  cancel-in-progress: false
+
+jobs:
+  canonicalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000001-adaptive-intelligence-v2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Assert expected pre-canonicalization state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('freezer/items/RTS-FRZ-000001/current.json').read_text())
+          if p['current_version'] != 1:
+              raise SystemExit(f"STOP: parent already moved: {p}")
+          item = json.loads(Path(p['path']).read_text())
+          assert item['status'] == 'FROZEN', item
+          assert item['build_authority'] == 'NOT_APPROVED', item
+          print('pre-state OK', item['item_id'], item['version'], item['status'], item['build_authority'])
+          PY
+
+      - name: Decouple FREEZER unit fixtures from evolving live state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacement = '''    def isolated_root(self, temp_dir: str) -> Path:\n        root = Path(temp_dir)\n        shutil.copytree(self.repo_root / "freezer", root / "freezer")\n\n        # Unit tests exercise the original FREEZER seed contract, not whatever\n        # lifecycle state the live repository has reached. Reconstruct that\n        # seed deterministically so append-only production evolution cannot\n        # silently change test preconditions.\n        parent_dir = root / "freezer" / "items" / "RTS-FRZ-000001"\n        seed_path = parent_dir / "v001.json"\n        seed = json.loads(seed_path.read_text(encoding="utf-8"))\n        for version_path in parent_dir.glob("v*.json"):\n            if version_path.name != "v001.json":\n                version_path.unlink()\n        (parent_dir / "current.json").write_text(\n            json.dumps(\n                {\n                    "item_id": "RTS-FRZ-000001",\n                    "current_version": 1,\n                    "path": "freezer/items/RTS-FRZ-000001/v001.json",\n                    "updated_at": seed["updated_at"],\n                },\n                ensure_ascii=False,\n                indent=2,\n            ) + "\\n",\n            encoding="utf-8",\n        )\n        for state_dir in ("assessments", "preflights"):\n            target = root / "freezer" / state_dir / "RTS-FRZ-000001"\n            if target.exists():\n                shutil.rmtree(target)\n\n        # Adaptive-intelligence v2 children are production state, not seed\n        # fixtures. Remove them by semantic tag rather than hard-coded IDs.\n        items_root = root / "freezer" / "items"\n        for current in list(items_root.glob("RTS-FRZ-*/current.json")):\n            pointer = json.loads(current.read_text(encoding="utf-8"))\n            item_path = root / pointer["path"]\n            item = json.loads(item_path.read_text(encoding="utf-8"))\n            if "adaptive-intelligence-v2-child" not in item.get("tags", []):\n                continue\n            item_id = item["item_id"]\n            shutil.rmtree(current.parent)\n            for state_dir in ("assessments", "preflights"):\n                target = root / "freezer" / state_dir / item_id\n                if target.exists():\n                    shutil.rmtree(target)\n\n        pointer_path = root / "freezer" / "items" / "RTS-FRZ-000007" / "current.json"\n        if pointer_path.exists():\n            pointer = json.loads(pointer_path.read_text(encoding="utf-8"))\n            learning_path = root / pointer["path"]\n            learning = json.loads(learning_path.read_text(encoding="utf-8"))\n            if learning["status"] in {"SELECTED", "IN_PROGRESS"}:\n                learning["status"] = "FROZEN"\n                learning["build_authority"] = "NOT_APPROVED"\n                learning_path.write_text(\n                    json.dumps(learning, ensure_ascii=False, indent=2) + "\\n",\n                    encoding="utf-8",\n                )\n        rebuild(root)\n        return root\n\n'''
+
+          for filename in (
+              'tests/_freezer_test_cases.py',
+              'tests/_freezer_build_assessment_cases.py',
+          ):
+              path = Path(filename)
+              text = path.read_text(encoding='utf-8')
+              start = text.index('    def isolated_root(self, temp_dir: str) -> Path:\n')
+              end = text.index('    def ', start + 5)
+              path.write_text(text[:start] + replacement + text[end:], encoding='utf-8')
+              print('patched', filename)
+          PY
+
+      - name: Prove baseline FREEZER tests still pass
+        run: |
+          set -euxo pipefail
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+
+      - name: Canonicalize governed decomposition
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli revise RTS-FRZ-000001 \
+            --input docs/implementation/frz000001_v2_inputs/revise_item_v2.json
+          python -m freezer.build_assessment create RTS-FRZ-000001 \
+            --input docs/implementation/frz000001_v2_inputs/build_assessment_input.json
+          python -m freezer.preflight create RTS-FRZ-000001 \
+            --input docs/implementation/frz000001_v2_inputs/preflight_input.json
+          python -m freezer.cli add \
+            --input docs/implementation/frz000001_v2_inputs/child_a_selective_recall_memory_lifecycle.json
+          python -m freezer.cli add \
+            --input docs/implementation/frz000001_v2_inputs/child_b_compact_active_restart_surface.json
+          python -m freezer.cli add \
+            --input docs/implementation/frz000001_v2_inputs/child_c_incremental_resumable_compiler.json
+          python -m freezer.cli add \
+            --input docs/implementation/frz000001_v2_inputs/child_d_reuse_efficiency_knowledge_debt_metrics.json
+          python -m freezer.cli add \
+            --input docs/implementation/frz000001_v2_inputs/child_e_external_transition_pattern_seed_corpus.json
+
+      - name: Verify FREEZER invariants
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.build_assessment gate RTS-FRZ-000001 | tee /tmp/frz-gate.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          gate = json.loads(Path('/tmp/frz-gate.json').read_text())
+          assert gate['status'] == 'FROZEN', gate
+          assert gate['build_authority'] == 'NOT_APPROVED', gate
+          assert gate['preflight_state'] == 'DECOMPOSE_REQUIRED', gate
+          assert gate['selection_ready'] is False, gate
+          print('parent gate OK')
+          PY
+
+      - name: Prove FREEZER tests remain stable after live-state evolution
+        run: |
+          set -euxo pipefail
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+
+      - name: Record child mapping and commit generated canonical records
+        run: |
+          set -euxo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          items = []
+          for p in sorted(Path('freezer/items').glob('RTS-FRZ-*/current.json')):
+              ptr = json.loads(p.read_text())
+              item = json.loads(Path(ptr['path']).read_text())
+              if item.get('tags') and 'adaptive-intelligence-v2-child' in item['tags']:
+                  items.append({
+                      'item_id': item['item_id'],
+                      'title': item['title'],
+                      'status': item['status'],
+                      'build_authority': item['build_authority'],
+                  })
+          if len(items) != 5:
+              raise SystemExit(f'STOP: expected 5 children, found {len(items)}: {items}')
+          for x in items:
+              assert x['status'] == 'FROZEN', x
+              assert x['build_authority'] == 'NOT_APPROVED', x
+          out = Path('docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_CHILD_MAPPING.json')
+          out.write_text(json.dumps({'children': items}, ensure_ascii=False, indent=2) + '\n')
+          print(json.dumps(items, ensure_ascii=False, indent=2))
+          PY
+          python -m freezer.cli reindex
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freezer tests/_freezer_test_cases.py tests/_freezer_build_assessment_cases.py \
+            docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_CHILD_MAPPING.json
+          git status --short
+          git commit -m 'freezer: decompose FRZ-000001 adaptive intelligence v2'
+          git push origin HEAD:feature/frz-000001-adaptive-intelligence-v2
