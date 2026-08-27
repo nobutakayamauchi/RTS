@@ -1,0 +1,82 @@
+{
+  "assessor": "RTS governed build assessment — Model Transition Intelligence v1",
+  "rationale": "F already owns bounded probe planning/profile synthesis and G owns bounded campaign execution. H adds only a provider-neutral, repository-local evidence-diff layer over immutable old/new official-document bundles. It validates provenance, classifies observable external contract changes, preserves documentation as hypotheses, and emits bounded probe requirements. Network crawling, provider calls, hidden architecture inference, runtime mutation, and automatic profile promotion remain out of scope.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 16,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": ["nobutakayamauchi/RTS"],
+    "queries": [
+      "model behavior adaptation probe plan",
+      "bounded probe executor campaign limits",
+      "external seed provenance exact refs",
+      "read only non authorizing transition evidence"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "model_behavior_adaptation/",
+        "ref": "0b9c6ac5c0d13c0d5b6c8506017df8188248621a",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Reuse bounded probe dimensions, engine identity, conservative profile semantics, and advisory-only authority boundaries."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "bounded_probe_executor/",
+        "ref": "0b9c6ac5c0d13c0d5b6c8506017df8188248621a",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse max probe/campaign bounding assumptions and fingerprinted downstream execution boundary."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "external_seed_corpus/",
+        "ref": "0b9c6ac5c0d13c0d5b6c8506017df8188248621a",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse exact provenance, countercondition, non-Canon, and external-evidence authority separation patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "selective_recall/",
+        "ref": "0b9c6ac5c0d13c0d5b6c8506017df8188248621a",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse bounded output/freshness and no-authority principles."
+      }
+    ],
+    "gaps": [
+      "No current component compares old/new official model-document bundles and classifies external execution-contract change severity.",
+      "No current component converts documentation deltas into bounded F/G probe requirements while keeping docs claims unverified."
+    ]
+  },
+  "risks": [
+    "Marketing wording can be mistaken for a real contract change.",
+    "Official documentation can conflict across release notes, API docs and migration guides.",
+    "Documentation claims can be mistaken for observed model behavior.",
+    "The phrase architecture change can accidentally overclaim hidden neural implementation details.",
+    "A severe transition label can be mistaken for runtime authority.",
+    "Probe expansion can exceed F/G bounded limits if mapping is not capped."
+  ]
+}
