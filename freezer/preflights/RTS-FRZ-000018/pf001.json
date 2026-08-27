@@ -1,0 +1,79 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Model Transition Intelligence v1",
+  "rationale": "Repository-local deterministic comparison of supplied immutable evidence bundles only. v1 has no crawler, provider/network calls, credentials, runtime routing mutation, hidden architecture inference, or automatic promotion. Official-document claims remain hypotheses; conflicting or incomplete evidence fails to REVIEW_REQUIRED/UNKNOWN; probe output is bounded by F's maximum probe dimensions and remains non-authorizing.",
+  "affected_boundaries": [
+    "new model_transition_intelligence package",
+    "version evidence bundle and normalized contract-claim schema",
+    "S0-S3 transition classification",
+    "old-profile disposition and bounded F/G probe request",
+    "focused DA and regression tests",
+    "RTS-FRZ-000018 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "A-G are COMPLETED.",
+    "F probe plans are bounded to max_probes <= 8 and advisory only.",
+    "G executes only explicitly approved bounded campaigns.",
+    "External documentation evidence does not create RTS Canon or execution authority.",
+    "Observed external contract != hidden internal neural architecture."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No existing profile, memory, FREEZER history, runtime router, or provider configuration is mutated."
+  },
+  "external_interfaces": [
+    "repository-local JSON-compatible old/new evidence bundles",
+    "deterministic transition report",
+    "bounded F/G probe requirement artifact",
+    "no crawler/provider/network interface in v1"
+  ],
+  "approval_changes": [
+    "none; H output grants no execution/profile-application/promotion authority",
+    "S3 may mark old operating assumptions DIRECT_APPLICATION_BLOCKED but cannot delete historical evidence or mutate runtime"
+  ],
+  "public_documents": [
+    "none"
+  ],
+  "regression_tests": [
+    "H transition-intelligence baseline + destructive DA/Counter-DA",
+    "G bounded probe executor regression",
+    "F model behavior adaptation regression",
+    "E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "source provenance and content digest must be present for every evidence source",
+    "only official contract evidence can raise transition severity",
+    "conflicting official claims for the same contract key must remain REVIEW_REQUIRED",
+    "probe mapping must remain within F's controlled dimensions and max 8 probes"
+  ],
+  "rollback_boundary": "Drop the H branch or revert model_transition_intelligence files and FRZ-000018 append-only versions; A-G remain untouched.",
+  "completion_conditions": [
+    "marketing-only or wording-only changes remain S0",
+    "limit/tuning changes map to S1 without architecture overclaim",
+    "behavioral contract changes map to S2 and targeted bounded probes",
+    "explicit execution-contract topology changes map to S3 and block direct old-profile application",
+    "documentation claims remain UNVERIFIED until observed evidence exists",
+    "conflicting official docs produce REVIEW_REQUIRED instead of false certainty",
+    "missing provenance/digest fails closed",
+    "unofficial evidence cannot raise severity",
+    "probe requests are deduplicated and capped at 8",
+    "no runtime/provider/network/promotion authority is granted",
+    "A-H regressions and FREEZER verify pass"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "normalized claim extraction is upstream of H v1; bad extraction can still create a bad hypothesis, so exact source pointers remain mandatory",
+    "classification rules are conservative and may require human review for ambiguous cross-document changes",
+    "S3 means observable execution-contract shift, not hidden neural architecture proof"
+  ],
+  "preflight_id": "RTS-PF-000018-001",
+  "item_id": "RTS-FRZ-000018",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "078c72d699c3ead29ad2598bbd52ed79770e25c4701785568b5c1d2dead13602",
+  "created_at": "2026-08-27T09:38:09Z"
+}
