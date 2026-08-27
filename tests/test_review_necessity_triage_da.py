@@ -48,6 +48,16 @@ class ReviewNecessityTriageDATests(unittest.TestCase):
         self.assertEqual(record["classification"], "DEFER_LOW_VALUE")
         self.assertLessEqual(record["da"]["human_review_importance"], 1)
 
+    def test_future_breaking_change_notice_is_high_causal_even_before_change(self):
+        j = make_j("For breaking changes, a 2-week notice will be provided before the version behind latest is changed.")
+        triage = triage_refinement_report(j)
+        record = triage["records"][0]
+        self.assertEqual(record["classification"], "HUMAN_NOW")
+        self.assertLess(record["da"]["impact"], 4)
+        self.assertGreaterEqual(record["da"]["causal_reach"], 4)
+        self.assertIn("FUTURE_CAUSAL_REACH", record["human_review_reason_codes"])
+        self.assertIn("ENGINE_IDENTITY_ROUTING", record["da"]["causal_paths"])
+
     def test_material_perspective_gap_cannot_be_averaged_into_later_review(self):
         j = make_j("The new model sets a quality and efficiency baseline for complex production workflows.")
         triage = triage_refinement_report(j)
