@@ -1,0 +1,153 @@
+from __future__ import annotations
+
+import hashlib
+import unittest
+
+from human_escalation_gate import (
+    EXHAUSTION_SEARCH_ROUTE,
+    HumanEscalationError,
+    evaluate_escalation_report,
+)
+from review_necessity_triage import triage_refinement_report
+from semantic_claim_refinement import refine_intake_report
+from tests.test_semantic_claim_refinement import make_intake
+
+
+def make_k0(body: str):
+    return triage_refinement_report(refine_intake_report(make_intake(body)))
+
+
+def fp(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+class HumanEscalationGateDATests(unittest.TestCase):
+    def test_attempts_do_not_exhaust_an_open_route(self):
+        k0 = make_k0("A request now uses a managed planner before tool execution.")
+        route = k0["records"][0]["da"]["problem_solving_paths"][0]
+        evidence = [{
+            "evidence_id": "e1",
+            "finding_index": 0,
+            "route_id": route,
+            "probe_fingerprint": fp("attempt-1"),
+            "evidence_distinction": "Observe one runtime sample without claiming it closes the route.",
+            "outcome": "INCONCLUSIVE",
+            "learned_facts": ["One sample did not discriminate the execution topology."],
+            "closed_routes": [],
+            "opened_routes": [],
+        }]
+        report = evaluate_escalation_report(k0, verification_evidence=evidence)
+        self.assertEqual(report["records"][0]["disposition"], "AI_CONTINUE")
+        self.assertIn(route, report["records"][0]["residual_routes"])
+
+    def test_refutation_can_close_old_route_and_open_new_route(self):
+        k0 = make_k0("A request now uses a managed planner before tool execution.")
+        route = k0["records"][0]["da"]["problem_solving_paths"][0]
+        evidence = [{
+            "evidence_id": "e1",
+            "finding_index": 0,
+            "route_id": route,
+            "probe_fingerprint": fp("refute-and-open"),
+            "evidence_distinction": "Check whether the planner is actually present and, if not, inspect routing metadata.",
+            "outcome": "REFUTED",
+            "learned_facts": ["The observed request did not expose the documented planner path."],
+            "closed_routes": [route],
+            "opened_routes": ["VERIFY_DEPLOYMENT_OR_SURFACE_IDENTITY"],
+        }]
+        report = evaluate_escalation_report(k0, verification_evidence=evidence)
+        row = report["records"][0]
+        self.assertEqual(row["disposition"], "AI_CONTINUE")
+        self.assertNotIn(route, row["residual_routes"])
+        self.assertIn("VERIFY_DEPLOYMENT_OR_SURFACE_IDENTITY", row["residual_routes"])
+
+    def test_safe_defer_prevents_human_escalation(self):
+        k0 = make_k0("The context window is 1000000 tokens.")
+        report = evaluate_escalation_report(
+            k0,
+            safe_defers={0: {
+                "trigger": "NEXT_ENGINE_REVISION_OR_CONTEXT_LIMIT_DOC_CHANGE",
+                "rationale": "No current operation depends on selecting a different bound before that trigger.",
+                "evidence_ids": [],
+            }},
+        )
+        self.assertEqual(report["records"][0]["disposition"], "WAIT_SAFE_DEFER")
+
+    def test_human_choice_without_exhaustion_search_is_not_enough(self):
+        k0 = make_k0("The context window is 1000000 tokens.")
+        report = evaluate_escalation_report(
+            k0,
+            human_choices={0: "Pick the planning bound."},
+        )
+        self.assertEqual(report["records"][0]["disposition"], "HUMAN_CANDIDATE")
+
+    def test_exhaustion_search_that_opens_route_cannot_escalate(self):
+        k0 = make_k0("The context window is 1000000 tokens.")
+        evidence = [{
+            "evidence_id": "search",
+            "finding_index": 0,
+            "route_id": EXHAUSTION_SEARCH_ROUTE,
+            "probe_fingerprint": fp("search-opens-route"),
+            "evidence_distinction": "Search for a runtime discriminator.",
+            "outcome": "OBSERVED",
+            "learned_facts": ["A runtime boundary probe can discriminate the remaining choice."],
+            "closed_routes": [],
+            "opened_routes": ["PROBE_RUNTIME_CONTEXT_BOUNDARY"],
+        }]
+        report = evaluate_escalation_report(
+            k0,
+            verification_evidence=evidence,
+            human_choices={0: "Pick the planning bound."},
+        )
+        self.assertEqual(report["records"][0]["disposition"], "AI_CONTINUE")
+
+    def test_non_material_dead_end_does_not_consume_human_now(self):
+        k0 = make_k0("New")
+        self.assertEqual(k0["records"][0]["classification"], "DEFER_LOW_VALUE")
+        evidence = [{
+            "evidence_id": "search",
+            "finding_index": 0,
+            "route_id": EXHAUSTION_SEARCH_ROUTE,
+            "probe_fingerprint": fp("non-material-search"),
+            "evidence_distinction": "Search for any operational discriminator.",
+            "outcome": "NON_DISCRIMINATING",
+            "learned_facts": ["No operational contract was present in the anchor."],
+            "closed_routes": [],
+            "opened_routes": [],
+        }]
+        report = evaluate_escalation_report(
+            k0,
+            verification_evidence=evidence,
+            human_choices={0: "Interpret the word New."},
+        )
+        self.assertEqual(report["records"][0]["disposition"], "WAIT_SAFE_DEFER")
+
+    def test_decision_cannot_reference_unknown_evidence(self):
+        k0 = make_k0("The context window is 1000000 tokens.")
+        with self.assertRaises(HumanEscalationError):
+            evaluate_escalation_report(
+                k0,
+                decisions={0: {"decision": "Use bound.", "evidence_ids": ["missing"]}},
+            )
+
+    def test_evidence_cannot_close_unknown_route(self):
+        k0 = make_k0("A request now uses a managed planner before tool execution.")
+        route = k0["records"][0]["da"]["problem_solving_paths"][0]
+        evidence = [{
+            "evidence_id": "bad-close",
+            "finding_index": 0,
+            "route_id": route,
+            "probe_fingerprint": fp("bad-close"),
+            "evidence_distinction": "Attempt to close an unrelated route.",
+            "outcome": "REFUTED",
+            "learned_facts": ["Observed one unrelated fact."],
+            "closed_routes": ["NEVER_OPENED"],
+            "opened_routes": [],
+        }]
+        # The core must not silently turn this into exhaustion. It may leave the
+        # real route open, but it must not produce HUMAN_NOW.
+        report = evaluate_escalation_report(k0, verification_evidence=evidence)
+        self.assertNotEqual(report["records"][0]["disposition"], "HUMAN_NOW")
+
+
+if __name__ == "__main__":
+    unittest.main()
