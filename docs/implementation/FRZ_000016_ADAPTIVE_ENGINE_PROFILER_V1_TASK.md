@@ -1,0 +1,3 @@
+# FRZ-000016 Adaptive Engine Profiler v1
+
+Build one bounded, provider-independent behavior adaptation layer on top of completed A-E. Treat prior profiles as hypotheses, not authority, when observable engine identity changes. Plan capped one-dimension-at-a-time probes, learn only from observable outcome summaries, keep missing telemetry unknown, require distinct-task evidence before stability, detect drift, and emit advisory-only operating recommendations with conservative fallback. No provider calls, hidden chain-of-thought collection, automatic router mutation, or Canon promotion are authorized in v1.

@@ -1,0 +1,88 @@
+{
+  "item_id": "RTS-FRZ-000016",
+  "title": "Adaptive Engine Profiler v1",
+  "type": "architecture",
+  "status": "IN_PROGRESS",
+  "summary": "モデル世代・tool contract・context contractの変化を未知のengine特性として扱い、bounded probe planと観測可能な実戦結果からdomain別の運転Profile候補、drift判定、保守的fallbackを生成する非権限適応層。",
+  "original_problem": "モデル更新で最適なcontext量、recall量、instruction density、autonomy、reasoning tier、tool strategyが変わると、旧世代で最適だった戦い方が新世代では抵抗や誤誘導になり得る。",
+  "why_it_matters": "モデル固有の必勝法を人間が毎世代覚え直すのではなく、仕様変更への対応方法そのものをRTSへ実装し、世代交代時の再適応コストと誤継承リスクを下げられる。",
+  "reason_frozen": "旧Profileの権威継承、少数標本の過学習、単一KPI最適化、hidden reasoning収集、無制限probe、provider自動実行を禁止する境界をPreflightとDAで確定するまで実装しない。",
+  "preserved_value": [
+    "engine identity is observable metadata, not an internal architecture claim",
+    "old profiles become priors on engine change, never authority",
+    "bounded one-dimension-at-a-time probe planning",
+    "observable outcome metrics only",
+    "missing telemetry remains unknown",
+    "success quality dominates speed optimization",
+    "distinct-task evidence prevents pseudo replication",
+    "drift detection with conservative fallback",
+    "domain-specific profiles",
+    "no automatic execution or Canon promotion"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 2,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000011 through RTS-FRZ-000015 are COMPLETED",
+    "engine/model behavior can change without reliable internal-architecture visibility",
+    "observable task outcomes can be recorded without hidden chain-of-thought",
+    "bounded profile recommendations can remain advisory-only"
+  ],
+  "negative_triggers": [
+    "new engine automatically inherits old engine profile as truth",
+    "one or a few repeated-task successes can become STABLE",
+    "speed or cache telemetry can override task success quality",
+    "hidden chain-of-thought or private scratchpad is collected",
+    "probe planner creates unbounded combinatorial experiments",
+    "profile recommendation directly grants execution or promotion authority"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000011 Selective Recall + Memory Lifecycle v1",
+    "RTS-FRZ-000012 Compact Active + Restart Surface v1",
+    "RTS-FRZ-000013 Incremental / Resumable Intelligence Compiler v1",
+    "RTS-FRZ-000014 Reuse Efficiency + Knowledge Debt Metrics v1",
+    "RTS-FRZ-000015 External Transition Pattern Seed Corpus v1"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000011",
+    "RTS-FRZ-000012",
+    "RTS-FRZ-000013",
+    "RTS-FRZ-000014",
+    "RTS-FRZ-000015",
+    "db1b08052c9d203a1ff75b37ec37c0f5107caded"
+  ],
+  "possible_destinations": [
+    "RTS model-behavior adaptation layer",
+    "Ultimate Loop engine-profile routing input",
+    "future bounded probe executor behind a separate execution gate"
+  ],
+  "estimated_hours": {
+    "minimum": 10,
+    "maximum": 20
+  },
+  "tags": [
+    "adaptive-intelligence-v3",
+    "engine-profiler",
+    "model-behavior",
+    "drift-detection",
+    "bounded-probes",
+    "conservative-fallback",
+    "codex-efficiency",
+    "self-adaptation"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 3,
+  "created_at": "2026-08-27T08:40:23Z",
+  "updated_at": "2026-08-27T08:40:23Z",
+  "supersedes": "v002"
+}

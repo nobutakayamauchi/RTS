@@ -1,0 +1,70 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Adaptive Engine Profiler v1",
+  "rationale": "Bounded repository-local Python module only. It plans probes but does not execute providers, ingests observable run summaries, refuses hidden reasoning fields, produces advisory profile candidates, detects engine mismatch/drift, and falls back to a conservative preset. No deployment, model API, prompt-body collection or automatic routing mutation.",
+  "affected_boundaries": [
+    "new model_behavior_adaptation package",
+    "focused baseline and destructive DA tests",
+    "FREEZER item RTS-FRZ-000016",
+    "persistent validation workflow"
+  ],
+  "existing_assumptions": [
+    "A-E are COMPLETED and WIP is clear.",
+    "Provider/model internals remain a black box; only observable metadata and outcomes are used.",
+    "Profiles are domain-specific and tied to an exact observable engine identity.",
+    "A new engine never inherits an old profile as authority.",
+    "v1 does not call providers or write router settings."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No existing memory, profile, provider state or Canon is mutated."
+  },
+  "external_interfaces": [
+    "repository-local JSON observations and engine identity objects",
+    "stdout JSON CLI output only",
+    "no network/provider/deployment interface"
+  ],
+  "approval_changes": [
+    "profile_application_authority=NONE",
+    "execution_authority=NONE",
+    "promotion_authority=NONE",
+    "future active probe execution requires a separate governed child"
+  ],
+  "public_documents": [
+    "No product/public claims changed."
+  ],
+  "regression_tests": [
+    "F baseline tests",
+    "F destructive DA / Counter-DA tests",
+    "A-E regression suites",
+    "FREEZER regression and manifest verification"
+  ],
+  "hidden_dependencies": [
+    "Observation quality depends on upstream run summaries.",
+    "Reasoning tier labels are abstract operating labels, not guarantees that every provider exposes identical controls.",
+    "Tool/context contract changes must be reflected in engine identity metadata when observable."
+  ],
+  "rollback_boundary": "Reset branch to db1b08052c9d203a1ff75b37ec37c0f5107caded; no external state or provider calls exist in v1.",
+  "completion_conditions": [
+    "Probe planner emits at most eight one-dimension-at-a-time variants.",
+    "Hidden reasoning and raw prompt/response bodies are rejected.",
+    "Missing telemetry remains null/unknown rather than zero.",
+    "Profile selection prioritizes conservative success evidence over speed.",
+    "STABLE requires enough observations across distinct tasks.",
+    "Engine mismatch immediately downgrades old profile to PRIOR_ONLY and conservative policy.",
+    "Drift can be detected from observable outcome degradation without architecture claims.",
+    "All recommendations remain ADVISORY_ONLY with authority NONE.",
+    "A-E and FREEZER regressions remain green."
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "False stability from correlated tasks.",
+    "Metrics gaming or missingness bias.",
+    "Over-probing increases cost instead of reducing it.",
+    "Stale profile used after model/tool/context contract change.",
+    "Unsafe interpretation of advisory output as permission."
+  ]
+}
