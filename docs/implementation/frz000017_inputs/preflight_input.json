@@ -1,0 +1,61 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Bounded Probe Executor v1",
+  "rationale": "Bounded repository-local campaign compiler/executor over callable adapters only. v1 has no provider implementation, no credentials, no network calls, and no runtime router mutation. All execution is fingerprint-bound to explicit approval, resource ceilings are validated before work, checkpoints are resumable, and profile application only materializes a reviewable local artifact.",
+  "affected_boundaries": [
+    "new bounded_probe_executor package",
+    "campaign/task/budget/checkpoint contracts",
+    "F observation integration",
+    "profile application preview artifact",
+    "focused DA and regression tests",
+    "RTS-FRZ-000017 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "A-F are COMPLETED.",
+    "F probe plans are advisory and execution=NOT_PERFORMED.",
+    "Provider-specific adapter code is a separate future credential/runtime boundary.",
+    "Observed engine identity is metadata, not an internal architecture claim."
+  ],
+  "data_migration": {"required": false, "notes": "No existing profile, memory, FREEZER history, or runtime router is mutated."},
+  "external_interfaces": [
+    "repository-local Python callable adapter contract",
+    "JSON-compatible campaign/checkpoint/profile artifacts",
+    "no provider/network interface in v1"
+  ],
+  "approval_changes": [
+    "campaign execution requires exact fingerprint human approval",
+    "approval grants BOUNDED_CAMPAIGN_ONLY execution authority",
+    "profile application remains LOCAL_POLICY_ARTIFACT_ONLY and never runtime authority"
+  ],
+  "public_documents": ["none"],
+  "regression_tests": [
+    "bounded probe executor baseline + DA",
+    "F model behavior adaptation regression",
+    "E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "worst-case retry attempts and estimated cost must be included before campaign authorization",
+    "adapter observation must exactly match campaign engine/domain/task/variant",
+    "resume must treat completed/quarantined jobs as terminal"
+  ],
+  "rollback_boundary": "Drop the G branch or revert the bounded_probe_executor files and FRZ-000017 append-only versions; A-F remain untouched.",
+  "completion_conditions": [
+    "queue overflow fails closed instead of truncating",
+    "unapproved campaigns cannot invoke an adapter",
+    "worst-case retries fit both attempts and cost ceilings",
+    "chunked execution resumes without duplicate completed work",
+    "engine mismatch stops the campaign",
+    "adapter output cannot persist hidden/raw text",
+    "failure ceiling stops new work",
+    "only same-engine STABLE profiles can reach review-required application preview",
+    "human-approved application produces local rollback-capable artifact without runtime mutation",
+    "A-G regressions and FREEZER verify pass"
+  ],
+  "decomposition": {"required": false, "child_candidates": []},
+  "risks": [
+    "callable adapters can still perform external work outside this package; authorization boundary must be enforced before invocation",
+    "thread cancellation cannot forcibly terminate arbitrary adapter code; adapter timeout is part of the adapter contract",
+    "estimated cost is only as accurate as task estimates and therefore the worst-case budget is a ceiling, not billing evidence"
+  ]
+}
