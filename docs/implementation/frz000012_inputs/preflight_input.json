@@ -1,0 +1,17 @@
+{
+  "outcome":"PASS",
+  "assessor":"RTS implementation preflight — Child B compact active restart surface",
+  "rationale":"The implementation is repository-local and read-only. It adds a fixed restart denominator, bounded active-load accounting, exact source-pointer freshness, explicit reopen conditions, restart-equivalence validation, and a selective-recall handoff. It never truncates required state to hit a budget and never grants execution or promotion authority.",
+  "affected_boundaries":["new restart_surface package","new repository-local restart surface sample","focused restart/restart-DA tests","RTS-FRZ-000012 lifecycle records"],
+  "existing_assumptions":["Child A Selective Recall is COMPLETED and remains the owner of historical selective retrieval.","Full history remains stored in existing sources and is not deleted by compaction.","Git blob identity can bind local source freshness deterministically.","Restart representation is not execution authority."],
+  "data_migration":{"required":false,"notes":"No full-history source is rewritten or deleted."},
+  "external_interfaces":["repository-local Python API/CLI only","no network/provider/subprocess/deployment surface"],
+  "approval_changes":["restart outputs carry execution_authority=NONE and promotion_authority=NONE","only RTS-FRZ-000012 may enter WIP during this loop"],
+  "public_documents":["restart_surface/README.md","thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000012_2026-08-27.md"],
+  "regression_tests":["fixed restart denominator","restart-equivalence","active-load budget","no silent truncation","UNKNOWN preservation","do-not-touch preservation","source freshness","path containment","explicit full-history reopen","selective-recall handoff","non-authority","FREEZER regression"],
+  "hidden_dependencies":["selective_recall Git-blob identity semantics","repository path containment","FREEZER WIP=1","existing full-history source ownership"],
+  "rollback_boundary":"Revert restart_surface, restart sample, focused tests/docs, and RTS-FRZ-000012 lifecycle revisions only. Do not alter Child A or full-history sources.",
+  "completion_conditions":["Required restart fields survive compaction exactly.","Over-budget surfaces fail closed instead of truncating.","Stale or escaped source pointers fail closed.","Restart-equivalence detects any missing or changed required state.","Explicit uncertainty and do-not-touch state remain representable.","Reopen-full-history and selective-recall routes are explicit and non-authorizing.","All focused and existing FREEZER tests pass.","Child B reaches COMPLETED while C-E remain FROZEN/NOT_APPROVED."],
+  "decomposition":{"required":false,"child_candidates":[]},
+  "risks":["A shorter surface can look successful while losing restart competence.","Self-referential current-head claims are not allowed; source commit is an explicit input identity.","Future callers could bypass equivalence validation."]
+}

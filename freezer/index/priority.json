@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T07:06:08Z",
-  "count": 5,
+  "generated_at": "2026-08-27T07:28:06Z",
+  "count": 4,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -9,30 +9,6 @@
     "auto_start": false
   },
   "items": [
-    {
-      "item_id": "RTS-FRZ-000012",
-      "version": 1,
-      "title": "Compact Active + Restart Surface v1",
-      "type": "feature",
-      "status": "FROZEN",
-      "priority_score": 80.82,
-      "estimated_hours": {
-        "minimum": 8,
-        "maximum": 16
-      },
-      "tags": [
-        "adaptive-intelligence-v2-child",
-        "context-compression",
-        "restartability",
-        "handoff",
-        "active-surface",
-        "reconstruction",
-        "codex-efficiency"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
-    },
     {
       "item_id": "RTS-FRZ-000001",
       "version": 2,
