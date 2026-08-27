@@ -12,3 +12,4 @@ from .core import (
     validate_probe_plan,
     validate_task,
 )
+from .worker import run_background_chunk
