@@ -125,6 +125,18 @@ SIGNALS: tuple[AttentionSignal, ...] = (
         ("ENGINE_IDENTITY_ROUTING", "H_TRANSITION_CLASSIFICATION", "F_ENGINE_PROFILE"),
     ),
     AttentionSignal(
+        "future_breaking_version_transition",
+        (
+            r"\bbreaking changes?\b",
+            r"\bversion\b.{0,120}\b(?:change|changed|changes|update|updated|updates|replace|replaced|replaces)\b",
+            r"\bnotice\b.{0,120}\b(?:version|latest|breaking change)\b",
+        ),
+        3,
+        5,
+        3,
+        ("ENGINE_IDENTITY_ROUTING", "API_CONTRACT", "H_TRANSITION_CLASSIFICATION", "F_ENGINE_PROFILE"),
+    ),
+    AttentionSignal(
         "request_response_schema",
         (
             r"\brequests?\b",
