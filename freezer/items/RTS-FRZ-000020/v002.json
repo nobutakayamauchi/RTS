@@ -1,0 +1,82 @@
+{
+  "item_id": "RTS-FRZ-000020",
+  "title": "Semantic Claim Refinement + Review Reduction v1",
+  "type": "architecture",
+  "status": "SELECTED",
+  "summary": "IがREVIEW_REQUIREDとして残した公式docsの未知contract-like文を、controlled semantic alias ontologyへ限定的に照合し、exact-anchor・UNVERIFIED・non-authorizingのままH互換claim候補へ昇格できるものだけを自動補完する。",
+  "original_problem": "Iは未知表現を安全にREVIEW_REQUIREDへ残せるが、実公式docs smokeではOpenAI 63件、Anthropic 5件、Google 17件のambiguous blockが残った。すべて人手確認すると新モデル追従時間が再び長くなる。一方、自由なLLM要約で自動解消すると否定反転・曖昧多重分類・claim捏造の危険がある。",
+  "why_it_matters": "unknownをunknownのまま保持する安全性を壊さずに、既知ontologyの言い換えだけを機械的に回収できれば、新モデル公開時の人手レビュー量を減らし、I→H→F→Gの初動を短縮できる。",
+  "reason_frozen": "自由文を根拠なくparaphraseする、否定文を肯定claimへ反転する、複数semantic ruleへ一致した文を勝手に1つへ決める、exact anchorを失う、ambiguous一覧truncationを無視する、既存claimと重複・衝突する、semantic refinementだけでobserved behaviorや実行権限へ昇格する、という失敗をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "controlled semantic alias ontology only",
+    "exact source anchor preserved",
+    "semantic result remains UNVERIFIED docs claim",
+    "negation and multi-match ambiguity fail closed",
+    "unresolved text remains REVIEW_REQUIRED",
+    "truncated upstream ambiguity can never become fully covered",
+    "original I report fingerprint retained",
+    "H-compatible bundle validation after refinement",
+    "no execution/profile-application/promotion authority",
+    "no hidden architecture claim"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000019 Official Docs Intake + Claim Extraction Adapter v1 is COMPLETED",
+    "I emits exact-anchor claims and explicit ambiguous block hashes",
+    "H transition-evidence-bundle/v1 validator is available"
+  ],
+  "negative_triggers": [
+    "freeform LLM output is accepted without deterministic verification",
+    "negative statements become positive capability claims",
+    "multiple semantic matches are silently collapsed",
+    "upstream ambiguous findings are truncated but output becomes READY_FOR_H",
+    "claim anchor does not exist verbatim in source content",
+    "semantic classification mutates runtime/profile/Canon authority"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000018 Model Transition Intelligence + Architecture Contract Diff v1",
+    "RTS-FRZ-000019 Official Docs Intake + Claim Extraction Adapter v1",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "official_docs_intake/",
+    "model_transition_intelligence/",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000019_2026-08-27.md"
+  ],
+  "possible_destinations": [
+    "semantic_claim_refinement/",
+    "I review-reduction postprocessor",
+    "future optional model-assisted candidate proposer behind the same verifier"
+  ],
+  "estimated_hours": {
+    "minimum": 10,
+    "maximum": 18
+  },
+  "tags": [
+    "adaptive-intelligence-v6",
+    "semantic-refinement",
+    "claim-ontology",
+    "review-reduction",
+    "official-docs",
+    "fail-closed",
+    "provider-neutral",
+    "self-adaptation"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 2,
+  "created_at": "2026-08-27T11:39:13Z",
+  "updated_at": "2026-08-27T11:39:13Z",
+  "supersedes": "v001"
+}
