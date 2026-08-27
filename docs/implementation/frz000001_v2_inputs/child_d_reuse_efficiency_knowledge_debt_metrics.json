@@ -65,6 +65,7 @@
     "maximum": 16
   },
   "tags": [
+    "adaptive-intelligence-v2-child",
     "metrics",
     "decision-reuse",
     "recompute-avoidance",
