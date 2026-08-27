@@ -92,10 +92,10 @@ class ModelTransitionIntelligenceTests(unittest.TestCase):
         old_text = "Detailed instructions are recommended."
         new_text = "Goal-level instructions are recommended; avoid overspecification."
         old = bundle("old", [source("old-guide", "guide", old_text, [
-            claim("i1", "instructions", "instruction_guidance", "CONTRACT", "detailed", "Detailed instructions are recommended")
+            claim("i1", "instructions", "instruction_guidance", "CONTRACT", "detailed", "Detailed instructions are recommended.")
         ], source_type="MIGRATION_GUIDE")])
         new = bundle("new", [source("new-guide", "guide", new_text, [
-            claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended")
+            claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended; avoid overspecification.")
         ], source_type="MIGRATION_GUIDE")])
         report = compare_bundles(old, new)
         self.assertEqual(report["severity"], "S2")

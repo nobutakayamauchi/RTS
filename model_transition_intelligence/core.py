@@ -336,6 +336,18 @@ def _max_severity(deltas: Iterable[dict[str, Any]]) -> str:
     return result
 
 
+def _remove_mapped_anchors(content: str, anchors: Iterable[str]) -> str:
+    residual = _normalized_text(content)
+    normalized_anchors = sorted(
+        {_normalized_text(anchor) for anchor in anchors if _normalized_text(anchor)},
+        key=len,
+        reverse=True,
+    )
+    for anchor in normalized_anchors:
+        residual = residual.replace(anchor, " ")
+    return _normalized_text(residual)
+
+
 def _document_text_change_review(old_bundle: dict[str, Any], new_bundle: dict[str, Any], claim_delta_keys: set[tuple[str, str]]) -> list[dict[str, Any]]:
     old_docs = {source["document_id"]: source for source in old_bundle["sources"] if source["trust"] == "OFFICIAL"}
     new_docs = {source["document_id"]: source for source in new_bundle["sources"] if source["trust"] == "OFFICIAL"}
@@ -347,17 +359,26 @@ def _document_text_change_review(old_bundle: dict[str, Any], new_bundle: dict[st
             continue
         if _normalized_text(old["content"]) == _normalized_text(new["content"]):
             continue
-        old_keys = {_claim_key(claim) for claim in old["claims"]}
-        new_keys = {_claim_key(claim) for claim in new["claims"]}
-        mapped_change = bool((old_keys | new_keys) & claim_delta_keys)
-        if not mapped_change:
-            ratio = difflib.SequenceMatcher(None, _normalized_text(old["content"]), _normalized_text(new["content"])).ratio()
+        old_anchors = [
+            claim["anchor"] for claim in old["claims"]
+            if _claim_key(claim) in claim_delta_keys
+        ]
+        new_anchors = [
+            claim["anchor"] for claim in new["claims"]
+            if _claim_key(claim) in claim_delta_keys
+        ]
+        old_residual = _remove_mapped_anchors(old["content"], old_anchors)
+        new_residual = _remove_mapped_anchors(new["content"], new_anchors)
+        if old_residual != new_residual:
+            ratio = difflib.SequenceMatcher(None, old_residual, new_residual).ratio()
             issues.append({
                 "document_id": document_id,
                 "old_source_id": old["source_id"],
                 "new_source_id": new["source_id"],
-                "reason": "OFFICIAL_TEXT_CHANGED_WITHOUT_NORMALIZED_CLAIM_DELTA",
-                "similarity_ratio": round(ratio, 6),
+                "reason": "OFFICIAL_TEXT_CHANGE_HAS_UNMAPPED_RESIDUAL",
+                "residual_similarity_ratio": round(ratio, 6),
+                "old_residual_sha256": _sha256_text(old_residual),
+                "new_residual_sha256": _sha256_text(new_residual),
             })
     for document_id in sorted(set(new_docs) - set(old_docs)):
         new = new_docs[document_id]
@@ -366,6 +387,14 @@ def _document_text_change_review(old_bundle: dict[str, Any], new_bundle: dict[st
                 "document_id": document_id,
                 "new_source_id": new["source_id"],
                 "reason": "NEW_OFFICIAL_DOCUMENT_HAS_NO_NORMALIZED_CLAIMS",
+            })
+    for document_id in sorted(set(old_docs) - set(new_docs)):
+        old = old_docs[document_id]
+        if not old["claims"]:
+            issues.append({
+                "document_id": document_id,
+                "old_source_id": old["source_id"],
+                "reason": "REMOVED_OFFICIAL_DOCUMENT_HAS_NO_NORMALIZED_CLAIMS",
             })
     return issues
 
