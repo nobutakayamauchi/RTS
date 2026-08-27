@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T08:40:32Z",
-  "count": 16,
+  "generated_at": "2026-08-27T08:58:51Z",
+  "count": 17,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -384,6 +384,32 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T08:40:32Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000017",
+      "version": 3,
+      "title": "Bounded Probe Executor + Profile Application Gate v1",
+      "type": "architecture",
+      "status": "IN_PROGRESS",
+      "priority_score": 84.59,
+      "estimated_hours": {
+        "minimum": 12,
+        "maximum": 24
+      },
+      "tags": [
+        "adaptive-intelligence-v3",
+        "bounded-probes",
+        "background-campaign",
+        "budget-gate",
+        "resume",
+        "checkpoint",
+        "profile-application-gate",
+        "self-adaptation",
+        "codex-efficiency"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T08:58:51Z"
     }
   ]
 }

@@ -1,0 +1,102 @@
+{
+  "assessor": "RTS governed build assessment — Bounded Probe Executor v1",
+  "rationale": "F already owns bounded probe planning and profile synthesis. G adds only a repository-local execution-control layer: deterministic campaign compilation, fingerprint-bound human approval, bounded parallel adapter execution, resumable checkpoints, sanitized observations, engine-drift stop, and review-only profile artifacts. Provider-specific network code and credentials remain out of scope.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 16,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "model behavior adaptation probe plan",
+      "resumable checkpoint failure isolation",
+      "human review application preview",
+      "budget execution controller"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "model_behavior_adaptation/",
+        "ref": "16f9a615cef443170529c8c50a4e96e23543ba22",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 5,
+        "notes": "Reuse engine/config/observation validation and bounded probe plan contract."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "intelligence_compiler/",
+        "ref": "16f9a615cef443170529c8c50a4e96e23543ba22",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse checkpoint/resume and failure-isolation invariants."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "governed_execution/",
+        "ref": "16f9a615cef443170529c8c50a4e96e23543ba22",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse bounded execution and authority-separation patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "promotion_application/",
+        "ref": "16f9a615cef443170529c8c50a4e96e23543ba22",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse preview-before-application and rollback artifact pattern."
+      }
+    ],
+    "gaps": [
+      "No current component compiles F probe plans into cost/retry-aware background campaigns.",
+      "No current component binds profile application to same-engine STABLE evidence plus a fingerprinted human approval artifact."
+    ]
+  },
+  "risks": [
+    "Parallel probing can create spend bursts.",
+    "Retries can exceed a naive pre-run cost estimate.",
+    "Interrupted workers can rerun already completed jobs.",
+    "Provider/model identity can drift during a campaign.",
+    "Adapter results can smuggle raw prompt/response or hidden reasoning.",
+    "Profile recommendation can be mistaken for runtime authority."
+  ],
+  "assessment_id": "RTS-BA-000017-001",
+  "item_id": "RTS-FRZ-000017",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "86fee4764e4ec0b96f8d4cfef41179c25caa5604c9c5c7d458ec49dd080ac902",
+  "derived": {
+    "benefit_score": 94.0,
+    "cost_score": 38.1,
+    "reuse_score": 62.5,
+    "decision_score": 72.5,
+    "reuse_hours_saved": 10.0,
+    "net_hours": 13.0,
+    "time_saved_ratio": 0.625,
+    "implementation_efficiency": 1.23,
+    "cost_effectiveness": 7.23,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T08:58:51Z"
+}
