@@ -13,6 +13,7 @@ permissions:
 
 env:
   PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
 
 jobs:
   ultimate-loop:
