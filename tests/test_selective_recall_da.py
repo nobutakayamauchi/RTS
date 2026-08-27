@@ -114,6 +114,56 @@ class SelectiveRecallDAAttacks(unittest.TestCase):
             self.assertEqual(result["recall_decision"], "RECALL")
             self.assertEqual(result["exclusion_counts"], {"EVENT_MISMATCH": 1})
 
+    def test_counter_da_relevant_stale_record_still_checks_freshness(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self.build_registry(root, irrelevant_count=0)
+            registry_path = root / "memory" / "recall_registry.json"
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+            registry["records"][0]["source_git_blob_sha"] = "0" * 40
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+
+            original = core.git_blob_sha_path
+            calls: list[str] = []
+
+            def counted(path: Path) -> str:
+                calls.append(path.name)
+                return original(path)
+
+            with patch("selective_recall.core.git_blob_sha_path", side_effect=counted):
+                result = route_recall(root, self.request())
+
+            self.assertEqual(result["recall_decision"], "NO_RECALL")
+            self.assertEqual(result["selected_anchors"], [])
+            self.assertEqual(calls, ["relevant.md"])
+            self.assertEqual(result["excluded_count"], 1)
+            self.assertEqual(result["exclusion_counts"], {"STALE": 1})
+            self.assertNotIn("excluded", result)
+
+    def test_counter_da_scope_mismatch_stays_cold_and_non_authorizing(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self.build_registry(root, irrelevant_count=2)
+            request = self.request()
+            request["scope_tags"] = ["different-scope"]
+            calls: list[str] = []
+
+            with patch(
+                "selective_recall.core.git_blob_sha_path",
+                side_effect=lambda path: calls.append(path.name) or "0" * 40,
+            ):
+                result = route_recall(root, request)
+
+            self.assertEqual(result["recall_decision"], "NO_RECALL")
+            self.assertEqual(calls, [])
+            self.assertEqual(result["excluded_count"], 3)
+            self.assertEqual(
+                result["exclusion_counts"],
+                {"EVENT_MISMATCH": 2, "SCOPE_MISMATCH": 1},
+            )
+            self.assertEqual(result["execution_authority"], "NONE")
+            self.assertEqual(result["promotion_authority"], "NONE")
+
 
 if __name__ == "__main__":
     unittest.main()
