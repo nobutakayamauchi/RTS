@@ -35,6 +35,7 @@ class SelectiveRecallDAAttacks(unittest.TestCase):
 
         relevant_path = "sources/relevant.md"
         relevant_source = root / relevant_path
+        relevant_source.parent.mkdir(parents=True, exist_ok=True)
         relevant_data = b"relevant source\n"
         relevant_source.write_bytes(relevant_data)
         records.append(
