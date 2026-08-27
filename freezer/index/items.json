@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T11:39:13Z",
+  "generated_at": "2026-08-27T11:52:17Z",
   "count": 20,
   "items": [
     {
@@ -466,10 +466,10 @@
     },
     {
       "item_id": "RTS-FRZ-000020",
-      "version": 3,
+      "version": 5,
       "title": "Semantic Claim Refinement + Review Reduction v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 86.89,
       "estimated_hours": {
         "minimum": 10,
@@ -487,7 +487,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-27T11:39:13Z"
+      "updated_at": "2026-08-27T11:52:17Z"
     }
   ]
 }
