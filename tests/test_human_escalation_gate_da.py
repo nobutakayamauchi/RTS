@@ -13,12 +13,30 @@ from semantic_claim_refinement import refine_intake_report
 from tests.test_semantic_claim_refinement import make_intake
 
 
+REASONING_CONTEXT_ANCHOR = "Check the response's `reasoning.context` field to confirm the effective mode."
+REASONING_ROUTE = "VERIFY_REASONING_CONTEXT_FIELD"
+
+
 def make_k0(body: str):
     return triage_refinement_report(refine_intake_report(make_intake(body)))
 
 
 def fp(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
+
+
+def close_reasoning_route() -> dict:
+    return {
+        "evidence_id": "close-reasoning",
+        "finding_index": 0,
+        "route_id": REASONING_ROUTE,
+        "probe_fingerprint": fp("close-reasoning-da"),
+        "evidence_distinction": "Inspect reasoning.context and determine whether it resolves the effective-mode ambiguity.",
+        "outcome": "NON_DISCRIMINATING",
+        "learned_facts": ["The named field route was checked but did not resolve the residual choice."],
+        "closed_routes": [REASONING_ROUTE],
+        "opened_routes": [],
+    }
 
 
 class HumanEscalationGateDATests(unittest.TestCase):
@@ -60,45 +78,48 @@ class HumanEscalationGateDATests(unittest.TestCase):
         self.assertNotIn(route, row["residual_routes"])
         self.assertIn("VERIFY_DEPLOYMENT_OR_SURFACE_IDENTITY", row["residual_routes"])
 
-    def test_safe_defer_prevents_human_escalation(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
+    def test_safe_defer_prevents_human_escalation_after_route_is_closed(self):
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         report = evaluate_escalation_report(
             k0,
+            verification_evidence=[close_reasoning_route()],
             safe_defers={0: {
-                "trigger": "NEXT_ENGINE_REVISION_OR_CONTEXT_LIMIT_DOC_CHANGE",
-                "rationale": "No current operation depends on selecting a different bound before that trigger.",
-                "evidence_ids": [],
+                "trigger": "NEXT_ENGINE_REVISION_OR_REASONING_MODE_DOC_CHANGE",
+                "rationale": "No current operation requires selecting a different mode before that trigger.",
+                "evidence_ids": ["close-reasoning"],
             }},
         )
         self.assertEqual(report["records"][0]["disposition"], "WAIT_SAFE_DEFER")
 
     def test_human_choice_without_exhaustion_search_is_not_enough(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         report = evaluate_escalation_report(
             k0,
-            human_choices={0: "Pick the planning bound."},
+            verification_evidence=[close_reasoning_route()],
+            human_choices={0: "Pick the residual effective-mode interpretation."},
         )
         self.assertEqual(report["records"][0]["disposition"], "HUMAN_CANDIDATE")
 
     def test_exhaustion_search_that_opens_route_cannot_escalate(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
-        evidence = [{
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
+        search = {
             "evidence_id": "search",
             "finding_index": 0,
             "route_id": EXHAUSTION_SEARCH_ROUTE,
             "probe_fingerprint": fp("search-opens-route"),
-            "evidence_distinction": "Search for a runtime discriminator.",
+            "evidence_distinction": "Search for an alternate runtime discriminator after the field route was closed.",
             "outcome": "OBSERVED",
-            "learned_facts": ["A runtime boundary probe can discriminate the remaining choice."],
+            "learned_facts": ["A runtime metadata probe can discriminate the remaining choice."],
             "closed_routes": [],
-            "opened_routes": ["PROBE_RUNTIME_CONTEXT_BOUNDARY"],
-        }]
+            "opened_routes": ["PROBE_RUNTIME_REASONING_METADATA"],
+        }
         report = evaluate_escalation_report(
             k0,
-            verification_evidence=evidence,
-            human_choices={0: "Pick the planning bound."},
+            verification_evidence=[close_reasoning_route(), search],
+            human_choices={0: "Pick the residual effective-mode interpretation."},
         )
         self.assertEqual(report["records"][0]["disposition"], "AI_CONTINUE")
+        self.assertIn("PROBE_RUNTIME_REASONING_METADATA", report["records"][0]["residual_routes"])
 
     def test_non_material_dead_end_does_not_consume_human_now(self):
         k0 = make_k0("New")
@@ -122,11 +143,11 @@ class HumanEscalationGateDATests(unittest.TestCase):
         self.assertEqual(report["records"][0]["disposition"], "WAIT_SAFE_DEFER")
 
     def test_decision_cannot_reference_unknown_evidence(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         with self.assertRaises(HumanEscalationError):
             evaluate_escalation_report(
                 k0,
-                decisions={0: {"decision": "Use bound.", "evidence_ids": ["missing"]}},
+                decisions={0: {"decision": "Use observed mode.", "evidence_ids": ["missing"]}},
             )
 
     def test_evidence_cannot_close_unknown_route(self):
@@ -143,10 +164,8 @@ class HumanEscalationGateDATests(unittest.TestCase):
             "closed_routes": ["NEVER_OPENED"],
             "opened_routes": [],
         }]
-        # The core must not silently turn this into exhaustion. It may leave the
-        # real route open, but it must not produce HUMAN_NOW.
-        report = evaluate_escalation_report(k0, verification_evidence=evidence)
-        self.assertNotEqual(report["records"][0]["disposition"], "HUMAN_NOW")
+        with self.assertRaises(HumanEscalationError):
+            evaluate_escalation_report(k0, verification_evidence=evidence)
 
 
 if __name__ == "__main__":
