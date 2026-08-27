@@ -236,6 +236,25 @@ NORMATIVE_PATTERNS: tuple[str, ...] = (
     r"\bsupports? up to\b",
 )
 
+OPERATIONAL_GUIDANCE_PATTERNS: tuple[str, ...] = (
+    r"\b(?:use|set|configure|provide|keep|select|choose|test|start with|switch|enable|disable|preserve|migrate)\b",
+    r"\bdo not\b",
+    r"\bshould\b",
+    r"\brecommend(?:ed|s)?\b",
+)
+
+DESCRIPTIVE_CAPABILITY_PATTERNS: tuple[str, ...] = (
+    r"\bmodel for\b",
+    r"\bmodel that\b",
+    r"\bengine with\b",
+    r"\bfeaturing\b",
+    r"\bcapabilit(?:y|ies)\b",
+    r"\bvideo generation\b",
+    r"\bimage generation\b",
+    r"\brobotic agents?\b",
+    r"\bstudio[- ]quality\b",
+)
+
 
 def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
@@ -243,6 +262,28 @@ def _canonical(value: Any) -> str:
 
 def _matches_any(text: str, patterns: tuple[str, ...]) -> bool:
     return any(re.search(pattern, text, re.IGNORECASE | re.MULTILINE) for pattern in patterns)
+
+
+def _looks_like_short_heading(text: str) -> bool:
+    words = re.findall(r"[A-Za-z0-9][A-Za-z0-9_-]*", text)
+    return 0 < len(words) <= 6 and not re.search(r"[.!?:;]", text)
+
+
+def _is_concrete_operational_signal(anchor: str, signals: list[AttentionSignal]) -> bool:
+    base = any(signal.explicit_contract and signal.impact >= 3 for signal in signals)
+    if not base:
+        return False
+    normative = _matches_any(anchor, NORMATIVE_PATTERNS)
+    operational = _matches_any(anchor, OPERATIONAL_GUIDANCE_PATTERNS)
+    descriptive = _matches_any(anchor, DESCRIPTIVE_CAPABILITY_PATTERNS) or _matches_any(anchor, MARKETING_PATTERNS)
+    docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS) or bool(re.match(r"^\s*see\b", anchor, re.IGNORECASE))
+    if _looks_like_short_heading(anchor) and not normative:
+        return False
+    if docs_link and not (normative or operational):
+        return False
+    if descriptive and not (normative or operational):
+        return False
+    return True
 
 
 def _signal_matches(anchor: str) -> list[AttentionSignal]:
@@ -255,18 +296,19 @@ def _signal_matches(anchor: str) -> list[AttentionSignal]:
 
 def _da_case(anchor: str) -> dict[str, Any]:
     signals = _signal_matches(anchor)
-    pure_noise = _matches_any(anchor, PURE_NOISE_PATTERNS)
+    pure_noise = _matches_any(anchor, PURE_NOISE_PATTERNS) or _looks_like_short_heading(anchor)
     marketing = _matches_any(anchor, MARKETING_PATTERNS)
-    docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS)
+    descriptive = _matches_any(anchor, DESCRIPTIVE_CAPABILITY_PATTERNS)
+    docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS) or bool(re.match(r"^\s*see\b", anchor, re.IGNORECASE))
 
     if signals:
-        explicit = any(signal.explicit_contract and signal.impact >= 3 for signal in signals)
+        explicit = _is_concrete_operational_signal(anchor, signals)
         if (pure_noise or docs_link) and not explicit:
             impact, causal, factors, paths = 0, 0, ["non_actionable_surface"], []
-        elif marketing and not explicit:
+        elif (marketing or descriptive) and not explicit:
             impact = min(2, max(signal.impact for signal in signals))
             causal = min(2, max(signal.causal_reach for signal in signals))
-            factors = ["marketing_positioning_with_bounded_signal"] + [signal.signal_id for signal in signals]
+            factors = ["descriptive_positioning_with_bounded_signal"] + [signal.signal_id for signal in signals]
             paths = sorted({path for signal in signals for path in signal.causal_paths})
         else:
             impact = max(signal.impact for signal in signals)
@@ -297,11 +339,12 @@ def _da_case(anchor: str) -> dict[str, Any]:
 
 def _counter_da_case(anchor: str) -> dict[str, Any]:
     signals = _signal_matches(anchor)
-    pure_noise = _matches_any(anchor, PURE_NOISE_PATTERNS)
+    pure_noise = _matches_any(anchor, PURE_NOISE_PATTERNS) or _looks_like_short_heading(anchor)
     marketing = _matches_any(anchor, MARKETING_PATTERNS)
-    docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS)
+    descriptive = _matches_any(anchor, DESCRIPTIVE_CAPABILITY_PATTERNS)
+    docs_link = _matches_any(anchor, DOCS_LINK_PATTERNS) or bool(re.match(r"^\s*see\b", anchor, re.IGNORECASE))
     normative = _matches_any(anchor, NORMATIVE_PATTERNS)
-    explicit = any(signal.explicit_contract and signal.impact >= 3 for signal in signals)
+    explicit = _is_concrete_operational_signal(anchor, signals)
 
     if explicit:
         importance = max(signal.counter_importance for signal in signals if signal.explicit_contract)
@@ -320,7 +363,7 @@ def _counter_da_case(anchor: str) -> dict[str, Any]:
     elif docs_link:
         importance = 1
         reasons = ["documentation_pointer_not_contract_by_itself"]
-    elif marketing:
+    elif marketing or descriptive:
         importance = 1
         reasons = ["marketing_or_positioning_without_concrete_contract"]
     elif signals:
