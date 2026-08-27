@@ -487,19 +487,31 @@ Scope:
 
 A separate child for promotion governance is not recommended because RTS already has Outcome Learning, Skill Regression, Human Review Ledger, and Promotion Application Preview.
 
+## Prepared canonicalization packet
+
+The following bounded inputs are now committed under `docs/implementation/frz000001_v2_inputs/`:
+
+- parent v2 revision input
+- parent Build Assessment input
+- parent `DECOMPOSE_REQUIRED` Preflight input
+- five child candidate inputs
+
+The exact governed execution sequence is recorded in:
+
+```text
+docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_EXECUTION_TASK.md
+```
+
+These inputs are preparation only. Until the FREEZER CLI runs successfully and verification passes, they are not canonical FREEZER state.
+
 ## Formal next action
 
-Do not implement the children from this document alone.
-
-The next governed action is:
-
-1. create a fresh Build Assessment for `RTS-FRZ-000001` using this evidence inventory
-2. recompute build ranking
-3. create a fresh Implementation Preflight
-4. if Preflight returns `DECOMPOSE_REQUIRED`, create child FREEZER candidates
-5. select at most one child under WIP=1
-6. obtain explicit human build authority for that child
-7. implement, verify, review, and close it before selecting the next child
+1. run the bounded execution task on this PR branch
+2. canonicalize parent v2, Build Assessment, and `DECOMPOSE_REQUIRED` Preflight
+3. create the five children as `FROZEN / NOT_APPROVED`
+4. rebuild indexes and manifest
+5. verify the exact final head
+6. leave every child unselected until a separate Build Assessment, PASS Preflight, and human approval exists
 
 ## Completion line for this reassessment
 
@@ -509,5 +521,5 @@ This reassessment is complete when:
 - proposed new joints are separated from already-implemented RTS governance
 - DA / countermeasures are explicit
 - decomposition is defined
-- no implementation or FREEZER lifecycle authority is implied by this document
-
+- canonicalization inputs and execution order are reviewable
+- no implementation or child selection authority is implied by this document
