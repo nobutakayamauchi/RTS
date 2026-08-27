@@ -1,0 +1,70 @@
+{
+  "affected_boundaries": [
+    "new external_seed_corpus package",
+    "external_seeds/registry.json sample",
+    "focused seed and destructive tests",
+    "RTS-FRZ-000015 lifecycle records"
+  ],
+  "approval_changes": [
+    "execution_authority=NONE",
+    "promotion_authority=NONE",
+    "canon_authority=NONE",
+    "only RTS-FRZ-000015 may enter WIP"
+  ],
+  "assessor": "RTS implementation preflight — Child E external transition seed corpus",
+  "completion_conditions": [
+    "External seeds cannot enter CANONICAL state.",
+    "Every accepted seed carries exact provenance, applicability, counterconditions and license/reuse posture.",
+    "External merge status cannot grant RTS validation or authority.",
+    "Matcher remains read-only and non-authorizing.",
+    "Focused and A/B/C/D/FREEZER regressions pass.",
+    "E reaches COMPLETED and WIP is clear."
+  ],
+  "data_migration": {
+    "notes": "No existing memory, Canon, FREEZER history or external repository is mutated.",
+    "required": false
+  },
+  "decomposition": {
+    "child_candidates": [],
+    "required": false
+  },
+  "existing_assumptions": [
+    "A/B/C/D are COMPLETED.",
+    "External source success is evidence, not RTS authority.",
+    "No upstream source code is copied; v1 is REFERENCE_ONLY.",
+    "Internal validation is a separate future evidence step from external merge status."
+  ],
+  "external_interfaces": [
+    "repository-local Python API/CLI only",
+    "no network/provider/deployment/write-back surface"
+  ],
+  "hidden_dependencies": [
+    "stable external-seed schema",
+    "FREEZER WIP=1",
+    "A lifecycle vocabulary",
+    "Human Review promotion boundary"
+  ],
+  "outcome": "PASS",
+  "public_documents": [
+    "external_seed_corpus/README.md",
+    "external_seeds/SOURCES.md",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000015_2026-08-27.md"
+  ],
+  "rationale": "Repository-local JSON seed registry + deterministic validator + read-only matcher only. Exact source refs, applicability, counterconditions, evidence class, license/reuse status and RTS validation status are mandatory. CANONICAL is not a valid seed state, and all authority fields remain NONE.",
+  "regression_tests": [
+    "exact provenance mandatory",
+    "counterconditions mandatory",
+    "CANONICAL rejected",
+    "authority escalation rejected",
+    "merged source does not auto-promote",
+    "license/reuse posture mandatory",
+    "read-only matching",
+    "A/B/C/D and FREEZER regressions"
+  ],
+  "risks": [
+    "A useful source can still be stale or non-transferable.",
+    "External evidence class can be overstated without counterconditions.",
+    "Reference-only reuse must remain distinct from copied/adapted code."
+  ],
+  "rollback_boundary": "Revert Child E package/registry/tests/docs/lifecycle only; preserve A/B/C/D and all external repositories."
+}

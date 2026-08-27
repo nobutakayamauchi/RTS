@@ -1,0 +1,102 @@
+{
+  "assessor": "RTS governed build assessment — Child E external transition seed corpus",
+  "expected_effect": {
+    "confidence": 5,
+    "impact": 4,
+    "recurrence": 4,
+    "revenue_leverage": 2,
+    "risk_reduction": 5,
+    "strategic_fit": 5
+  },
+  "github_scan": {
+    "assets": [
+      {
+        "estimated_hours_saved": 2,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse non-authority, lifecycle and freshness concepts; do not create a second memory store.",
+        "path": "selective_recall/",
+        "ref": "a284dc7a0534bafdf43cfe61fe3daac393718033",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 1,
+        "kind": "code",
+        "license_status": "OWNED",
+        "notes": "Reuse exact claim-boundary and non-authority validation patterns.",
+        "path": "reuse_metrics/",
+        "ref": "a284dc7a0534bafdf43cfe61fe3daac393718033",
+        "repository": "nobutakayamauchi/RTS",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 1,
+        "kind": "documentation",
+        "license_status": "COMPATIBLE",
+        "notes": "Reference observed failure/repair/counterconditions only; no upstream code copied.",
+        "path": "pull/125722 + pull/129927",
+        "ref": "08fa41c1606a4c201462d76f43184e6920a0cef7 / 657026cab35f62e6b9a68da0f7fad3666874c28d",
+        "repository": "openclaw/openclaw",
+        "reuse_mode": "REFERENCE"
+      },
+      {
+        "estimated_hours_saved": 1,
+        "kind": "design",
+        "license_status": "COMPATIBLE",
+        "notes": "Reference negative recall boundaries and non-authorization concept; no upstream code copied.",
+        "path": "field_notes/050_lane_recall_failure_and_weight_limits.md",
+        "ref": "fe88f90430bacbb8f5aaf3ac5439e0580c04abd6",
+        "repository": "shin4141/decision-os-v13-loopkit",
+        "reuse_mode": "REFERENCE"
+      }
+    ],
+    "gaps": [
+      "No current RTS schema stores external failure patterns with exact provenance, counterconditions and license posture while structurally forbidding Canonical state.",
+      "No current read-only matcher exposes external seeds without granting execution/promotion/canon authority."
+    ],
+    "performed": true,
+    "queries": [
+      "external seed provenance validation",
+      "OpenClaw embedding item-limit repair",
+      "lane recall weight limits"
+    ],
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "openclaw/openclaw",
+      "shin4141/decision-os-v13-loopkit"
+    ]
+  },
+  "implementation": {
+    "from_scratch_hours": 7,
+    "integration_hours": 2,
+    "unknown_buffer_hours": 1,
+    "validation_hours": 3
+  },
+  "rationale": "Child E is a bounded repository-local registry and validator for external public repair/design patterns. It stores only provenance-rich non-Canonical seeds, requires applicability/counterconditions/license posture, reuses A lifecycle/non-authority boundaries and D claim-boundary conventions, and introduces no provider/network/execution surface.",
+  "risks": [
+    "Merged external repair may be mistaken for RTS Canon.",
+    "Repository-specific evidence may be generalized beyond its source conditions.",
+    "Missing counterconditions may create unsafe recall.",
+    "License/reuse posture may drift if provenance is incomplete.",
+    "Seed retrieval may be misread as permission to act."
+  ],
+  "assessment_id": "RTS-BA-000015-001",
+  "item_id": "RTS-FRZ-000015",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "9399bdfd21a3643b693aca72d27da442df35c21990fda1d440644837e4a15d76",
+  "derived": {
+    "benefit_score": 83.5,
+    "cost_score": 50.0,
+    "reuse_score": 71.43,
+    "decision_score": 71.64,
+    "reuse_hours_saved": 5.0,
+    "net_hours": 8.0,
+    "time_saved_ratio": 0.7143,
+    "implementation_efficiency": 0.88,
+    "cost_effectiveness": 10.44,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T08:06:16Z"
+}

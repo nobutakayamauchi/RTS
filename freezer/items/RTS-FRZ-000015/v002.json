@@ -1,0 +1,78 @@
+{
+  "title": "External Transition Pattern Seed Corpus v1",
+  "type": "research",
+  "status": "SELECTED",
+  "summary": "公開OSS修理から、failure boundary、repair principle、applicability、countercondition、evidence、licenseを持つ非CanonicalなTransition Pattern Seedを抽出し、RTS内部検証へ渡す。",
+  "original_problem": "外部の有用な修理知見は単なるリンク保存では再利用しにくく、逆に外部実績だけで一般則へ昇格すると誤用が起きる。",
+  "why_it_matters": "他者が既に踏んだ失敗から候補知能を得つつ、RTS Canonと外部事例を分離できる。",
+  "reason_frozen": "seed schema、exact source ref、license status、claim boundary、内部validation状態を個別Preflightで確定し、自動昇格しないことを確認するまで実装しない。",
+  "preserved_value": [
+    "exact repository/ref/PR provenance",
+    "observed failure boundary",
+    "repair principle",
+    "evidence class",
+    "applicability conditions",
+    "counterexample / non-applicable conditions",
+    "license / reuse status",
+    "RTS validation status",
+    "external seeds begin RAW or VERIFICATION_PENDING",
+    "no automatic Canon promotion"
+  ],
+  "priority": {
+    "impact": 4,
+    "urgency": 2,
+    "strategic_fit": 4,
+    "readiness": 4,
+    "revenue_value": 2,
+    "dependency_value": 3,
+    "risk_reduction": 3,
+    "confidence": 4,
+    "effort": 2,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "親000001がDECOMPOSE_REQUIREDとして確定している",
+    "exact public sourceとclaim boundaryを記録できる",
+    "外部seedとRTS Canonをschema上で分離できる"
+  ],
+  "negative_triggers": [
+    "外部修理を検証なしでCanonical ruleにする",
+    "source/ref/licenseを欠いたパターンを保存する",
+    "repository固有の制約を一般則として隠す"
+  ],
+  "dependencies": [
+    "Cross-Repo Asset Manifest / provenance",
+    "Selective Recall lifecycle states",
+    "Outcome Learning / Human Review promotion boundary"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000001 Adaptive Intelligence v2 reassessment",
+    "openclaw/openclaw#125722",
+    "openclaw/openclaw#129927",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6"
+  ],
+  "possible_destinations": [
+    "RTS external intelligence seed registry",
+    "Ultimate Loop cross-repo failure-pattern retrieval"
+  ],
+  "estimated_hours": {
+    "minimum": 6,
+    "maximum": 14
+  },
+  "tags": [
+    "adaptive-intelligence-v2-child",
+    "external-intelligence",
+    "pattern-corpus",
+    "provenance",
+    "oss-repair",
+    "verification-pending",
+    "license"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "item_id": "RTS-FRZ-000015",
+  "version": 2,
+  "created_at": "2026-08-27T06:21:54Z",
+  "updated_at": "2026-08-27T08:06:17Z",
+  "supersedes": "v001"
+}
