@@ -38,54 +38,58 @@ Both failures are disqualifying because syntactically valid H claims can still i
 
 Run `33068760770`: SUCCESS.
 
-The survivor now auto-resolves only when:
-
-- exactly one controlled semantic ontology rule matches; and
-- no negation/exception guard is present.
-
-Negated/exception statements remain `NEGATION_OR_EXCEPTION`. Multiple ontology matches remain `MULTIPLE_ONTOLOGY_MATCHES` with candidate rule IDs/count retained for review. J/I/H focused regression and FREEZER verification passed.
+The survivor auto-resolves only when exactly one controlled ontology rule matches and no negation/exception guard is present. Negated statements remain `NEGATION_OR_EXCEPTION`; multi-rule matches remain `MULTIPLE_ONTOLOGY_MATCHES` with candidate IDs/count retained.
 
 ## First live usefulness death
 
 Run `33068822634`: expected FAILURE.
 
-The initial safe ontology resolved **0 of 85** ambiguous blocks across live public official documentation:
+The first safe ontology resolved **0 of 85** live ambiguous blocks:
 
-- OpenAI: 63 original / 0 resolved / 63 remaining
+- OpenAI: 63 / 0 / 63
 - Anthropic: 5 / 0 / 5
 - Google: 17 / 0 / 17
 
-This was treated as a product-value death even though the safety tests passed. A review-reduction component that safely resolves nothing does not justify completion.
+Safety without useful review reduction was treated as a product-value death rather than completion evidence.
 
 ## Live-evidence ontology refinement
 
 Run `33068957255`: SUCCESS.
 
-Only narrow, observable wording found in the live official sources was added to the controlled registry, including:
+Only narrow wording observed in live official sources was added, including documented naming-scheme change, `reasoning.context`, reasoning preservation across calls, pro mode, explicit `support up to N output tokens` with captured value, and response metadata fields.
 
-- documented model naming-scheme change;
-- `reasoning.context` behavior selector;
-- reasoning preservation across calls;
-- documented pro mode;
-- explicit `support up to N output tokens` with numeric capture retained in the claim value;
-- response metadata fields `max_input_tokens`, `max_tokens`, and `capabilities`.
-
-The ontology was not broadened around generic marketing language or vague capability claims.
-
-Live result after the refinement:
+Live result:
 
 - OpenAI: **63 original / 7 resolved / 56 remaining**
 - Anthropic: **5 / 2 / 3**
 - Google: **17 / 0 / 17**
 - Total: **85 / 9 resolved / 76 remaining**
 
-The zero Google reduction is intentional: current ambiguous samples were mostly generic catalog/marketing wording and were not force-classified merely to improve the metric.
+Google's zero reduction is intentional; vague catalog/marketing wording was not force-classified to improve a metric.
+
+## Persistent survivor validation
+
+Run `33069215448`: SUCCESS on the cleaned pre-completion branch.
+
+J baseline + destructive DA/Counter-DA passed, followed by I/H/G/F/E/D/C/B/A regressions and FREEZER verification.
+
+## FREEZER completion
+
+Run `33069264779`: SUCCESS.
+
+- pre-completion survivor regression passed;
+- FRZ-000020 transitioned `VERIFIED` then `COMPLETED` through the canonical FREEZER CLI;
+- post-completion J→I→H→G→F→E→D→C→B→A regression passed;
+- FREEZER tests and verification passed;
+- A-J were asserted `COMPLETED`;
+- WIP was asserted clear;
+- only generated FREEZER completion state was committed by the completion workflow.
 
 ## Safety boundaries verified
 
 - exact source anchor preserved;
 - input I report fingerprint preserved and checked;
-- H-valid bundle required after every refinement;
+- H-valid bundle required after refinement;
 - docs claim remains `UNVERIFIED`;
 - hidden architecture claim remains `NONE`;
 - negation/exception fails closed;
@@ -93,9 +97,9 @@ The zero Google reduction is intentional: current ambiguous samples were mostly 
 - unmatched text remains reviewable;
 - upstream ambiguity truncation prevents `READY_FOR_H`;
 - selected-document fetch failures still prevent readiness;
-- review-count reduction is explicitly not correctness evidence;
+- review reduction is not correctness evidence;
 - all execution/profile-application/promotion authority remains `NONE`.
 
-## Current conclusion
+## Final conclusion
 
-SURVIVOR pending independent persistent full-stack CI and FREEZER completion. One-shot governed-start, DA-repair, initial-live-smoke and live-ontology-repair workflows were removed before final validation.
+**COMPLETED / SURVIVOR.** Governed-start, DA-repair, initial live-review, live-ontology-repair and completion one-shot workflows were removed. The persistent J validation workflow remains as the durable regression surface. A final cleaned COMPLETED-head persistent CI run is required after this document update before stack PR creation.
