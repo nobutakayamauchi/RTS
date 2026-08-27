@@ -8,7 +8,7 @@ from tests.test_semantic_claim_refinement import make_intake
 
 class SemanticClaimRefinementDATests(unittest.TestCase):
     def test_negated_capability_cannot_become_positive_claim(self):
-        intake = make_intake("Requests do not dispatch several functions concurrently.")
+        intake = make_intake("A request does not dispatch several functions concurrently.")
         self.assertEqual(intake["status"], "REVIEW_REQUIRED")
         refined = refine_intake_report(intake)
         self.assertEqual(refined["status"], "REVIEW_REQUIRED")
@@ -18,7 +18,7 @@ class SemanticClaimRefinementDATests(unittest.TestCase):
 
     def test_multi_match_sentence_stays_reviewable(self):
         intake = make_intake(
-            "Requests may dispatch several functions concurrently inside an isolated environment."
+            "A request may dispatch several functions concurrently inside an isolated environment."
         )
         self.assertEqual(intake["status"], "REVIEW_REQUIRED")
         refined = refine_intake_report(intake)
