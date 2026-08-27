@@ -36,124 +36,30 @@ jobs:
           core_path = Path('selective_recall/core.py')
           core = core_path.read_text(encoding='utf-8')
 
-          old_base = '''def _base_output(decision: str, reason: str, *, request: RecallRequest) -> dict[str, Any]:
-              return {
-                  "schema_version": OUTPUT_SCHEMA_VERSION,
-                  "recall_decision": decision,
-                  "reason": reason,
-                  "request": {
-                      "event": request.event,
-                      "scope_tags": list(request.scope_tags),
-                      "current_context_sufficient": request.current_context_sufficient,
-                      "explicit_recall": request.explicit_recall,
-                      "max_results": request.max_results,
-                  },
-                  "selected_anchors": [],
-                  "excluded": [],
-                  "execution_authority": NO_AUTHORITY,
-                  "promotion_authority": NO_AUTHORITY,
-              }
-          '''.replace('          ', '')
-          new_base = '''def _base_output(decision: str, reason: str, *, request: RecallRequest) -> dict[str, Any]:
-              return {
-                  "schema_version": OUTPUT_SCHEMA_VERSION,
-                  "recall_decision": decision,
-                  "reason": reason,
-                  "request": {
-                      "event": request.event,
-                      "scope_tags": list(request.scope_tags),
-                      "current_context_sufficient": request.current_context_sufficient,
-                      "explicit_recall": request.explicit_recall,
-                      "max_results": request.max_results,
-                  },
-                  "selected_anchors": [],
-                  "excluded_count": 0,
-                  "exclusion_counts": {},
-                  "execution_authority": NO_AUTHORITY,
-                  "promotion_authority": NO_AUTHORITY,
-              }
-          '''.replace('          ', '')
+          replacements = [
+              (
+                  '        "selected_anchors": [],\n        "excluded": [],\n        "execution_authority": NO_AUTHORITY,\n',
+                  '        "selected_anchors": [],\n        "excluded_count": 0,\n        "exclusion_counts": {},\n        "execution_authority": NO_AUTHORITY,\n',
+                  'bounded aggregate output',
+              ),
+              (
+                  '    excluded: list[ExcludedRecord] = []\n    candidates: list[tuple[int, MemoryRecord]] = []\n    requested_scopes = set(req.scope_tags)\n\n    for record in records:\n',
+                  '    exclusion_counts: dict[str, int] = {}\n    candidates: list[tuple[int, MemoryRecord]] = []\n    requested_scopes = set(req.scope_tags)\n\n    def exclude(reason: str) -> None:\n        exclusion_counts[reason] = exclusion_counts.get(reason, 0) + 1\n\n    for record in records:\n',
+                  'aggregate exclusion accumulator',
+              ),
+              (
+                  '        if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:\n            excluded.append(ExcludedRecord(record.memory_id, "LIFECYCLE_INELIGIBLE"))\n            continue\n        if record.superseded_by is not None:\n            excluded.append(ExcludedRecord(record.memory_id, "SUPERSEDED"))\n            continue\n        freshness = record_freshness(root, record)\n        if freshness != "CURRENT":\n            excluded.append(ExcludedRecord(record.memory_id, freshness))\n            continue\n        if req.event not in record.event_triggers:\n            excluded.append(ExcludedRecord(record.memory_id, "EVENT_MISMATCH"))\n            continue\n        record_scopes = set(record.scope_tags)\n        overlap = requested_scopes & record_scopes\n        if requested_scopes and not overlap:\n            excluded.append(ExcludedRecord(record.memory_id, "SCOPE_MISMATCH"))\n            continue\n\n',
+                  '        # Cheap registry metadata gates run before source-body freshness I/O.\n        # This keeps unrelated strata cold as the memory corpus grows.\n        if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:\n            exclude("LIFECYCLE_INELIGIBLE")\n            continue\n        if record.superseded_by is not None:\n            exclude("SUPERSEDED")\n            continue\n        if req.event not in record.event_triggers:\n            exclude("EVENT_MISMATCH")\n            continue\n        record_scopes = set(record.scope_tags)\n        overlap = requested_scopes & record_scopes\n        if requested_scopes and not overlap:\n            exclude("SCOPE_MISMATCH")\n            continue\n\n        freshness = record_freshness(root, record)\n        if freshness != "CURRENT":\n            exclude(freshness)\n            continue\n\n',
+                  'metadata-before-freshness routing',
+              ),
+              (
+                  '    output["excluded"] = [asdict(entry) for entry in sorted(excluded, key=lambda x: x.memory_id)]\n    return output\n',
+                  '    output["excluded_count"] = sum(exclusion_counts.values())\n    output["exclusion_counts"] = dict(sorted(exclusion_counts.items()))\n    return output\n',
+                  'bounded diagnostic tail',
+              ),
+          ]
 
-          old_loop = '''    records = load_registry(root, registry_path)
-              excluded: list[ExcludedRecord] = []
-              candidates: list[tuple[int, MemoryRecord]] = []
-              requested_scopes = set(req.scope_tags)
-
-              for record in records:
-                  if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:
-                      excluded.append(ExcludedRecord(record.memory_id, "LIFECYCLE_INELIGIBLE"))
-                      continue
-                  if record.superseded_by is not None:
-                      excluded.append(ExcludedRecord(record.memory_id, "SUPERSEDED"))
-                      continue
-                  freshness = record_freshness(root, record)
-                  if freshness != "CURRENT":
-                      excluded.append(ExcludedRecord(record.memory_id, freshness))
-                      continue
-                  if req.event not in record.event_triggers:
-                      excluded.append(ExcludedRecord(record.memory_id, "EVENT_MISMATCH"))
-                      continue
-                  record_scopes = set(record.scope_tags)
-                  overlap = requested_scopes & record_scopes
-                  if requested_scopes and not overlap:
-                      excluded.append(ExcludedRecord(record.memory_id, "SCOPE_MISMATCH"))
-                      continue
-
-                  # Event match is mandatory. Scope overlap only refines ranking. Stable
-                  # memory_id ordering resolves ties deterministically.
-                  score = 100 + len(overlap)
-                  candidates.append((score, record))
-          '''.replace('          ', '')
-          new_loop = '''    records = load_registry(root, registry_path)
-              exclusion_counts: dict[str, int] = {}
-              candidates: list[tuple[int, MemoryRecord]] = []
-              requested_scopes = set(req.scope_tags)
-
-              def exclude(reason: str) -> None:
-                  exclusion_counts[reason] = exclusion_counts.get(reason, 0) + 1
-
-              for record in records:
-                  # Cheap registry metadata gates run before source-body freshness I/O.
-                  # This keeps unrelated strata cold as the memory corpus grows.
-                  if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:
-                      exclude("LIFECYCLE_INELIGIBLE")
-                      continue
-                  if record.superseded_by is not None:
-                      exclude("SUPERSEDED")
-                      continue
-                  if req.event not in record.event_triggers:
-                      exclude("EVENT_MISMATCH")
-                      continue
-                  record_scopes = set(record.scope_tags)
-                  overlap = requested_scopes & record_scopes
-                  if requested_scopes and not overlap:
-                      exclude("SCOPE_MISMATCH")
-                      continue
-
-                  freshness = record_freshness(root, record)
-                  if freshness != "CURRENT":
-                      exclude(freshness)
-                      continue
-
-                  # Event match is mandatory. Scope overlap only refines ranking. Stable
-                  # memory_id ordering resolves ties deterministically.
-                  score = 100 + len(overlap)
-                  candidates.append((score, record))
-          '''.replace('          ', '')
-
-          old_tail = '''    output["excluded"] = [asdict(entry) for entry in sorted(excluded, key=lambda x: x.memory_id)]
-              return output
-          '''.replace('          ', '')
-          new_tail = '''    output["excluded_count"] = sum(exclusion_counts.values())
-              output["exclusion_counts"] = dict(sorted(exclusion_counts.items()))
-              return output
-          '''.replace('          ', '')
-
-          for old, new, label in (
-              (old_base, new_base, 'base output'),
-              (old_loop, new_loop, 'routing loop'),
-              (old_tail, new_tail, 'diagnostic tail'),
-          ):
+          for old, new, label in replacements:
               count = core.count(old)
               if count != 1:
                   raise SystemExit(f'{label}: expected exactly one match, got {count}')
