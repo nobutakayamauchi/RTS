@@ -63,27 +63,33 @@ jobs:
           python -m freezer.cli verify
           python -m freezer.build_assessment verify
 
-      - name: Assert governed Child A WIP boundary
+      - name: Assert Child A lifecycle governance boundary
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
           root = Path('.')
+          items = {}
           active = []
           for p in (root / 'freezer' / 'items').glob('RTS-FRZ-*/current.json'):
               pointer = json.loads(p.read_text())
               item = json.loads((root / pointer['path']).read_text())
+              items[item['item_id']] = item
               if item['status'] == 'IN_PROGRESS':
                   active.append(item['item_id'])
-          assert active == ['RTS-FRZ-000011'], active
 
-          for item_id in ('RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
-              pointer = json.loads((root / 'freezer' / 'items' / item_id / 'current.json').read_text())
-              item = json.loads((root / pointer['path']).read_text())
-              assert item['status'] == 'FROZEN', item
-              assert item['build_authority'] == 'NOT_APPROVED', item
-          print('WIP=1 and sibling freeze boundary OK')
+          child = items['RTS-FRZ-000011']
+          assert child['status'] in {'IN_PROGRESS', 'VERIFIED', 'COMPLETED'}, child
+          if child['status'] == 'IN_PROGRESS':
+              assert active == ['RTS-FRZ-000011'], active
+              for item_id in ('RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+                  sibling = items[item_id]
+                  assert sibling['status'] == 'FROZEN', sibling
+                  assert sibling['build_authority'] == 'NOT_APPROVED', sibling
+          else:
+              assert 'RTS-FRZ-000011' not in active, active
+          print('Child A lifecycle governance boundary OK')
           PY
 
       - name: Prove smallest-anchor CLI behavior
