@@ -1,0 +1,77 @@
+{
+  "item_id": "RTS-FRZ-000022",
+  "title": "Exhausted-AI Human Escalation Gate v1",
+  "type": "architecture",
+  "status": "FROZEN",
+  "summary": "K0のhuman-attention triageの後段で、DA・Counter-DA・利用可能な追加検証を尽くしても妥当な決断、判別可能な次実験、安全な保留条件のいずれも作れず、その未解決選択が結果へ実質的影響を持つ場合だけHUMAN_NOWを許可する。",
+  "original_problem": "K0は76件を35 HUMAN_NOW / 11 HUMAN_LATER / 30 DEFERまで絞ったが、35件の多くは重要かつactionableというだけで、reasoning/config/migration等に追加Probeや再検証経路が残っている。重要であることと人間が決める必要があることを分離できていない。",
+  "why_it_matters": "人間の注意はAI側の探索・反証・検証を使い切った残余判断にだけ投入すべきである。次の実験や安全な待機条件が作れる案件まで人間へ返すと、AIによる問題解決能力を使わずレビュー待ちを増やす。",
+  "reason_frozen": "high impact、perspective disagreement、低confidenceだけでHUMAN_NOWにする、未実施検証をEXHAUSTED扱いする、安全なdefer条件や判別Probeがあるのに人へ返す、逆に全経路が尽きmaterially重要な案件をsilent deferする、という失敗をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "K0 triage record and exact source anchor are preserved",
+    "important is distinct from human-required",
+    "uncertainty alone never proves exhaustion",
+    "available discriminating probe keeps work on the AI side",
+    "safe defer condition prevents premature human escalation",
+    "HUMAN_NOW requires explicit bounded exhaustion evidence",
+    "material effect is required for HUMAN_NOW",
+    "blocked/stale/truncated upstream evidence fails closed",
+    "no semantic truth or execution authority"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 5,
+    "effort": 2,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000021 is COMPLETED",
+    "K0 preserves impact, causal reach, adversarial views and problem-solving paths",
+    "WIP is clear"
+  ],
+  "negative_triggers": [
+    "high impact automatically authorizes HUMAN_NOW while a probe remains",
+    "perspective disagreement automatically authorizes HUMAN_NOW while evidence can discriminate",
+    "uncertainty or low confidence is treated as verification exhaustion",
+    "missing verification evidence is treated as exhausted verification",
+    "safe defer exists but HUMAN_NOW is emitted",
+    "material unresolved choice remains after proven exhaustion but is silently deferred",
+    "non-material no-route item becomes HUMAN_NOW",
+    "blocked or stale upstream evidence receives a normal disposition"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000021 Adversarial Human Review Necessity Triage v1",
+    "review_necessity_triage/",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "review_necessity_triage/",
+    "docs/implementation/FRZ_000021_HUMAN_REVIEW_NECESSITY_DA_V1_TASK.md",
+    "semantic_claim_refinement/"
+  ],
+  "possible_destinations": [
+    "human_escalation_gate/",
+    "future F/G discriminating probe handoff",
+    "bounded human decision queue"
+  ],
+  "estimated_hours": {"minimum": 6, "maximum": 12},
+  "tags": [
+    "adaptive-intelligence-v8",
+    "human-escalation",
+    "exhaustion-gate",
+    "da",
+    "counter-da",
+    "verification",
+    "safe-defer",
+    "fail-closed",
+    "provider-neutral"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL"
+}
