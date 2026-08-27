@@ -1,4 +1,4 @@
-name: FRZ-000022 Knowledge Order Fix Once
+name: FRZ-000022 Monotonicity Fix Once
 
 on:
   push:
@@ -26,14 +26,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Require escape search after known routes are closed
+      - name: Keep K1 escape recovery monotone with K0 attention class
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('human_escalation_gate/core.py')
           s=p.read_text()
-          old='''            if route_id == EXHAUSTION_SEARCH_ROUTE:\n                if row["opened_routes"]:\n                    active_routes.extend(row["opened_routes"])\n                elif row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:\n                    exhaustion_search_observed = True\n'''
-          new='''            if route_id == EXHAUSTION_SEARCH_ROUTE:\n                if row["opened_routes"]:\n                    active_routes.extend(row["opened_routes"])\n                elif not active_routes and row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:\n                    # A no-new-route search only proves exhaustion after all\n                    # previously known routes have already been closed and their\n                    # evidence has been folded into the current knowledge state.\n                    exhaustion_search_observed = True\n'''
+          old='''        initial_routes = list(dict.fromkeys(_k0_routes(k0) + recover_escape_routes(k0["anchor"])))\n        active_routes = list(initial_routes)\n'''
+          new='''        k0_routes = _k0_routes(k0)\n        recovered_routes = recover_escape_routes(k0["anchor"])\n        # K1 is an escalation gate, not a work scheduler. Second-pass heuristic\n        # recovery exists to rescue K0 HUMAN_NOW findings before human handoff;\n        # it must not promote K0 HUMAN_LATER/DEFER_LOW_VALUE into active work.\n        active_recovered_routes = recovered_routes if k0.get("classification") == "HUMAN_NOW" else []\n        initial_routes = list(dict.fromkeys(k0_routes + active_recovered_routes))\n        active_routes = list(initial_routes)\n'''
           assert s.count(old)==1, s.count(old)
           p.write_text(s.replace(old,new))
           PY
@@ -45,5 +45,5 @@ jobs:
           git config user.email rts-bot@users.noreply.github.com
           git add human_escalation_gate/core.py
           git diff --cached --quiet && exit 1 || true
-          git commit -m 'fix: require post-integration escape search for FRZ-000022 exhaustion'
+          git commit -m 'fix: keep FRZ-000022 escape recovery monotone with K0 priority'
           git push origin HEAD:feature/frz-000022-exhausted-ai-human-escalation-gate-v1
