@@ -25,6 +25,10 @@ REPORT_SCHEMA_VERSION = "semantic-claim-refinement-report/v1"
 METHOD = "CONTROLLED_SEMANTIC_ALIAS_V1"
 MAX_ADDED_CLAIMS = 128
 MAX_RULES = 32
+NEGATION_OR_EXCEPTION_RE = re.compile(
+    r"\b(?:no|not|never|without|cannot|can't|does not|doesn't|do not|don't|except|unless|unsupported|unavailable)\b|\bonly when\b|\bnot available\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -211,12 +215,30 @@ def refine_intake_report(
                 unresolved.append({"source_id": source["source_id"], "anchor_sha256": anchor_hash, "reason": "ANCHOR_NOT_RECOVERED"})
                 continue
             matches = _semantic_matches(anchor, rules)
+            if matches and NEGATION_OR_EXCEPTION_RE.search(anchor):
+                unresolved.append({
+                    "source_id": source["source_id"],
+                    "anchor_sha256": anchor_hash,
+                    "preview": anchor[:240],
+                    "reason": "NEGATION_OR_EXCEPTION",
+                    "candidate_count": len(matches),
+                    "candidate_rule_ids": [rule.rule_id for rule in matches],
+                })
+                continue
             if not matches:
                 unresolved.append({"source_id": source["source_id"], "anchor_sha256": anchor_hash, "preview": anchor[:240], "reason": "NO_ONTOLOGY_MATCH"})
                 continue
+            if len(matches) != 1:
+                unresolved.append({
+                    "source_id": source["source_id"],
+                    "anchor_sha256": anchor_hash,
+                    "preview": anchor[:240],
+                    "reason": "MULTIPLE_ONTOLOGY_MATCHES",
+                    "candidate_count": len(matches),
+                    "candidate_rule_ids": [rule.rule_id for rule in matches],
+                })
+                continue
 
-            # Naive candidate: first semantic match wins. Destructive DA must kill
-            # negation reversal and multi-match ambiguity before this can survive.
             rule = matches[0]
             claim = _claim_for(rule, anchor)
             fingerprint = (claim["area"], claim["key"], claim["anchor"])
