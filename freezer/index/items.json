@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T13:29:50Z",
-  "count": 21,
+  "generated_at": "2026-08-27T23:17:55Z",
+  "count": 22,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -514,6 +514,33 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T13:29:50Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000022",
+      "version": 3,
+      "title": "Exhausted-AI Human Escalation Gate v1",
+      "type": "architecture",
+      "status": "IN_PROGRESS",
+      "priority_score": 89.84,
+      "estimated_hours": {
+        "minimum": 6,
+        "maximum": 12
+      },
+      "tags": [
+        "adaptive-intelligence-v8",
+        "human-escalation",
+        "exhaustion-gate",
+        "knowledge-integration",
+        "da",
+        "counter-da",
+        "verification",
+        "safe-defer",
+        "fail-closed",
+        "provider-neutral"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T23:17:55Z"
     }
   ]
 }
