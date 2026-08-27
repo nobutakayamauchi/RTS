@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Re-run live I-J-K0-K1 official-doc surface
+      - name: Re-run live I-J-K0-K1 official-doc surface after monotonicity repair
         run: |
           python - <<'PY'
           import json
@@ -54,11 +54,12 @@ jobs:
               total.update(c); total['UNRESOLVED'] += len(j['audit']['unresolved'])
               print('PROVIDER',provider,'UNRESOLVED',len(j['audit']['unresolved']),dict(c))
               for row in k1['records']:
-                  if row['disposition']=='AI_CONTINUE' and row['recovered_escape_routes']:
+                  if row['recovered_escape_routes']:
                       print('RECOVERED', json.dumps({
                           'provider':provider,
                           'finding_index':row['finding_index'],
                           'k0_classification':row['k0_classification'],
+                          'disposition':row['disposition'],
                           'recovered_escape_routes':row['recovered_escape_routes'],
                           'initial_routes':row['initial_routes'],
                           'anchor':row['anchor'],
@@ -70,8 +71,9 @@ jobs:
                   'records':k1['records'],
               })
           print('TOTAL',dict(total))
-          # Counts are evidence, not a target. K1 may legitimately recover more
-          # AI-side routes than the earlier temporary revalidation.
+          # Counts are evidence, not an optimization target. The safety
+          # invariants are cardinality preservation, no blocked input, and no
+          # premature human handoff while a valid AI/defer route exists.
           assert total['UNRESOLVED'] == 76, total
           assert total['AI_CONTINUE'] > 0, total
           assert total['WAIT_SAFE_DEFER'] > 0, total
