@@ -1,0 +1,99 @@
+{
+  "summary": "RTSへ、証拠付き記憶に加えて、選択的再接続、記憶ライフサイクル、再開可能な知能コンパイル、Known/Unknown分離、再計算削減計測を既存の承認・回帰・ロールバック系へ接続する親アーキテクチャ候補。",
+  "original_problem": "RTSは判断・実行・証拠・Skill提案・人間レビュー・ロールバックを統治できるが、蓄積した経験を次回の判断へ最小限だけ再接続する層、巨大な経験を差分・分割・再開可能に知能化する層、そして人間のCodex操縦技能をどれだけ再利用資産へ変換できたかを測る層が未統合である。結果として、既知問題の再探索、過去失敗の再発、長大コンテキスト再読、知能化処理の全体失敗、モデル側cacheとRTS側知能再利用の混同が残る。",
+  "why_it_matters": "過去に払った探索・失敗・判断コストを、安全に次回へ相続できれば、Codexへ毎回同じ推論を買わせず、未知部分へ高推論を集中できる。初心者のCodex操作技能依存を下げつつ、熟練者もより未知領域へ推論予算を回せる。RTSの既存統制を維持したまま、長期運用で賢くなるほど重くなって進化停止する問題を避けられる。",
+  "reason_frozen": "親候補を一括実装しない。外部知見と現在のRTS基盤により設計可能性は上がったが、Selective Recall、Compact Surface、Incremental Compiler、Metrics、External Pattern Corpusは独立に検証可能で失敗境界も異なるため、親はFROZENのまま正式Preflightで分解し、各子候補をWIP=1・個別承認で進める。",
+  "preserved_value": [
+    "証拠と出典を伴う長期記憶",
+    "記憶・実行記録・判断状態の連結",
+    "必要な過去知能だけを選択的に再接続するRecall Router",
+    "RAWからCANONICAL・SUPERSEDED・QUARANTINEDまでの明示的記憶ライフサイクル",
+    "常駐指示を小さく保ち条件付き知識を再接続するCompact Active Surface",
+    "新しいAIが全履歴を読まず安全に続行できるCompact Restart Surface",
+    "raw-first・chunk・checkpoint・resume・quarantineによる差分知能コンパイル",
+    "Known / Partially Known / Unknown分離による高推論予算の集中",
+    "RTS自身による改善案の生成",
+    "人間承認後のみSkillまたは能力層を追加",
+    "変更前後の回帰試験",
+    "問題発生時のロールバック",
+    "進化理由・承認者・結果の再構成",
+    "利用者ごとに異なる進化経路",
+    "Decision Reuse・Recompute Avoidance・Knowledge Debt等の再利用効率計測",
+    "外部OSS修理から抽出した非CanonicalなTransition Pattern Seed"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 4,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 5,
+    "uncertainty": 3
+  },
+  "trigger_conditions": [
+    "Outcome Learning・Skill Regression・Human Review Ledger・Promotion Application Preview・Governed Loop Orchestratorが利用可能である",
+    "過去判断・過去失敗・再開情報の再利用が複数回必要になっている",
+    "長大コンテキスト再読または同型推論の再計算が実運用負荷になっている",
+    "外部知見をexact ref・license・claim boundary付きで再評価できる",
+    "親をDECOMPOSE_REQUIREDとして子候補へ分離しWIP=1を維持できる"
+  ],
+  "negative_triggers": [
+    "親候補を一括実装しようとしている",
+    "記憶取得が実行権限や人間承認を代替する設計になっている",
+    "raw experience保存より先に要約・昇格だけを行う",
+    "進化処理の失敗が完了済み本体タスクを失敗扱いにする",
+    "顧客・private prompt・credentials・provider payloadを境界なしに取り込む",
+    "外部repoのmerge実績だけでRTS Canonへ昇格する",
+    "直接コード再利用のlicense・attribution条件が未確認"
+  ],
+  "dependencies": [
+    "Cross-Repo Asset Manifestとexact source provenance",
+    "execution_recordとevidence_refの完全連結",
+    "checkpointとmanifestの運用規則",
+    "Outcome Learning proposal flow",
+    "Skill Regressionとrollback linkage",
+    "Human Review Ledger",
+    "Promotion Application Preview",
+    "Read-Only Governed Loop Orchestrator",
+    "顧客・プロジェクト単位のデータ境界",
+    "provider-side cache指標とRTS-side intelligence reuse指標の分離"
+  ],
+  "source_refs": [
+    "docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_REASSESSMENT.md",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6",
+    "shin4141/agents-md-compactor@7679dceddc7213433f885d5054db50213460d266",
+    "shin4141/output-surface-integrity@5aa086171309bf83604360f0ea9fbcb169bbe921",
+    "openclaw/openclaw#125722",
+    "openclaw/openclaw#129927",
+    "RTS FREEZER / Read-Only Loop / Governed Execution / Outcome Learning / Human Review / Promotion Preview contracts"
+  ],
+  "possible_destinations": [
+    "RTS Core optional adaptive-intelligence layer",
+    "RTS-AGE evolution engine",
+    "Ultimate Loop selective-recall and knowledge-compilation path",
+    "Hermes Drive governed adaptation extension"
+  ],
+  "estimated_hours": {
+    "minimum": 40,
+    "maximum": 90
+  },
+  "tags": [
+    "memory",
+    "self-evolution",
+    "governance",
+    "evidence",
+    "rollback",
+    "selective-recall",
+    "context-compression",
+    "resumable-learning",
+    "knowledge-debt",
+    "decision-reuse",
+    "codex-efficiency"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "status": "FROZEN",
+  "recall_mode": "MANUAL"
+}
