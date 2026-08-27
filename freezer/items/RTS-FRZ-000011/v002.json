@@ -1,0 +1,77 @@
+{
+  "title": "Selective Recall + Memory Lifecycle v1",
+  "type": "feature",
+  "status": "SELECTED",
+  "summary": "RTSの過去判断・失敗境界・再開情報を、イベントに応じて必要最小限だけ取得し、鮮度・supersession・quarantineを伴う明示的ライフサイクルで管理する。",
+  "original_problem": "蓄積情報が増えるほど全履歴再読か人間の記憶に依存しやすく、古い判断が現行権限として誤用される危険がある。",
+  "why_it_matters": "既知部分を再利用し未知部分へ推論を集中するための入口になる。過去失敗の再発防止とCodex操縦技能の外部化に直結する。",
+  "reason_frozen": "親Preflightによる分解後も、自動実装は禁止。exact storage owner、record schema、routing trigger、freshness ruleをBuild Assessment/Preflightで確定してから選択する。",
+  "preserved_value": [
+    "no-recall fast path",
+    "event-triggered selective retrieval",
+    "smallest-anchor-first retrieval",
+    "provenance and As-of state",
+    "stale/superseded fail-closed handling",
+    "RAW/ACTIVE_CANDIDATE/VERIFICATION_PENDING/REPEATED/PROMOTION_READY/CANONICAL/FOLDED/SUPERSEDED/ARCHIVED/QUARANTINED lifecycle",
+    "routing is not authority",
+    "over-recall measurement"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 4,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "親000001がDECOMPOSE_REQUIREDとして確定している",
+    "memory record ownerと最小schemaをboundedに定義できる",
+    "既存RTS authorityを変更せずread-only retrievalから開始できる"
+  ],
+  "negative_triggers": [
+    "tiny local taskまで必ずrecallする",
+    "retrieved memoryをexecution approvalとして扱う",
+    "stale/superseded判定なしで過去判断を再利用する",
+    "保存しただけの観測をCanonicalへ昇格する"
+  ],
+  "dependencies": [
+    "Cross-Repo Asset Manifest / provenance",
+    "Outcome Evidence",
+    "Human Review / Promotion governance",
+    "current goal and task identity"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000001 Adaptive Intelligence v2 reassessment",
+    "shin4141/decision-os-v13-loopkit@fe88f90430bacbb8f5aaf3ac5439e0580c04abd6",
+    "field_notes/048, 050, 051 selective recall patterns"
+  ],
+  "possible_destinations": [
+    "RTS optional memory/retrieval layer",
+    "Ultimate Loop pre-reasoning router"
+  ],
+  "estimated_hours": {
+    "minimum": 10,
+    "maximum": 20
+  },
+  "tags": [
+    "adaptive-intelligence-v2-child",
+    "selective-recall",
+    "memory-lifecycle",
+    "provenance",
+    "freshness",
+    "quarantine",
+    "codex-efficiency"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "item_id": "RTS-FRZ-000011",
+  "version": 2,
+  "created_at": "2026-08-27T06:21:54Z",
+  "updated_at": "2026-08-27T06:33:06Z",
+  "supersedes": "v001"
+}

@@ -1,0 +1,135 @@
+{
+  "assessor": "RTS governed build assessment — Child A selective recall",
+  "rationale": "The child is bounded to a read-only semantic layer above the existing repository-local Memory Index. RTS already owns raw memory sources, deterministic indexing, provenance patterns, fail-closed governance, evidence records, and non-authorizing learning/promotion flows. The remaining implementation is small: validate lifecycle metadata, bind source freshness, route only decision-relevant anchors, preserve a no-recall fast path, and emit no execution or promotion authority.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 4,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 18,
+    "integration_hours": 2,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "shin4141/decision-os-v13-loopkit"
+    ],
+    "queries": [
+      "memory index searchable incident log",
+      "historical evidence current authority retrieval decision competence",
+      "provenance exact reference append-only manifest",
+      "non-authorizing governance proposal review",
+      "selective recall lifecycle external intelligence"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "rts_kernel/indexing/memory_index_engine.py",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 6,
+        "notes": "Reuse the existing repository-local memory source/index ownership and deterministic lexical search contract. Child A remains an overlay rather than building another memory database."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "thin-rts/ultimate-loop/README.md",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse canonical boundaries: historical evidence is not current authority, retrieval is not decision competence, stale derived state requires revalidation, and routing does not create authority."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "asset_manifest/",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse exact-reference, single-owner, path-safety, append-only, and provenance validation patterns."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "adaptive_governance/",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "code",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse deterministic fail-closed modeling and the permanent non-authorizing output pattern."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "outcome_evidence/",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse repository-local evidence binding, deterministic verification, privacy/path containment, and bounded VERIFIED semantics."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "learning_proposals/",
+        "ref": "245cf85715e88381ca2724f08f1d79583b974923",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse the explicit separation between candidate/review information and approval/application authority."
+      },
+      {
+        "repository": "shin4141/decision-os-v13-loopkit",
+        "path": "README.md",
+        "ref": "fe88f90430bacbb8f5aaf3ac5439e0580c04abd6",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 1,
+        "notes": "MIT-licensed external reference for selective external intelligence, event-triggered recall, lifecycle states, conditional reading, stale-memory recheck, and routing-not-authority concepts. No wholesale framework import."
+      }
+    ],
+    "gaps": [
+      "Current Memory Index has lexical retrieval but no lifecycle/freshness/supersession/quarantine semantic overlay.",
+      "No current package exposes a deterministic no-recall fast path and smallest-anchor-only routing result with permanent NONE authority.",
+      "The initial v1 seed uses two historical context-loss incidents only to prove mechanics; broad cross-project transfer remains unproven and outside this child."
+    ]
+  },
+  "risks": [
+    "A retrieval layer could accidentally become a second memory store instead of an overlay.",
+    "Stale historical records could be treated as current truth or authority.",
+    "Over-recall could increase context load instead of reducing it.",
+    "Lifecycle labels could be mistaken for promotion or execution permissions.",
+    "Historical incident hypotheses could be overgeneralized beyond their evidence scope.",
+    "Source freshness identity could drift if path or bytes change without registry revalidation."
+  ],
+  "assessment_id": "RTS-BA-000011-001",
+  "item_id": "RTS-FRZ-000011",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "16c2cfde9581e7c1d3edb1a2bbc3de7237966e3c751c81561c73f2358e492c8a",
+  "derived": {
+    "benefit_score": 94.5,
+    "cost_score": 50.0,
+    "reuse_score": 88.89,
+    "decision_score": 80.31,
+    "reuse_hours_saved": 16.0,
+    "net_hours": 8.0,
+    "time_saved_ratio": 0.8889,
+    "implementation_efficiency": 2.25,
+    "cost_effectiveness": 11.81,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T06:33:05Z"
+}
