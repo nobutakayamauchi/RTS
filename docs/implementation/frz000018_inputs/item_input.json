@@ -1,0 +1,81 @@
+{
+  "item_id": "RTS-FRZ-000018",
+  "title": "Model Transition Intelligence + Architecture Contract Diff v1",
+  "type": "architecture",
+  "status": "FROZEN",
+  "summary": "新旧AI世代の公式資料Evidence Bundleを比較し、外部から観測可能な契約差分をS0-S3で分類、旧Engine Profileの扱いとF/Gへ渡すbounded probe要求を生成する。Docs claimは観測事実ではなく仮説として保持する。",
+  "original_problem": "新モデル公開時に人間がREADME、release notes、API docs、migration guides等を手作業で読み比べ、どこが性能更新でどこが戦い方を変える契約変更かを判断している。見落としやマーケティング表現への過剰反応が起きると、旧Profileを誤継承したり不要な全探索を実行する。",
+  "why_it_matters": "どのAI providerでも世代交代時の資料差分を同じ契約で解析し、execution-contract shift候補だけを早期検出してF/Gの実測へ接続することで、AI進化への追従時間と再探索コストを減らす。",
+  "reason_frozen": "marketing copyを契約変更扱いする、READMEだけを唯一の真実にする、docs claimをobserved behaviorへ昇格する、内部architectureを推測する、S3判定だけで旧Profileを自動破棄/適用する、無制限probeを要求する、という失敗をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "provider-neutral version evidence bundle",
+    "official-source evidence classes and exact provenance",
+    "observable external contract only; no hidden architecture claims",
+    "semantic change classification S0-S3",
+    "docs claim remains hypothesis until measured",
+    "execution-contract shift can quarantine old operating assumptions without deleting evidence",
+    "bounded probe requirements for F/G",
+    "irrelevant marketing and wording-only changes do not trigger broad reprofiling",
+    "missing or conflicting evidence remains UNKNOWN or REVIEW_REQUIRED",
+    "all outputs remain non-authorizing"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000017 Bounded Probe Executor + Profile Application Gate v1 is COMPLETED",
+    "F/G expose bounded probe/profile contracts",
+    "official-source documents can be supplied as immutable evidence bundles",
+    "runtime execution and provider crawling remain outside H v1"
+  ],
+  "negative_triggers": [
+    "unofficial commentary is silently treated as official contract evidence",
+    "marketing-only wording escalates to S3",
+    "docs claim is emitted as observed model behavior",
+    "internal neural architecture is inferred without evidence",
+    "conflicting official docs are collapsed into certainty",
+    "S3 automatically mutates runtime routing or deletes historical profiles",
+    "probe requirements exceed bounded F/G limits",
+    "source provenance or content digest is missing"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000016 Adaptive Engine Profiler v1",
+    "RTS-FRZ-000017 Bounded Probe Executor + Profile Application Gate v1",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000016 Adaptive Engine Profiler v1",
+    "RTS-FRZ-000017 Bounded Probe Executor + Profile Application Gate v1",
+    "model_behavior_adaptation/",
+    "bounded_probe_executor/"
+  ],
+  "possible_destinations": [
+    "provider-neutral model transition intake",
+    "future official-doc source adapters",
+    "F probe planning seed",
+    "G bounded campaign request"
+  ],
+  "estimated_hours": {"minimum": 12, "maximum": 24},
+  "tags": [
+    "adaptive-intelligence-v4",
+    "model-transition",
+    "architecture-contract-diff",
+    "official-docs",
+    "semantic-diff",
+    "behavior-hypothesis",
+    "probe-routing",
+    "provider-neutral",
+    "self-adaptation"
+  ],
+  "build_authority": "NOT_APPROVED",
+  "recall_mode": "MANUAL"
+}
