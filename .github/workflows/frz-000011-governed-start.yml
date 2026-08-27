@@ -1,0 +1,165 @@
+name: Govern FRZ-000011 Selective Recall Start
+
+on:
+  push:
+    branches:
+      - feature/frz-000011-selective-recall-memory-lifecycle-v1
+    paths:
+      - .github/workflows/frz-000011-governed-start.yml
+      - docs/implementation/FRZ_000011_SELECTIVE_RECALL_MEMORY_LIFECYCLE_V1_TASK.md
+      - docs/implementation/frz000011_inputs/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frz-000011-governed-start
+  cancel-in-progress: false
+
+jobs:
+  govern-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000011-selective-recall-memory-lifecycle-v1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Assert exact starting boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def current(item_id):
+              ptr = json.loads(Path(f'freezer/items/{item_id}/current.json').read_text())
+              return json.loads(Path(ptr['path']).read_text())
+
+          child = current('RTS-FRZ-000011')
+          assert child['version'] == 1, child
+          assert child['status'] == 'FROZEN', child
+          assert child['build_authority'] == 'NOT_APPROVED', child
+
+          for item_id in ('RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+              sibling = current(item_id)
+              assert sibling['status'] == 'FROZEN', sibling
+              assert sibling['build_authority'] == 'NOT_APPROVED', sibling
+
+          active = []
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              ptr = json.loads(p.read_text())
+              item = json.loads(Path(ptr['path']).read_text())
+              if item['status'] == 'IN_PROGRESS':
+                  active.append(item['item_id'])
+          assert active == [], active
+          print('exact start boundary OK')
+          PY
+
+      - name: Baseline FREEZER verification and tests
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+
+      - name: Create Build Assessment
+        run: |
+          set -euxo pipefail
+          python -m freezer.build_assessment create RTS-FRZ-000011 \
+            --input docs/implementation/frz000011_inputs/build_assessment_input.json
+          python -m freezer.build_assessment gate RTS-FRZ-000011 | tee /tmp/gate-after-ba.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          gate = json.loads(Path('/tmp/gate-after-ba.json').read_text())
+          assert gate['assessment_state'] == 'CURRENT', gate
+          assert gate['recommendation'] == 'BUILD_NOW', gate
+          assert gate['build_authority'] == 'NOT_APPROVED', gate
+          assert gate['selection_ready'] is False, gate
+          print('BUILD_NOW gate proven', gate['decision_score'])
+          PY
+
+      - name: Create PASS Implementation Preflight
+        run: |
+          set -euxo pipefail
+          python -m freezer.preflight create RTS-FRZ-000011 \
+            --input docs/implementation/frz000011_inputs/preflight_input.json
+          python -m freezer.build_assessment gate RTS-FRZ-000011 | tee /tmp/gate-after-pf.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          gate = json.loads(Path('/tmp/gate-after-pf.json').read_text())
+          assert gate['recommendation'] == 'BUILD_NOW', gate
+          assert gate['preflight_state'] == 'PASS', gate
+          assert gate['build_authority'] == 'NOT_APPROVED', gate
+          assert gate['selection_ready'] is False, gate
+          print('PASS preflight proven; human authority still required')
+          PY
+
+      - name: Apply explicit operator build authority and select only Child A
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli revise RTS-FRZ-000011 \
+            --input docs/implementation/frz000011_inputs/approve_selected.json
+          python -m freezer.build_assessment gate RTS-FRZ-000011 | tee /tmp/gate-selected.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          gate = json.loads(Path('/tmp/gate-selected.json').read_text())
+          assert gate['status'] == 'SELECTED', gate
+          assert gate['build_authority'] == 'APPROVED', gate
+          assert gate['recommendation'] == 'BUILD_NOW', gate
+          assert gate['preflight_state'] == 'PASS', gate
+          assert gate['selection_ready'] is True, gate
+          print('Child A selected under all gates')
+          PY
+
+      - name: Start WIP=1 implementation
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli revise RTS-FRZ-000011 \
+            --input docs/implementation/frz000011_inputs/start_in_progress.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          active = []
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              ptr = json.loads(p.read_text())
+              item = json.loads(Path(ptr['path']).read_text())
+              if item['status'] == 'IN_PROGRESS':
+                  active.append(item['item_id'])
+          assert active == ['RTS-FRZ-000011'], active
+
+          for item_id in ('RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+              ptr = json.loads(Path(f'freezer/items/{item_id}/current.json').read_text())
+              sibling = json.loads(Path(ptr['path']).read_text())
+              assert sibling['status'] == 'FROZEN', sibling
+              assert sibling['build_authority'] == 'NOT_APPROVED', sibling
+          print('WIP=1 proven:', active)
+          PY
+
+      - name: Reindex and verify final governed start
+        run: |
+          set -euxo pipefail
+          python -m freezer.cli reindex
+          python -m freezer.build_assessment reindex
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.build_assessment gate RTS-FRZ-000011
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+
+      - name: Commit only generated FREEZER governance records
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freezer
+          git status --short
+          git commit -m 'freezer: start FRZ-000011 selective recall v1'
+          git push origin HEAD:feature/frz-000011-selective-recall-memory-lifecycle-v1
