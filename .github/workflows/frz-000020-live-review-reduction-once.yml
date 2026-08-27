@@ -1,0 +1,65 @@
+name: FRZ-000020 Live Review Reduction Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000020-semantic-claim-refinement-v1
+    paths:
+      - .github/workflows/frz-000020-live-review-reduction-once.yml
+  workflow_dispatch:
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  live-review-reduction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000020-semantic-claim-refinement-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run I to J against live official docs
+        run: |
+          python - <<'PY'
+          from official_docs_intake import build_intake_report
+          from semantic_claim_refinement import refine_intake_report, verify_refinement_report
+          from model_transition_intelligence.core import validate_bundle
+
+          cases = [
+              ('openai', 'gpt-5.6', 'api', 'https://developers.openai.com/api/docs/guides/latest-model.md'),
+              ('anthropic', 'claude-fable-5', 'claude-api', 'https://platform.claude.com/docs/en/about-claude/models/overview.md'),
+              ('google', 'gemini-3.7', 'gemini-api', 'https://ai.google.dev/gemini-api/docs/models'),
+          ]
+          total_resolved = 0
+          total_original = 0
+          for provider, generation, surface, url in cases:
+              intake = build_intake_report({
+                  'provider': provider,
+                  'product_surface': surface,
+                  'generation': generation,
+                  'captured_at': '2026-08-27T11:46:00Z',
+                  'query_terms': [generation],
+                  'explicit_urls': [url],
+                  'max_documents': 1,
+              })
+              refined = refine_intake_report(intake)
+              verify_refinement_report(refined, intake_report=intake)
+              assert refined['bundle'] is not None, provider
+              validate_bundle(refined['bundle'])
+              original = refined['audit']['original_ambiguous_count']
+              resolved = refined['audit']['resolved_count']
+              remaining = refined['audit']['remaining_ambiguous_count']
+              total_original += original
+              total_resolved += resolved
+              print(provider, 'intake=', intake['status'], 'refined=', refined['status'], 'original=', original, 'resolved=', resolved, 'remaining=', remaining)
+              if resolved == 0 and intake['audit']['documents']:
+                  previews = intake['audit']['documents'][0]['extraction']['ambiguous'][:8]
+                  print(provider, 'sample_unresolved=', [p.get('preview','') for p in previews])
+          print('TOTAL', 'original=', total_original, 'resolved=', total_resolved)
+          assert total_original > 0
+          assert total_resolved > 0, 'controlled ontology did not reduce any live review surface'
+          PY
