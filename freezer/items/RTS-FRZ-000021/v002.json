@@ -1,0 +1,85 @@
+{
+  "item_id": "RTS-FRZ-000021",
+  "title": "Adversarial Human Review Necessity Triage v1",
+  "type": "architecture",
+  "status": "SELECTED",
+  "summary": "JがREVIEW_REQUIREDとして残した各exact-anchor unresolved findingに対し、DAとCounter-DAを別レンズで実行し、impact・causal reach・perspective gapから人間の注意を今使うべき理由を査定する。低価値判定でも証拠は捨てず、v1では自動DROP権限を持たない。",
+  "original_problem": "Jは85件中9件を安全に自動解決したが76件を保留した。76件を全部人間が同じ優先度で読むと新モデル追従時間が長い。一方、単純なnoise filterや平均scoreでは、低い即時impactでも後でH/F/Gへ効く因果経路や、DAとCounter-DAの評価差そのものを見落とす。",
+  "why_it_matters": "人間の判断力を本当に必要なUNKNOWNへ集中させるには、semantic correctnessを自動決定する前に、なぜ人間が見る価値があるのかをimpact・future causal reach・adversarial disagreementで順位付けする必要がある。",
+  "reason_frozen": "DAとCounter-DAを平均して disagreement を消す、高いcausal reachを低い即時impactだけでdeferする、marketing語を理由に同一anchor内のexecution-contract signalまで捨てる、unresolved itemをsilent dropする、truncated/stale inputを通常判定する、triageから実行権限を生やす、という失敗をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "exact unresolved source anchor preserved",
+    "one input unresolved finding produces one triage record",
+    "DA and Counter-DA remain separately inspectable",
+    "impact and causal reach are distinct dimensions",
+    "perspective disagreement increases rather than decreases review priority",
+    "low immediate impact can still be HUMAN_NOW when causal reach is high",
+    "noise signals cannot override explicit execution-contract signals",
+    "upstream truncation and stale fingerprints fail closed",
+    "no automatic DROP authority in v1",
+    "no execution/profile-application/promotion/Canon authority"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000020 Semantic Claim Refinement + Review Reduction v1 is COMPLETED",
+    "J preserves unresolved exact anchors and source identity",
+    "A-J are COMPLETED and WIP is clear"
+  ],
+  "negative_triggers": [
+    "DA and Counter-DA scores are averaged into a single hidden consensus",
+    "high perspective disagreement lowers review priority",
+    "high causal reach is auto-deferred solely because immediate impact is low",
+    "marketing/noise text suppresses an explicit contract-change signal in the same anchor",
+    "unresolved records disappear from output",
+    "truncated or stale upstream input produces a normal triage result",
+    "triage mutates runtime/profile/Canon authority"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000020 Semantic Claim Refinement + Review Reduction v1",
+    "official_docs_intake/",
+    "semantic_claim_refinement/",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "semantic_claim_refinement/",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000020_2026-08-27.md",
+    "model_transition_intelligence/"
+  ],
+  "possible_destinations": [
+    "review_necessity_triage/",
+    "future model-assisted DA/Counter-DA proposer behind deterministic verification",
+    "human attention queue for transition review"
+  ],
+  "estimated_hours": {
+    "minimum": 10,
+    "maximum": 18
+  },
+  "tags": [
+    "adaptive-intelligence-v7",
+    "human-review",
+    "adversarial-triage",
+    "impact",
+    "causal-reach",
+    "perspective-gap",
+    "review-priority",
+    "fail-closed",
+    "provider-neutral"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 2,
+  "created_at": "2026-08-27T12:34:49Z",
+  "updated_at": "2026-08-27T12:34:50Z",
+  "supersedes": "v001"
+}

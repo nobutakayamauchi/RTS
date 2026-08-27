@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T11:52:17Z",
-  "count": 20,
+  "generated_at": "2026-08-27T12:34:50Z",
+  "count": 21,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -488,6 +488,32 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T11:52:17Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000021",
+      "version": 3,
+      "title": "Adversarial Human Review Necessity Triage v1",
+      "type": "architecture",
+      "status": "IN_PROGRESS",
+      "priority_score": 86.89,
+      "estimated_hours": {
+        "minimum": 10,
+        "maximum": 18
+      },
+      "tags": [
+        "adaptive-intelligence-v7",
+        "human-review",
+        "adversarial-triage",
+        "impact",
+        "causal-reach",
+        "perspective-gap",
+        "review-priority",
+        "fail-closed",
+        "provider-neutral"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T12:34:50Z"
     }
   ]
 }

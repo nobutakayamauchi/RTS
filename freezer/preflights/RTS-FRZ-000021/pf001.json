@@ -1,0 +1,79 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Adversarial Human Review Necessity Triage v1",
+  "rationale": "Repository-local postprocessing of an already-valid J refinement report only. K0 does not fetch network data, call a provider/model, create semantic truth, alter H/F/G runtime behavior, or drop evidence. It assigns advisory human-attention classes while preserving exact unresolved anchors and two separate adversarial assessments.",
+  "affected_boundaries": [
+    "new review_necessity_triage package",
+    "J unresolved audit postprocessing",
+    "DA and Counter-DA advisory assessment records",
+    "impact / causal reach / perspective gap scoring",
+    "focused destructive DA and full A-K regression",
+    "RTS-FRZ-000021 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "A-J are COMPLETED.",
+    "J reports retain exact unresolved anchor previews/hashes/source IDs and an input fingerprint.",
+    "J never grants execution/profile/promotion authority.",
+    "Unresolved official-doc text remains semantically unverified."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No existing intake/refinement/transition/profile/FREEZER history is mutated in place."
+  },
+  "external_interfaces": [
+    "repository-local J refinement report object",
+    "deterministic adversarial triage report",
+    "no network/provider/model interface in v1"
+  ],
+  "approval_changes": [
+    "none; triage grants no execution/profile-application/promotion authority",
+    "DEFER_LOW_VALUE is attention scheduling only, never semantic dismissal or evidence deletion"
+  ],
+  "public_documents": [
+    "none"
+  ],
+  "regression_tests": [
+    "K0 baseline + destructive DA/Counter-DA",
+    "J semantic refinement regression",
+    "I official docs intake regression",
+    "H/G/F/E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "every unresolved J finding must appear exactly once in triage output",
+    "DA and Counter-DA cases remain separate",
+    "perspective gap must not be averaged away",
+    "high causal reach can override low immediate impact",
+    "explicit contract-change signals override generic noise heuristics",
+    "upstream truncation/staleness blocks normal triage",
+    "causal reach is an advisory score/path, not a measured probability"
+  ],
+  "rollback_boundary": "Drop the K0 branch or revert review_necessity_triage files and FRZ-000021 append-only versions; A-J remain untouched.",
+  "completion_conditions": [
+    "each unresolved J item yields one triage record with separate DA and Counter-DA cases",
+    "impact and causal reach are scored separately",
+    "perspective gap increases review priority when lenses disagree materially",
+    "low immediate impact plus high causal reach can produce HUMAN_NOW",
+    "marketing/noise wording cannot suppress explicit execution-contract signals",
+    "low-value items can become DEFER_LOW_VALUE without being dropped",
+    "truncated/stale input produces REVIEW_BLOCKED or fails closed",
+    "all authority fields remain NONE",
+    "live I→J→K0 triage reports useful differentiation across the current residual surface",
+    "A-K regressions and FREEZER verify pass"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "v1 deterministic lenses are advisory heuristics and not a semantic correctness oracle",
+    "future model-assisted DA/Counter-DA proposals must remain behind deterministic validation",
+    "human-review count reduction is not itself correctness evidence"
+  ],
+  "preflight_id": "RTS-PF-000021-001",
+  "item_id": "RTS-FRZ-000021",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "c8c7ec7cc8beb6939660fd720ec2acb46cac59f4f6185e813e321d88db74604b",
+  "created_at": "2026-08-27T12:34:49Z"
+}

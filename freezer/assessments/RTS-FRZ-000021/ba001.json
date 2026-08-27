@@ -1,0 +1,91 @@
+{
+  "assessor": "RTS governed build assessment — Adversarial Human Review Necessity Triage v1",
+  "rationale": "J leaves 76 unresolved official-doc findings after safe semantic refinement. K0 does not attempt to solve their semantics. It ranks human attention by keeping two visible adversarial lenses and scoring immediate impact, future causal reach, and their perspective gap. This directly reduces equal-priority review burden without creating execution or semantic truth authority.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 10,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 2
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "semantic claim refinement unresolved audit",
+      "model transition probe impact causal",
+      "human review adversarial priority"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "semantic_claim_refinement/",
+        "ref": "6a3b4fdd72e4a57548e0bce2689f2f617fa21a95",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 5,
+        "notes": "Reuse J report fingerprint, unresolved exact anchors, source identities and fail-closed ambiguity surface."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "model_transition_intelligence/",
+        "ref": "6a3b4fdd72e4a57548e0bce2689f2f617fa21a95",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Reuse contract areas and downstream H/F/G transition concepts for causal-path labels only."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000020_2026-08-27.md",
+        "ref": "6a3b4fdd72e4a57548e0bce2689f2f617fa21a95",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 1,
+        "notes": "Reuse measured live residual surface of 76 unresolved findings and J DA lessons."
+      }
+    ],
+    "gaps": [
+      "No component currently explains why an unresolved docs finding deserves human attention now versus later.",
+      "No current layer preserves DA/Counter-DA disagreement as a first-class review-priority signal.",
+      "No current layer distinguishes immediate impact from future causal reach for unresolved transition evidence."
+    ]
+  },
+  "risks": [
+    "Heuristic impact scoring can over-rank generic technical language.",
+    "Noise heuristics can under-rank a real contract change embedded in marketing wording.",
+    "A single aggregate score can hide adversarial disagreement if the design averages perspectives.",
+    "Causal reach can be overstated as a fake probability instead of an advisory path score.",
+    "Attention reduction can become a vanity metric if low-priority findings are silently dropped."
+  ],
+  "assessment_id": "RTS-BA-000021-001",
+  "item_id": "RTS-FRZ-000021",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "ae3bf45f26eb884df9df9831567477789de9a0034106f86d8b76d3a66968d58b",
+  "derived": {
+    "benefit_score": 91.5,
+    "cost_score": 47.06,
+    "reuse_score": 90.0,
+    "decision_score": 77.94,
+    "reuse_hours_saved": 9.0,
+    "net_hours": 9.0,
+    "time_saved_ratio": 0.9,
+    "implementation_efficiency": 1.11,
+    "cost_effectiveness": 10.17,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-27T12:34:49Z"
+}
