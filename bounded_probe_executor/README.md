@@ -14,6 +14,8 @@ This layer executes **approved bounded campaigns**, not arbitrary provider work.
 
 ## Background education pattern
 
-A scheduler or worker can call `run_campaign(..., max_jobs_this_chunk=N)`, persist the returned checkpoint, and later call it again with the same authorized campaign. Already terminal jobs are skipped. This lets model-behavior education run in bounded background chunks without replaying completed work.
+A scheduler or worker calls `run_background_chunk(campaign, adapter, checkpoint_path, max_jobs_this_chunk=N)`. The worker atomically persists its checkpoint with `os.replace`; a later process can load the same file and continue the exact authorized campaign. Terminal jobs are skipped rather than replayed, and a checkpoint from another campaign fingerprint fails closed.
 
-Provider-specific API adapters and credentials are deliberately outside v1. They must satisfy the callable adapter contract and remain behind a separate credential/runtime gate.
+This is the intended "background education" primitive: run a bounded slice, persist progress, resume later, and feed the resulting observable outcomes back into F. It is not an unlimited batch runner.
+
+Provider-specific API adapters, credentials, billing truth, and scheduler policy are deliberately outside v1. They must satisfy the callable adapter contract and remain behind a separate credential/runtime gate. The executor's estimated-cost ceiling is authorization input, not a claim about actual provider billing.
