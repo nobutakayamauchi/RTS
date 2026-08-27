@@ -28,5 +28,17 @@ jobs:
           python-version: '3.12'
       - name: Validate D runner syntax
         run: python -m py_compile scripts/run_frz000014_ultimate_loop.py
+      - name: Repair generated CLI newline escape
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/run_frz000014_ultimate_loop.py')
+          s=p.read_text()
+          old=r"sort_keys=True)+'\n')"
+          new=r"sort_keys=True)+'\\n')"
+          if s.count(old)!=1:
+              raise SystemExit(f'newline marker mismatch: {s.count(old)}')
+          p.write_text(s.replace(old,new))
+          PY
       - name: Run Child D Ultimate Loop
         run: python scripts/run_frz000014_ultimate_loop.py
