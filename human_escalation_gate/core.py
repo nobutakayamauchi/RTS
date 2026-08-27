@@ -302,7 +302,13 @@ def evaluate_escalation_report(
             counts[disposition] += 1
             continue
 
-        initial_routes = list(dict.fromkeys(_k0_routes(k0) + recover_escape_routes(k0["anchor"])))
+        k0_routes = _k0_routes(k0)
+        recovered_routes = recover_escape_routes(k0["anchor"])
+        # K1 is an escalation gate, not a work scheduler. Second-pass heuristic
+        # recovery exists to rescue K0 HUMAN_NOW findings before human handoff;
+        # it must not promote K0 HUMAN_LATER/DEFER_LOW_VALUE into active work.
+        active_recovered_routes = recovered_routes if k0.get("classification") == "HUMAN_NOW" else []
+        initial_routes = list(dict.fromkeys(k0_routes + active_recovered_routes))
         active_routes = list(initial_routes)
         learned_facts: list[str] = []
         evidence_ids_for_finding: set[str] = set()
