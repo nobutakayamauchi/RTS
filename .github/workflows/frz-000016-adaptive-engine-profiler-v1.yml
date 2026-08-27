@@ -1,0 +1,68 @@
+name: Validate FRZ-000016 Adaptive Engine Profiler v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000016-adaptive-engine-profiler-v1
+    paths:
+      - model_behavior_adaptation/**
+      - tests/test_model_behavior_adaptation.py
+      - tests/test_model_behavior_adaptation_da.py
+      - freezer/**
+      - .github/workflows/frz-000016-adaptive-engine-profiler-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000016-adaptive-engine-profiler-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run F baseline and destructive DA / Counter-DA
+        run: python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+      - name: Regress completed Child E
+        run: python -m unittest tests.test_external_seed_corpus tests.test_external_seed_corpus_da -v
+      - name: Regress completed Child D
+        run: python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+      - name: Regress completed Child C
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress completed Child B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress completed Child A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Assert adaptive intelligence stack A-F completed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              pointer=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(pointer['path']).read_text())
+          items=tuple(f'RTS-FR-{n:06d}' for n in [])
+          ids=('RTS-FRZ-000011','RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015','RTS-FRZ-000016')
+          for item_id in ids:
+              item=current(item_id)
+              assert item['status']=='COMPLETED', item
+          active=[]
+          for pointer in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              item=current(pointer.parent.name)
+              if item['status']=='IN_PROGRESS': active.append(item['item_id'])
+          assert active==[], active
+          print('A-F COMPLETED; WIP clear')
+          PY
