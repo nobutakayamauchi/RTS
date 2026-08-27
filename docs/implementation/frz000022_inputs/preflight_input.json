@@ -1,0 +1,63 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Exhausted-AI Human Escalation Gate v1",
+  "rationale": "Repository-local postprocessing of K0 triage plus explicit bounded verification evidence. K1 does not call providers, execute probes, mutate profiles, decide semantic truth, or delete evidence. It only decides whether AI-side work remains or an explicitly exhausted material dead-end may be returned to a human.",
+  "affected_boundaries": [
+    "new human_escalation_gate package",
+    "K0 triage postprocessing",
+    "explicit verification/exhaustion evidence records",
+    "focused destructive DA and full A-K1 regression",
+    "RTS-FRZ-000022 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "RTS-FRZ-000021 is COMPLETED.",
+    "K0 preserves exact unresolved anchors, materiality dimensions, adversarial views and problem-solving paths.",
+    "K0 and upstream layers grant no execution/profile/promotion authority.",
+    "Missing verification evidence is not proof that verification is exhausted."
+  ],
+  "data_migration": {"required": false, "notes": "No K0/J/I/H/F/G or prior FREEZER history is mutated in place."},
+  "external_interfaces": [
+    "repository-local K0 ReviewNecessityReport",
+    "explicit bounded VerificationEvidence objects",
+    "deterministic advisory escalation report",
+    "no network/provider/model interface in v1"
+  ],
+  "approval_changes": [
+    "none; HUMAN_NOW is an advisory human-attention disposition only",
+    "K1 grants no execution/profile-application/promotion/Canon authority"
+  ],
+  "public_documents": ["none"],
+  "regression_tests": [
+    "K1 baseline + destructive DA/Counter-DA",
+    "K0 review necessity regression",
+    "J/I/H/G/F/E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "a remaining K0 problem-solving path means AI work remains unless bounded verification explicitly exhausted that path",
+    "uncertainty or disagreement alone cannot prove exhaustion",
+    "a discriminating experiment must name a concrete next test or evidence distinction",
+    "a safe defer must name a bounded recheck/trigger condition",
+    "HUMAN_NOW requires material effect and explicit exhaustion evidence",
+    "blocked/stale/truncated upstream evidence fails closed"
+  ],
+  "rollback_boundary": "Drop the K1 branch or revert human_escalation_gate files and FRZ-000022 append-only versions; completed K0 and A-J remain untouched.",
+  "completion_conditions": [
+    "high-impact K0 items with an unexhausted discriminating probe are not HUMAN_NOW",
+    "items with a bounded safe defer condition are not HUMAN_NOW",
+    "uncertainty/disagreement alone cannot emit HUMAN_NOW",
+    "missing verification evidence cannot emit HUMAN_NOW",
+    "explicitly exhausted material dead-end with no defensible decision, experiment or defer emits HUMAN_NOW",
+    "non-material exhausted dead-end does not emit HUMAN_NOW",
+    "blocked/stale input fails closed",
+    "live I→J→K0→K1 revalidation reports the current 76-item surface without silently dropping records",
+    "all authority fields remain NONE",
+    "A-K1 regressions and FREEZER verify pass"
+  ],
+  "decomposition": {"required": false, "child_candidates": []},
+  "risks": [
+    "K1 v1 validates exhaustion evidence structurally and cannot infer hidden provider behavior.",
+    "A future model-assisted verification proposer must remain behind bounded evidence validation.",
+    "lower HUMAN_NOW count is not itself correctness evidence."
+  ]
+}
