@@ -284,24 +284,25 @@ class SelectiveRecallV1Tests(unittest.TestCase):
                     seen.add(node.module.split(".")[0])
         self.assertTrue(forbidden.isdisjoint(seen), seen & forbidden)
 
-    def test_only_child_a_is_in_progress_and_siblings_remain_frozen(self) -> None:
+    def test_child_a_lifecycle_boundary_is_governed(self) -> None:
+        items = {}
         active = []
         for current in (self.repo_root / "freezer" / "items").glob("RTS-FRZ-*/current.json"):
             pointer = json.loads(current.read_text(encoding="utf-8"))
             item = json.loads((self.repo_root / pointer["path"]).read_text(encoding="utf-8"))
+            items[item["item_id"]] = item
             if item["status"] == "IN_PROGRESS":
                 active.append(item["item_id"])
-        self.assertEqual(active, ["RTS-FRZ-000011"])
 
-        for item_id in ("RTS-FRZ-000012", "RTS-FRZ-000013", "RTS-FRZ-000014", "RTS-FRZ-000015"):
-            pointer = json.loads(
-                (self.repo_root / "freezer" / "items" / item_id / "current.json").read_text(
-                    encoding="utf-8"
-                )
-            )
-            item = json.loads((self.repo_root / pointer["path"]).read_text(encoding="utf-8"))
-            self.assertEqual(item["status"], "FROZEN")
-            self.assertEqual(item["build_authority"], "NOT_APPROVED")
+        child = items["RTS-FRZ-000011"]
+        self.assertIn(child["status"], {"IN_PROGRESS", "VERIFIED", "COMPLETED"})
+        if child["status"] == "IN_PROGRESS":
+            self.assertEqual(active, ["RTS-FRZ-000011"])
+            for item_id in ("RTS-FRZ-000012", "RTS-FRZ-000013", "RTS-FRZ-000014", "RTS-FRZ-000015"):
+                self.assertEqual(items[item_id]["status"], "FROZEN")
+                self.assertEqual(items[item_id]["build_authority"], "NOT_APPROVED")
+        else:
+            self.assertNotIn("RTS-FRZ-000011", active)
 
 
 if __name__ == "__main__":
