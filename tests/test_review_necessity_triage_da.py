@@ -24,6 +24,30 @@ class ReviewNecessityTriageDATests(unittest.TestCase):
         self.assertTrue(record["da"]["explicit_contract_signal"])
         self.assertGreaterEqual(record["da"]["impact"], 4)
 
+    def test_descriptive_reasoning_capability_is_not_operational_contract(self):
+        j = make_j("Our most advanced model for complex tasks features deep reasoning and coding capabilities.")
+        triage = triage_refinement_report(j)
+        record = triage["records"][0]
+        self.assertNotEqual(record["classification"], "HUMAN_NOW")
+        self.assertLessEqual(record["da"]["impact"], 2)
+        self.assertLessEqual(record["da"]["causal_reach"], 2)
+        self.assertFalse(record["da"]["explicit_contract_signal"])
+
+    def test_operational_reasoning_guidance_remains_human_now(self):
+        j = make_j("Use high or xhigh when more reasoning produces a measured quality gain.")
+        triage = triage_refinement_report(j)
+        record = triage["records"][0]
+        self.assertEqual(record["classification"], "HUMAN_NOW")
+        self.assertGreaterEqual(record["da"]["causal_reach"], 4)
+        self.assertTrue(record["da"]["explicit_contract_signal"])
+
+    def test_short_catalog_heading_does_not_become_tool_contract(self):
+        j = make_j("Tool and agent models")
+        triage = triage_refinement_report(j)
+        record = triage["records"][0]
+        self.assertEqual(record["classification"], "DEFER_LOW_VALUE")
+        self.assertLessEqual(record["da"]["human_review_importance"], 1)
+
     def test_material_perspective_gap_cannot_be_averaged_into_later_review(self):
         j = make_j("The new model sets a quality and efficiency baseline for complex production workflows.")
         triage = triage_refinement_report(j)
