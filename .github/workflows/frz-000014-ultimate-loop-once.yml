@@ -34,11 +34,15 @@ jobs:
           from pathlib import Path
           p=Path('scripts/run_frz000014_ultimate_loop.py')
           s=p.read_text()
+          start=s.index("write('reuse_metrics/cli.py',")
+          end=s.index("write('reuse_metrics/__main__.py'", start)
+          block=s[start:end]
           old=r"sort_keys=True)+'\n')"
           new=r"sort_keys=True)+'\\n')"
-          if s.count(old)!=1:
-              raise SystemExit(f'newline marker mismatch: {s.count(old)}')
-          p.write_text(s.replace(old,new))
+          if block.count(old)!=1:
+              raise SystemExit(f'CLI newline marker mismatch: {block.count(old)}')
+          block=block.replace(old,new)
+          p.write_text(s[:start]+block+s[end:])
           PY
       - name: Run Child D Ultimate Loop
         run: python scripts/run_frz000014_ultimate_loop.py
