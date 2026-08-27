@@ -1,0 +1,70 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Official Docs Intake + Claim Extraction Adapter v1",
+  "rationale": "I is an upstream documentation intake boundary only. Network access is bounded to HTTPS official-host allowlists, redirects are revalidated, fetch count/bytes/time are capped, HTML is normalized without executing scripts, and emitted claims are exact anchors copied from normalized source text. Ambiguous contract-like chunks remain visible in extraction audit. Output is validated by H and grants no runtime/profile/promotion authority.",
+  "affected_boundaries": [
+    "new official_docs_intake package",
+    "provider official-host/index registry",
+    "bounded discovery and HTTPS fetch",
+    "deterministic HTML/text normalization",
+    "exact-anchor claim candidate extraction",
+    "coverage audit and H bundle emission",
+    "focused DA/regression tests",
+    "RTS-FRZ-000019 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "A-H are COMPLETED.",
+    "H validates transition-evidence-bundle/v1 and keeps docs claims UNVERIFIED.",
+    "Only OFFICIAL evidence can establish H transition severity.",
+    "F/G remain separately bounded and approval-controlled.",
+    "No external documentation creates execution authority or Canon by itself."
+  ],
+  "data_migration": {"required": false, "notes": "No existing H bundles, profiles, memory, FREEZER history, runtime router, or provider credentials are mutated."},
+  "external_interfaces": [
+    "provider + generation + query terms intake request",
+    "HTTPS GET to explicit provider official hosts only",
+    "bounded discovery from provider index/seeds",
+    "JSON-compatible extraction audit",
+    "H-compatible transition-evidence-bundle/v1"
+  ],
+  "approval_changes": [
+    "none; I output grants no execution/profile-application/promotion authority",
+    "provider OFFICIAL trust derives from configured provider allowlist, not page self-assertion"
+  ],
+  "public_documents": ["none"],
+  "regression_tests": [
+    "I baseline + destructive DA/Counter-DA",
+    "H model transition intelligence regression",
+    "G/F/E/D/C/B/A regressions",
+    "FREEZER regression and verification"
+  ],
+  "hidden_dependencies": [
+    "redirect final host must remain allowlisted",
+    "download and normalized text size must remain bounded",
+    "document_id must remain stable across generations for H residual comparison",
+    "claim anchors must exist byte-for-byte in normalized source content",
+    "contract-like but unclassified chunks must remain auditable rather than silently discarded"
+  ],
+  "rollback_boundary": "Drop the I branch or revert official_docs_intake files and FRZ-000019 append-only versions; A-H remain untouched.",
+  "completion_conditions": [
+    "OpenAI, Anthropic and Google built-in provider policies exist with bounded official hosts/seeds",
+    "non-HTTPS or non-allowlisted URLs fail closed",
+    "redirect to non-allowlisted host fails closed",
+    "fetch count, content bytes and normalized text size are capped",
+    "script/style content is not executed or treated as visible document text",
+    "claim candidates use exact anchors present in normalized source text",
+    "obvious context/reasoning/tool/cache/delegation/limit/pricing/deprecation signals map to H areas/kinds conservatively",
+    "novel contract-like text is surfaced in coverage audit instead of silently disappearing",
+    "partial fetch/extraction failures prevent READY status while preserving completed evidence",
+    "emitted H bundle passes H validate_bundle",
+    "all I outputs remain non-authorizing and docs claims remain hypotheses",
+    "A-I regressions and FREEZER verify pass"
+  ],
+  "decomposition": {"required": false, "child_candidates": []},
+  "risks": [
+    "lexical extraction is intentionally conservative and may over-route ambiguous changes to review",
+    "provider index formats can evolve and require adapter updates",
+    "some JS-heavy docs may not expose useful server-rendered text; these must fail/review rather than fabricate coverage",
+    "v1 discovers within bounded configured indexes/seeds and is not a general web crawler"
+  ]
+}
