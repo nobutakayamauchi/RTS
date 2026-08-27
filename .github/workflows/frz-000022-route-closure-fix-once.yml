@@ -1,4 +1,4 @@
-name: FRZ-000022 Route Closure Fix Once
+name: FRZ-000022 Knowledge Order Fix Once
 
 on:
   push:
@@ -26,14 +26,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Enforce active-route closure only
+      - name: Require escape search after known routes are closed
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('human_escalation_gate/core.py')
           s=p.read_text()
-          old='''            for closed in row["closed_routes"]:\n                active_routes = [route for route in active_routes if route != closed]\n            for opened in row["opened_routes"]:\n'''
-          new='''            closeable_routes = set(active_routes) | set(row["opened_routes"])\n            unknown_closures = [closed for closed in row["closed_routes"] if closed not in closeable_routes]\n            if unknown_closures:\n                raise HumanEscalationError(\n                    f"finding {index}: cannot close routes that were never active: {unknown_closures}"\n                )\n            for closed in row["closed_routes"]:\n                active_routes = [route for route in active_routes if route != closed]\n            for opened in row["opened_routes"]:\n'''
+          old='''            if route_id == EXHAUSTION_SEARCH_ROUTE:\n                if row["opened_routes"]:\n                    active_routes.extend(row["opened_routes"])\n                elif row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:\n                    exhaustion_search_observed = True\n'''
+          new='''            if route_id == EXHAUSTION_SEARCH_ROUTE:\n                if row["opened_routes"]:\n                    active_routes.extend(row["opened_routes"])\n                elif not active_routes and row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:\n                    # A no-new-route search only proves exhaustion after all\n                    # previously known routes have already been closed and their\n                    # evidence has been folded into the current knowledge state.\n                    exhaustion_search_observed = True\n'''
           assert s.count(old)==1, s.count(old)
           p.write_text(s.replace(old,new))
           PY
@@ -45,5 +45,5 @@ jobs:
           git config user.email rts-bot@users.noreply.github.com
           git add human_escalation_gate/core.py
           git diff --cached --quiet && exit 1 || true
-          git commit -m 'fix: reject impossible FRZ-000022 route closures'
+          git commit -m 'fix: require post-integration escape search for FRZ-000022 exhaustion'
           git push origin HEAD:feature/frz-000022-exhausted-ai-human-escalation-gate-v1
