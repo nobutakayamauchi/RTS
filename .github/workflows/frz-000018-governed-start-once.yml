@@ -1,0 +1,94 @@
+name: FRZ-000018 Governed Start Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000018-model-transition-intelligence-v1
+    paths:
+      - .github/workflows/frz-000018-governed-start-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  governed-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000018-model-transition-intelligence-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify clean A-G baseline
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          for n in range(11,18):
+              item=current(f'RTS-FRZ-{n:06d}')
+              assert item['status']=='COMPLETED', item
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              item=current(p.parent.name)
+              if item['status']=='IN_PROGRESS': active.append(item['item_id'])
+          assert active==[], active
+          print('A-G COMPLETED; WIP clear')
+          PY
+      - name: Add and assess FRZ-000018
+        run: |
+          python -m freezer.cli add --input docs/implementation/frz000018_inputs/item_input.json
+          python -m freezer.build_assessment create RTS-FRZ-000018 --input docs/implementation/frz000018_inputs/build_assessment_input.json
+          python - <<'PY'
+          import json
+          p=json.load(open('freezer/assessments/RTS-FRZ-000018/ba001.json'))
+          assert p['derived']['recommendation']=='BUILD_NOW', p['derived']
+          print(p['derived'])
+          PY
+          python -m freezer.preflight create RTS-FRZ-000018 --input docs/implementation/frz000018_inputs/preflight_input.json
+      - name: Apply explicit build authority and start WIP
+        run: |
+          python -m freezer.cli revise RTS-FRZ-000018 --input docs/implementation/frz000018_inputs/approve_selected.json
+          python -m freezer.cli revise RTS-FRZ-000018 --input docs/implementation/frz000018_inputs/start_in_progress.json
+          python -m freezer.cli reindex
+          python -m freezer.build_assessment reindex
+      - name: Verify governed start
+        run: |
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          item=current('RTS-FRZ-000018')
+          assert item['status']=='IN_PROGRESS', item
+          assert item['build_authority']=='APPROVED', item
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              row=current(p.parent.name)
+              if row['status']=='IN_PROGRESS': active.append(row['item_id'])
+          assert active==['RTS-FRZ-000018'], active
+          print('FRZ-000018 IN_PROGRESS; WIP=1')
+          PY
+      - name: Commit generated FREEZER state
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add freezer
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'freezer: start FRZ-000018 model transition intelligence v1'
+          git push origin HEAD:feature/frz-000018-model-transition-intelligence-v1
