@@ -1,0 +1,125 @@
+name: Validate FRZ-000011 Selective Recall v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000011-selective-recall-memory-lifecycle-v1
+    paths:
+      - selective_recall/**
+      - memory/recall_registry.json
+      - tests/test_selective_recall.py
+      - .github/workflows/frz-000011-selective-recall-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frz-000011-selective-recall-v1
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000011-selective-recall-memory-lifecycle-v1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify committed recall registry freshness and authority
+        run: |
+          set -euxo pipefail
+          python -m selective_recall verify | tee /tmp/recall-verify.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          value = json.loads(Path('/tmp/recall-verify.json').read_text())
+          assert value['record_count'] == 2, value
+          assert value['all_sources_current'] is True, value
+          assert value['execution_authority'] == 'NONE', value
+          assert value['promotion_authority'] == 'NONE', value
+          print('registry boundary OK')
+          PY
+
+      - name: Run Selective Recall v1 tests
+        run: |
+          set -euxo pipefail
+          python -m unittest tests.test_selective_recall -v
+
+      - name: Run existing FREEZER regression suite
+        run: |
+          set -euxo pipefail
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Assert governed Child A WIP boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          active = []
+          for p in (root / 'freezer' / 'items').glob('RTS-FRZ-*/current.json'):
+              pointer = json.loads(p.read_text())
+              item = json.loads((root / pointer['path']).read_text())
+              if item['status'] == 'IN_PROGRESS':
+                  active.append(item['item_id'])
+          assert active == ['RTS-FRZ-000011'], active
+
+          for item_id in ('RTS-FRZ-000012','RTS-FRZ-000013','RTS-FRZ-000014','RTS-FRZ-000015'):
+              pointer = json.loads((root / 'freezer' / 'items' / item_id / 'current.json').read_text())
+              item = json.loads((root / pointer['path']).read_text())
+              assert item['status'] == 'FROZEN', item
+              assert item['build_authority'] == 'NOT_APPROVED', item
+          print('WIP=1 and sibling freeze boundary OK')
+          PY
+
+      - name: Prove smallest-anchor CLI behavior
+        run: |
+          cat > /tmp/recall-request.json <<'JSON'
+          {
+            "event": "reasoning_continuity_loss",
+            "scope_tags": ["context", "reconstruction", "claude-code"],
+            "current_context_sufficient": false,
+            "explicit_recall": false,
+            "max_results": 1
+          }
+          JSON
+          python -m selective_recall recall --request /tmp/recall-request.json | tee /tmp/recall-result.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          value = json.loads(Path('/tmp/recall-result.json').read_text())
+          assert value['recall_decision'] == 'RECALL', value
+          assert len(value['selected_anchors']) == 1, value
+          anchor = value['selected_anchors'][0]
+          assert anchor['memory_id'] == 'incident:INC_20260222_1603_ClaudeCode_ContextLoss.md', anchor
+          assert 'body' not in anchor and 'content' not in anchor and 'snippet' not in anchor, anchor
+          assert value['execution_authority'] == 'NONE', value
+          assert value['promotion_authority'] == 'NONE', value
+          print('smallest-anchor behavior OK')
+          PY
+
+      - name: Prove lifecycle cannot jump RAW to CANONICAL
+        run: |
+          set -euxo pipefail
+          if python -m selective_recall transition RAW CANONICAL; then
+            echo 'RAW -> CANONICAL unexpectedly passed' >&2
+            exit 1
+          fi
+          python -m selective_recall transition RAW ACTIVE_CANDIDATE | tee /tmp/transition.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          value = json.loads(Path('/tmp/transition.json').read_text())
+          assert value['valid'] is True, value
+          assert value['applied'] is False, value
+          assert value['application_authority'] == 'NONE', value
+          print('lifecycle boundary OK')
+          PY
