@@ -1,0 +1,115 @@
+{
+  "authority": {
+    "canon": "NONE",
+    "execution": "NONE",
+    "promotion": "NONE"
+  },
+  "schema_version": 1,
+  "seeds": [
+    {
+      "applicability_conditions": [
+        "A bounded batch owner already exists and can split while preserving order.",
+        "The provider error explicitly identifies an item-count or supported input-length limit shape.",
+        "Retrying the same unchanged oversized batch is known to be futile."
+      ],
+      "applicability_tags": [
+        "batch-limit",
+        "failure-isolation",
+        "retry-avoidance",
+        "incremental-recovery",
+        "embedding"
+      ],
+      "authority": {
+        "canon": "NONE",
+        "execution": "NONE",
+        "promotion": "NONE"
+      },
+      "counterconditions": [
+        "Generic or ambiguous HTTP 400 input-validation failures without a supported explicit limit shape.",
+        "Token-length failures that are not item-count failures.",
+        "Transient 429/5xx/network failures governed by a distinct retry policy."
+      ],
+      "evidence_class": "UPSTREAM_MERGED_REPAIR",
+      "license": {
+        "source_ref": "openclaw/openclaw/LICENSE@ebaebf7c416761a32f932ad70ebe5d1d2e214f68",
+        "spdx": "MIT",
+        "verified": true
+      },
+      "observed_failure_boundary": "OpenAI-compatible embedding providers can explicitly reject oversized input-item batches; replaying the unchanged batch cannot succeed, and unrelated digits inside request ids can be misread as HTTP status if matching is unbounded.",
+      "pattern_title": "Split only explicitly reported oversized embedding item batches; do not replay the same known-invalid batch",
+      "repair_principle": "Recognize only self-describing supported item-limit shapes, route those through an existing order-preserving splitter, skip futile unchanged retries, and leave generic malformed HTTP 400 input failures out of split recovery.",
+      "reuse_mode": "REFERENCE_ONLY",
+      "rts_validation": {
+        "evidence_refs": [],
+        "notes": "Upstream merged evidence is preserved, but transfer to RTS has not been independently validated and grants no Canon authority.",
+        "status": "VERIFICATION_PENDING"
+      },
+      "seed_id": "ext-openclaw-embedding-item-limit-split-v1",
+      "source_refs": [
+        {
+          "kind": "pull_request",
+          "merged": false,
+          "ref": "pull/125722@08fa41c1606a4c201462d76f43184e6920a0cef7",
+          "repository": "openclaw/openclaw",
+          "url": "https://github.com/openclaw/openclaw/pull/125722"
+        },
+        {
+          "kind": "pull_request",
+          "merged": true,
+          "ref": "pull/129927@657026cab35f62e6b9a68da0f7fad3666874c28d",
+          "repository": "openclaw/openclaw",
+          "url": "https://github.com/openclaw/openclaw/pull/129927"
+        }
+      ],
+      "state": "VERIFICATION_PENDING"
+    },
+    {
+      "applicability_conditions": [
+        "A prior memory decision could materially change GO/HOLD/CAP/BLOCK, a protected surface, or the first read.",
+        "Freshness/supersession can be checked before the recalled note influences action."
+      ],
+      "applicability_tags": [
+        "selective-recall",
+        "context-weight",
+        "stale-memory",
+        "routing-non-authority"
+      ],
+      "authority": {
+        "canon": "NONE",
+        "execution": "NONE",
+        "promotion": "NONE"
+      },
+      "counterconditions": [
+        "Tiny local work with an explicit target and no consequential surface.",
+        "Discussion where recall does not change an operational decision.",
+        "More than two candidate lanes without a distinct decision need; downshift or HOLD instead."
+      ],
+      "evidence_class": "UPSTREAM_DESIGN_NOTE",
+      "license": {
+        "source_ref": "shin4141/decision-os-v13-loopkit/LICENSE@20d7e5614d096b44120ff50279e9c4d9f87d2557",
+        "spdx": "MIT",
+        "verified": true
+      },
+      "observed_failure_boundary": "Memory recall itself can create governance drag, stale-note authority leaks and analysis overload when used for tiny work or when multiple lanes do not change the next action.",
+      "pattern_title": "Recall should downshift when it does not change a real decision or when too many memory lanes add process weight",
+      "repair_principle": "Use no/light recall when local context is enough; invoke bounded recall only when it can change a gate, protected surface or first read; recheck stale notes; routing never grants authority.",
+      "reuse_mode": "REFERENCE_ONLY",
+      "rts_validation": {
+        "evidence_refs": [],
+        "notes": "Concept note only. RTS already has Child A selective recall; this seed remains external evidence until a distinct internal validation record exists.",
+        "status": "VERIFICATION_PENDING"
+      },
+      "seed_id": "ext-decision-os-lane-recall-weight-limits-v1",
+      "source_refs": [
+        {
+          "kind": "commit_file",
+          "merged": true,
+          "ref": "fe88f90430bacbb8f5aaf3ac5439e0580c04abd6:field_notes/050_lane_recall_failure_and_weight_limits.md",
+          "repository": "shin4141/decision-os-v13-loopkit",
+          "url": "https://github.com/shin4141/decision-os-v13-loopkit/blob/fe88f90430bacbb8f5aaf3ac5439e0580c04abd6/field_notes/050_lane_recall_failure_and_weight_limits.md"
+        }
+      ],
+      "state": "VERIFICATION_PENDING"
+    }
+  ]
+}
