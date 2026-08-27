@@ -14,6 +14,10 @@ from semantic_claim_refinement import refine_intake_report
 from tests.test_semantic_claim_refinement import make_intake
 
 
+REASONING_CONTEXT_ANCHOR = "Check the response's `reasoning.context` field to confirm the effective mode."
+REASONING_ROUTE = "VERIFY_REASONING_CONTEXT_FIELD"
+
+
 def make_k0(body: str):
     j = refine_intake_report(make_intake(body))
     return triage_refinement_report(j)
@@ -21,6 +25,20 @@ def make_k0(body: str):
 
 def fp(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
+
+
+def close_reasoning_route_evidence() -> dict:
+    return {
+        "evidence_id": "e-close-reasoning",
+        "finding_index": 0,
+        "route_id": REASONING_ROUTE,
+        "probe_fingerprint": fp("close-reasoning-route"),
+        "evidence_distinction": "Inspect the named reasoning.context field and determine whether it discriminates the effective mode.",
+        "outcome": "NON_DISCRIMINATING",
+        "learned_facts": ["The bounded field check did not resolve the remaining operational choice."],
+        "closed_routes": [REASONING_ROUTE],
+        "opened_routes": [],
+    }
 
 
 class HumanEscalationGateTests(unittest.TestCase):
@@ -33,13 +51,13 @@ class HumanEscalationGateTests(unittest.TestCase):
         self.assertTrue(row["residual_routes"])
 
     def test_second_pass_recovers_reasoning_context_route(self):
-        k0 = make_k0("Check the response's `reasoning.context` field to confirm the effective mode.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         self.assertEqual(k0["records"][0]["classification"], "HUMAN_NOW")
         self.assertFalse(k0["records"][0]["da"]["problem_solving_paths"])
         report = evaluate_escalation_report(k0)
         row = report["records"][0]
         self.assertEqual(row["disposition"], "AI_CONTINUE")
-        self.assertIn("VERIFY_REASONING_CONTEXT_FIELD", row["recovered_escape_routes"])
+        self.assertIn(REASONING_ROUTE, row["recovered_escape_routes"])
 
     def test_low_priority_item_gets_bounded_safe_defer(self):
         k0 = make_k0("The new model sets a quality and efficiency baseline for complex production workflows.")
@@ -49,30 +67,33 @@ class HumanEscalationGateTests(unittest.TestCase):
         self.assertEqual(row["safe_defer"]["trigger"], "SOURCE_OR_ENGINE_IDENTITY_CHANGE")
 
     def test_material_dead_end_without_exhaustion_evidence_is_candidate_not_human_now(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
-        self.assertEqual(k0["records"][0]["classification"], "HUMAN_NOW")
-        report = evaluate_escalation_report(k0)
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
+        report = evaluate_escalation_report(
+            k0,
+            verification_evidence=[close_reasoning_route_evidence()],
+        )
         row = report["records"][0]
         self.assertEqual(row["disposition"], "HUMAN_CANDIDATE")
+        self.assertFalse(row["residual_routes"])
         self.assertIsNone(row["human_handoff"])
 
     def test_bounded_no_new_route_search_plus_material_choice_allows_human_now(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
-        evidence = [{
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
+        search = {
             "evidence_id": "e-search",
             "finding_index": 0,
             "route_id": EXHAUSTION_SEARCH_ROUTE,
             "probe_fingerprint": fp("search-1"),
-            "evidence_distinction": "Search bounded official-doc and observable-runtime surfaces for a discriminator that changes the context-window decision.",
+            "evidence_distinction": "Search bounded official-doc and observable-runtime surfaces for a new discriminator after the named field route was exhausted.",
             "outcome": "NON_DISCRIMINATING",
             "learned_facts": ["No additional bounded discriminator was found in the searched surfaces."],
             "closed_routes": [],
             "opened_routes": [],
-        }]
+        }
         report = evaluate_escalation_report(
             k0,
-            verification_evidence=evidence,
-            human_choices={0: "Choose whether RTS should treat the documented context window as an operational planning bound."},
+            verification_evidence=[close_reasoning_route_evidence(), search],
+            human_choices={0: "Choose how RTS should treat the unresolved effective-mode ambiguity after bounded verification is exhausted."},
         )
         row = report["records"][0]
         self.assertEqual(row["disposition"], "HUMAN_NOW")
@@ -80,35 +101,35 @@ class HumanEscalationGateTests(unittest.TestCase):
         self.assertTrue(row["human_handoff"]["learned_facts"])
 
     def test_decision_requires_evidence_and_resolves_without_human(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         evidence = [{
             "evidence_id": "e-contract",
             "finding_index": 0,
-            "route_id": EXHAUSTION_SEARCH_ROUTE,
+            "route_id": REASONING_ROUTE,
             "probe_fingerprint": fp("decision-evidence"),
-            "evidence_distinction": "Compare observed accepted input boundary with the documented limit.",
+            "evidence_distinction": "Inspect reasoning.context and compare it with the requested mode.",
             "outcome": "OBSERVED",
-            "learned_facts": ["Observed behavior is consistent with the documented planning bound."],
-            "closed_routes": [],
+            "learned_facts": ["The observed field discriminates the effective mode for this case."],
+            "closed_routes": [REASONING_ROUTE],
             "opened_routes": [],
         }]
         report = evaluate_escalation_report(
             k0,
             verification_evidence=evidence,
-            decisions={0: {"decision": "Use the observed bound provisionally.", "evidence_ids": ["e-contract"]}},
+            decisions={0: {"decision": "Use the observed effective mode provisionally.", "evidence_ids": ["e-contract"]}},
         )
         self.assertEqual(report["records"][0]["disposition"], "AI_RESOLVE")
 
     def test_duplicate_probe_fingerprint_is_rejected_even_with_different_ids(self):
-        k0 = make_k0("The context window is 1000000 tokens.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         digest = fp("same-probe")
         evidence = [
             {
                 "evidence_id": "e1",
                 "finding_index": 0,
-                "route_id": EXHAUSTION_SEARCH_ROUTE,
+                "route_id": REASONING_ROUTE,
                 "probe_fingerprint": digest,
-                "evidence_distinction": "Search route A.",
+                "evidence_distinction": "Inspect the named field once.",
                 "outcome": "INCONCLUSIVE",
                 "learned_facts": ["No decision yet."],
                 "closed_routes": [],
@@ -117,7 +138,7 @@ class HumanEscalationGateTests(unittest.TestCase):
             {
                 "evidence_id": "e2",
                 "finding_index": 0,
-                "route_id": EXHAUSTION_SEARCH_ROUTE,
+                "route_id": REASONING_ROUTE,
                 "probe_fingerprint": digest,
                 "evidence_distinction": "Same probe replayed under another evidence id.",
                 "outcome": "INCONCLUSIVE",
@@ -130,7 +151,7 @@ class HumanEscalationGateTests(unittest.TestCase):
             evaluate_escalation_report(k0, verification_evidence=evidence)
 
     def test_authority_boundaries_remain_none(self):
-        k0 = make_k0("Check the response's `reasoning.context` field to confirm the effective mode.")
+        k0 = make_k0(REASONING_CONTEXT_ANCHOR)
         report = evaluate_escalation_report(k0)
         self.assertEqual(report["execution_authority"], "NONE")
         self.assertEqual(report["profile_application_authority"], "NONE")
