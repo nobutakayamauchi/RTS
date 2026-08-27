@@ -60,6 +60,7 @@
     "maximum": 16
   },
   "tags": [
+    "adaptive-intelligence-v2-child",
     "context-compression",
     "restartability",
     "handoff",
