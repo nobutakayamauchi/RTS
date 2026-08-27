@@ -141,6 +141,15 @@ class HumanEscalationGateDATests(unittest.TestCase):
         )
         self.assertEqual(report["records"][0]["disposition"], "HUMAN_CANDIDATE")
 
+    def test_k1_does_not_promote_k0_later_or_defer_to_active_work_from_escape_heuristic(self):
+        k0 = make_k0("High-efficiency, low-cost, developer-first video generation and editing.")
+        self.assertIn(k0["records"][0]["classification"], {"HUMAN_LATER", "DEFER_LOW_VALUE"})
+        report = evaluate_escalation_report(k0)
+        row = report["records"][0]
+        self.assertIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])
+        self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")
+        self.assertFalse(row["residual_routes"])
+
     def test_non_material_dead_end_does_not_consume_human_now(self):
         k0 = make_k0("New")
         self.assertEqual(k0["records"][0]["classification"], "DEFER_LOW_VALUE")
