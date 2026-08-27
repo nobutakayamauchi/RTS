@@ -447,12 +447,11 @@ def discover_document_urls(
         if current is None or score > current["score"]:
             candidates[clean] = row
 
+    terms = tuple(_normalize_space(str(term)) for term in query_terms if _normalize_space(str(term)))
     for url in explicit_urls:
         add(url, 10_000, "EXPLICIT")
     for url in policy["seed_urls"]:
-        add(url, 100, "SEED")
-
-    terms = tuple(_normalize_space(str(term)) for term in query_terms if _normalize_space(str(term)))
+        add(url, 5 + _score_candidate("", url, terms), "SEED")
     for index_url in policy["index_urls"]:
         try:
             fetched = fetch(provider, index_url)
@@ -485,20 +484,26 @@ def _chunk_blocks(content: str) -> list[str]:
         block = _normalize_space(raw_block)
         if not block:
             continue
-        if len(block) <= 1800:
-            chunks.append(block)
-            continue
-        remaining = block
-        while len(remaining) > 1800:
-            cut = max(remaining.rfind(". ", 0, 1800), remaining.rfind("; ", 0, 1800), remaining.rfind(" ", 0, 1800))
-            if cut < 200:
-                cut = 1800
-            piece = remaining[:cut].strip()
-            if piece:
-                chunks.append(piece)
-            remaining = remaining[cut:].strip()
-        if remaining:
-            chunks.append(remaining)
+        sentence_parts = [
+            _normalize_space(part)
+            for part in re.split(r"(?<=[.!?;])\s+(?=[A-Z0-9])", block)
+            if _normalize_space(part)
+        ]
+        for sentence in sentence_parts:
+            if len(sentence) <= 1800:
+                chunks.append(sentence)
+                continue
+            remaining = sentence
+            while len(remaining) > 1800:
+                cut = max(remaining.rfind(". ", 0, 1800), remaining.rfind("; ", 0, 1800), remaining.rfind(" ", 0, 1800))
+                if cut < 200:
+                    cut = 1800
+                piece = remaining[:cut].strip()
+                if piece:
+                    chunks.append(piece)
+                remaining = remaining[cut:].strip()
+            if remaining:
+                chunks.append(remaining)
     return chunks
 
 
