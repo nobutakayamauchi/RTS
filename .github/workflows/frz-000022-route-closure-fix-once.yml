@@ -1,0 +1,49 @@
+name: FRZ-000022 Route Closure Fix Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000022-exhausted-ai-human-escalation-gate-v1
+    paths:
+      - .github/workflows/frz-000022-route-closure-fix-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000022-exhausted-ai-human-escalation-gate-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enforce active-route closure only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('human_escalation_gate/core.py')
+          s=p.read_text()
+          old='''            for closed in row["closed_routes"]:\n                active_routes = [route for route in active_routes if route != closed]\n            for opened in row["opened_routes"]:\n'''
+          new='''            closeable_routes = set(active_routes) | set(row["opened_routes"])\n            unknown_closures = [closed for closed in row["closed_routes"] if closed not in closeable_routes]\n            if unknown_closures:\n                raise HumanEscalationError(\n                    f"finding {index}: cannot close routes that were never active: {unknown_closures}"\n                )\n            for closed in row["closed_routes"]:\n                active_routes = [route for route in active_routes if route != closed]\n            for opened in row["opened_routes"]:\n'''
+          assert s.count(old)==1, s.count(old)
+          p.write_text(s.replace(old,new))
+          PY
+      - name: Validate K1 after repair
+        run: python -m unittest tests.test_human_escalation_gate tests.test_human_escalation_gate_da -v
+      - name: Commit repair
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add human_escalation_gate/core.py
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'fix: reject impossible FRZ-000022 route closures'
+          git push origin HEAD:feature/frz-000022-exhausted-ai-human-escalation-gate-v1
