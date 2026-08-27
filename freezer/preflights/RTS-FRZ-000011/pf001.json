@@ -1,0 +1,99 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Child A selective recall",
+  "rationale": "The v1 implementation is bounded to a repository-local read-only semantic overlay above the existing Memory Index. It does not replace raw memory ownership, does not add a network/provider/vector store, does not mutate recalled sources, and cannot grant execution or promotion authority. Freshness, lifecycle eligibility, supersession, quarantine, event/scope matching, and smallest-anchor selection are deterministic and independently testable.",
+  "affected_boundaries": [
+    "new selective_recall package with read-only routing and lifecycle validation",
+    "new memory sidecar registry containing metadata and source identities but no copied raw bodies",
+    "focused selective-recall tests",
+    "RTS-FRZ-000011 FREEZER lifecycle records",
+    "documentation of non-authority and rollback boundaries"
+  ],
+  "existing_assumptions": [
+    "rts_kernel/indexing/memory_index_engine.py remains the owner of the existing searchable Memory Index.",
+    "Raw historical source files remain authoritative for their own stored content and are not rewritten by recall routing.",
+    "Repository-local source bytes can be bound deterministically using Git blob identity without invoking Git, subprocess, network, or providers.",
+    "Historical evidence and lifecycle labels do not create current execution or promotion authority.",
+    "The existing Ultimate Loop boundaries HISTORICAL EVIDENCE != CURRENT AUTHORITY and RETRIEVAL != DECISION COMPETENCE remain controlling.",
+    "The operator's 2026-08-27 direction to implement these parts one by one authorizes Child A only after current BUILD_NOW and PASS gates are proven."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No existing memory/index/evidence records are rewritten. v1 adds a sidecar metadata registry and a read-only package."
+  },
+  "external_interfaces": [
+    "repository-local Python API/CLI only",
+    "no network or provider interface",
+    "no vector database",
+    "no subprocess or shell execution",
+    "no adjacent-repository write interface",
+    "no deployment, publication, payment, messaging, or scheduling interface"
+  ],
+  "approval_changes": [
+    "Recall output permanently carries execution_authority=NONE and promotion_authority=NONE.",
+    "Lifecycle transition validation does not apply a transition and does not approve promotion.",
+    "Existing execution, Human Review, Skill Regression, and Promotion Application Preview authority boundaries remain unchanged.",
+    "Only RTS-FRZ-000011 may be selected/in-progress under WIP=1; children RTS-FRZ-000012 through RTS-FRZ-000015 remain FROZEN/NOT_APPROVED."
+  ],
+  "public_documents": [
+    "selective_recall/README.md",
+    "docs/implementation/FRZ_000011_SELECTIVE_RECALL_MEMORY_LIFECYCLE_V1_TASK.md"
+  ],
+  "regression_tests": [
+    "no-recall fast path",
+    "deterministic event/scope recall",
+    "smallest-anchor-only output",
+    "max-results enforcement",
+    "stale source identity rejection",
+    "superseded and quarantined record rejection",
+    "malformed duplicate and path-escape registry fail-closed behavior",
+    "insufficient signal does not guess relevance",
+    "execution and promotion authority always NONE",
+    "invalid lifecycle and direct RAW-to-CANONICAL transition rejection",
+    "allowed staged lifecycle transition validates without applying",
+    "forbidden external-action import/surface rejection",
+    "existing memory index source and behavior unchanged",
+    "seed incident source bytes unchanged after routing",
+    "FREEZER verification",
+    "children B-E remain FROZEN/NOT_APPROVED",
+    "WIP contains only RTS-FRZ-000011 while active"
+  ],
+  "hidden_dependencies": [
+    "memory/index.json and rts_kernel/indexing/memory_index_engine.py ownership",
+    "repository path containment semantics",
+    "Git blob identity algorithm for local source freshness",
+    "Ultimate Loop historical-evidence/current-authority and retrieval/competence invariants",
+    "FREEZER Build Assessment / Preflight / WIP=1 runtime constraints",
+    "future promotion remains owned by existing learning/review/regression/preview packages"
+  ],
+  "rollback_boundary": "Revert only the selective_recall package, its sidecar registry, focused tests/docs, and RTS-FRZ-000011 implementation lifecycle revisions. Do not alter raw memory bodies, the existing Memory Index engine/index, Outcome Evidence, Skill promotion governance, or any adaptive-intelligence sibling child.",
+  "completion_conditions": [
+    "A deterministic repository-local registry validates exact lifecycle vocabulary, provenance, source containment, and source freshness.",
+    "Current-context-sufficient requests take a deterministic no-recall fast path unless explicit recall is requested.",
+    "Relevant requests return only bounded metadata anchors and never inline/copy entire historical source bodies.",
+    "Stale, superseded, quarantined, malformed, and lifecycle-ineligible records cannot appear in default active recall.",
+    "Every output states execution_authority=NONE and promotion_authority=NONE.",
+    "Lifecycle transition validation rejects direct RAW-to-CANONICAL and never applies transitions automatically.",
+    "The existing Memory Index engine and seed incident bytes are unchanged by recall routing.",
+    "All focused selective-recall and existing FREEZER tests pass on the final Child A head.",
+    "FREEZER verification shows RTS-FRZ-000011 as the only IN_PROGRESS child during implementation and children B-E remain FROZEN/NOT_APPROVED.",
+    "Completion does not start or implement Child B, C, D, or E."
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "Over-recall could add context instead of reducing recomputation.",
+    "A lifecycle state name such as CANONICAL could be misread as operational authority unless output boundaries are permanent and tested.",
+    "Source path/byte drift could make registry metadata stale.",
+    "Historical incident hypotheses could be treated too broadly if the anchor is read without its evidence scope.",
+    "Future callers could bypass the no-recall policy unless this package remains the bounded semantic owner."
+  ],
+  "preflight_id": "RTS-PF-000011-001",
+  "item_id": "RTS-FRZ-000011",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "d3771b48f7c8915dcbe6383c4fddb6b3d15428a5e3fee853347d34e4585baa37",
+  "created_at": "2026-08-27T06:33:06Z"
+}

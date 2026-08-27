@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T06:21:57Z",
-  "count": 6,
+  "generated_at": "2026-08-27T07:06:08Z",
+  "count": 5,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -9,30 +9,6 @@
     "auto_start": false
   },
   "items": [
-    {
-      "item_id": "RTS-FRZ-000011",
-      "version": 1,
-      "title": "Selective Recall + Memory Lifecycle v1",
-      "type": "feature",
-      "status": "FROZEN",
-      "priority_score": 82.62,
-      "estimated_hours": {
-        "minimum": 10,
-        "maximum": 20
-      },
-      "tags": [
-        "adaptive-intelligence-v2-child",
-        "selective-recall",
-        "memory-lifecycle",
-        "provenance",
-        "freshness",
-        "quarantine",
-        "codex-efficiency"
-      ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
-    },
     {
       "item_id": "RTS-FRZ-000012",
       "version": 1,

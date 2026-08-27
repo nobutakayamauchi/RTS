@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T06:21:57Z",
-  "count": 6,
+  "generated_at": "2026-08-27T07:06:08Z",
+  "count": 5,
   "policy": {
     "priority_weight": 0.35,
     "build_assessment_weight": 0.65,
@@ -23,21 +23,6 @@
       "net_hours": 60.0,
       "reuse_hours_saved": 48.0,
       "implementation_efficiency": 1.33,
-      "build_authority": "NOT_APPROVED"
-    },
-    {
-      "item_id": "RTS-FRZ-000011",
-      "version": 1,
-      "title": "Selective Recall + Memory Lifecycle v1",
-      "status": "FROZEN",
-      "priority_score": 82.62,
-      "assessment_state": "MISSING",
-      "build_score": null,
-      "ranking_score": 28.92,
-      "recommendation": "ASSESSMENT_REQUIRED",
-      "net_hours": null,
-      "reuse_hours_saved": null,
-      "implementation_efficiency": null,
       "build_authority": "NOT_APPROVED"
     },
     {

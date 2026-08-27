@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T06:21:57Z",
+  "generated_at": "2026-08-27T07:06:08Z",
   "count": 15,
   "items": [
     {
@@ -241,10 +241,10 @@
     },
     {
       "item_id": "RTS-FRZ-000011",
-      "version": 1,
+      "version": 5,
       "title": "Selective Recall + Memory Lifecycle v1",
       "type": "feature",
-      "status": "FROZEN",
+      "status": "COMPLETED",
       "priority_score": 82.62,
       "estimated_hours": {
         "minimum": 10,
@@ -259,9 +259,9 @@
         "quarantine",
         "codex-efficiency"
       ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T07:06:08Z"
     },
     {
       "item_id": "RTS-FRZ-000012",
