@@ -56,13 +56,10 @@ jobs:
                   if old == 'REVIEW_BLOCKED':
                       new='REVIEW_BLOCKED'; reason='upstream blocked/stale'
                   elif paths:
-                      # There is a concrete AI-side action/verification route. It has not been exhausted.
                       new='AI_CONTINUE'; reason='concrete problem-solving/revalidation path remains'
                   elif old in ('HUMAN_LATER','DEFER_LOW_VALUE'):
-                      # Evidence is retained and can be rechecked on source/model identity change.
                       new='WAIT_SAFE_DEFER'; reason='no immediate material dead-end; bounded recheck remains'
                   elif old == 'HUMAN_NOW':
-                      # No explicit exhaustion evidence exists in the current pipeline.
                       new='HUMAN_CANDIDATE'; reason='material K0 finding but no remaining path and no proven exhaustion evidence'
                   else:
                       new='HUMAN_CANDIDATE'; reason='unclassified unresolved path; human escalation not yet authorized'
@@ -71,13 +68,15 @@ jobs:
                   summary[('TOTAL',new)] += 1
                   rows.append({
                       'provider':provider,
-                      'record_id':r['record_id'],
+                      'finding_index':r['finding_index'],
+                      'source_id':r['source_id'],
+                      'anchor_sha256':r['anchor_sha256'],
                       'old_classification':old,
                       'new_disposition':new,
                       'reason':reason,
                       'anchor':r['anchor'],
-                      'impact':max(da.get('impact',0),cda.get('impact',0)),
-                      'causal_reach':max(da.get('causal_reach',0),cda.get('causal_reach',0)),
+                      'impact':da.get('impact',0),
+                      'causal_reach':da.get('causal_reach',0),
                       'perspective_gap':r.get('perspective_gap'),
                       'problem_solving_paths':paths,
                       'exhaustion_evidence':'NOT_PROVIDED',
