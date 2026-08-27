@@ -1,0 +1,58 @@
+name: FRZ-000019 Official Docs Live Smoke Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000019-official-docs-intake-claim-extraction-v1
+    paths:
+      - .github/workflows/frz-000019-live-smoke-once.yml
+  workflow_dispatch:
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000019-official-docs-intake-claim-extraction-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch real official provider docs and build H bundles
+        run: |
+          python - <<'PY'
+          from official_docs_intake import build_intake_report, discover_document_urls, verify_intake_report
+          from model_transition_intelligence.core import validate_bundle
+
+          cases = [
+              ('openai', 'gpt-5.6', 'api', 'https://developers.openai.com/api/docs/guides/latest-model.md'),
+              ('anthropic', 'claude-fable-5', 'claude-api', 'https://platform.claude.com/docs/en/about-claude/models/overview.md'),
+              ('google', 'gemini-3.7', 'gemini-api', 'https://ai.google.dev/gemini-api/docs/models'),
+          ]
+          for provider, generation, surface, url in cases:
+              discovered = discover_document_urls(provider, [generation], max_documents=3)
+              assert discovered['urls'], (provider, discovered)
+              report = build_intake_report({
+                  'provider': provider,
+                  'product_surface': surface,
+                  'generation': generation,
+                  'captured_at': '2026-08-27T10:42:00Z',
+                  'query_terms': [generation],
+                  'explicit_urls': [url],
+                  'max_documents': 1,
+              })
+              verify_intake_report(report)
+              assert report['status'] in {'READY_FOR_H','REVIEW_REQUIRED'}, (provider, report['status'])
+              assert report['bundle'] is not None, provider
+              validate_bundle(report['bundle'])
+              assert len(report['bundle']['sources']) == 1, provider
+              assert not report['audit']['fetch_failures'], (provider, report['audit']['fetch_failures'])
+              source = report['bundle']['sources'][0]
+              assert source['trust'] == 'OFFICIAL'
+              assert source['claims'], (provider, 'no claims extracted')
+              print(provider, report['status'], source['url'], len(source['claims']), report['audit']['ambiguous_block_count'])
+          PY
