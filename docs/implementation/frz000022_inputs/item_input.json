@@ -3,18 +3,22 @@
   "title": "Exhausted-AI Human Escalation Gate v1",
   "type": "architecture",
   "status": "FROZEN",
-  "summary": "K0のhuman-attention triageの後段で、DA・Counter-DA・利用可能な追加検証を尽くしても妥当な決断、判別可能な次実験、安全な保留条件のいずれも作れず、その未解決選択が結果へ実質的影響を持つ場合だけHUMAN_NOWを許可する。",
-  "original_problem": "K0は76件を35 HUMAN_NOW / 11 HUMAN_LATER / 30 DEFERまで絞ったが、35件の多くは重要かつactionableというだけで、reasoning/config/migration等に追加Probeや再検証経路が残っている。重要であることと人間が決める必要があることを分離できていない。",
-  "why_it_matters": "人間の注意はAI側の探索・反証・検証を使い切った残余判断にだけ投入すべきである。次の実験や安全な待機条件が作れる案件まで人間へ返すと、AIによる問題解決能力を使わずレビュー待ちを増やす。",
-  "reason_frozen": "high impact、perspective disagreement、低confidenceだけでHUMAN_NOWにする、未実施検証をEXHAUSTED扱いする、安全なdefer条件や判別Probeがあるのに人へ返す、逆に全経路が尽きmaterially重要な案件をsilent deferする、という失敗をDAで禁止するまで実装しない。",
+  "summary": "K0のhuman-attention triageの後段で、DA・Counter-DA・追加検証から得た新しい知識を次の判断へ逐次統合し、判別可能なUNKNOWNをAI側で潰し続ける。妥当な決断、追加Evidence取得、判別可能な次実験、安全な保留条件のいずれも新たに作れない知識固定点に達し、かつ残る未決定が結果へ実質的影響を持つ場合だけHUMAN_NOWへの差し戻しを許可する。",
+  "original_problem": "K0は76件を35 HUMAN_NOW / 11 HUMAN_LATER / 30 DEFERまで絞ったが、再検証すると35件の多くは重要かつactionableというだけで、reasoning/config/migration等に追加Probeや再検証経路が残っていた。さらに最初は13件が次手不明に見えたが、反証で得た知識を再投入すると全件にAI側の追加検証経路が見つかった。重要であること、難しいこと、現時点で分からないことと、人間が決める必要があることを分離する必要がある。",
+  "why_it_matters": "人間の注意はAI側の探索・反証・検証・学習統合を使い切った残余判断にだけ投入すべきである。検証で得た知識を次の探索へ戻さず途中状態を人間へ返すと、AIによる問題解決能力を使い切れずレビュー待ちを増やす。K1は『AIが分からない』ではなく『AIが得た知識を統合しても、もう判別可能な次手を生成できない』を人間差し戻し条件にする。",
+  "reason_frozen": "high impact、perspective disagreement、低confidence、一定回数の試行だけでHUMAN_NOWにする、未実施検証をEXHAUSTED扱いする、反証で得た新知識を次の判断へ統合せず同じUNKNOWNを残す、安全なdefer条件や判別Probeがあるのに人へ返す、逆に全経路が尽きmaterially重要な案件をsilent deferする、という失敗をDAで禁止するまで実装しない。",
   "preserved_value": [
     "K0 triage record and exact source anchor are preserved",
     "important is distinct from human-required",
     "uncertainty alone never proves exhaustion",
+    "every completed DA, Counter-DA and verification result feeds a cumulative knowledge state",
+    "failed or refuting probes are learning evidence and must reduce or reshape the remaining UNKNOWN before another escalation decision",
+    "attempt count is not exhaustion; exhaustion means no defensible decision, evidence-acquisition path, discriminating probe or safe defer can be generated from the accumulated knowledge",
     "available discriminating probe keeps work on the AI side",
     "safe defer condition prevents premature human escalation",
-    "HUMAN_NOW requires explicit bounded exhaustion evidence",
+    "HUMAN_NOW requires explicit bounded exhaustion evidence and a no-new-discriminating-route fixed point",
     "material effect is required for HUMAN_NOW",
+    "human handoff preserves what was tested, what was learned, what remains undecidable, why no AI-side next step exists, and what material choice remains",
     "blocked/stale/truncated upstream evidence fails closed",
     "no semantic truth or execution authority"
   ],
@@ -33,16 +37,21 @@
   "trigger_conditions": [
     "RTS-FRZ-000021 is COMPLETED",
     "K0 preserves impact, causal reach, adversarial views and problem-solving paths",
+    "the live 76-item revalidation demonstrated that integrating second-pass counter-evidence can convert apparent human candidates into AI-side verification work",
     "WIP is clear"
   ],
   "negative_triggers": [
     "high impact automatically authorizes HUMAN_NOW while a probe remains",
     "perspective disagreement automatically authorizes HUMAN_NOW while evidence can discriminate",
     "uncertainty or low confidence is treated as verification exhaustion",
+    "attempt count or retry count is treated as proof of exhaustion",
     "missing verification evidence is treated as exhausted verification",
+    "new knowledge from DA, Counter-DA or probes is not incorporated before deciding whether the AI is exhausted",
+    "the same unresolved question is repeated without showing how accumulated evidence changed the remaining UNKNOWN",
     "safe defer exists but HUMAN_NOW is emitted",
     "material unresolved choice remains after proven exhaustion but is silently deferred",
     "non-material no-route item becomes HUMAN_NOW",
+    "HUMAN_NOW lacks an auditable handoff packet explaining tested paths, learned evidence, residual ambiguity and why no discriminating AI-side route remains",
     "blocked or stale upstream evidence receives a normal disposition"
   ],
   "dependencies": [
@@ -52,19 +61,21 @@
   ],
   "source_refs": [
     "review_necessity_triage/",
-    "docs/implementation/FRZ_000021_HUMAN_REVIEW_NECESSITY_DA_V1_TASK.md",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000021_2026-08-27.md",
+    "live FRZ-000022 revalidation runs 33120893542 and 33121069776",
     "semantic_claim_refinement/"
   ],
   "possible_destinations": [
     "human_escalation_gate/",
     "future F/G discriminating probe handoff",
-    "bounded human decision queue"
+    "bounded human decision queue with exhaustion handoff packet"
   ],
   "estimated_hours": {"minimum": 6, "maximum": 12},
   "tags": [
     "adaptive-intelligence-v8",
     "human-escalation",
     "exhaustion-gate",
+    "knowledge-integration",
     "da",
     "counter-da",
     "verification",
