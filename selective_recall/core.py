@@ -348,7 +348,8 @@ def _base_output(decision: str, reason: str, *, request: RecallRequest) -> dict[
             "max_results": request.max_results,
         },
         "selected_anchors": [],
-        "excluded": [],
+        "excluded_count": 0,
+        "exclusion_counts": {},
         "execution_authority": NO_AUTHORITY,
         "promotion_authority": NO_AUTHORITY,
     }
@@ -374,28 +375,34 @@ def route_recall(
         return _base_output("NO_RECALL", "INSUFFICIENT_SIGNAL", request=req)
 
     records = load_registry(root, registry_path)
-    excluded: list[ExcludedRecord] = []
+    exclusion_counts: dict[str, int] = {}
     candidates: list[tuple[int, MemoryRecord]] = []
     requested_scopes = set(req.scope_tags)
 
+    def exclude(reason: str) -> None:
+        exclusion_counts[reason] = exclusion_counts.get(reason, 0) + 1
+
     for record in records:
+        # Cheap registry metadata gates run before source-body freshness I/O.
+        # This keeps unrelated strata cold as the memory corpus grows.
         if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:
-            excluded.append(ExcludedRecord(record.memory_id, "LIFECYCLE_INELIGIBLE"))
+            exclude("LIFECYCLE_INELIGIBLE")
             continue
         if record.superseded_by is not None:
-            excluded.append(ExcludedRecord(record.memory_id, "SUPERSEDED"))
-            continue
-        freshness = record_freshness(root, record)
-        if freshness != "CURRENT":
-            excluded.append(ExcludedRecord(record.memory_id, freshness))
+            exclude("SUPERSEDED")
             continue
         if req.event not in record.event_triggers:
-            excluded.append(ExcludedRecord(record.memory_id, "EVENT_MISMATCH"))
+            exclude("EVENT_MISMATCH")
             continue
         record_scopes = set(record.scope_tags)
         overlap = requested_scopes & record_scopes
         if requested_scopes and not overlap:
-            excluded.append(ExcludedRecord(record.memory_id, "SCOPE_MISMATCH"))
+            exclude("SCOPE_MISMATCH")
+            continue
+
+        freshness = record_freshness(root, record)
+        if freshness != "CURRENT":
+            exclude(freshness)
             continue
 
         # Event match is mandatory. Scope overlap only refines ranking. Stable
@@ -426,7 +433,8 @@ def route_recall(
         )
         for record in selected_records
     ]
-    output["excluded"] = [asdict(entry) for entry in sorted(excluded, key=lambda x: x.memory_id)]
+    output["excluded_count"] = sum(exclusion_counts.values())
+    output["exclusion_counts"] = dict(sorted(exclusion_counts.items()))
     return output
 
 

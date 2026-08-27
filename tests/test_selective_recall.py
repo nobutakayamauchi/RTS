@@ -146,7 +146,8 @@ class SelectiveRecallV1Tests(unittest.TestCase):
             result = route_recall(root, self.request())
             self.assertEqual(result["recall_decision"], "NO_RECALL")
             self.assertEqual(result["selected_anchors"], [])
-            self.assertIn("STALE", {entry["reason"] for entry in result["excluded"]})
+            self.assertEqual(result["excluded_count"], 1)
+            self.assertEqual(result["exclusion_counts"], {"STALE": 1})
             with self.assertRaises(RecallValidationError):
                 verify_registry(root, require_current=True)
 
