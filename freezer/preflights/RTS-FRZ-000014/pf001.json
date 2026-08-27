@@ -1,0 +1,77 @@
+{
+  "affected_boundaries": [
+    "new reuse_metrics package",
+    "repository-local metrics sample",
+    "focused metric and destructive tests",
+    "RTS-FRZ-000014 lifecycle records"
+  ],
+  "approval_changes": [
+    "execution_authority=NONE",
+    "optimization_authority=NONE",
+    "promotion_authority=NONE",
+    "only RTS-FRZ-000014 may enter WIP"
+  ],
+  "assessor": "RTS implementation preflight — Child D reuse efficiency + knowledge debt metrics",
+  "completion_conditions": [
+    "Provider cache cannot populate RTS decision reuse.",
+    "Missing or zero-denominator metrics remain UNKNOWN.",
+    "Estimated values remain ESTIMATED.",
+    "Character load never claims token/time savings.",
+    "All metrics are observability-only/non-authorizing.",
+    "Focused and A/B/C/FREEZER regressions pass.",
+    "D reaches COMPLETED while E remains FROZEN/NOT_APPROVED."
+  ],
+  "data_migration": {
+    "notes": "No existing logs/memory/history are rewritten.",
+    "required": false
+  },
+  "decomposition": {
+    "child_candidates": [],
+    "required": false
+  },
+  "existing_assumptions": [
+    "A/B/C are COMPLETED.",
+    "Explicit event records are observations, not authority.",
+    "Character counts are not token/time savings.",
+    "Provider cache telemetry is optional and semantically distinct from RTS decision reuse."
+  ],
+  "external_interfaces": [
+    "repository-local Python API/CLI only",
+    "no provider/network/deployment/action surface"
+  ],
+  "hidden_dependencies": [
+    "stable metric vocabulary",
+    "event source identity",
+    "FREEZER WIP=1",
+    "optional provider telemetry"
+  ],
+  "outcome": "PASS",
+  "public_documents": [
+    "reuse_metrics/README.md",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000014_2026-08-27.md"
+  ],
+  "rationale": "Read-only event validation and aggregation only. Every metric carries state/unit/source count and rates carry denominators. Missing/zero-denominator telemetry is UNKNOWN; ESTIMATED never upgrades to MEASURED. Provider cache is a distinct namespace. Report authority is NONE and metrics cannot mutate active goals or execution.",
+  "regression_tests": [
+    "cache/reuse namespace separation",
+    "missing UNKNOWN",
+    "estimated-state preservation",
+    "zero denominator UNKNOWN",
+    "units preserved",
+    "rates/counts/load aggregation",
+    "duplicate event rejection",
+    "non-authority",
+    "A/B/C and FREEZER regressions"
+  ],
+  "risks": [
+    "A ratio without denominator can be misleading.",
+    "Mixed measured/estimated samples require measured-only claim behavior.",
+    "Metric naming drift can create false continuity."
+  ],
+  "rollback_boundary": "Revert Child D package/sample/tests/docs/lifecycle only; preserve A/B/C and source events.",
+  "preflight_id": "RTS-PF-000014-001",
+  "item_id": "RTS-FRZ-000014",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "a573e8c709ba07f6d3beba81602a2d3c2641c50d8bcaeeed561c45c641215cb5",
+  "created_at": "2026-08-27T07:50:25Z"
+}
