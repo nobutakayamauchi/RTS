@@ -1,0 +1,90 @@
+{
+  "item_id": "RTS-FRZ-000019",
+  "title": "Official Docs Intake + Claim Extraction Adapter v1",
+  "type": "architecture",
+  "status": "COMPLETED",
+  "summary": "OpenAI/Anthropic/Google等の公式AI資料をboundedかつprovenance-preservingに発見・取得・固定化し、exact-anchor contract claim候補とcoverage auditを生成してHのtransition-evidence-bundle/v1へ接続する。取得・抽出結果は観測挙動や実行権限へ昇格しない。",
+  "original_problem": "Hは旧版/新版のEvidence Bundleを比較できるが、公式docsの発見・取得・正規化・claim抽出が人手のまま残っている。新モデル公開のたびにURL探索と読み取りを手動で行うと追従が遅く、取得漏れ・非公式混入・抽出漏れ・redirect先の取り違えがHの入力品質を壊す。",
+  "why_it_matters": "公式docs intakeを機械化し、同じprovider-neutral契約でH→F→Gへ繋ぐことで、新AI世代への初動を短縮しつつ、無制限crawlerやLLM幻覚によるcontract捏造を避ける。",
+  "reason_frozen": "無制限crawl、非公式hostのOFFICIAL昇格、redirectでallowlist外へ逸脱、巨大文書/HTML/scriptの無制限取り込み、抽出できない文を黙って捨てる、keywordだけでhidden architectureを断定する、claim anchorを原文に存在しない形で生成する、取得時点でH/F/G実行権限を与える、という失敗をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "provider-specific official-host registry with bounded discovery seeds",
+    "HTTPS-only fetch with redirect revalidation and byte/time/document caps",
+    "immutable raw source digest and exact final URL provenance",
+    "deterministic HTML/text normalization without script/style execution",
+    "exact-anchor conservative claim extraction",
+    "extraction coverage audit with ambiguous/unmapped contract signals surfaced",
+    "H-compatible transition-evidence-bundle/v1 output",
+    "docs claim remains hypothesis and never observed behavior",
+    "no execution/profile-application/promotion authority",
+    "network failure preserves partial evidence and fails closed"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000018 Model Transition Intelligence v1 is COMPLETED",
+    "H transition-evidence-bundle/v1 schema is stable",
+    "provider official documentation roots can be allowlisted",
+    "network fetch remains bounded and separate from runtime execution authority"
+  ],
+  "negative_triggers": [
+    "crawler can follow arbitrary internet links",
+    "redirected host is not revalidated against provider allowlist",
+    "unofficial host can be marked OFFICIAL by document content alone",
+    "claim anchor is synthesized instead of copied exactly from normalized source text",
+    "ambiguous contract-like text is silently ignored",
+    "network or extraction failure still emits READY bundle without audit warning",
+    "provider docs are treated as observed model behavior",
+    "intake output can mutate runtime routing or profiles"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000018 Model Transition Intelligence + Architecture Contract Diff v1",
+    "model_transition_intelligence/ transition-evidence-bundle/v1",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "model_transition_intelligence/",
+    "RTS-FRZ-000018",
+    "https://developers.openai.com/llms.txt",
+    "https://platform.claude.com/llms.txt",
+    "https://ai.google.dev/gemini-api/docs/models"
+  ],
+  "possible_destinations": [
+    "official_docs_intake/ provider registry",
+    "bounded discovery/fetch CLI",
+    "claim extraction coverage report",
+    "H transition evidence bundle builder"
+  ],
+  "estimated_hours": {
+    "minimum": 10,
+    "maximum": 20
+  },
+  "tags": [
+    "adaptive-intelligence-v4",
+    "official-docs",
+    "provider-adapter",
+    "bounded-fetch",
+    "claim-extraction",
+    "provenance",
+    "transition-intelligence",
+    "openai",
+    "anthropic",
+    "google"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 5,
+  "created_at": "2026-08-27T10:33:57Z",
+  "updated_at": "2026-08-27T10:46:13Z",
+  "supersedes": "v004"
+}

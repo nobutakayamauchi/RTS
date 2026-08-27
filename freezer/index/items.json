@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T10:33:57Z",
+  "generated_at": "2026-08-27T10:46:14Z",
   "count": 19,
   "items": [
     {
@@ -439,10 +439,10 @@
     },
     {
       "item_id": "RTS-FRZ-000019",
-      "version": 3,
+      "version": 5,
       "title": "Official Docs Intake + Claim Extraction Adapter v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 86.89,
       "estimated_hours": {
         "minimum": 10,
@@ -462,7 +462,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-27T10:33:57Z"
+      "updated_at": "2026-08-27T10:46:13Z"
     }
   ]
 }
