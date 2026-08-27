@@ -1,0 +1,58 @@
+name: FRZ-000018 DA Repair Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000018-model-transition-intelligence-v1
+    paths:
+      - .github/workflows/frz-000018-da-repair-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000018-model-transition-intelligence-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reproduce DA death
+        run: |
+          python -m unittest tests.test_model_transition_intelligence_da.ModelTransitionIntelligenceDATests.test_mapped_marketing_delta_cannot_hide_unmapped_contract_text_change -v && exit 1 || true
+      - name: Apply minimal changed-fragment coverage repair
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('model_transition_intelligence/core.py')
+          s=p.read_text()
+          old='''def _document_text_change_review(old_bundle: dict[str, Any], new_bundle: dict[str, Any], claim_delta_keys: set[tuple[str, str]]) -> list[dict[str, Any]]:\n    old_docs = {source["document_id"]: source for source in old_bundle["sources"] if source["trust"] == "OFFICIAL"}\n    new_docs = {source["document_id"]: source for source in new_bundle["sources"] if source["trust"] == "OFFICIAL"}\n    issues: list[dict[str, Any]] = []\n    for document_id in sorted(set(old_docs) & set(new_docs)):\n        old = old_docs[document_id]\n        new = new_docs[document_id]\n        if old["content_sha256"] == new["content_sha256"]:\n            continue\n        if _normalized_text(old["content"]) == _normalized_text(new["content"]):\n            continue\n        old_keys = {_claim_key(claim) for claim in old["claims"]}\n        new_keys = {_claim_key(claim) for claim in new["claims"]}\n        mapped_change = bool((old_keys | new_keys) & claim_delta_keys)\n        if not mapped_change:\n            ratio = difflib.SequenceMatcher(None, _normalized_text(old["content"]), _normalized_text(new["content"])).ratio()\n            issues.append({\n                "document_id": document_id,\n                "old_source_id": old["source_id"],\n                "new_source_id": new["source_id"],\n                "reason": "OFFICIAL_TEXT_CHANGED_WITHOUT_NORMALIZED_CLAIM_DELTA",\n                "similarity_ratio": round(ratio, 6),\n            })\n    for document_id in sorted(set(new_docs) - set(old_docs)):\n        new = new_docs[document_id]\n        if not new["claims"]:\n            issues.append({\n                "document_id": document_id,\n                "new_source_id": new["source_id"],\n                "reason": "NEW_OFFICIAL_DOCUMENT_HAS_NO_NORMALIZED_CLAIMS",\n            })\n    return issues\n'''
+          new='''def _changed_token_fragments(old_content: str, new_content: str) -> list[str]:\n    old_tokens = _normalized_text(old_content).split()\n    new_tokens = _normalized_text(new_content).split()\n    fragments: list[str] = []\n    matcher = difflib.SequenceMatcher(None, old_tokens, new_tokens)\n    for tag, i1, i2, j1, j2 in matcher.get_opcodes():\n        if tag == "equal":\n            continue\n        old_fragment = " ".join(old_tokens[i1:i2]).strip()\n        new_fragment = " ".join(new_tokens[j1:j2]).strip()\n        if old_fragment:\n            fragments.append(old_fragment)\n        if new_fragment:\n            fragments.append(new_fragment)\n    return fragments\n\n\ndef _document_text_change_review(old_bundle: dict[str, Any], new_bundle: dict[str, Any], claim_delta_keys: set[tuple[str, str]]) -> list[dict[str, Any]]:\n    old_docs = {source["document_id"]: source for source in old_bundle["sources"] if source["trust"] == "OFFICIAL"}\n    new_docs = {source["document_id"]: source for source in new_bundle["sources"] if source["trust"] == "OFFICIAL"}\n    issues: list[dict[str, Any]] = []\n    for document_id in sorted(set(old_docs) & set(new_docs)):\n        old = old_docs[document_id]\n        new = new_docs[document_id]\n        if old["content_sha256"] == new["content_sha256"]:\n            continue\n        if _normalized_text(old["content"]) == _normalized_text(new["content"]):\n            continue\n        anchors: list[str] = []\n        for source in (old, new):\n            for claim in source["claims"]:\n                if _claim_key(claim) in claim_delta_keys:\n                    anchor = _normalized_text(claim["anchor"])\n                    if anchor and anchor not in anchors:\n                        anchors.append(anchor)\n        fragments = _changed_token_fragments(old["content"], new["content"])\n        uncovered = [\n            fragment for fragment in fragments\n            if not any(fragment in anchor or anchor in fragment for anchor in anchors)\n        ]\n        if uncovered:\n            ratio = difflib.SequenceMatcher(None, _normalized_text(old["content"]), _normalized_text(new["content"])).ratio()\n            issues.append({\n                "document_id": document_id,\n                "old_source_id": old["source_id"],\n                "new_source_id": new["source_id"],\n                "reason": "OFFICIAL_TEXT_CHANGE_HAS_UNMAPPED_FRAGMENTS",\n                "similarity_ratio": round(ratio, 6),\n                "uncovered_fragment_count": len(uncovered),\n                "uncovered_fragment_digests": [_sha256_text(fragment)[:16] for fragment in uncovered[:8]],\n            })\n    for document_id in sorted(set(new_docs) - set(old_docs)):\n        new = new_docs[document_id]\n        if not new["claims"]:\n            issues.append({\n                "document_id": document_id,\n                "new_source_id": new["source_id"],\n                "reason": "NEW_OFFICIAL_DOCUMENT_HAS_NO_NORMALIZED_CLAIMS",\n            })\n    for document_id in sorted(set(old_docs) - set(new_docs)):\n        old = old_docs[document_id]\n        if not old["claims"]:\n            issues.append({\n                "document_id": document_id,\n                "old_source_id": old["source_id"],\n                "reason": "REMOVED_OFFICIAL_DOCUMENT_HAS_NO_NORMALIZED_CLAIMS",\n            })\n    return issues\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'marker mismatch: {s.count(old)}')
+          p.write_text(s.replace(old,new))
+          PY
+      - name: Counter-DA and focused regression
+        run: |
+          python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+          python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+          python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Commit repair only
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add model_transition_intelligence/core.py
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'fix: detect unmapped changed document fragments'
+          git push origin HEAD:feature/frz-000018-model-transition-intelligence-v1
