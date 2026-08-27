@@ -41,6 +41,18 @@ jobs:
               raise SystemExit(f'marker mismatch: {s.count(old)}')
           p.write_text(s.replace(old,new))
           PY
+      - name: Tighten fixture anchor to full documented change
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/test_model_transition_intelligence.py')
+          s=p.read_text()
+          old='claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended")'
+          new='claim("i2", "instructions", "instruction_guidance", "CONTRACT", "goal_level", "Goal-level instructions are recommended; avoid overspecification.")'
+          if s.count(old)!=1:
+              raise SystemExit(f'fixture marker mismatch: {s.count(old)}')
+          p.write_text(s.replace(old,new))
+          PY
       - name: Counter-DA and focused regression
         run: |
           python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
@@ -52,7 +64,7 @@ jobs:
         run: |
           git config user.name rts-bot
           git config user.email rts-bot@users.noreply.github.com
-          git add model_transition_intelligence/core.py
+          git add model_transition_intelligence/core.py tests/test_model_transition_intelligence.py
           git diff --cached --quiet && exit 1 || true
-          git commit -m 'fix: detect unmapped changed document fragments'
+          git commit -m 'fix: enforce changed-fragment evidence coverage'
           git push origin HEAD:feature/frz-000018-model-transition-intelligence-v1
