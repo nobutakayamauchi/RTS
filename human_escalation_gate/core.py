@@ -314,7 +314,10 @@ def evaluate_escalation_report(
             if route_id == EXHAUSTION_SEARCH_ROUTE:
                 if row["opened_routes"]:
                     active_routes.extend(row["opened_routes"])
-                elif row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:
+                elif not active_routes and row["outcome"] in {"OBSERVED", "REFUTED", "NON_DISCRIMINATING"}:
+                    # A no-new-route search only proves exhaustion after all
+                    # previously known routes have already been closed and their
+                    # evidence has been folded into the current knowledge state.
                     exhaustion_search_observed = True
             else:
                 if route_id not in active_routes and route_id not in row["opened_routes"]:
