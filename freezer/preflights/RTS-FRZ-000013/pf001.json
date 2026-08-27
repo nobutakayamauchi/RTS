@@ -1,0 +1,79 @@
+{
+  "affected_boundaries": [
+    "new intelligence_compiler package",
+    "deterministic compiler sample store",
+    "focused compiler and destructive tests",
+    "RTS-FRZ-000013 lifecycle records"
+  ],
+  "approval_changes": [
+    "compiler output application_authority=NONE",
+    "promotion_authority=NONE",
+    "only RTS-FRZ-000013 may enter WIP"
+  ],
+  "assessor": "RTS implementation preflight — Child C incremental resumable intelligence compiler",
+  "completion_conditions": [
+    "Raw record exists before any job manifest.",
+    "Successful chunks survive later failures.",
+    "First incomplete chunk resumes without recomputing completed chunks.",
+    "Failed chunk retries then quarantines independently.",
+    "Learning failure never flips completed main work.",
+    "Full-corpus reevaluation requires an explicit reason.",
+    "All compiler/A/B/FREEZER tests pass.",
+    "C reaches COMPLETED while D-E remain FROZEN/NOT_APPROVED."
+  ],
+  "data_migration": {
+    "notes": "No existing memory/history store is rewritten.",
+    "required": false
+  },
+  "decomposition": {
+    "child_candidates": [],
+    "required": false
+  },
+  "existing_assumptions": [
+    "Child A and B are COMPLETED.",
+    "Completed main work is authoritative input and learning is downstream.",
+    "Raw outcome/evidence can be fingerprinted deterministically.",
+    "Promotion/application remains governed elsewhere."
+  ],
+  "external_interfaces": [
+    "repository-local Python API/CLI only",
+    "no provider/network/deployment/action surface"
+  ],
+  "hidden_dependencies": [
+    "filesystem atomic replace semantics",
+    "stable JSON canonicalization",
+    "FREEZER WIP=1",
+    "completed task outcome/evidence identity"
+  ],
+  "outcome": "PASS",
+  "public_documents": [
+    "intelligence_compiler/README.md",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000013_2026-08-27.md"
+  ],
+  "rationale": "Repository-local compiler with explicit raw ingest, deterministic chunk manifest, per-chunk result checkpoint, first-incomplete resume, bounded retry/quarantine, idempotency keys, differential reevaluation and proposal-only authority. Main task completion is immutable from learning failures.",
+  "regression_tests": [
+    "raw-first persistence",
+    "deterministic chunking",
+    "resume first incomplete",
+    "successful checkpoint preservation",
+    "retry/quarantine isolation",
+    "idempotent replay",
+    "raw/result fingerprint verification",
+    "differential reevaluation",
+    "explicit full-recompile reason",
+    "non-authority",
+    "A/B and FREEZER regressions"
+  ],
+  "risks": [
+    "Crash can occur between result write and manifest update; recovery must adopt a valid orphan result.",
+    "Processor output must remain proposal-only.",
+    "Changing compiler_version changes idempotency identity."
+  ],
+  "rollback_boundary": "Revert Child C package/sample/tests/docs/lifecycle only; preserve completed A/B and raw source outcomes.",
+  "preflight_id": "RTS-PF-000013-001",
+  "item_id": "RTS-FRZ-000013",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "02bc097cba23a0747c516011c8bb38ba93fb68f28b813432648a9ab58225480a",
+  "created_at": "2026-08-27T07:37:07Z"
+}

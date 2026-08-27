@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T07:28:06Z",
+  "generated_at": "2026-08-27T07:37:13Z",
   "count": 15,
   "items": [
     {
@@ -289,10 +289,10 @@
     },
     {
       "item_id": "RTS-FRZ-000013",
-      "version": 1,
+      "version": 5,
       "title": "Incremental / Resumable Intelligence Compiler v1",
       "type": "architecture",
-      "status": "FROZEN",
+      "status": "COMPLETED",
       "priority_score": 77.7,
       "estimated_hours": {
         "minimum": 14,
@@ -308,9 +308,9 @@
         "idempotency",
         "self-evolution"
       ],
-      "build_authority": "NOT_APPROVED",
-      "preflight_state": "MISSING",
-      "updated_at": "2026-08-27T06:21:54Z"
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-27T07:37:13Z"
     },
     {
       "item_id": "RTS-FRZ-000014",
