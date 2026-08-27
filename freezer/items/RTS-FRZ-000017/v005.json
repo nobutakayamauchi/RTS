@@ -1,0 +1,87 @@
+{
+  "item_id": "RTS-FRZ-000017",
+  "title": "Bounded Probe Executor + Profile Application Gate v1",
+  "type": "architecture",
+  "status": "COMPLETED",
+  "summary": "Adaptive Engine Profilerが生成したbounded probe planを、予算・並列・retry・失敗上限・checkpoint・resume・human approvalで囲んだcampaignとして実行し、観測結果をProfilerへ返す。Stable profileの適用はruntime mutationではなくreviewable local policy artifactまでに制限する。",
+  "original_problem": "モデル世代交代への再教育を人手で逐次実行すると時間がかかる。一方でprobeを無制限に並列実行するとAPI費用、重複実行、誤Profile適用、engine drift中の汚染が起こる。",
+  "why_it_matters": "モデル更新時の身体測定を短時間で一括実行しつつ、費用と失敗をboundedに保ち、A-Fの自己適応ループを実運転可能な形へ近づける。",
+  "reason_frozen": "unapproved execution、silent truncation、retry cost undercount、resume duplicate、engine mismatch継続、hidden/raw text保存、unstable profile自動適用をDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "campaign fingerprint binds plan tasks and budget",
+    "explicit bounded execution approval",
+    "max jobs max attempts max parallel retry failure wall-clock and cost ceilings",
+    "worst-case retry cost accounted before execution",
+    "checkpoint and resume never rerun completed jobs",
+    "engine identity mismatch stops the campaign",
+    "observable outcome only; hidden reasoning and raw bodies forbidden",
+    "background chunk execution is resumable",
+    "STABLE same-engine profile required for application preview",
+    "human approval creates local policy artifact only",
+    "no automatic runtime router mutation"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 4,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 3,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 4,
+    "effort": 3,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000016 Adaptive Engine Profiler v1 is COMPLETED",
+    "F emits bounded probe plans with observable engine identity",
+    "execution can remain adapter-bounded and human-authorized",
+    "runtime profile mutation remains outside v1"
+  ],
+  "negative_triggers": [
+    "provider execution begins without explicit campaign approval",
+    "queue silently truncates to fit budget",
+    "retries are omitted from worst-case cost/attempt calculation",
+    "resume reruns completed jobs",
+    "engine identity mismatch is ignored",
+    "hidden reasoning raw prompt or raw response is persisted",
+    "PROVISIONAL or cross-engine profile is applied",
+    "profile artifact mutates runtime routing automatically"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000011 through RTS-FRZ-000016",
+    "model_behavior_adaptation observable outcome schema",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "RTS-FRZ-000016 Adaptive Engine Profiler v1",
+    "model_behavior_adaptation/",
+    "16f9a615cef443170529c8c50a4e96e23543ba22"
+  ],
+  "possible_destinations": [
+    "RTS background model behavior campaign worker",
+    "future provider-specific adapter behind separate credential gate",
+    "reviewable local engine policy artifact"
+  ],
+  "estimated_hours": {
+    "minimum": 12,
+    "maximum": 24
+  },
+  "tags": [
+    "adaptive-intelligence-v3",
+    "bounded-probes",
+    "background-campaign",
+    "budget-gate",
+    "resume",
+    "checkpoint",
+    "profile-application-gate",
+    "self-adaptation",
+    "codex-efficiency"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 5,
+  "created_at": "2026-08-27T08:58:51Z",
+  "updated_at": "2026-08-27T09:10:04Z",
+  "supersedes": "v004"
+}

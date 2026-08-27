@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T08:58:51Z",
+  "generated_at": "2026-08-27T09:10:05Z",
   "count": 17,
   "items": [
     {
@@ -387,10 +387,10 @@
     },
     {
       "item_id": "RTS-FRZ-000017",
-      "version": 3,
+      "version": 5,
       "title": "Bounded Probe Executor + Profile Application Gate v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 84.59,
       "estimated_hours": {
         "minimum": 12,
@@ -409,7 +409,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-27T08:58:51Z"
+      "updated_at": "2026-08-27T09:10:04Z"
     }
   ]
 }
