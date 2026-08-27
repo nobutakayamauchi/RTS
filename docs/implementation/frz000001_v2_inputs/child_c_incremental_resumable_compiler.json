@@ -65,6 +65,7 @@
     "maximum": 28
   },
   "tags": [
+    "adaptive-intelligence-v2-child",
     "incremental-learning",
     "resumable",
     "checkpoint",
