@@ -28,16 +28,19 @@ jobs:
           python-version: '3.12'
       - name: Validate E runner syntax
         run: python -m py_compile scripts/run_frz000015_ultimate_loop.py
-      - name: Normalize FREEZER assessment asset kinds
+      - name: Normalize FREEZER assessment enums only
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('scripts/run_frz000015_ultimate_loop.py')
           s=p.read_text()
-          replacements={"'kind': 'public_pr_evidence'":"'kind': 'documentation'", "'kind': 'public_design_note'":"'kind': 'design'"}
+          replacements={
+              "'kind': 'public_pr_evidence',\n                    'reuse_mode': 'REFERENCE_ONLY'": "'kind': 'documentation',\n                    'reuse_mode': 'REFERENCE'",
+              "'kind': 'public_design_note',\n                    'reuse_mode': 'REFERENCE_ONLY'": "'kind': 'design',\n                    'reuse_mode': 'REFERENCE'",
+          }
           for old,new in replacements.items():
               if s.count(old)!=1:
-                  raise SystemExit(f'asset kind marker mismatch for {old}: {s.count(old)}')
+                  raise SystemExit(f'assessment enum marker mismatch: {s.count(old)} for {old!r}')
               s=s.replace(old,new)
           p.write_text(s)
           PY
