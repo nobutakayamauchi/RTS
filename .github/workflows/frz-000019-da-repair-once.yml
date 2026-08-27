@@ -1,0 +1,65 @@
+name: FRZ-000019 DA Repair Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000019-official-docs-intake-claim-extraction-v1
+    paths:
+      - .github/workflows/frz-000019-da-repair-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000019-official-docs-intake-claim-extraction-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reproduce both DA deaths
+        run: |
+          python -m unittest \
+            tests.test_official_docs_intake_da.OfficialDocsIntakeDATests.test_known_claim_cannot_hide_unknown_contract_change_in_same_line \
+            tests.test_official_docs_intake_da.OfficialDocsIntakeDATests.test_exact_generation_discovery_outranks_generic_seed -v && exit 1 || true
+      - name: Apply minimal sentence-coverage and seed-ranking repairs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('official_docs_intake/core.py')
+          s=p.read_text()
+          old='''    for url in explicit_urls:\n        add(url, 10_000, "EXPLICIT")\n    for url in policy["seed_urls"]:\n        add(url, 100, "SEED")\n\n    terms = tuple(_normalize_space(str(term)) for term in query_terms if _normalize_space(str(term)))\n'''
+          new='''    terms = tuple(_normalize_space(str(term)) for term in query_terms if _normalize_space(str(term)))\n    for url in explicit_urls:\n        add(url, 10_000, "EXPLICIT")\n    for url in policy["seed_urls"]:\n        add(url, 5 + _score_candidate("", url, terms), "SEED")\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'ranking marker mismatch: {s.count(old)}')
+          s=s.replace(old,new)
+          old2='''def _chunk_blocks(content: str) -> list[str]:\n    chunks: list[str] = []\n    for raw_block in content.splitlines():\n        block = _normalize_space(raw_block)\n        if not block:\n            continue\n        if len(block) <= 1800:\n            chunks.append(block)\n            continue\n        remaining = block\n        while len(remaining) > 1800:\n            cut = max(remaining.rfind(". ", 0, 1800), remaining.rfind("; ", 0, 1800), remaining.rfind(" ", 0, 1800))\n            if cut < 200:\n                cut = 1800\n            piece = remaining[:cut].strip()\n            if piece:\n                chunks.append(piece)\n            remaining = remaining[cut:].strip()\n        if remaining:\n            chunks.append(remaining)\n    return chunks\n'''
+          new2='''def _chunk_blocks(content: str) -> list[str]:\n    chunks: list[str] = []\n    for raw_block in content.splitlines():\n        block = _normalize_space(raw_block)\n        if not block:\n            continue\n        sentence_parts = [\n            _normalize_space(part)\n            for part in re.split(r"(?<=[.!?;])\\s+(?=[A-Z0-9])", block)\n            if _normalize_space(part)\n        ]\n        for sentence in sentence_parts:\n            if len(sentence) <= 1800:\n                chunks.append(sentence)\n                continue\n            remaining = sentence\n            while len(remaining) > 1800:\n                cut = max(remaining.rfind(". ", 0, 1800), remaining.rfind("; ", 0, 1800), remaining.rfind(" ", 0, 1800))\n                if cut < 200:\n                    cut = 1800\n                piece = remaining[:cut].strip()\n                if piece:\n                    chunks.append(piece)\n                remaining = remaining[cut:].strip()\n            if remaining:\n                chunks.append(remaining)\n    return chunks\n'''
+          if s.count(old2)!=1:
+              raise SystemExit(f'chunk marker mismatch: {s.count(old2)}')
+          p.write_text(s.replace(old2,new2))
+          PY
+      - name: Counter-DA and focused stack regression
+        run: |
+          python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+          python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+          python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+      - name: Commit repair only
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add official_docs_intake/core.py
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'fix: preserve sentence coverage and query-first discovery'
+          git push origin HEAD:feature/frz-000019-official-docs-intake-claim-extraction-v1
