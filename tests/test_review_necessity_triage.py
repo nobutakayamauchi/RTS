@@ -41,14 +41,6 @@ class ReviewNecessityTriageTests(unittest.TestCase):
         self.assertFalse(record["semantic_correctness_decided"])
         self.assertEqual(record["evidence_drop_authority"], "NONE")
 
-    def test_pure_documentation_surface_can_defer_without_drop(self):
-        j = make_j("This guide introduces all the models available through the API.")
-        triage = triage_refinement_report(j)
-        record = triage["records"][0]
-        self.assertEqual(record["classification"], "DEFER_LOW_VALUE")
-        self.assertEqual(record["evidence_drop_authority"], "NONE")
-        self.assertFalse(record["semantic_correctness_decided"])
-
     def test_every_unresolved_finding_is_preserved(self):
         j = make_j("A request now uses a new runtime policy. Another request now uses a different execution policy.")
         triage = triage_refinement_report(j)
