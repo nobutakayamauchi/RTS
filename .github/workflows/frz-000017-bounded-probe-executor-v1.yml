@@ -8,6 +8,7 @@ on:
       - bounded_probe_executor/**
       - tests/test_bounded_probe_executor.py
       - tests/test_bounded_probe_executor_da.py
+      - tests/test_bounded_probe_worker.py
       - freezer/**
       - .github/workflows/frz-000017-bounded-probe-executor-v1.yml
   workflow_dispatch:
@@ -29,8 +30,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run G baseline and destructive DA
-        run: python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da -v
+      - name: Run G baseline and destructive DA / Counter-DA
+        run: python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
       - name: Regress F
         run: python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
       - name: Regress E
