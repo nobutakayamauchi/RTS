@@ -1,0 +1,86 @@
+{
+  "outcome": "DECOMPOSE_REQUIRED",
+  "assessor": "RTS implementation preflight — Adaptive Intelligence v2",
+  "rationale": "The parent candidate now has enough evidence to define its architecture, but it spans five independently risky implementation grounds with different storage, routing, checkpoint, telemetry, and provenance boundaries. A monolithic PR would make rollback, validation, and causal attribution worse. The parent should remain FROZEN and be decomposed into five children, each separately assessed and approved under WIP=1.",
+  "affected_boundaries": [
+    "FREEZER parent architecture and future child candidates",
+    "memory / external-intelligence record model",
+    "pre-reasoning retrieval and routing",
+    "always-loaded instruction surface and restart state",
+    "post-outcome intelligence compilation",
+    "checkpoint / retry / quarantine persistence",
+    "reuse-efficiency and knowledge-debt telemetry",
+    "external pattern provenance and validation",
+    "existing Outcome Learning / Skill Regression / Human Review / Promotion Preview integration"
+  ],
+  "existing_assumptions": [
+    "Existing RTS governance components remain authoritative and must not be duplicated.",
+    "Memory retrieval is advisory context and never grants execution or promotion authority.",
+    "Raw outcome/evidence can be persisted independently from later intelligence compilation.",
+    "Each child can be implemented behind a bounded repository-local interface before any cross-repo or provider automation is considered.",
+    "WIP=1 and explicit human build authority remain mandatory for active child work."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "The parent decomposition itself requires no data migration. Any child that introduces a durable memory or checkpoint schema must define its own migration/compatibility boundary in its own Preflight."
+  },
+  "external_interfaces": [
+    "GitHub repositories and exact public source refs used only as governed evidence/reuse inputs",
+    "optional provider-side token/cache telemetry as a read-only metric source when available",
+    "no provider/network execution is authorized by the parent",
+    "no external repository writes are authorized by the parent"
+  ],
+  "approval_changes": [
+    "No existing approval authority is widened.",
+    "The parent remains NOT_APPROVED and FROZEN.",
+    "Each child must receive its own current Build Assessment, PASS Preflight, and explicit human approval before SELECTED/IN_PROGRESS.",
+    "Canonical memory or Skill promotion continues to require existing Human Review / regression / Promotion Preview boundaries."
+  ],
+  "public_documents": [
+    "docs/implementation/FRZ_000001_ADAPTIVE_INTELLIGENCE_V2_REASSESSMENT.md",
+    "Draft PR #365 and its bounded assessment inputs"
+  ],
+  "regression_tests": [
+    "Parent decomposition must not alter current governed-loop outputs or authority.",
+    "Existing FREEZER verification and WIP=1 constraints must remain unchanged.",
+    "Existing Outcome Learning, Skill Regression, Human Review Ledger, Promotion Preview, and governed-loop tests remain green after each child.",
+    "Each child must prove deterministic behavior or explicitly bounded non-determinism at its own owner boundary.",
+    "No child may convert retrieved memory, external evidence, or cache telemetry into execution authority."
+  ],
+  "hidden_dependencies": [
+    "Current RTS item/assessment/preflight fingerprint rules",
+    "manifest and index rebuilding after FREEZER mutations",
+    "exact source identity for external references",
+    "future storage owner for reusable intelligence records",
+    "future restart-item register and equivalence criteria",
+    "future checkpoint identity and idempotency rules",
+    "availability and semantics of provider cache telemetry"
+  ],
+  "rollback_boundary": "The parent decomposition is documentation/FREEZER metadata only. Before any child implementation, rollback is deletion/reversion of newly created child candidate records and restoration of the prior parent current pointer/index/manifest state. No runtime behavior, Skill, external repository, or provider state is changed by decomposition.",
+  "completion_conditions": [
+    "RTS-FRZ-000001 is revised to the v2 parent architecture while remaining FROZEN / NOT_APPROVED.",
+    "A current Build Assessment records exact reuse sources, license boundaries, gaps, and parent-level cost/value.",
+    "A current Preflight records DECOMPOSE_REQUIRED and names all five children.",
+    "Five child FREEZER candidates are created as FROZEN / NOT_APPROVED with no implementation side effects.",
+    "No child is selected automatically.",
+    "FREEZER indexes and manifest verify after decomposition.",
+    "The next active implementation, if any, is one separately assessed and human-approved child under WIP=1."
+  ],
+  "decomposition": {
+    "required": true,
+    "child_candidates": [
+      "Selective Recall + Memory Lifecycle v1",
+      "Compact Active + Restart Surface v1",
+      "Incremental / Resumable Intelligence Compiler v1",
+      "Reuse Efficiency + Knowledge Debt Metrics v1",
+      "External Transition Pattern Seed Corpus v1"
+    ]
+  },
+  "risks": [
+    "Creating all children may be mistaken for approval to build all children.",
+    "A child may duplicate an existing RTS governance owner unless its Preflight checks ownership first.",
+    "Cross-child schema coupling could recreate a monolith if shared contracts are not kept minimal.",
+    "Telemetry work may drift into unsupported claims about OpenAI quota/cache causality.",
+    "External pattern corpus work may drift into code copying or canonical promotion without evidence."
+  ]
+}
