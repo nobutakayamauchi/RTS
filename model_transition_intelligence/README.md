@@ -34,7 +34,9 @@ Each source carries:
 - trust class (`OFFICIAL` or `UNOFFICIAL`);
 - normalized claims, each anchored to exact text contained in that document.
 
-H performs no crawling in v1. A future provider-specific source adapter can fetch README/release notes/API docs/model cards/migration guides and build the bundle, but the comparator itself remains deterministic and network-free.
+H performs no crawling or LLM semantic extraction in v1. A future provider-specific source adapter can fetch README/release notes/API docs/model cards/migration guides and an extraction boundary can propose normalized claims, but the comparator itself remains deterministic and network-free. H verifies that every supplied claim is anchored in the immutable source text and never treats the extracted claim set as complete merely because at least one claim changed.
+
+For an official document present in both generations, H removes only the anchors belonging to the actual normalized claim deltas from the old and new document text. If the residual document text still differs, the transition becomes `REVIEW_REQUIRED`. This prevents one mapped marketing change from hiding a second, unextracted execution-contract change in the same README or migration guide.
 
 Only `OFFICIAL` claims can raise transition severity. Unofficial material can be carried for context but cannot establish a contract change.
 
@@ -45,7 +47,7 @@ Only `OFFICIAL` claims can raise transition severity. Unofficial material can be
 - `S2`: documented behavior/interface/tool semantics changed.
 - `S3`: observable execution-contract topology changed.
 
-Conflicting official claims, digest/provenance failures, or changed official text that is not mapped to normalized claims fail to `REVIEW_REQUIRED` rather than pretending nothing changed.
+Conflicting official claims, digest/provenance failures, or changed official text that is not fully accounted for by normalized claim deltas fail to `REVIEW_REQUIRED` rather than pretending nothing changed.
 
 ## Authority
 
