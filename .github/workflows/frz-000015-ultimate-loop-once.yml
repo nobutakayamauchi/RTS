@@ -1,0 +1,32 @@
+name: FRZ-000015 Ultimate Loop Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000015-external-transition-pattern-seed-corpus-v1
+    paths:
+      - .github/workflows/frz-000015-ultimate-loop-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  ultimate-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000015-external-transition-pattern-seed-corpus-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate E runner syntax
+        run: python -m py_compile scripts/run_frz000015_ultimate_loop.py
+      - name: Run Child E Ultimate Loop
+        run: python scripts/run_frz000015_ultimate_loop.py
