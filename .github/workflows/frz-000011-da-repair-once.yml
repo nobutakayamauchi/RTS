@@ -1,0 +1,198 @@
+name: Repair FRZ-000011 DA Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000011-selective-recall-memory-lifecycle-v1
+    paths:
+      - .github/workflows/frz-000011-da-repair-once.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frz-000011-da-repair-once
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000011-selective-recall-memory-lifecycle-v1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply exact bounded DA repair
+        run: |
+          set -euxo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          core_path = Path('selective_recall/core.py')
+          core = core_path.read_text(encoding='utf-8')
+
+          old_base = '''def _base_output(decision: str, reason: str, *, request: RecallRequest) -> dict[str, Any]:
+              return {
+                  "schema_version": OUTPUT_SCHEMA_VERSION,
+                  "recall_decision": decision,
+                  "reason": reason,
+                  "request": {
+                      "event": request.event,
+                      "scope_tags": list(request.scope_tags),
+                      "current_context_sufficient": request.current_context_sufficient,
+                      "explicit_recall": request.explicit_recall,
+                      "max_results": request.max_results,
+                  },
+                  "selected_anchors": [],
+                  "excluded": [],
+                  "execution_authority": NO_AUTHORITY,
+                  "promotion_authority": NO_AUTHORITY,
+              }
+          '''.replace('          ', '')
+          new_base = '''def _base_output(decision: str, reason: str, *, request: RecallRequest) -> dict[str, Any]:
+              return {
+                  "schema_version": OUTPUT_SCHEMA_VERSION,
+                  "recall_decision": decision,
+                  "reason": reason,
+                  "request": {
+                      "event": request.event,
+                      "scope_tags": list(request.scope_tags),
+                      "current_context_sufficient": request.current_context_sufficient,
+                      "explicit_recall": request.explicit_recall,
+                      "max_results": request.max_results,
+                  },
+                  "selected_anchors": [],
+                  "excluded_count": 0,
+                  "exclusion_counts": {},
+                  "execution_authority": NO_AUTHORITY,
+                  "promotion_authority": NO_AUTHORITY,
+              }
+          '''.replace('          ', '')
+
+          old_loop = '''    records = load_registry(root, registry_path)
+              excluded: list[ExcludedRecord] = []
+              candidates: list[tuple[int, MemoryRecord]] = []
+              requested_scopes = set(req.scope_tags)
+
+              for record in records:
+                  if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:
+                      excluded.append(ExcludedRecord(record.memory_id, "LIFECYCLE_INELIGIBLE"))
+                      continue
+                  if record.superseded_by is not None:
+                      excluded.append(ExcludedRecord(record.memory_id, "SUPERSEDED"))
+                      continue
+                  freshness = record_freshness(root, record)
+                  if freshness != "CURRENT":
+                      excluded.append(ExcludedRecord(record.memory_id, freshness))
+                      continue
+                  if req.event not in record.event_triggers:
+                      excluded.append(ExcludedRecord(record.memory_id, "EVENT_MISMATCH"))
+                      continue
+                  record_scopes = set(record.scope_tags)
+                  overlap = requested_scopes & record_scopes
+                  if requested_scopes and not overlap:
+                      excluded.append(ExcludedRecord(record.memory_id, "SCOPE_MISMATCH"))
+                      continue
+
+                  # Event match is mandatory. Scope overlap only refines ranking. Stable
+                  # memory_id ordering resolves ties deterministically.
+                  score = 100 + len(overlap)
+                  candidates.append((score, record))
+          '''.replace('          ', '')
+          new_loop = '''    records = load_registry(root, registry_path)
+              exclusion_counts: dict[str, int] = {}
+              candidates: list[tuple[int, MemoryRecord]] = []
+              requested_scopes = set(req.scope_tags)
+
+              def exclude(reason: str) -> None:
+                  exclusion_counts[reason] = exclusion_counts.get(reason, 0) + 1
+
+              for record in records:
+                  # Cheap registry metadata gates run before source-body freshness I/O.
+                  # This keeps unrelated strata cold as the memory corpus grows.
+                  if record.lifecycle_state not in DEFAULT_RECALL_ELIGIBLE_STATES:
+                      exclude("LIFECYCLE_INELIGIBLE")
+                      continue
+                  if record.superseded_by is not None:
+                      exclude("SUPERSEDED")
+                      continue
+                  if req.event not in record.event_triggers:
+                      exclude("EVENT_MISMATCH")
+                      continue
+                  record_scopes = set(record.scope_tags)
+                  overlap = requested_scopes & record_scopes
+                  if requested_scopes and not overlap:
+                      exclude("SCOPE_MISMATCH")
+                      continue
+
+                  freshness = record_freshness(root, record)
+                  if freshness != "CURRENT":
+                      exclude(freshness)
+                      continue
+
+                  # Event match is mandatory. Scope overlap only refines ranking. Stable
+                  # memory_id ordering resolves ties deterministically.
+                  score = 100 + len(overlap)
+                  candidates.append((score, record))
+          '''.replace('          ', '')
+
+          old_tail = '''    output["excluded"] = [asdict(entry) for entry in sorted(excluded, key=lambda x: x.memory_id)]
+              return output
+          '''.replace('          ', '')
+          new_tail = '''    output["excluded_count"] = sum(exclusion_counts.values())
+              output["exclusion_counts"] = dict(sorted(exclusion_counts.items()))
+              return output
+          '''.replace('          ', '')
+
+          for old, new, label in (
+              (old_base, new_base, 'base output'),
+              (old_loop, new_loop, 'routing loop'),
+              (old_tail, new_tail, 'diagnostic tail'),
+          ):
+              count = core.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, got {count}')
+              core = core.replace(old, new, 1)
+          core_path.write_text(core, encoding='utf-8')
+
+          test_path = Path('tests/test_selective_recall.py')
+          test = test_path.read_text(encoding='utf-8')
+          old = '            self.assertIn("STALE", {entry["reason"] for entry in result["excluded"]})\n'
+          new = '            self.assertEqual(result["excluded_count"], 1)\n            self.assertEqual(result["exclusion_counts"], {"STALE": 1})\n'
+          if test.count(old) != 1:
+              raise SystemExit('stale diagnostic assertion did not match exactly once')
+          test_path.write_text(test.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Run DA and full bounded regressions before commit
+        run: |
+          set -euxo pipefail
+          python -m unittest tests.test_selective_recall_da -v
+          python -m unittest tests.test_selective_recall -v
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m selective_recall verify
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+
+      - name: Assert bounded diff and remove one-shot workflow
+        run: |
+          set -euxo pipefail
+          git diff -- selective_recall/core.py tests/test_selective_recall.py
+          changed="$(git diff --name-only | sort)"
+          expected=$'selective_recall/core.py\ntests/test_selective_recall.py'
+          test "$changed" = "$expected"
+          rm .github/workflows/frz-000011-da-repair-once.yml
+
+      - name: Commit repaired implementation only after green
+        run: |
+          set -euxo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add selective_recall/core.py tests/test_selective_recall.py .github/workflows/frz-000011-da-repair-once.yml
+          git commit -m 'fix: harden FRZ-000011 recall against load bloat'
+          git push origin HEAD:feature/frz-000011-selective-recall-memory-lifecycle-v1
