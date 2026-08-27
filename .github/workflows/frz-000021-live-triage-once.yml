@@ -46,7 +46,7 @@ jobs:
                   'provider': provider,
                   'product_surface': surface,
                   'generation': generation,
-                  'captured_at': '2026-08-27T12:45:00Z',
+                  'captured_at': '2026-08-27T12:50:00Z',
                   'query_terms': [generation],
                   'explicit_urls': [url],
                   'max_documents': 1,
@@ -110,6 +110,6 @@ jobs:
 
           assert total['J_UNRESOLVED'] > 0
           assert total['HUMAN_NOW'] + total['HUMAN_LATER'] + total['DEFER_LOW_VALUE'] + total['REVIEW_BLOCKED'] == total['J_UNRESOLVED']
-          assert total['DEFER_LOW_VALUE'] > 0, 'triage failed to identify any low-value attention surface'
-          assert total['HUMAN_NOW'] < total['J_UNRESOLVED'], 'triage escalated the entire residual surface'
+          assert total['DEFER_LOW_VALUE'] >= 25, 'triage did not preserve meaningful low-value differentiation'
+          assert 0 < total['HUMAN_NOW'] < total['J_UNRESOLVED'], 'triage did not preserve a bounded immediate human-review set'
           PY
