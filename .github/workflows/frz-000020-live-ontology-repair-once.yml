@@ -1,0 +1,93 @@
+name: FRZ-000020 Live Ontology Repair Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000020-semantic-claim-refinement-v1
+    paths:
+      - .github/workflows/frz-000020-live-ontology-repair-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  repair-live-ontology:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000020-semantic-claim-refinement-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Add narrow aliases observed in live official docs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('semantic_claim_refinement/core.py')
+          s=p.read_text()
+          old='''    semantic_value: dict[str, Any]\n    patterns: tuple[str, ...]\n'''
+          new='''    semantic_value: dict[str, Any]\n    patterns: tuple[str, ...]\n    capture_pattern: str | None = None\n    capture_key: str | None = None\n'''
+          if s.count(old)!=1:
+              raise SystemExit(f'dataclass marker mismatch: {s.count(old)}')
+          s=s.replace(old,new)
+          marker='''    SemanticRule(\n        "limits.concurrent_requests.v1",\n        "limits",\n        "concurrent_requests",\n        "LIMIT",\n        {"dimension": "CONCURRENT_REQUESTS", "limit": "DOCUMENTED"},\n        (\n            r"\\b(?:concurrent|simultaneous) requests?\\b",\n        ),\n    ),\n)\n'''
+          replacement='''    SemanticRule(\n        "limits.concurrent_requests.v1",\n        "limits",\n        "concurrent_requests",\n        "LIMIT",\n        {"dimension": "CONCURRENT_REQUESTS", "limit": "DOCUMENTED"},\n        (\n            r"\\b(?:concurrent|simultaneous) requests?\\b",\n        ),\n    ),\n    SemanticRule(\n        "model_identity.naming_scheme.v1",\n        "model_identity",\n        "naming_scheme",\n        "CONTRACT",\n        {"change": "DOCUMENTED"},\n        (r"\\b(?:introduces? )?(?:a )?new naming scheme\\b",),\n    ),\n    SemanticRule(\n        "reasoning.context_selector.v1",\n        "reasoning",\n        "reasoning_context_selector",\n        "CONTRACT",\n        {"selector": "reasoning.context"},\n        (r"\\breasoning\\.context\\b.{0,80}\\b(?:select|choose|behavior)\\b",),\n    ),\n    SemanticRule(\n        "state.reasoning_across_calls.v1",\n        "state",\n        "reasoning_state_across_calls",\n        "CAPABILITY",\n        {"support": "DOCUMENTED", "scope": "ACROSS_CALLS"},\n        (r"\\bpreserve reasoning across calls\\b",),\n    ),\n    SemanticRule(\n        "reasoning.pro_mode.v1",\n        "reasoning",\n        "pro_mode",\n        "CAPABILITY",\n        {"support": "DOCUMENTED", "mode": "PRO"},\n        (r"\\bpro mode\\b",),\n    ),\n    SemanticRule(\n        "limits.output_tokens_up_to.v1",\n        "limits",\n        "max_output_tokens",\n        "LIMIT",\n        {"dimension": "OUTPUT_TOKENS"},\n        (r"\\bsupport(?:s)? up to\\s+[0-9][0-9,.]*\\s*[kKmM]?\\s+output tokens?\\b",),\n        capture_pattern=r"\\bsupport(?:s)? up to\\s+([0-9][0-9,.]*\\s*[kKmM]?)\\s+output tokens?\\b",\n        capture_key="max_tokens",\n    ),\n    SemanticRule(\n        "response.model_metadata_fields.v1",\n        "response_schema",\n        "model_metadata_fields",\n        "CONTRACT",\n        {"fields": ["max_input_tokens", "max_tokens", "capabilities"]},\n        (r"\\bresponse includes\\b.{0,240}\\bmax_input_tokens\\b.{0,120}\\bmax_tokens\\b.{0,120}\\bcapabilities\\b",),\n    ),\n)\n'''
+          if s.count(marker)!=1:
+              raise SystemExit(f'rule tail marker mismatch: {s.count(marker)}')
+          s=s.replace(marker,replacement)
+          old_claim='''def _claim_for(rule: SemanticRule, anchor: str) -> dict[str, Any]:\n    digest = _sha256_text(anchor)\n    return {\n        "claim_id": "j_" + _sha256_text(f"{rule.rule_id}|{anchor}")[:20],\n        "area": rule.area,\n        "key": rule.key,\n        "kind": rule.kind,\n        "value": copy.deepcopy(rule.semantic_value),\n'''
+          new_claim='''def _claim_for(rule: SemanticRule, anchor: str) -> dict[str, Any]:\n    digest = _sha256_text(anchor)\n    value = copy.deepcopy(rule.semantic_value)\n    if rule.capture_pattern is not None:\n        if not rule.capture_key:\n            raise RefinementError(f"capture_key missing for {rule.rule_id}")\n        match = re.search(rule.capture_pattern, anchor, re.IGNORECASE)\n        if match is None or match.lastindex is None:\n            raise RefinementError(f"semantic capture failed for {rule.rule_id}")\n        value[rule.capture_key] = match.group(1).replace(",", "").replace(" ", "").lower()\n    return {\n        "claim_id": "j_" + _sha256_text(f"{rule.rule_id}|{anchor}")[:20],\n        "area": rule.area,\n        "key": rule.key,\n        "kind": rule.kind,\n        "value": value,\n'''
+          if s.count(old_claim)!=1:
+              raise SystemExit(f'claim marker mismatch: {s.count(old_claim)}')
+          p.write_text(s.replace(old_claim,new_claim))
+          PY
+      - name: Counter-DA after ontology extension
+        run: |
+          python -m unittest tests.test_semantic_claim_refinement tests.test_semantic_claim_refinement_da -v
+          python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+          python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+      - name: Require nonzero safe live review reduction
+        run: |
+          python - <<'PY'
+          from official_docs_intake import build_intake_report
+          from semantic_claim_refinement import refine_intake_report, verify_refinement_report
+          from model_transition_intelligence.core import validate_bundle
+          cases = [
+              ('openai', 'gpt-5.6', 'api', 'https://developers.openai.com/api/docs/guides/latest-model.md'),
+              ('anthropic', 'claude-fable-5', 'claude-api', 'https://platform.claude.com/docs/en/about-claude/models/overview.md'),
+              ('google', 'gemini-3.7', 'gemini-api', 'https://ai.google.dev/gemini-api/docs/models'),
+          ]
+          total_original=0
+          total_resolved=0
+          for provider,generation,surface,url in cases:
+              intake=build_intake_report({
+                  'provider':provider,'product_surface':surface,'generation':generation,
+                  'captured_at':'2026-08-27T11:48:00Z','query_terms':[generation],
+                  'explicit_urls':[url],'max_documents':1,
+              })
+              refined=refine_intake_report(intake)
+              verify_refinement_report(refined,intake_report=intake)
+              validate_bundle(refined['bundle'])
+              a=refined['audit']
+              total_original += a['original_ambiguous_count']
+              total_resolved += a['resolved_count']
+              print(provider, 'original=',a['original_ambiguous_count'],'resolved=',a['resolved_count'],'remaining=',a['remaining_ambiguous_count'],'status=',refined['status'])
+          print('TOTAL',total_original,total_resolved)
+          assert total_original>0
+          assert total_resolved>0
+          PY
+      - name: Commit live-validated ontology extension
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add semantic_claim_refinement/core.py
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'feat: refine controlled ontology from live official wording'
+          git push origin HEAD:feature/frz-000020-semantic-claim-refinement-v1
