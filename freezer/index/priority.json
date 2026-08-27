@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-26T08:15:53Z",
-  "count": 1,
+  "generated_at": "2026-08-27T06:21:57Z",
+  "count": 6,
   "policy": {
     "work_in_progress_limit": 1,
     "human_approval_required": true,
@@ -10,15 +10,63 @@
   },
   "items": [
     {
-      "item_id": "RTS-FRZ-000001",
+      "item_id": "RTS-FRZ-000011",
       "version": 1,
+      "title": "Selective Recall + Memory Lifecycle v1",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 82.62,
+      "estimated_hours": {
+        "minimum": 10,
+        "maximum": 20
+      },
+      "tags": [
+        "adaptive-intelligence-v2-child",
+        "selective-recall",
+        "memory-lifecycle",
+        "provenance",
+        "freshness",
+        "quarantine",
+        "codex-efficiency"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-08-27T06:21:54Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000012",
+      "version": 1,
+      "title": "Compact Active + Restart Surface v1",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 80.82,
+      "estimated_hours": {
+        "minimum": 8,
+        "maximum": 16
+      },
+      "tags": [
+        "adaptive-intelligence-v2-child",
+        "context-compression",
+        "restartability",
+        "handoff",
+        "active-surface",
+        "reconstruction",
+        "codex-efficiency"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-08-27T06:21:54Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000001",
+      "version": 2,
       "title": "Governed Adaptive Memory Layer",
       "type": "feature",
       "status": "FROZEN",
-      "priority_score": 65.25,
+      "priority_score": 78.03,
       "estimated_hours": {
-        "minimum": 20,
-        "maximum": 70
+        "minimum": 40,
+        "maximum": 90
       },
       "tags": [
         "memory",
@@ -26,11 +74,89 @@
         "governance",
         "evidence",
         "rollback",
-        "personal-ai"
+        "selective-recall",
+        "context-compression",
+        "resumable-learning",
+        "knowledge-debt",
+        "decision-reuse",
+        "codex-efficiency"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "DECOMPOSE_REQUIRED",
+      "updated_at": "2026-08-27T06:21:53Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000013",
+      "version": 1,
+      "title": "Incremental / Resumable Intelligence Compiler v1",
+      "type": "architecture",
+      "status": "FROZEN",
+      "priority_score": 77.7,
+      "estimated_hours": {
+        "minimum": 14,
+        "maximum": 28
+      },
+      "tags": [
+        "adaptive-intelligence-v2-child",
+        "incremental-learning",
+        "resumable",
+        "checkpoint",
+        "quarantine",
+        "failure-isolation",
+        "idempotency",
+        "self-evolution"
       ],
       "build_authority": "NOT_APPROVED",
       "preflight_state": "MISSING",
-      "updated_at": "2026-07-24T00:00:00Z"
+      "updated_at": "2026-08-27T06:21:54Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000014",
+      "version": 1,
+      "title": "Reuse Efficiency + Knowledge Debt Metrics v1",
+      "type": "feature",
+      "status": "FROZEN",
+      "priority_score": 73.11,
+      "estimated_hours": {
+        "minimum": 8,
+        "maximum": 16
+      },
+      "tags": [
+        "adaptive-intelligence-v2-child",
+        "metrics",
+        "decision-reuse",
+        "recompute-avoidance",
+        "knowledge-debt",
+        "observability",
+        "cache-separation"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-08-27T06:21:54Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000015",
+      "version": 1,
+      "title": "External Transition Pattern Seed Corpus v1",
+      "type": "research",
+      "status": "FROZEN",
+      "priority_score": 63.11,
+      "estimated_hours": {
+        "minimum": 6,
+        "maximum": 14
+      },
+      "tags": [
+        "adaptive-intelligence-v2-child",
+        "external-intelligence",
+        "pattern-corpus",
+        "provenance",
+        "oss-repair",
+        "verification-pending",
+        "license"
+      ],
+      "build_authority": "NOT_APPROVED",
+      "preflight_state": "MISSING",
+      "updated_at": "2026-08-27T06:21:54Z"
     }
   ]
 }

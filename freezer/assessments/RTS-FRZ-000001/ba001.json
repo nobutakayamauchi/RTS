@@ -1,0 +1,134 @@
+{
+  "assessor": "RTS governed build assessment — Adaptive Intelligence v2 reassessment",
+  "rationale": "The parent architecture has very high strategic and recurrence value, but it is too broad for one implementation boundary. Existing RTS governance already supplies FREEZER, execution, evidence, Skill regression, Human Review, Promotion Preview, and governed-loop contracts; the new work should reuse those and adapt external selective-recall, compact-surface, restartability, and resumable-learning patterns. The parent should therefore be assessed for value and then decomposed rather than activated as one build.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 4
+  },
+  "implementation": {
+    "from_scratch_hours": 80,
+    "integration_hours": 8,
+    "validation_hours": 10,
+    "unknown_buffer_hours": 10
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS",
+      "shin4141/decision-os-v13-loopkit",
+      "shin4141/agents-md-compactor",
+      "shin4141/output-surface-integrity",
+      "shin4141/decision-os-v12-completion-integrity",
+      "openclaw/openclaw"
+    ],
+    "queries": [
+      "selective recall external intelligence memory lifecycle",
+      "AGENTS conditional routing reconnect compaction",
+      "restart surface handoff continuation integrity",
+      "resumable incremental learning chunk checkpoint quarantine",
+      "embedding oversized batch recursive split retry without recompute",
+      "RTS outcome learning human review promotion rollback governed loop"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "freezer/ + loop_core/ + governed_execution/ + learning_proposals/ + skill_regression/ + human_review_ledger/ + promotion_application_preview/ + governed_loop/",
+        "ref": "main@96763c65746834abda08b4abe7b3a8f8bf4a9262",
+        "kind": "design",
+        "reuse_mode": "ADAPT",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 24,
+        "notes": "Reuse existing authority, WIP=1, evidence, regression, rollback, proposal-only learning, Human Review, preview, determinism, and one-shot orchestration contracts instead of rebuilding parallel governance."
+      },
+      {
+        "repository": "shin4141/decision-os-v13-loopkit",
+        "path": "AGENTS.md; docs/context_compression.md; docs/field_note_lifecycle.md; field_notes/048_lane_memory_event_triggered_recall.md; field_notes/050_lane_recall_failure_and_weight_limits.md; field_notes/051_lane_recall_mini_protocol.md",
+        "ref": "fe88f90430bacbb8f5aaf3ac5439e0580c04abd6",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 9,
+        "notes": "Reference selective recall, stale-memory recheck, routing-not-authority, lifecycle, compact restart, and over-recall downshift patterns. MIT license confirmed."
+      },
+      {
+        "repository": "shin4141/agents-md-compactor",
+        "path": "repository guidance and compaction implementation/docs",
+        "ref": "7679dceddc7213433f885d5054db50213460d266",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 6,
+        "notes": "Reference the small always-loaded surface plus reconnectable conditional guidance pattern. Apache-2.0 confirmed; direct reuse would require attribution and license handling."
+      },
+      {
+        "repository": "shin4141/output-surface-integrity",
+        "path": "restart/completion integrity docs and examples",
+        "ref": "5aa086171309bf83604360f0ea9fbcb169bbe921",
+        "kind": "design",
+        "reuse_mode": "REFERENCE",
+        "license_status": "COMPATIBLE",
+        "estimated_hours_saved": 4,
+        "notes": "Reference durable restart state, unresolved-state preservation, evidence-bound completion, and restart-equivalence ideas. MIT license confirmed."
+      },
+      {
+        "repository": "openclaw/openclaw",
+        "path": "PR #125722 and merged maintainer continuation PR #129927",
+        "ref": "PR-129927-merged-2026-08-26",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "UNKNOWN",
+        "estimated_hours_saved": 3,
+        "notes": "Pattern seed only: self-describing oversized work should split through an existing recovery path rather than replay unchanged; successful partial progress should not be discarded. No OpenClaw code import is authorized by this assessment."
+      },
+      {
+        "repository": "shin4141/decision-os-v12-completion-integrity",
+        "path": "completion / handoff / restartability surfaces",
+        "ref": "public-main-inspected-during-reassessment",
+        "kind": "documentation",
+        "reuse_mode": "REFERENCE",
+        "license_status": "UNKNOWN",
+        "estimated_hours_saved": 2,
+        "notes": "Reference Changed / Unverified / Rollback / Do-not-touch / Next-safe-action framing only until exact ref and license are recorded for any deeper reuse."
+      }
+    ],
+    "gaps": [
+      "The parent still needs formal decomposition; one monolithic implementation would violate reviewability and failure isolation.",
+      "Exact implementation ownership for Selective Recall, memory record storage, and compiler checkpoint persistence must be chosen per child.",
+      "Provider cache telemetry availability varies and cannot be assumed to exist for every run.",
+      "External repair patterns have not yet demonstrated transferability inside RTS and must remain non-canonical seeds.",
+      "The exact Decision-OS V12 reuse surface and license must be pinned before any direct reuse beyond conceptual reference."
+    ]
+  },
+  "risks": [
+    "Governance drag if recall runs for trivial tasks.",
+    "Stale memory may leak into current authority unless freshness and supersession are fail-closed.",
+    "Bad observations may compound if storage is mistaken for promotion.",
+    "The learning pipeline may block completed main work unless raw-first persistence, chunking, checkpointing, and failure isolation are mandatory.",
+    "Active instruction surfaces may grow despite a larger external knowledge store unless active-load burden is measured separately.",
+    "Provider cache hit rate may be incorrectly credited to RTS intelligence reuse.",
+    "External repository patterns may be overgeneralized without internal validation.",
+    "License and attribution requirements may be lost if reference material becomes copied code."
+  ],
+  "assessment_id": "RTS-BA-000001-001",
+  "item_id": "RTS-FRZ-000001",
+  "assessment_version": 1,
+  "item_version_snapshot": 2,
+  "item_fingerprint": "fec2cfdf27a8a57114f6830e543a90ead44ea88b75e0b75efecf029a0628b06b",
+  "derived": {
+    "benefit_score": 91.5,
+    "cost_score": 11.76,
+    "reuse_score": 60.0,
+    "decision_score": 62.85,
+    "reuse_hours_saved": 48.0,
+    "net_hours": 60.0,
+    "time_saved_ratio": 0.6,
+    "implementation_efficiency": 1.33,
+    "cost_effectiveness": 1.52,
+    "recommendation": "BUILD_NEXT"
+  },
+  "created_at": "2026-08-27T06:21:54Z"
+}
