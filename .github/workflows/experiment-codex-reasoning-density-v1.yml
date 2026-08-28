@@ -1,0 +1,46 @@
+name: Validate Codex Reasoning Density Benchmark v1
+
+on:
+  push:
+    branches:
+      - experiment/codex-reasoning-density-v1
+    paths:
+      - 'experiments/codex_reasoning_density_v1/**'
+      - '.github/workflows/experiment-codex-reasoning-density-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate shell and Python syntax
+        run: |
+          bash -n experiments/codex_reasoning_density_v1/run.sh
+          python -m py_compile experiments/codex_reasoning_density_v1/aggregate.py
+      - name: Validate usage aggregation semantics
+        run: |
+          tmp="$(mktemp -d)"
+          cat > "$tmp/cold.jsonl" <<'EOF'
+          {"type":"turn.completed","usage":{"input_tokens":100000,"cached_input_tokens":20000,"cache_write_input_tokens":0,"output_tokens":10000,"reasoning_output_tokens":4000}}
+          EOF
+          cat > "$tmp/reuse.jsonl" <<'EOF'
+          {"type":"turn.completed","usage":{"input_tokens":40000,"cached_input_tokens":15000,"cache_write_input_tokens":0,"output_tokens":7000,"reasoning_output_tokens":2000}}
+          EOF
+          cat > "$tmp/next.jsonl" <<'EOF'
+          {"type":"turn.completed","usage":{"input_tokens":30000,"cached_input_tokens":10000,"cache_write_input_tokens":0,"output_tokens":6000,"reasoning_output_tokens":1500}}
+          EOF
+          python experiments/codex_reasoning_density_v1/aggregate.py --results-dir "$tmp" --reference-tokens 5000000 > /tmp/report.json
+          python - "$tmp/summary.json" <<'PY'
+          import json, sys
+          r=json.load(open(sys.argv[1]))
+          assert r['runs']['cold']['uncached_input_tokens']==80000, r
+          assert r['runs']['reuse']['uncached_input_tokens']==25000, r
+          assert abs(r['comparisons']['cold_to_reuse_input_reduction']-0.60)<1e-9, r
+          assert abs(r['comparisons']['cold_to_reuse_uncached_input_reduction']-0.6875)<1e-9, r
+          assert r['reference_ratios_only']['cold']==0.02, r
+          print('benchmark aggregation semantics valid')
+          PY
