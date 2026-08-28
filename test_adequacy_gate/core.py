@@ -223,6 +223,56 @@ def run_mutation_suite(repo_root: str | Path | None = None) -> dict[str, Any]:
     }
 
 
+
+def _validate_mutation_report(report: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(report, dict) or report.get("schema_version") != "false-green-mutation-report/v1":
+        raise TestAdequacyError("unexpected mutation report schema")
+    before = report.get("source_sha256_before")
+    after = report.get("source_sha256_after")
+    if not isinstance(before, str) or len(before) != 64 or not isinstance(after, str) or len(after) != 64:
+        raise TestAdequacyError("mutation report requires source hashes")
+    baseline = report.get("baseline")
+    if not isinstance(baseline, dict) or baseline.get("load_ok") is not True or baseline.get("tests_ran") is not True or baseline.get("test_returncode") != 0:
+        raise TestAdequacyError("mutation baseline must be a passing targeted-test run")
+    results = report.get("results")
+    if not isinstance(results, list) or not results:
+        raise TestAdequacyError("mutation results are required")
+    ids = []
+    for row in results:
+        if not isinstance(row, dict):
+            raise TestAdequacyError("mutation result row must be an object")
+        if row.get("kind") not in {"CRITICAL", "EQUIVALENT_CONTROL", "INVALID_CONTROL"}:
+            raise TestAdequacyError("unknown mutation kind")
+        if row.get("status") not in {"KILLED", "SURVIVED", "INVALID_MUTANT", "STALE_OPERATOR"}:
+            raise TestAdequacyError("unknown mutation status")
+        if not isinstance(row.get("id"), str) or not row["id"]:
+            raise TestAdequacyError("mutation id is required")
+        ids.append(row["id"])
+    if len(ids) != len(set(ids)):
+        raise TestAdequacyError("duplicate mutation id")
+    critical = [r for r in results if r["kind"] == "CRITICAL"]
+    equivalent = [r for r in results if r["kind"] == "EQUIVALENT_CONTROL"]
+    invalid = [r for r in results if r["kind"] == "INVALID_CONTROL"]
+    if not critical or not equivalent or not invalid:
+        raise TestAdequacyError("critical and control mutants are all mandatory")
+    computed = {
+        "critical_total": len(critical),
+        "critical_killed": sum(r["status"] == "KILLED" for r in critical),
+        "invalid_not_counted_as_kill": True,
+        "mutation_lane_pass": all(
+            r["status"] == "KILLED" and r.get("load_ok") is True and r.get("tests_ran") is True
+            for r in critical
+        ),
+        "controls_pass": (
+            all(r["status"] == "SURVIVED" and r.get("load_ok") is True for r in equivalent)
+            and all(r["status"] == "INVALID_MUTANT" and r.get("load_ok") is False for r in invalid)
+        ),
+        "production_source_unchanged": before == after,
+    }
+    if report.get("audit") != computed:
+        raise TestAdequacyError("mutation audit does not match recomputed mutant results")
+    return computed
+
 def evaluate_test_adequacy(
     mutation_report: dict[str, Any],
     *,
@@ -230,6 +280,7 @@ def evaluate_test_adequacy(
     held_out: list[dict[str, Any]],
     metamorphic: list[dict[str, Any]],
 ) -> dict[str, Any]:
+    mutation_audit = _validate_mutation_report(mutation_report)
     for name, rows in (("known_bad", known_bad), ("held_out", held_out), ("metamorphic", metamorphic)):
         if not rows:
             raise TestAdequacyError(f"{name} lane must not be empty")
@@ -241,9 +292,9 @@ def evaluate_test_adequacy(
         if any(not isinstance(row["passed"], bool) for row in rows):
             raise TestAdequacyError(f"{name} lane passed must be boolean")
 
-    mutation_pass = bool(mutation_report.get("audit", {}).get("mutation_lane_pass"))
-    controls_pass = bool(mutation_report.get("audit", {}).get("controls_pass"))
-    source_unchanged = bool(mutation_report.get("audit", {}).get("production_source_unchanged"))
+    mutation_pass = mutation_audit["mutation_lane_pass"]
+    controls_pass = mutation_audit["controls_pass"]
+    source_unchanged = mutation_audit["production_source_unchanged"]
     lane_status = {
         "mutation": mutation_pass,
         "harness_controls": controls_pass,
@@ -281,7 +332,31 @@ def verify_test_adequacy_report(report: dict[str, Any]) -> None:
     lanes = report.get("lanes")
     if not isinstance(lanes, dict) or not lanes:
         raise TestAdequacyError("adequacy lanes are required")
-    expected = "ADEQUATE" if all(lanes.values()) else "HOLD_FALSE_GREEN_RISK"
+    mutation_audit = _validate_mutation_report(report.get("mutation_report"))
+    for name in ("known_bad", "held_out", "metamorphic"):
+        rows = report.get(name)
+        if (
+            not isinstance(rows, list)
+            or not rows
+            or any(
+                not isinstance(row, dict)
+                or set(row) != {"case_id", "passed", "detail"}
+                or not isinstance(row.get("passed"), bool)
+                for row in rows
+            )
+        ):
+            raise TestAdequacyError(f"invalid {name} lane")
+    expected_lanes = {
+        "mutation": mutation_audit["mutation_lane_pass"],
+        "harness_controls": mutation_audit["controls_pass"],
+        "known_bad": all(row["passed"] for row in report["known_bad"]),
+        "held_out": all(row["passed"] for row in report["held_out"]),
+        "metamorphic": all(row["passed"] for row in report["metamorphic"]),
+        "production_source_unchanged": mutation_audit["production_source_unchanged"],
+    }
+    if lanes != expected_lanes:
+        raise TestAdequacyError("adequacy lane summary does not match underlying evidence")
+    expected = "ADEQUATE" if all(expected_lanes.values()) else "HOLD_FALSE_GREEN_RISK"
     if report.get("status") != expected:
         raise TestAdequacyError("adequacy status does not match lane results")
     for field in (

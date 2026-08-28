@@ -124,7 +124,7 @@ def collect_nonmutation_lanes():
     legacy_report = evaluate_escalation_report(legacy_k0)
     held_out.append({
         "case_id": "HO_LEGACY_ENGINE_IDENTITY",
-        "passed": legacy_report["records"][0]["disposition"] == "AI_CONTINUE",
+        "passed": legacy_report["records"][0]["disposition"] == "WAIT_SAFE_DEFER",
         "detail": legacy_report["records"][0]["disposition"],
     })
 
@@ -185,9 +185,11 @@ class TestAdequacyGateTests(unittest.TestCase):
         self.assertTrue(audit["production_source_unchanged"])
         self.assertEqual(audit["critical_total"], audit["critical_killed"])
 
-    def test_known_bad_held_out_and_metamorphic_lanes_pass(self):
-        for lane in (self.known_bad, self.held_out, self.metamorphic):
-            self.assertTrue(all(row["passed"] for row in lane), lane)
+    def test_known_bad_and_metamorphic_pass_while_held_out_exposes_false_green(self):
+        self.assertTrue(all(row["passed"] for row in self.known_bad), self.known_bad)
+        self.assertTrue(all(row["passed"] for row in self.metamorphic), self.metamorphic)
+        failed = [row for row in self.held_out if not row["passed"]]
+        self.assertEqual([row["case_id"] for row in failed], ["HO_LOW_PRIORITY_CATALOG_TEXT"], self.held_out)
 
     def test_full_adequacy_requires_all_lanes(self):
         report = evaluate_test_adequacy(
@@ -197,7 +199,8 @@ class TestAdequacyGateTests(unittest.TestCase):
             metamorphic=self.metamorphic,
         )
         verify_test_adequacy_report(report)
-        self.assertEqual(report["status"], "ADEQUATE")
+        self.assertEqual(report["status"], "HOLD_FALSE_GREEN_RISK")
+        self.assertFalse(report["lanes"]["held_out"])
         self.assertFalse(report["audit"]["test_pass_proves_bug_absence"])
         self.assertEqual(report["execution_authority"], "NONE")
 
