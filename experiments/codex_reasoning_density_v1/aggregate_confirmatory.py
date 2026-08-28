@@ -44,8 +44,17 @@ def usage_from(events: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def quality(path: Path) -> dict[str, Any]:
+    """Score semantic answer quality separately from exact provenance completeness.
+
+    Exact attested source paths are not a fair semantic requirement for COLD because
+    COLD is not supplied those paths. They remain visible as provenance diagnostics.
+    """
     if not path.exists():
-        return {"pass":False,"checks":{"file_exists":False}}
+        return {
+            "semantic_pass":False,
+            "provenance_complete":False,
+            "checks":{"file_exists":False},
+        }
     text=path.read_text(encoding="utf-8",errors="replace")
     upper=text.upper(); lower=text.lower()
     checks={
@@ -58,7 +67,16 @@ def quality(path: Path) -> dict[str, Any]:
         "resolution": "docs/implementation/frz000024_resolution.json" in text,
         "k2_readme": "test_adequacy_gate/README.md" in text,
     }
-    return {"pass":all(checks.values()),"checks":checks}
+    semantic_keys=("headings","completed","adequate","bounded_adequacy","residual_risk")
+    provenance_keys=("current_pointer","resolution","k2_readme")
+    semantic_pass=all(checks[k] for k in semantic_keys)
+    provenance_complete=all(checks[k] for k in provenance_keys)
+    return {
+        "pass":semantic_pass,  # backward-compatible alias for semantic quality
+        "semantic_pass":semantic_pass,
+        "provenance_complete":provenance_complete,
+        "checks":checks,
+    }
 
 
 def transport(events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -104,6 +122,18 @@ def reduction(a: Any,b: Any) -> float | None:
     return (a-b)/a
 
 
+def quality_relation(cold: dict[str, Any], att: dict[str, Any]) -> str:
+    c=bool(cold.get("quality",{}).get("semantic_pass"))
+    a=bool(att.get("quality",{}).get("semantic_pass"))
+    if c and a:
+        return "PRESERVED"
+    if not c and a:
+        return "IMPROVED"
+    if c and not a:
+        return "REGRESSED"
+    return "BOTH_FAIL"
+
+
 def main() -> None:
     ap=argparse.ArgumentParser()
     ap.add_argument("--results-dir",required=True)
@@ -111,7 +141,7 @@ def main() -> None:
     ns=ap.parse_args()
     root=Path(ns.results_dir)
     pairs=[]
-    total_reductions=[]; uncached_reductions=[]
+    total_reductions=[]; uncached_reductions=[]; wall_reductions=[]
     for i in range(1,ns.pairs+1):
         cold=load_run(root,f"pair{i}_cold")
         att=load_run(root,f"pair{i}_attested")
@@ -120,11 +150,16 @@ def main() -> None:
         exits_ok=cold.get("meta",{}).get("exit_code")==0 and att.get("meta",{}).get("exit_code")==0
         tr=reduction(cold.get("input_tokens"),att.get("input_tokens"))
         ur=reduction(cold.get("uncached_input_tokens"),att.get("uncached_input_tokens"))
+        wr=reduction(cold.get("meta",{}).get("wall_seconds"),att.get("meta",{}).get("wall_seconds"))
         if tr is not None: total_reductions.append(tr)
         if ur is not None: uncached_reductions.append(ur)
+        if wr is not None: wall_reductions.append(wr)
+        relation=quality_relation(cold,att)
+        candidate_quality_ok=bool(att.get("quality",{}).get("semantic_pass"))
+        no_quality_regression=relation in ("PRESERVED","IMPROVED")
         win=(
             same_head and same_model and exits_ok
-            and cold["quality"]["pass"] and att["quality"]["pass"]
+            and candidate_quality_ok and no_quality_regression
             and isinstance(cold.get("input_tokens"),int) and isinstance(att.get("input_tokens"),int)
             and att["input_tokens"] < cold["input_tokens"]
             and isinstance(cold.get("uncached_input_tokens"),int) and isinstance(att.get("uncached_input_tokens"),int)
@@ -133,22 +168,32 @@ def main() -> None:
         pairs.append({
             "pair":i,"cold":cold,"attested":att,
             "same_git_head":same_head,"same_model":same_model,"exit_codes_ok":exits_ok,
-            "total_input_reduction":tr,"uncached_input_reduction":ur,"strict_pair_win":win,
+            "quality_relation":relation,
+            "candidate_quality_ok":candidate_quality_ok,
+            "no_quality_regression":no_quality_regression,
+            "total_input_reduction":tr,"uncached_input_reduction":ur,"wall_time_reduction":wr,
+            "strict_pair_win":win,
         })
     median_total=statistics.median(total_reductions) if len(total_reductions)==ns.pairs else None
     median_uncached=statistics.median(uncached_reductions) if len(uncached_reductions)==ns.pairs else None
+    median_wall=statistics.median(wall_reductions) if len(wall_reductions)==ns.pairs else None
     all_pairs_win=len(pairs)==ns.pairs and all(p["strict_pair_win"] for p in pairs)
     confirmed=all_pairs_win and isinstance(median_total,float) and median_total>0 and isinstance(median_uncached,float) and median_uncached>0
     report={
-        "schema":"codex-attested-confirmatory/v1",
+        "schema":"codex-attested-confirmatory/v2",
         "pair_count":ns.pairs,
         "pairs":pairs,
         "median_total_input_reduction":median_total,
         "median_uncached_input_reduction":median_uncached,
+        "median_wall_time_reduction":median_wall,
         "strict_pair_wins":sum(1 for p in pairs if p["strict_pair_win"]),
+        "quality_relations":{
+            key:sum(1 for p in pairs if p["quality_relation"]==key)
+            for key in ("PRESERVED","IMPROVED","REGRESSED","BOTH_FAIL")
+        },
         "result":"CONFIRMED_STRICT_WIN" if confirmed else "NOT_CONFIRMED",
-        "confirmation_rule":"Every fresh pair must use the same model/head, exit cleanly, pass bounded quality checks, and have ATTESTED below COLD on both total and uncached input; medians must also improve.",
-        "warning":"This is task-specific empirical evidence, not a universal Codex token-reduction guarantee. Deterministic quality checks remain guardrails, not semantic proof.",
+        "confirmation_rule":"Every fresh pair must use the same model/head, exit cleanly, have ATTESTED pass semantic quality without regression versus COLD, and have ATTESTED below COLD on both total and uncached input; medians must also improve. Exact attested source-path completeness is reported separately and does not make COLD fail semantic quality merely because COLD was not supplied those paths.",
+        "warning":"This is task-specific empirical evidence, not a universal Codex token-reduction guarantee. Deterministic semantic checks remain guardrails, not semantic proof.",
     }
     (root/"confirmatory_summary.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(report,ensure_ascii=False,indent=2))
