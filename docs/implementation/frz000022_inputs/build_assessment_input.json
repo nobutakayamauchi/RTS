@@ -1,0 +1,65 @@
+{
+  "assessor": "RTS governed build assessment — Exhausted-AI Human Escalation Gate v1",
+  "rationale": "K0 reduced equal-priority review load but still mapped many high-impact or high-causal findings to HUMAN_NOW even when discriminating probes, deterministic checks, evidence-acquisition paths or bounded defer conditions remained. Live revalidation of the same 76 findings showed 35 AI_CONTINUE / 41 WAIT_SAFE_DEFER / 0 HUMAN_NOW after second-pass escape-route verification. K1 therefore gates human escalation on knowledge-integrated exhaustion: DA, Counter-DA and probe results must be folded into a cumulative knowledge state, and human return is allowed only when that accumulated evidence cannot produce a defensible decision, new discriminating test/evidence route, or safe defer for a materially consequential residual choice.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 3,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 6,
+    "integration_hours": 2,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": ["nobutakayamauchi/RTS"],
+    "queries": [
+      "review necessity triage problem solving",
+      "bounded probe executor",
+      "human review escalation",
+      "knowledge evidence exhaustion"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "review_necessity_triage/",
+        "ref": "d51b24fca5d0db715792644b4db92663789b956a",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 4,
+        "notes": "Reuse K0 materiality dimensions, separate adversarial views and explicit problem-solving paths."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "bounded_probe_executor/",
+        "ref": "d51b24fca5d0db715792644b4db92663789b956a",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Reuse bounded/explicit execution philosophy; K1 itself does not execute probes."
+      }
+    ],
+    "gaps": [
+      "No current layer requires accumulated DA/Counter-DA/probe knowledge to be reintegrated before deciding that AI work is exhausted.",
+      "No current layer requires explicit exhaustion evidence before HUMAN_NOW.",
+      "No current layer distinguishes a high-priority finding with a remaining probe from a true human decision dead-end.",
+      "No current layer treats defensible decision, further evidence acquisition, discriminating experiment and safe defer as explicit escape routes from human escalation.",
+      "No current layer requires an auditable handoff packet explaining why the residual decision cannot be reduced further by AI."
+    ]
+  },
+  "risks": [
+    "A claimed experiment may be too vague to be genuinely discriminating.",
+    "The system may loop by repeatedly proposing equivalent probes and falsely appear to be learning.",
+    "Safe defer may be asserted without a bounded trigger or recheck condition.",
+    "Missing verification evidence may accidentally be treated as exhaustion.",
+    "Accumulated knowledge may be recorded but not actually used to shrink or reshape the remaining UNKNOWN.",
+    "Human counts may be reduced as a vanity metric instead of preserving material dead-ends."
+  ]
+}
