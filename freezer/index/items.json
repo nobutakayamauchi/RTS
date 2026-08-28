@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T00:24:00Z",
+  "generated_at": "2026-08-28T00:36:16Z",
   "count": 23,
   "items": [
     {
@@ -544,10 +544,10 @@
     },
     {
       "item_id": "RTS-FRZ-000023",
-      "version": 3,
+      "version": 5,
       "title": "False-Green Test Adequacy Gate v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 87.7,
       "estimated_hours": {
         "minimum": 6,
@@ -567,7 +567,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-28T00:24:00Z"
+      "updated_at": "2026-08-28T00:36:16Z"
     }
   ]
 }
