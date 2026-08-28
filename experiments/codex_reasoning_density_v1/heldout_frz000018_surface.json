@@ -1,0 +1,21 @@
+{
+  "schema": "rts-heldout-restart-surface/v1",
+  "scope": "RTS-FRZ-000018 model-transition state",
+  "authority": "NONE",
+  "state": {
+    "item": "RTS-FRZ-000018",
+    "version": 5,
+    "lifecycle": "COMPLETED",
+    "s3_meaning": "observable execution-contract topology shift",
+    "hidden_architecture_claim": "NONE",
+    "docs_claim_status": "UNVERIFIED_BEHAVIOR_HYPOTHESIS",
+    "old_profile_rule": "preserve historical profile; severe change blocks direct reuse assumption but does not delete or apply profiles",
+    "safe_next": "bounded F/G reprofiling or probe request only when transition evidence requires it; no automatic runtime mutation"
+  },
+  "sources": [
+    {"path": "freezer/items/RTS-FRZ-000018/current.json", "git_blob_sha1": "152b8f00cfb87aacc50abe1051603efe7d189245"},
+    {"path": "freezer/items/RTS-FRZ-000018/v005.json", "git_blob_sha1": "636b5c17c539ee3a60c4c4189181a8cd76397d14"},
+    {"path": "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000018_2026-08-27.md", "git_blob_sha1": "b2060f1da92e896ecb9a7ea1075717ce40ed1b0e"}
+  ],
+  "verification": "Runner verifies source git blobs before ATTESTED invocation. COLD receives no surface or benchmark harness."
+}
