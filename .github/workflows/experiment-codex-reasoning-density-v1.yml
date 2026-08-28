@@ -21,11 +21,28 @@ jobs:
         run: |
           bash -n experiments/codex_reasoning_density_v1/run.sh
           bash -n experiments/codex_reasoning_density_v1/run_reuse_sweep.sh
+          bash -n experiments/codex_reasoning_density_v1/run_restart_surface.sh
           bash -n experiments/codex_reasoning_density_v1/collect_history.sh
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate.py
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate_sweep.py
           python -m py_compile experiments/codex_reasoning_density_v1/collect_history.py
           python -m py_compile experiments/codex_reasoning_density_v1/test_collect_history.py
+      - name: Validate compact restart surface provenance
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          p=Path('experiments/codex_reasoning_density_v1/restart_surface.json')
+          data=json.loads(p.read_text())
+          assert p.stat().st_size <= 1800, p.stat().st_size
+          assert data['state']['lifecycle']=='COMPLETED', data
+          assert data['state']['k2_adequacy']=='ADEQUATE', data
+          assert data['state']['zero_defect_claim'] is False, data
+          for src in data['sources']:
+              actual=subprocess.check_output(['git','hash-object',src['path']], text=True).strip()
+              assert actual==src['git_blob_sha1'], (src['path'], actual, src['git_blob_sha1'])
+          print('compact restart surface provenance valid')
+          PY
       - name: Validate historical collector semantics
         run: |
           python experiments/codex_reasoning_density_v1/test_collect_history.py
@@ -58,14 +75,14 @@ jobs:
       - name: Validate reuse sweep semantics
         run: |
           tmp="$(mktemp -d)"
-          for spec in 'cold 100000 20000' 'reuse 140000 120000' 'reuse_thin 60000 30000' 'reuse_minimal 45000 25000'; do
+          for spec in 'cold 100000 20000' 'reuse 140000 120000' 'reuse_thin 60000 30000' 'reuse_minimal 45000 25000' 'reuse_restart 35000 20000'; do
             set -- $spec
             name="$1"; input="$2"; cached="$3"
             cat > "$tmp/$name.jsonl" <<EOF
           {"type":"turn.completed","usage":{"input_tokens":$input,"cached_input_tokens":$cached,"output_tokens":1000,"reasoning_output_tokens":500}}
           EOF
           done
-          for name in reuse reuse_thin reuse_minimal; do
+          for name in reuse reuse_thin reuse_minimal reuse_restart; do
             cat > "$tmp/$name.final.txt" <<'EOF'
           STATE
           RTS-FRZ-000024 is COMPLETED.
@@ -85,8 +102,10 @@ jobs:
           r=json.load(open(sys.argv[1]))
           assert r['comparisons']['full']['candidate_total_below_cold'] is False, r
           assert r['comparisons']['thin']['candidate_total_below_cold'] is True, r
-          assert r['comparisons']['thin']['candidate_uncached_below_cold'] is True, r
           assert r['comparisons']['minimal']['quality_gate_pass'] is True, r
-          assert r['strict_winners']==['thin','minimal'], r
+          assert r['comparisons']['restart']['candidate_total_below_cold'] is True, r
+          assert r['comparisons']['restart']['candidate_uncached_below_cold'] is True, r
+          assert r['comparisons']['restart']['quality_gate_pass'] is True, r
+          assert r['strict_winners']==['thin','minimal','restart'], r
           print('reuse sweep semantics valid')
           PY
