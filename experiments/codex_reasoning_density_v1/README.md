@@ -4,6 +4,35 @@ Purpose: measure whether RTS externalized knowledge and selective restart contex
 
 This is an **experiment**, not a production authority change. It does not mutate FREEZER, Canon, runtime policy, or completed K0/K1/K2/FRZ-000024 state.
 
+## Phase 0 — Historical baseline first
+
+Before running any new Codex benchmark, inventory the existing SSH-side Codex history:
+
+```bash
+bash experiments/codex_reasoning_density_v1/collect_history.sh
+```
+
+The collector is read-only. By default it:
+
+- scans `~/.codex/sessions/**/*.jsonl`;
+- inventories non-secret files under `~/.codex`;
+- looks for benchmark surfaces such as `.benchmark-results`, `EXP-*`, and `WISH-KILL` under known repo roots;
+- extracts session/model/cwd/provider and usage counters when present;
+- hashes the first task text instead of copying prompt/response text;
+- excludes `auth.json`, config/credential/secret files;
+- labels `turn.completed` usage aggregation `HIGH` confidence;
+- treats generic usage snapshots as potentially cumulative and keeps only the final snapshot with `LOW` confidence rather than blindly summing them.
+
+Outputs:
+
+```text
+results/history-<UTC timestamp>/historical_baseline.json
+results/history-<UTC timestamp>/historical_baseline.csv
+results/history-<UTC timestamp>/summary.json
+```
+
+Do not merge `LOW` or `NONE` confidence usage into a headline token-reduction claim until its meter semantics are resolved.
+
 ## Three fresh runs
 
 All three runs use fresh `codex exec --ephemeral --json` invocations. We deliberately do **not** use `codex exec resume`, because this benchmark is intended to measure RTS external reuse rather than session-history replay cost.
@@ -43,7 +72,10 @@ Prerequisites:
 - Codex already authenticated in the local environment;
 - Python 3.
 
+First collect history, inspect the baseline, then run the new benchmark:
+
 ```bash
+bash experiments/codex_reasoning_density_v1/collect_history.sh
 bash experiments/codex_reasoning_density_v1/run.sh
 ```
 
