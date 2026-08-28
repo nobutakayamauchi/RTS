@@ -29,7 +29,7 @@
         "path": "human_escalation_gate/core.py",
         "ref": "b8d8948f136d2e6f719477535d65f74af067a80a",
         "kind": "code",
-        "reuse_mode": "MODIFY",
+        "reuse_mode": "ADAPT",
         "license_status": "OWNED",
         "estimated_hours_saved": 2,
         "notes": "Small route-recovery boundary repair only."
@@ -39,7 +39,7 @@
         "path": "tests/test_test_adequacy_gate.py",
         "ref": "b8d8948f136d2e6f719477535d65f74af067a80a",
         "kind": "test",
-        "reuse_mode": "REVALIDATE",
+        "reuse_mode": "REFERENCE",
         "license_status": "OWNED",
         "estimated_hours_saved": 3,
         "notes": "Existing independent held-out oracle should turn from failed to passed without changing the held-out expected outcome."
