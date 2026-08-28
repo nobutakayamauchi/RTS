@@ -1,0 +1,64 @@
+name: FRZ-000023 Finding Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000023-false-green-test-adequacy-gate-v1
+    paths:
+      - .github/workflows/frz-000023-finding-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  finding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000023-false-green-test-adequacy-gate-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Trace held-out catalog wording through K0 and K1
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tests.test_human_escalation_gate import make_k0
+          from human_escalation_gate import evaluate_escalation_report
+          anchor='A cost-efficient creative model is described for routine media drafts.'
+          k0=make_k0(anchor)
+          k1=evaluate_escalation_report(k0)
+          row0=k0['records'][0]
+          row1=k1['records'][0]
+          out={
+            'finding_id':'FRZ-000023-FG-001',
+            'anchor':anchor,
+            'expected_k1_disposition':'WAIT_SAFE_DEFER',
+            'k0_classification':row0['classification'],
+            'k0_da_paths':row0['da']['problem_solving_paths'],
+            'k0_counter_da_paths':row0['counter_da']['problem_solving_paths'],
+            'k1_recovered_escape_routes':row1['recovered_escape_routes'],
+            'k1_initial_routes':row1['initial_routes'],
+            'k1_disposition':row1['disposition'],
+            'false_green':row1['disposition']!='WAIT_SAFE_DEFER',
+            'authority':'NONE',
+          }
+          assert out['false_green'] is True, out
+          Path('docs/implementation/frz000023_false_green_001.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit finding evidence
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add docs/implementation/frz000023_false_green_001.json
+          git commit -m 'test: record FRZ-000023 held-out false-green finding'
+          git push origin HEAD:feature/frz-000023-false-green-test-adequacy-gate-v1
