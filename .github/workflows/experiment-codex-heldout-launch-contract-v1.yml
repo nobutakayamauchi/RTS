@@ -1,0 +1,30 @@
+name: Validate Codex Held-out Launch Contract v1
+
+on:
+  push:
+    branches:
+      - experiment/codex-reasoning-density-v1
+    paths:
+      - 'experiments/codex_reasoning_density_v1/run_heldout_frz000018.sh'
+      - '.github/workflows/experiment-codex-heldout-launch-contract-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate isolated snapshot contract
+        run: |
+          bash -n experiments/codex_reasoning_density_v1/run_heldout_frz000018.sh
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('experiments/codex_reasoning_density_v1/run_heldout_frz000018.sh')
+          s=p.read_text()
+          assert 'git archive "$GIT_HEAD"' in s, 'held-out must use an archive snapshot'
+          assert 'rm -rf "$dest/experiments/codex_reasoning_density_v1"' in s, 'benchmark harness must be removed'
+          assert '[[ ! -e "$dest/.git" ]]' in s, 'snapshot must assert .git absence'
+          assert 'codex exec --skip-git-repo-check --json --ephemeral --sandbox read-only' in s, 'non-git snapshot must explicitly skip only the git repo check'
+          assert '"skip_git_repo_check":True' in s, 'launch exception must be recorded in metadata'
+          print('isolated held-out launch contract valid')
+          PY
