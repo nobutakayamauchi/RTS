@@ -76,6 +76,7 @@ def main() -> None:
         "thin": "reuse_thin",
         "minimal": "reuse_minimal",
         "restart": "reuse_restart",
+        "attested": "reuse_attested",
     }
     runs = {}
     for label, stem in files.items():
@@ -91,7 +92,7 @@ def main() -> None:
                 runs[label]["meta"] = {"parse_error": True}
 
     cold = runs["cold"]
-    candidate_labels = ("full", "thin", "minimal", "restart")
+    candidate_labels = ("full", "thin", "minimal", "restart", "attested")
     comparisons = {}
     for label in candidate_labels:
         candidate = runs[label]
@@ -120,7 +121,7 @@ def main() -> None:
     ]
 
     report = {
-        "schema": "codex-reuse-density-sweep/v2",
+        "schema": "codex-reuse-density-sweep/v3",
         "goal": "reduce total and uncached input below COLD without losing bounded decision quality",
         "runs": runs,
         "comparisons": comparisons,
@@ -132,8 +133,9 @@ def main() -> None:
                 "deterministic quality checklist passes",
             ],
             "quality_warning": "The deterministic checklist is a guardrail, not a semantic correctness proof. Review final answers before claiming success.",
-            "baseline_warning": "COLD/FULL/THIN/MINIMAL may be reused from preceding exploratory runs; RESTART is fresh. Use a later fully rerun sweep for publication-grade comparison.",
-            "restart_rule": "RESTART verifies listed source blobs without reading source contents; source expansion is allowed only on hash mismatch, contradiction, or task-relevant insufficiency.",
+            "baseline_warning": "Earlier variants may be reused from preceding exploratory runs; ATTESTED is fresh. Use a later fully rerun sweep for publication-grade comparison.",
+            "restart_rule": "RESTART lets the model verify source blobs itself without reading source contents unless expansion is required.",
+            "attested_rule": "ATTESTED moves deterministic source-blob verification outside the model and supplies a fail-closed runner attestation, avoiding model tool round trips when verified=true.",
         },
     }
     out = root / "reuse_sweep.json"
