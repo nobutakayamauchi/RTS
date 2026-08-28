@@ -1,6 +1,6 @@
 name: FRZ-000024 Repair Once
 
-# rerun after stale low-cost oracle correction
+# rerun after M06 lower-priority promotion oracle restoration
 on:
   push:
     branches:
