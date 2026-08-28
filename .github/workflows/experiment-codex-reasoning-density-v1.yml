@@ -37,7 +37,7 @@ jobs:
           {"type":"turn.completed","usage":{"input_tokens":40000,"cached_input_tokens":15000,"cache_write_input_tokens":0,"output_tokens":7000,"reasoning_output_tokens":2000}}
           EOF
           cat > "$tmp/next.jsonl" <<'EOF'
-          {"type":"turn.completed","usage":{"input_tokens":30000,"cached_input_tokens":10000,"cache_write_input_tokens":0,"output_tokens":6000,"reasoning_output_tokens":1500}}
+          {"timestamp":"2026-08-28T00:00:00Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":30000,"cached_input_tokens":10000,"cache_write_input_tokens":0,"output_tokens":6000,"reasoning_output_tokens":1500,"total_tokens":37500},"last_token_usage":{"input_tokens":30000,"cached_input_tokens":10000,"cache_write_input_tokens":0,"output_tokens":6000,"reasoning_output_tokens":1500,"total_tokens":37500}}}}
           EOF
           python experiments/codex_reasoning_density_v1/aggregate.py --results-dir "$tmp" --reference-tokens 5000000 > /tmp/report.json
           python - "$tmp/summary.json" <<'PY'
@@ -45,6 +45,9 @@ jobs:
           r=json.load(open(sys.argv[1]))
           assert r['runs']['cold']['uncached_input_tokens']==80000, r
           assert r['runs']['reuse']['uncached_input_tokens']==25000, r
+          assert r['runs']['next']['uncached_input_tokens']==20000, r
+          assert r['runs']['cold']['usage_source']=='turn.completed', r
+          assert r['runs']['next']['usage_source']=='event_msg.token_count.total_token_usage', r
           assert abs(r['comparisons']['cold_to_reuse_input_reduction']-0.60)<1e-9, r
           assert abs(r['comparisons']['cold_to_reuse_uncached_input_reduction']-0.6875)<1e-9, r
           assert r['reference_ratios_only']['cold']==0.02, r
