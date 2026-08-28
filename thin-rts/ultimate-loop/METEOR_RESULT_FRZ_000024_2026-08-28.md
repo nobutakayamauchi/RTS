@@ -105,11 +105,9 @@ The first candidate repair exposed a stale test oracle: an older K1 DA test expl
 
 After that correction, K0 and K1 regressions passed, but K2 still stopped the repair because mutation M06 (`LOW_PRIORITY_HEURISTIC_PROMOTION`) survived.
 
-Why?
+The old low-cost test had also been the effective sentinel proving that K1 cannot promote a lower-priority K0 item merely because second-pass recovery finds a route. Removing the bare cost route accidentally removed that sentinel.
 
-The old low-cost test had also been the only effective sentinel proving that K1 cannot promote a lower-priority K0 item merely because second-pass recovery finds a route. Removing the bare cost route accidentally removed that sentinel.
-
-The production repair was **not reverted**. Instead, the M06 oracle was restored with an independent lower-priority identity case:
+The production repair was not reverted. Instead, the M06 oracle was restored with an independent lower-priority identity case:
 
 ```text
 Legacy models remain available during a transition window;
@@ -125,15 +123,15 @@ but active recovery is suppressed
 => WAIT_SAFE_DEFER
 ```
 
-Under M06, the lower-priority suppression is removed and the test fails. M06 is therefore killed again.
+Under M06, lower-priority suppression is removed and the test fails. M06 is therefore killed again.
 
-This is a useful quality lesson:
+This yields another quality invariant:
 
 ```text
 fixing a defect can reduce detector sensitivity
 ```
 
-So repair validation must test both behavior and the continued ability to detect seeded defects.
+Repair validation must therefore test both the repaired behavior and continued ability to detect seeded faults.
 
 ## K2 after repair
 
@@ -179,10 +177,13 @@ For a simple independent binomial thought experiment, even observing zero defect
 - governed start repaired run `33131410344`: SUCCESS, FRZ-000024 entered governed WIP;
 - first bounded repair run `33131591658`: K0 PASS, K1 FAIL on stale low-cost oracle; no repair commit landed;
 - K1 diagnostic `33131627629`: confirmed FG-001 and all operational pricing controls behaved correctly under the candidate repair;
-- second repair run `33131800051`: K0/K1 PASS, K2 stopped on M06 survivor (6/7);
+- second repair run `33131800051`: K0/K1 PASS, K2 stopped on M06 survivor (6/7); no repair commit landed;
 - K2 diagnostic `33131839612`: confirmed M06 was the sole critical survivor;
 - final bounded repair run `33131933464`: K0 PASS, K1 PASS, K2 PASS, FG-001 resolution assertion PASS, repair committed;
-- post-repair evidence run `33131992451`: resolution evidence generated from the committed repair.
+- post-repair evidence run `33131992451`: resolution evidence generated from the committed repair;
+- persistent A-K2 full-stack run `33132084820`: SUCCESS;
+- canonical FREEZER completion run `33132138773`: pre-validation SUCCESS, `VERIFIED -> COMPLETED`, post-validation SUCCESS, completion committed;
+- temporary start/repair/diagnostic/evidence/completion workflows, repair script, and diagnostic dumps removed after completion.
 
 ## Authority boundary
 
@@ -196,8 +197,17 @@ The repair grants no authority for:
 
 All remain `NONE`.
 
-## Current state
+## Final state
 
-**REPAIR SURVIVOR / PENDING FINAL FULL-STACK + FREEZER CLOSE.**
+```text
+RTS-FRZ-000024              = COMPLETED
+FRZ-000023-FG-001            = RESOLVED by bounded repair
+K2 current defined lanes     = ADEQUATE
+critical mutation detection  = 7 / 7
+zero defect claim            = FALSE
+WIP                           = CLEAR
+```
 
-Next: persistent A-K2 full-stack validation, canonical FREEZER `VERIFIED -> COMPLETED`, cleanup of temporary repair/diagnostic workflows and scripts, final cleaned-head validation, and stacked PR creation.
+**COMPLETED / bounded adequacy restored.**
+
+The next model or corpus should still be treated as a new sample. A future zero-failure result remains a trigger to ask whether the detector has enough independent coverage, not permission to infer a permanent 0% defect rate.
