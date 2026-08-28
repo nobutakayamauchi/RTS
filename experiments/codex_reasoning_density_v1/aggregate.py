@@ -3,6 +3,45 @@ import argparse
 import json
 from pathlib import Path
 
+USAGE_KEYS = (
+    "input_tokens",
+    "cached_input_tokens",
+    "cache_write_input_tokens",
+    "output_tokens",
+    "reasoning_output_tokens",
+    "total_tokens",
+)
+
+
+def normalize_usage(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {}
+    for key in USAGE_KEYS:
+        raw = value.get(key)
+        if isinstance(raw, bool):
+            continue
+        if isinstance(raw, int) and raw >= 0:
+            out[key] = raw
+    return out
+
+
+def token_count_total(event):
+    stack = [event]
+    while stack:
+        value = stack.pop()
+        if isinstance(value, dict):
+            if value.get("type") == "token_count":
+                info = value.get("info")
+                if isinstance(info, dict):
+                    usage = normalize_usage(info.get("total_token_usage"))
+                    if usage:
+                        return usage
+            stack.extend(value.values())
+        elif isinstance(value, list):
+            stack.extend(value)
+    return None
+
 
 def load_run(path: Path):
     events = []
@@ -17,7 +56,20 @@ def load_run(path: Path):
 
     completed = [e for e in events if e.get("type") == "turn.completed" and isinstance(e.get("usage"), dict)]
     failed = [e for e in events if e.get("type") == "turn.failed"]
-    if not completed:
+    token_snapshots = [u for e in events if (u := token_count_total(e))]
+
+    if completed:
+        # codex exec normally emits one terminal turn.completed event for one exec turn.
+        # If multiple are present, use the last terminal usage snapshot rather than summing
+        # potentially cumulative snapshots.
+        usage = normalize_usage(completed[-1]["usage"])
+        usage_source = "turn.completed"
+    elif token_snapshots:
+        # Defensive fallback for Codex streams that expose the same cumulative
+        # token_count schema observed in ~/.codex/sessions.
+        usage = token_snapshots[-1]
+        usage_source = "event_msg.token_count.total_token_usage"
+    else:
         return {
             "file": str(path),
             "status": "NO_USAGE",
@@ -25,10 +77,6 @@ def load_run(path: Path):
             "event_count": len(events),
         }
 
-    # codex exec normally emits one terminal turn.completed event for one exec turn.
-    # If multiple are present, use the last terminal usage snapshot rather than summing
-    # potentially cumulative snapshots.
-    usage = completed[-1]["usage"]
     input_tokens = int(usage.get("input_tokens", 0) or 0)
     cached_input_tokens = int(usage.get("cached_input_tokens", 0) or 0)
     cache_write_input_tokens = int(usage.get("cache_write_input_tokens", 0) or 0)
@@ -47,6 +95,7 @@ def load_run(path: Path):
     return {
         "file": str(path),
         "status": "COMPLETED",
+        "usage_source": usage_source,
         "event_count": len(events),
         "input_tokens": input_tokens,
         "cached_input_tokens": cached_input_tokens,
