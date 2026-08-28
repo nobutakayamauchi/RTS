@@ -75,6 +75,7 @@ def main() -> None:
         "full": "reuse",
         "thin": "reuse_thin",
         "minimal": "reuse_minimal",
+        "restart": "reuse_restart",
     }
     runs = {}
     for label, stem in files.items():
@@ -90,8 +91,9 @@ def main() -> None:
                 runs[label]["meta"] = {"parse_error": True}
 
     cold = runs["cold"]
+    candidate_labels = ("full", "thin", "minimal", "restart")
     comparisons = {}
-    for label in ("full", "thin", "minimal"):
+    for label in candidate_labels:
         candidate = runs[label]
         comparisons[label] = {
             "cold_to_candidate_input_reduction": reduction(cold, candidate, "input_tokens"),
@@ -111,14 +113,14 @@ def main() -> None:
         }
 
     winners = [
-        label for label in ("full", "thin", "minimal")
+        label for label in candidate_labels
         if comparisons[label]["candidate_total_below_cold"]
         and comparisons[label]["candidate_uncached_below_cold"]
         and comparisons[label]["quality_gate_pass"]
     ]
 
     report = {
-        "schema": "codex-reuse-density-sweep/v1",
+        "schema": "codex-reuse-density-sweep/v2",
         "goal": "reduce total and uncached input below COLD without losing bounded decision quality",
         "runs": runs,
         "comparisons": comparisons,
@@ -130,7 +132,8 @@ def main() -> None:
                 "deterministic quality checklist passes",
             ],
             "quality_warning": "The deterministic checklist is a guardrail, not a semantic correctness proof. Review final answers before claiming success.",
-            "full_baseline_warning": "COLD and FULL are reused from the immediately preceding benchmark; THIN and MINIMAL are fresh runs. Use a later fully rerun sweep for publication-grade comparison.",
+            "baseline_warning": "COLD/FULL/THIN/MINIMAL may be reused from preceding exploratory runs; RESTART is fresh. Use a later fully rerun sweep for publication-grade comparison.",
+            "restart_rule": "RESTART verifies listed source blobs without reading source contents; source expansion is allowed only on hash mismatch, contradiction, or task-relevant insufficiency.",
         },
     }
     out = root / "reuse_sweep.json"
