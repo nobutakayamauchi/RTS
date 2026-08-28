@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T00:58:49Z",
+  "generated_at": "2026-08-28T01:12:38Z",
   "count": 24,
   "items": [
     {
@@ -571,10 +571,10 @@
     },
     {
       "item_id": "RTS-FRZ-000024",
-      "version": 3,
+      "version": 5,
       "title": "Catalog Cost False-Green Repair v1",
       "type": "architecture",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "priority_score": 90.66,
       "estimated_hours": {
         "minimum": 2,
@@ -592,7 +592,7 @@
       ],
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
-      "updated_at": "2026-08-28T00:58:49Z"
+      "updated_at": "2026-08-28T01:12:38Z"
     }
   ]
 }
