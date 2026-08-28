@@ -1,5 +1,6 @@
 name: FRZ-000024 Start Once
 
+# retry after build-assessment schema repair
 on:
   push:
     branches:
