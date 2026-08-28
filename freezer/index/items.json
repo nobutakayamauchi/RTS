@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T23:35:40Z",
-  "count": 22,
+  "generated_at": "2026-08-28T00:24:00Z",
+  "count": 23,
   "items": [
     {
       "item_id": "RTS-FRZ-000001",
@@ -541,6 +541,33 @@
       "build_authority": "APPROVED",
       "preflight_state": "PASS",
       "updated_at": "2026-08-27T23:35:40Z"
+    },
+    {
+      "item_id": "RTS-FRZ-000023",
+      "version": 3,
+      "title": "False-Green Test Adequacy Gate v1",
+      "type": "architecture",
+      "status": "IN_PROGRESS",
+      "priority_score": 87.7,
+      "estimated_hours": {
+        "minimum": 6,
+        "maximum": 14
+      },
+      "tags": [
+        "adaptive-intelligence-v9",
+        "false-green",
+        "test-adequacy",
+        "mutation-testing",
+        "held-out",
+        "metamorphic-testing",
+        "known-bad",
+        "da",
+        "fail-closed",
+        "provider-neutral"
+      ],
+      "build_authority": "APPROVED",
+      "preflight_state": "PASS",
+      "updated_at": "2026-08-28T00:24:00Z"
     }
   ]
 }

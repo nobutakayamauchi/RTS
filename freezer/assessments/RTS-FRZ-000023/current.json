@@ -1,0 +1,10 @@
+{
+  "item_id": "RTS-FRZ-000023",
+  "current_assessment_version": 1,
+  "path": "freezer/assessments/RTS-FRZ-000023/ba001.json",
+  "assessment_id": "RTS-BA-000023-001",
+  "recommendation": "BUILD_NOW",
+  "decision_score": 74.88,
+  "item_fingerprint": "a0db0e1b645360adf7158af5be29946a96b51088d08140f13f044742b8e5be1c",
+  "updated_at": "2026-08-28T00:24:00Z"
+}
