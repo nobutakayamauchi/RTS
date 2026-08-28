@@ -1,0 +1,114 @@
+name: Validate FRZ-000024 Catalog Cost False-Green Repair v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000024-catalog-cost-false-green-repair-v1
+  pull_request:
+    paths:
+      - 'review_necessity_triage/**'
+      - 'human_escalation_gate/**'
+      - 'test_adequacy_gate/**'
+      - 'tests/test_review_necessity_triage*.py'
+      - 'tests/test_human_escalation_gate*.py'
+      - 'tests/test_test_adequacy_gate*.py'
+      - 'docs/implementation/frz000024_inputs/**'
+      - 'docs/implementation/frz000024_resolution.json'
+      - 'thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000024_2026-08-28.md'
+      - 'freezer/**'
+      - '.github/workflows/frz-000024-catalog-cost-false-green-repair-v1.yml'
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate repair evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          row=json.loads(Path('docs/implementation/frz000024_resolution.json').read_text())
+          assert row['schema_version']=='frz-000024-resolution-evidence/v1', row
+          assert row['finding_id']=='FRZ-000023-FG-001', row
+          assert row['historical_finding_preserved'] is True, row
+          assert row['post_repair']['k0_classification'] in {'HUMAN_LATER','DEFER_LOW_VALUE'}, row
+          assert row['post_repair']['k0_explicit_contract_signal'] is False, row
+          assert row['post_repair']['k1_disposition']=='WAIT_SAFE_DEFER', row
+          assert 'RECALIBRATE_LIMIT_OR_BUDGET' not in row['post_repair']['k1_recovered_escape_routes'], row
+          assert all('RECALIBRATE_LIMIT_OR_BUDGET' in c['routes'] for c in row['operational_cost_controls']), row
+          assert row['mutation_audit']['critical_total']==7, row
+          assert row['mutation_audit']['critical_killed']==7, row
+          assert row['mutation_audit']['mutation_lane_pass'] is True, row
+          assert row['mutation_audit']['controls_pass'] is True, row
+          assert all(row['lane_status'].values()), row
+          assert row['adequacy_status']=='ADEQUATE', row
+          assert row['adequacy_scope']=='CURRENT_DEFINED_K2_LANES_ONLY', row
+          assert row['zero_defect_claim'] is False, row
+          assert all(v=='NONE' for v in row['authority'].values()), row
+          print('FRZ-000024 resolution evidence valid')
+          PY
+      - name: Re-run K2 adequacy gate on repaired target
+        run: |
+          python -m unittest tests.test_test_adequacy_gate -v
+          python -m unittest tests.test_test_adequacy_gate_da -v
+      - name: Regress K1
+        run: python -m unittest tests.test_human_escalation_gate tests.test_human_escalation_gate_da -v
+      - name: Regress K0
+        run: python -m unittest tests.test_review_necessity_triage tests.test_review_necessity_triage_da -v
+      - name: Regress J
+        run: python -m unittest tests.test_semantic_claim_refinement tests.test_semantic_claim_refinement_da -v
+      - name: Regress I
+        run: python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+      - name: Regress H
+        run: python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+      - name: Regress G
+        run: python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+      - name: Regress F
+        run: python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+      - name: Regress E
+        run: python -m unittest tests.test_external_seed_corpus tests.test_external_seed_corpus_da -v
+      - name: Regress D
+        run: python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+      - name: Regress C
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.preflight verify
+      - name: Assert A-K2 complete and FRZ-000024 lifecycle valid
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          for n in range(11,24):
+              row=current(f'RTS-FRZ-{n:06d}')
+              assert row['status']=='COMPLETED', row
+          fix=current('RTS-FRZ-000024')
+          assert fix['status'] in {'IN_PROGRESS','VERIFIED','COMPLETED'}, fix
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              row=current(p.parent.name)
+              if row['status']=='IN_PROGRESS': active.append(row['item_id'])
+          if fix['status']=='IN_PROGRESS':
+              assert active==['RTS-FRZ-000024'], active
+          else:
+              assert active==[], active
+          print('A-K2 COMPLETED; FRZ-000024 lifecycle valid; WIP boundary valid')
+          PY

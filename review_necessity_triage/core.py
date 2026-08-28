@@ -256,6 +256,9 @@ OPERATIONAL_GUIDANCE_PATTERNS: tuple[str, ...] = (
 )
 
 DESCRIPTIVE_CAPABILITY_PATTERNS: tuple[str, ...] = (
+    r"\b(?:cost|price)[- ](?:efficient|effective|optimized|friendly)\b",
+    r"\b(?:model|engine|product)\s+(?:is\s+)?(?:described|positioned|marketed|presented)\s+(?:as|for)\b",
+    r"\b(?:described|positioned|marketed|presented)\s+for\b",
     r"\bmodel for\b",
     r"\bmodel that\b",
     r"\bengine with\b",

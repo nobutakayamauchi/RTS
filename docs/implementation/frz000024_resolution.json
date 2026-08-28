@@ -1,0 +1,194 @@
+{
+  "schema_version": "frz-000024-resolution-evidence/v1",
+  "finding_id": "FRZ-000023-FG-001",
+  "historical_finding_preserved": true,
+  "anchor": "A cost-efficient creative model is described for routine media drafts.",
+  "expected_disposition": "WAIT_SAFE_DEFER",
+  "post_repair": {
+    "k0_classification": "HUMAN_LATER",
+    "k0_explicit_contract_signal": false,
+    "k0_da_problem_solving_paths": [],
+    "k0_counter_da_problem_solving_paths": [],
+    "k1_recovered_escape_routes": [],
+    "k1_residual_routes": [],
+    "k1_disposition": "WAIT_SAFE_DEFER"
+  },
+  "operational_cost_controls": [
+    {
+      "anchor": "Pricing for input tokens is $5 per million tokens.",
+      "routes": [
+        "RECALIBRATE_LIMIT_OR_BUDGET"
+      ]
+    },
+    {
+      "anchor": "API cost increases from $5 to $7 per million tokens.",
+      "routes": [
+        "RECALIBRATE_LIMIT_OR_BUDGET"
+      ]
+    },
+    {
+      "anchor": "Billing changed and the budget cap must be recalibrated before rollout.",
+      "routes": [
+        "RECALIBRATE_LIMIT_OR_BUDGET"
+      ]
+    },
+    {
+      "anchor": "The token price is 7 USD per million input tokens.",
+      "routes": [
+        "RECALIBRATE_LIMIT_OR_BUDGET"
+      ]
+    }
+  ],
+  "mutation_audit": {
+    "critical_total": 7,
+    "critical_killed": 7,
+    "invalid_not_counted_as_kill": true,
+    "mutation_lane_pass": true,
+    "controls_pass": true,
+    "production_source_unchanged": true
+  },
+  "mutation_statuses": [
+    {
+      "id": "M01_ROUTE_REMAINS_BUT_HUMAN_CANDIDATE",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M02_SAFE_DEFER_IGNORED",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M03_HUMAN_CHOICE_BYPASSES_EXHAUSTION",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M04_EARLY_SEARCH_COUNTS_AS_EXHAUSTION",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M05_DUPLICATE_PROBE_ALLOWED",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M06_LOW_PRIORITY_HEURISTIC_PROMOTION",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "M07_UNKNOWN_ROUTE_CLOSURE_ALLOWED",
+      "kind": "CRITICAL",
+      "status": "KILLED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "C01_EQUIVALENT_COMMENT",
+      "kind": "EQUIVALENT_CONTROL",
+      "status": "SURVIVED",
+      "load_ok": true,
+      "tests_ran": true
+    },
+    {
+      "id": "C02_INVALID_SYNTAX",
+      "kind": "INVALID_CONTROL",
+      "status": "INVALID_MUTANT",
+      "load_ok": false,
+      "tests_ran": false
+    }
+  ],
+  "lane_status": {
+    "mutation": true,
+    "harness_controls": true,
+    "known_bad": true,
+    "held_out": true,
+    "metamorphic": true,
+    "production_source_unchanged": true
+  },
+  "known_bad": [
+    {
+      "case_id": "KB_ROUTE_REMAINS_AI_SIDE",
+      "passed": true,
+      "detail": "AI_CONTINUE"
+    },
+    {
+      "case_id": "KB_HUMAN_CHOICE_IS_NOT_EXHAUSTION",
+      "passed": true,
+      "detail": "HUMAN_CANDIDATE"
+    },
+    {
+      "case_id": "KB_PROVEN_MATERIAL_EXHAUSTION_REACHES_HUMAN",
+      "passed": true,
+      "detail": "HUMAN_NOW"
+    },
+    {
+      "case_id": "KB_LOW_PRIORITY_COST_SIGNAL_NOT_PROMOTED",
+      "passed": true,
+      "detail": "WAIT_SAFE_DEFER"
+    },
+    {
+      "case_id": "KB_DUPLICATE_PROBE_REPLAY_REJECTED",
+      "passed": true,
+      "detail": "rejected"
+    }
+  ],
+  "held_out": [
+    {
+      "case_id": "HO_STATE_CONTINUATION_CONTRACT",
+      "passed": true,
+      "detail": "AI_CONTINUE"
+    },
+    {
+      "case_id": "HO_LEGACY_ENGINE_IDENTITY",
+      "passed": true,
+      "detail": "WAIT_SAFE_DEFER"
+    },
+    {
+      "case_id": "HO_LOW_PRIORITY_CATALOG_TEXT",
+      "passed": true,
+      "detail": "WAIT_SAFE_DEFER"
+    }
+  ],
+  "metamorphic": [
+    {
+      "case_id": "MM_CASE_CHANGE_PRESERVES_ROUTE_DECISION",
+      "passed": true,
+      "detail": "AI_CONTINUE->AI_CONTINUE"
+    },
+    {
+      "case_id": "MM_ROUTE_CLOSURE_CHANGES_CONTINUE_TO_CANDIDATE",
+      "passed": true,
+      "detail": "AI_CONTINUE->HUMAN_CANDIDATE"
+    },
+    {
+      "case_id": "MM_SAFE_DEFER_CHANGES_CANDIDATE_TO_WAIT",
+      "passed": true,
+      "detail": "HUMAN_CANDIDATE->WAIT_SAFE_DEFER"
+    }
+  ],
+  "adequacy_status": "ADEQUATE",
+  "adequacy_scope": "CURRENT_DEFINED_K2_LANES_ONLY",
+  "zero_defect_claim": false,
+  "authority": {
+    "execution": "NONE",
+    "profile_application": "NONE",
+    "promotion": "NONE",
+    "canon": "NONE",
+    "semantic_truth": "NONE"
+  }
+}

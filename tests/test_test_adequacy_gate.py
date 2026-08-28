@@ -185,11 +185,10 @@ class TestAdequacyGateTests(unittest.TestCase):
         self.assertTrue(audit["production_source_unchanged"])
         self.assertEqual(audit["critical_total"], audit["critical_killed"])
 
-    def test_known_bad_and_metamorphic_pass_while_held_out_exposes_false_green(self):
+    def test_all_independent_lanes_pass_after_fg001_repair(self):
         self.assertTrue(all(row["passed"] for row in self.known_bad), self.known_bad)
+        self.assertTrue(all(row["passed"] for row in self.held_out), self.held_out)
         self.assertTrue(all(row["passed"] for row in self.metamorphic), self.metamorphic)
-        failed = [row for row in self.held_out if not row["passed"]]
-        self.assertEqual([row["case_id"] for row in failed], ["HO_LOW_PRIORITY_CATALOG_TEXT"], self.held_out)
 
     def test_full_adequacy_requires_all_lanes(self):
         report = evaluate_test_adequacy(
@@ -199,8 +198,8 @@ class TestAdequacyGateTests(unittest.TestCase):
             metamorphic=self.metamorphic,
         )
         verify_test_adequacy_report(report)
-        self.assertEqual(report["status"], "HOLD_FALSE_GREEN_RISK")
-        self.assertFalse(report["lanes"]["held_out"])
+        self.assertEqual(report["status"], "ADEQUATE")
+        self.assertTrue(report["lanes"]["held_out"])
         self.assertFalse(report["audit"]["test_pass_proves_bug_absence"])
         self.assertEqual(report["execution_authority"], "NONE")
 

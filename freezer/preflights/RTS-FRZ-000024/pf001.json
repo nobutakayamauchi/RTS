@@ -1,0 +1,74 @@
+{
+  "outcome": "PASS",
+  "assessor": "RTS implementation preflight — Catalog Cost False-Green Repair v1",
+  "rationale": "A bounded repository-local fix to one reproduced K1 false-green boundary. No provider calls, external probes, runtime deployment, profile mutation, Canon promotion, or authority expansion. The repair must preserve legitimate operational pricing/billing verification while suppressing descriptive catalog-cost promotion, then rerun the same K2 adequacy lanes.",
+  "affected_boundaries": [
+    "K1 second-pass cost-route recovery",
+    "K1 direct regression tests",
+    "K2 held-out adequacy expectation after repair",
+    "RTS-FRZ-000024 lifecycle records"
+  ],
+  "existing_assumptions": [
+    "RTS-FRZ-000023 is COMPLETED.",
+    "FRZ-000023-FG-001 remains historical evidence and is not rewritten.",
+    "The held-out expected outcome remains WAIT_SAFE_DEFER.",
+    "Legitimate pricing/billing/limit operational contracts must still be eligible for bounded verification.",
+    "K2 stale mutation operators fail closed."
+  ],
+  "data_migration": {
+    "required": false,
+    "notes": "No historical K2 finding or prior FREEZER record is mutated in place."
+  },
+  "external_interfaces": [
+    "repository-local K0/K1/K2 code and tests only",
+    "no network/provider/model execution"
+  ],
+  "approval_changes": [
+    "none; all authority fields remain NONE"
+  ],
+  "public_documents": [
+    "none"
+  ],
+  "regression_tests": [
+    "reproduce FG-001 before repair evidence",
+    "catalog cost adjective must not create active K1 work",
+    "real pricing/billing contract must preserve RECALIBRATE_LIMIT_OR_BUDGET",
+    "K1 baseline + DA regressions",
+    "K2 mutation + known-bad + held-out + metamorphic + harness controls",
+    "K0/J/I/H/G/F/E/D/C/B/A regressions",
+    "FREEZER verification"
+  ],
+  "hidden_dependencies": [
+    "do not special-case the exact FG-001 sentence",
+    "do not use K2 expected result changes to fake a repair",
+    "the held-out row must become passed because K1 behavior changes",
+    "real operational cost contracts remain active routes",
+    "K2 ADEQUATE still means no failure in the currently defined mandatory lanes, not proof of zero unknown defects"
+  ],
+  "rollback_boundary": "Revert the FRZ-000024 branch to checkpoint/frz-000024-pre-repair; FRZ-000023 and K2 historical finding remain intact.",
+  "completion_conditions": [
+    "FG-001 reproduces before the repair and no longer reproduces after it",
+    "the exact held-out expectation remains WAIT_SAFE_DEFER",
+    "at least two paraphrased descriptive cost catalog cases also remain non-active",
+    "at least two operational pricing/billing cases still open RECALIBRATE_LIMIT_OR_BUDGET",
+    "K2 mutation lane and harness controls remain valid after K1 source change",
+    "all known-bad, held-out, and metamorphic lanes pass",
+    "K2 report status becomes ADEQUATE from underlying evidence rather than summary editing",
+    "A-K2 regressions and FREEZER verify pass",
+    "all authority fields remain NONE"
+  ],
+  "decomposition": {
+    "required": false,
+    "child_candidates": []
+  },
+  "risks": [
+    "Current lexical boundary remains heuristic and future wording may expose another false green.",
+    "A clean K2 pass narrows observed false-green risk but cannot establish literal zero defect probability."
+  ],
+  "preflight_id": "RTS-PF-000024-001",
+  "item_id": "RTS-FRZ-000024",
+  "preflight_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "d0af40d5ed4348b3a98c1b42696ca5ec7e6b675924df196dcabd08c54a4ba51c",
+  "created_at": "2026-08-28T00:58:49Z"
+}

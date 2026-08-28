@@ -7,6 +7,7 @@ from human_escalation_gate import (
     EXHAUSTION_SEARCH_ROUTE,
     HumanEscalationError,
     evaluate_escalation_report,
+    recover_escape_routes,
 )
 from review_necessity_triage import triage_refinement_report
 from semantic_claim_refinement import refine_intake_report
@@ -40,6 +41,35 @@ def close_reasoning_route() -> dict:
 
 
 class HumanEscalationGateDATests(unittest.TestCase):
+    def test_fg001_catalog_cost_does_not_manufacture_budget_work(self):
+        anchors = [
+            "A cost-efficient creative model is described for routine media drafts.",
+            "The catalog presents a cost-effective model for routine image drafts.",
+            "A cost-optimized model is marketed for everyday creative drafts.",
+        ]
+        for anchor in anchors:
+            with self.subTest(anchor=anchor):
+                self.assertNotIn("RECALIBRATE_LIMIT_OR_BUDGET", recover_escape_routes(anchor))
+
+    def test_operational_pricing_and_cost_changes_keep_budget_route(self):
+        anchors = [
+            "Pricing for input tokens is $5 per million tokens.",
+            "API cost increases from $5 to $7 per million tokens.",
+            "Billing changed and the budget cap must be recalibrated before rollout.",
+            "The token price is 7 USD per million input tokens.",
+        ]
+        for anchor in anchors:
+            with self.subTest(anchor=anchor):
+                self.assertIn("RECALIBRATE_LIMIT_OR_BUDGET", recover_escape_routes(anchor))
+
+    def test_fg001_end_to_end_is_safe_defer(self):
+        k0 = make_k0("A cost-efficient creative model is described for routine media drafts.")
+        self.assertNotEqual(k0["records"][0]["classification"], "HUMAN_NOW")
+        report = evaluate_escalation_report(k0)
+        row = report["records"][0]
+        self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")
+        self.assertNotIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])
+
     def test_attempts_do_not_exhaust_an_open_route(self):
         k0 = make_k0("A request now uses a managed planner before tool execution.")
         route = k0["records"][0]["da"]["problem_solving_paths"][0]
@@ -142,11 +172,11 @@ class HumanEscalationGateDATests(unittest.TestCase):
         self.assertEqual(report["records"][0]["disposition"], "HUMAN_CANDIDATE")
 
     def test_k1_does_not_promote_k0_later_or_defer_to_active_work_from_escape_heuristic(self):
-        k0 = make_k0("High-efficiency, low-cost, developer-first video generation and editing.")
+        k0 = make_k0("Legacy models remain available during a transition window; map the effective model identity before assuming equivalent behavior.")
         self.assertIn(k0["records"][0]["classification"], {"HUMAN_LATER", "DEFER_LOW_VALUE"})
         report = evaluate_escalation_report(k0)
         row = report["records"][0]
-        self.assertIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])
+        self.assertIn("MAP_ENGINE_IDENTITY_CATALOG", row["recovered_escape_routes"])
         self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")
         self.assertFalse(row["residual_routes"])
 
