@@ -1,0 +1,116 @@
+name: Validate Codex Evidence Freeze and Held-out v1
+
+on:
+  push:
+    branches:
+      - experiment/codex-reasoning-density-v1
+    paths:
+      - 'experiments/codex_reasoning_density_v1/freeze_confirmatory_evidence.py'
+      - 'experiments/codex_reasoning_density_v1/heldout_frz000018_surface.json'
+      - 'experiments/codex_reasoning_density_v1/aggregate_heldout_frz000018.py'
+      - 'experiments/codex_reasoning_density_v1/run_heldout_frz000018.sh'
+      - '.github/workflows/experiment-codex-evidence-heldout-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax
+        run: |
+          bash -n experiments/codex_reasoning_density_v1/run_heldout_frz000018.sh
+          python -m py_compile experiments/codex_reasoning_density_v1/freeze_confirmatory_evidence.py
+          python -m py_compile experiments/codex_reasoning_density_v1/aggregate_heldout_frz000018.py
+      - name: Validate held-out surface provenance
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          p='experiments/codex_reasoning_density_v1/heldout_frz000018_surface.json'
+          d=json.load(open(p))
+          assert d['state']['item']=='RTS-FRZ-000018'
+          assert d['state']['lifecycle']=='COMPLETED'
+          assert len(d['sources'])==3
+          for s in d['sources']:
+              actual=subprocess.check_output(['git','hash-object',s['path']],text=True).strip()
+              assert actual==s['git_blob_sha1'], (s['path'],actual,s['git_blob_sha1'])
+          print('held-out provenance valid')
+          PY
+      - name: Validate evidence freeze semantics
+        run: |
+          tmp="$(mktemp -d)"; src="$tmp/confirmatory-test"; mkdir -p "$src"
+          printf '%s\n' '{"result":"CONFIRMED_STRICT_WIN","pair_count":3,"strict_pair_wins":3,"median_total_input_reduction":0.7,"median_uncached_input_reduction":0.1,"median_wall_time_reduction":0.5,"quality_relations":{"PRESERVED":1,"IMPROVED":2,"REGRESSED":0,"BOTH_FAIL":0}}' > "$src/confirmatory_summary.json"
+          printf '%s\n' '{"type":"turn.completed","usage":{"input_tokens":10}}' > "$src/pair1_cold.jsonl"
+          printf '%s\n' 'STATE' > "$src/pair1_cold.final.txt"
+          python experiments/codex_reasoning_density_v1/freeze_confirmatory_evidence.py --source "$src" --dest-root "$tmp/evidence" >/tmp/freeze.json
+          python - "$tmp/evidence/confirmatory-test/evidence_manifest.json" <<'PY'
+          import hashlib,json,sys
+          from pathlib import Path
+          m=json.load(open(sys.argv[1])); root=Path(sys.argv[1]).parent
+          assert m['result']=='CONFIRMED_STRICT_WIN'
+          for f in m['files']:
+              p=root/f['path']; assert p.stat().st_size==f['bytes']; assert hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256']
+          print('freeze manifest valid')
+          PY
+          bad="$tmp/confirmatory-bad"; mkdir -p "$bad"; printf '%s\n' '{"result":"NOT_CONFIRMED"}' > "$bad/confirmatory_summary.json"
+          if python experiments/codex_reasoning_density_v1/freeze_confirmatory_evidence.py --source "$bad" --dest-root "$tmp/evidence"; then exit 1; fi
+      - name: Validate held-out oracle semantics
+        run: |
+          tmp="$(mktemp -d)"
+          good_final() {
+            cat > "$1" <<'EOF'
+          STATE
+          RTS-FRZ-000018 is COMPLETED.
+          S3
+          S3 is an observable external execution-contract topology shift; it is NOT hidden neural architecture proof and does NOT authorize runtime/profile mutation.
+          CLAIM
+          A docs claim remains UNVERIFIED and is not observed behavior.
+          NEXT
+          Request only a bounded F/G probe or reprofiling step; no automatic profile application.
+          EVIDENCE
+          freezer/items/RTS-FRZ-000018/current.json
+          freezer/items/RTS-FRZ-000018/v005.json
+          thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000018_2026-08-27.md
+          EOF
+          }
+          cold_weak() {
+            cat > "$1" <<'EOF'
+          STATE
+          uncertain
+          S3
+          S3 seems important.
+          CLAIM
+          docs are evidence.
+          NEXT
+          bounded probe.
+          EVIDENCE
+          repository evidence inspected.
+          EOF
+          }
+          for i in 1 2 3; do
+            cat > "$tmp/pair${i}_cold.jsonl" <<EOF
+          {"type":"turn.completed","usage":{"input_tokens":100000,"cached_input_tokens":20000,"output_tokens":1000,"reasoning_output_tokens":500}}
+          EOF
+            cat > "$tmp/pair${i}_attested.jsonl" <<EOF
+          {"type":"turn.completed","usage":{"input_tokens":20000,"cached_input_tokens":5000,"output_tokens":200,"reasoning_output_tokens":50}}
+          EOF
+            cold_weak "$tmp/pair${i}_cold.final.txt"; good_final "$tmp/pair${i}_attested.final.txt"
+            printf '%s\n' '{"exit_code":0,"git_head":"abc","requested_model":"gpt-test","wall_seconds":30}' > "$tmp/pair${i}_cold.meta.json"
+            printf '%s\n' '{"exit_code":0,"git_head":"abc","requested_model":"gpt-test","wall_seconds":10}' > "$tmp/pair${i}_attested.meta.json"
+          done
+          python experiments/codex_reasoning_density_v1/aggregate_heldout_frz000018.py --results-dir "$tmp" --pairs 3 >/tmp/heldout.json
+          python - "$tmp/heldout_summary.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1])); assert r['strict_pair_wins']==3,r; assert r['result']=='HELDOUT_CONFIRMED_STRICT_WIN',r; assert r['quality_relations']['IMPROVED']==3,r
+          print('positive held-out semantics valid')
+          PY
+          printf '%s\n' 'STATE S3 CLAIM NEXT EVIDENCE' > "$tmp/pair3_attested.final.txt"
+          python experiments/codex_reasoning_density_v1/aggregate_heldout_frz000018.py --results-dir "$tmp" --pairs 3 >/tmp/heldout-bad.json
+          python - "$tmp/heldout_summary.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1])); assert r['strict_pair_wins']==2,r; assert r['result']=='HELDOUT_NOT_CONFIRMED',r
+          print('negative held-out semantics valid')
+          PY
