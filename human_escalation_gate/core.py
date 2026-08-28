@@ -67,7 +67,12 @@ _ESCAPE_ROUTE_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
     (
         "RECALIBRATE_LIMIT_OR_BUDGET",
-        (r"(?:billed|billing|token rates?|pricing|price|cost)",),
+        (
+            r"(?:\b(?:billed|billing|pricing|token rates?|budget|spend)\b|"
+            r"\b(?:price|cost)s?\b(?=[\s\S]{0,120}(?:[$¥€]|\b(?:usd|dollars?|yen|eur)\b|\bper\b|"
+            r"\bincreas(?:e|ed|es|ing)?\b|\bdecreas(?:e|ed|es|ing)?\b|\bchang(?:e|ed|es|ing)?\b|"
+            r"\blimit\b|\bcap\b|\bbudget\b)))",
+        ),
     ),
     (
         "FETCH_REFERENCED_OFFICIAL_DOC_CONTEXT",

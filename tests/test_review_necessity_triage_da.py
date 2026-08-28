@@ -33,6 +33,22 @@ class ReviewNecessityTriageDATests(unittest.TestCase):
         self.assertLessEqual(record["da"]["causal_reach"], 2)
         self.assertFalse(record["da"]["explicit_contract_signal"])
 
+    def test_catalog_cost_positioning_is_not_concrete_operational_contract(self):
+        anchors = [
+            "A cost-efficient creative model is described for routine media drafts.",
+            "The catalog presents a cost-effective model for routine image drafts.",
+            "A cost-optimized model is marketed for everyday creative drafts.",
+        ]
+        for anchor in anchors:
+            with self.subTest(anchor=anchor):
+                j = make_j(anchor)
+                triage = triage_refinement_report(j)
+                record = triage["records"][0]
+                self.assertNotEqual(record["classification"], "HUMAN_NOW")
+                self.assertFalse(record["da"]["explicit_contract_signal"])
+                self.assertLessEqual(record["da"]["impact"], 2)
+                self.assertLessEqual(record["da"]["causal_reach"], 2)
+
     def test_operational_reasoning_guidance_remains_human_now(self):
         j = make_j("Use high or xhigh when more reasoning produces a measured quality gain.")
         triage = triage_refinement_report(j)
