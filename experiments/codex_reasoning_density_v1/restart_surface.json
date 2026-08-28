@@ -1,0 +1,22 @@
+{
+  "schema": "rts-compact-restart-surface/v1",
+  "scope": "RTS-FRZ-000024/K2 current-state restart only",
+  "authority": "NONE",
+  "state": {
+    "item": "RTS-FRZ-000024",
+    "version": 5,
+    "lifecycle": "COMPLETED",
+    "k2_adequacy": "ADEQUATE",
+    "adequacy_scope": "CURRENT_DEFINED_K2_LANES_ONLY",
+    "zero_defect_claim": false,
+    "residual_risk": "Unknown defects may remain outside sampled, modeled, or detector-visible K2 surfaces.",
+    "safe_next": "STOP unless a new bounded task is explicitly authorized."
+  },
+  "sources": [
+    {"path": "freezer/items/RTS-FRZ-000024/current.json", "git_blob_sha1": "112fc0bc47ed6c56f509e2355c4e03e8f93c2455"},
+    {"path": "freezer/items/RTS-FRZ-000024/v005.json", "git_blob_sha1": "fe0b22c85340757dec648281b8ea34bfd60ba99e"},
+    {"path": "docs/implementation/frz000024_resolution.json", "git_blob_sha1": "18f891f8995b40174a14e210f322901c36f92537"},
+    {"path": "test_adequacy_gate/README.md", "git_blob_sha1": "8f3946065087b3fa28ddfe09aaf0d5a82687ef21"}
+  ],
+  "verification": "Verify source git blobs only. Read source contents only on hash mismatch, contradiction, or task-relevant insufficiency."
+}
