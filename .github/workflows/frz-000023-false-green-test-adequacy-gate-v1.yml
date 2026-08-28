@@ -1,0 +1,85 @@
+name: Validate FRZ-000023 False-Green Test Adequacy Gate v1
+
+on:
+  push:
+    branches:
+      - feature/frz-000023-false-green-test-adequacy-gate-v1
+  pull_request:
+    paths:
+      - 'test_adequacy_gate/**'
+      - 'tests/test_test_adequacy_gate*.py'
+      - 'docs/implementation/frz000023_inputs/**'
+      - 'docs/implementation/frz000023_false_green_001.json'
+      - 'thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000023_2026-08-28.md'
+      - 'freezer/**'
+      - '.github/workflows/frz-000023-false-green-test-adequacy-gate-v1.yml'
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run K2 false-green baseline and self-DA
+        run: |
+          python -m unittest tests.test_test_adequacy_gate -v
+          python -m unittest tests.test_test_adequacy_gate_da -v
+      - name: Regress K1
+        run: python -m unittest tests.test_human_escalation_gate tests.test_human_escalation_gate_da -v
+      - name: Regress K0
+        run: python -m unittest tests.test_review_necessity_triage tests.test_review_necessity_triage_da -v
+      - name: Regress J
+        run: python -m unittest tests.test_semantic_claim_refinement tests.test_semantic_claim_refinement_da -v
+      - name: Regress I
+        run: python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+      - name: Regress H
+        run: python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+      - name: Regress G
+        run: python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+      - name: Regress F
+        run: python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+      - name: Regress E
+        run: python -m unittest tests.test_external_seed_corpus tests.test_external_seed_corpus_da -v
+      - name: Regress D
+        run: python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+      - name: Regress C
+        run: python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+      - name: Regress B
+        run: python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+      - name: Regress A
+        run: python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+      - name: Regress FREEZER
+        run: |
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.preflight verify
+      - name: Assert A-K1 complete and K2 lifecycle valid
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          for n in range(11,23):
+              row=current(f'RTS-FRZ-{n:06d}')
+              assert row['status']=='COMPLETED', row
+          k2=current('RTS-FRZ-000023')
+          assert k2['status'] in {'IN_PROGRESS','VERIFIED','COMPLETED'}, k2
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              row=current(p.parent.name)
+              if row['status']=='IN_PROGRESS': active.append(row['item_id'])
+          if k2['status']=='IN_PROGRESS':
+              assert active==['RTS-FRZ-000023'], active
+          else:
+              assert active==[], active
+          print('A-K1 COMPLETED; K2 lifecycle valid; WIP boundary valid')
+          PY

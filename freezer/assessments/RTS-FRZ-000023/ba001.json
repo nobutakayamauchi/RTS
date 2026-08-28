@@ -1,0 +1,84 @@
+{
+  "assessor": "RTS governed build assessment — False-Green Test Adequacy Gate v1",
+  "rationale": "K1 now has a strong human-escalation contract, but its 76-item green result is only as trustworthy as the tests that can detect violations of that contract. K2 adds an independent repository-local adequacy layer: known-bad injection, valid critical mutants, held-out fixtures, metamorphic checks, and harness controls. The layer does not change K1 runtime logic and is designed to fail closed when a behavioral fault survives or when the mutation harness cannot distinguish semantic failures from invalid mutants.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 2,
+    "risk_reduction": 5,
+    "recurrence": 5,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 7,
+    "integration_hours": 2,
+    "validation_hours": 4,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": [
+      "nobutakayamauchi/RTS"
+    ],
+    "queries": [
+      "human escalation gate tests",
+      "destructive DA",
+      "mutation testing false green",
+      "held out test adequacy"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "human_escalation_gate/",
+        "ref": "409fc71fc46b2b96f396fe05c08d20cd1c95f1c6",
+        "kind": "code",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "K2 mutates a temporary copy or structured behavior surface only; production K1 is not edited in-place."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "tests/test_human_escalation_gate.py",
+        "ref": "409fc71fc46b2b96f396fe05c08d20cd1c95f1c6",
+        "kind": "test",
+        "reuse_mode": "REFERENCE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Targeted K1 behavioral tests are the mutation kill oracle."
+      }
+    ],
+    "gaps": [
+      "No layer verifies that K1 tests kill deliberate semantic faults.",
+      "No layer distinguishes a meaningful mutation kill from syntax/import failure.",
+      "No positive control proves the mutation harness does not kill equivalent behavior.",
+      "No independent held-out lane guards against tuning to the original 76-item surface.",
+      "No metamorphic lane verifies decision stability under meaning-preserving representation changes."
+    ]
+  },
+  "risks": [
+    "Mutation operators may become stale when K1 source changes.",
+    "A mutation may be invalid rather than behaviorally wrong and create a false kill.",
+    "Known-bad fixtures may accidentally duplicate K1 training/DA fixtures.",
+    "Metamorphic transformations may alter semantics unintentionally.",
+    "Mutation kill percentage can become a vanity metric if lane-specific failures are hidden."
+  ],
+  "assessment_id": "RTS-BA-000023-001",
+  "item_id": "RTS-FRZ-000023",
+  "assessment_version": 1,
+  "item_version_snapshot": 1,
+  "item_fingerprint": "a0db0e1b645360adf7158af5be29946a96b51088d08140f13f044742b8e5be1c",
+  "derived": {
+    "benefit_score": 91.0,
+    "cost_score": 47.06,
+    "reuse_score": 71.43,
+    "decision_score": 74.88,
+    "reuse_hours_saved": 5.0,
+    "net_hours": 9.0,
+    "time_saved_ratio": 0.7143,
+    "implementation_efficiency": 0.78,
+    "cost_effectiveness": 10.11,
+    "recommendation": "BUILD_NOW"
+  },
+  "created_at": "2026-08-28T00:24:00Z"
+}

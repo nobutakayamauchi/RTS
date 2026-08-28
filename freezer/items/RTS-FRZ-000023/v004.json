@@ -1,0 +1,93 @@
+{
+  "item_id": "RTS-FRZ-000023",
+  "title": "False-Green Test Adequacy Gate v1",
+  "type": "architecture",
+  "status": "VERIFIED",
+  "summary": "K1の結果がGREENでも本当に異常を検出できるテスト面を持つかを別層で検証する。known-bad注入、critical mutation、held-out、metamorphic、harness controlを独立レーンとして実行し、validなcritical mutantをK1 targeted testsが意味的にkillできない、known-badを通す、またはharness自体が何でもkillする場合はADEQUACY HOLDとする。",
+  "original_problem": "K1は76件を35 AI_CONTINUE / 41 WAIT_SAFE_DEFER / 0 HUMANまで絞ったが、TEST PASSは問題不在の証明ではない。K1本体やテストoracleに盲点があれば、本来止めるべき異常がGREENのまま通り、HUMAN_NOW=0という結果の信頼性を過大評価する可能性がある。",
+  "why_it_matters": "Adaptive intelligence stackはテスト結果を次の判断の証拠として再利用するため、false greenは単発バグより危険である。検出器の盲点が知識として固定される前に、既知悪性ケースと意図的なsemantic mutationを検出できること、同時に無害なcontrolを誤検出しないことを証明する必要がある。",
+  "reason_frozen": "mutationがsyntax/import errorで落ちただけなのにKILLED扱いする、equivalent controlまで落ちる、known-bad corpusへ過適合する、held-outを実質training fixture化する、meaning-preserving変換で結果が変わる、重大mutationがsurviveする、1レーンの高スコアだけでadequate扱いする、というfalse-greenをDAで禁止するまで実装しない。",
+  "preserved_value": [
+    "TEST PASS is evidence of non-detection, not proof of bug absence",
+    "K1 production behavior remains unchanged by K2",
+    "critical mutants must compile/import before they can be counted as killed",
+    "invalid mutant is not a kill",
+    "equivalent/no-op control mutant must survive",
+    "known-bad cases have explicit expected safety outcomes",
+    "held-out cases remain separate from tuning fixtures",
+    "metamorphic meaning-preserving transformations must preserve disposition",
+    "meaning-changing transformations must change the required expectation where specified",
+    "adequacy requires all independent lanes, not a single percentage",
+    "all failures and exclusions remain auditable",
+    "no semantic truth or execution authority"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 2,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 5,
+    "effort": 2,
+    "uncertainty": 2
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000022 is COMPLETED",
+    "K1 has targeted baseline and destructive DA tests",
+    "K1 live official-doc result is 35 AI_CONTINUE / 41 WAIT_SAFE_DEFER / 0 HUMAN",
+    "WIP is clear"
+  ],
+  "negative_triggers": [
+    "valid critical mutant survives targeted tests",
+    "known-bad injection passes with an unsafe normal disposition",
+    "invalid/import-breaking mutant is counted as killed",
+    "equivalent control mutant is killed",
+    "held-out corpus is silently reused for tuning",
+    "meaning-preserving metamorphic transform changes result unexpectedly",
+    "meaning-changing transform fails to trigger the required behavioral difference",
+    "one lane is used as sole adequacy proof",
+    "failure records are dropped or truncated without HOLD"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000022 Exhausted-AI Human Escalation Gate v1",
+    "human_escalation_gate/",
+    "tests/test_human_escalation_gate*.py",
+    "FREEZER human gate and WIP=1"
+  ],
+  "source_refs": [
+    "human_escalation_gate/",
+    "tests/test_human_escalation_gate.py",
+    "tests/test_human_escalation_gate_da.py",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000022_2026-08-28.md",
+    "K1 final CI run 33127079670"
+  ],
+  "possible_destinations": [
+    "test_adequacy_gate/",
+    "tests/test_test_adequacy_gate*.py",
+    "persistent false-green validation workflow"
+  ],
+  "estimated_hours": {
+    "minimum": 6,
+    "maximum": 14
+  },
+  "tags": [
+    "adaptive-intelligence-v9",
+    "false-green",
+    "test-adequacy",
+    "mutation-testing",
+    "held-out",
+    "metamorphic-testing",
+    "known-bad",
+    "da",
+    "fail-closed",
+    "provider-neutral"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 4,
+  "created_at": "2026-08-28T00:23:59Z",
+  "updated_at": "2026-08-28T00:36:16Z",
+  "supersedes": "v003"
+}
