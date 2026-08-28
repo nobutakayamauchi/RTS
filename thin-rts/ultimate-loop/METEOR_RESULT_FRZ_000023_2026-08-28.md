@@ -118,11 +118,19 @@ K2 now rejects:
 - an invalid critical mutant counted as a kill;
 - a failed held-out row hidden behind an `ADEQUATE` lane summary.
 
-One intermediate repair workflow definition had invalid YAML and produced no jobs; it is excluded from semantic adequacy evidence and was replaced with a staged repository-local repair script.
+One intermediate repair workflow definition had invalid YAML and produced no jobs; it is excluded from semantic adequacy evidence and was replaced with a staged repository-local repair script. The temporary repair, diagnostic, finding, start, validation, and completion surfaces were removed after their evidence was folded into the persistent result.
+
+## Persistent and FREEZER validation
+
+Persistent A-K2 validation run `33130193219` passed K2 baseline/self-DA, K1 through A regressions, and FREEZER verification while K2 was in governed WIP.
+
+Canonical completion run `33130235365` passed pre-completion validation, transitioned `RTS-FRZ-000023` through `VERIFIED -> COMPLETED`, passed post-completion validation, confirmed A-K2 `COMPLETED` with WIP clear, and committed only generated FREEZER completion state.
+
+The permanent K2 workflow remains the cleaned-head validation surface after removal of temporary one-shot tooling.
 
 ## Current target adequacy state
 
-The **K2 gate implementation is a survivor**, but the current K0/K1 target surface is intentionally:
+The **K2 gate implementation is completed**, but the current K0/K1 target surface is intentionally:
 
 ```text
 HOLD_FALSE_GREEN_RISK
@@ -136,10 +144,10 @@ This distinction is mandatory:
 K2 COMPLETED != TARGET ADEQUATE
 ```
 
-K2 completion means the false-green detector is implemented, adversarially tested, and can correctly HOLD the target when a held-out failure survives. It does not certify K1 as bug-free.
+K2 completion means the false-green detector is implemented, adversarially tested, governed, and can correctly HOLD the target when a held-out failure survives. It does not certify K1 as bug-free.
 
 ## Current state
 
-**SURVIVOR / PENDING FREEZER CLOSE.**
+**COMPLETED / TARGET HOLD_FALSE_GREEN_RISK.**
 
-Next: persistent A-K2 regression, canonical FREEZER `VERIFIED -> COMPLETED`, removal of temporary one-shot/diagnostic repair surfaces, final cleaned-head validation, and stacked PR creation.
+Next repair, if authorized, belongs in a new FREEZER item and must address the cross-layer catalog/cost false-green without mutating the historical K2 result or pretending that 7/7 mutation kill proved adequacy.
