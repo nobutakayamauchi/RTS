@@ -1,5 +1,6 @@
 name: FRZ-000024 Repair Once
 
+# rerun after stale low-cost oracle correction
 on:
   push:
     branches:
