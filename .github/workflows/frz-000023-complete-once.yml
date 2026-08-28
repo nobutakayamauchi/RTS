@@ -1,0 +1,88 @@
+name: FRZ-000023 Complete Once
+
+on:
+  push:
+    branches:
+      - feature/frz-000023-false-green-test-adequacy-gate-v1
+    paths:
+      - .github/workflows/frz-000023-complete-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONPATH: '.'
+
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frz-000023-false-green-test-adequacy-gate-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pre-completion survivor validation
+        run: |
+          python -m unittest tests.test_test_adequacy_gate -v
+          python -m unittest tests.test_test_adequacy_gate_da -v
+          python -m unittest tests.test_human_escalation_gate tests.test_human_escalation_gate_da -v
+          python -m unittest tests.test_review_necessity_triage tests.test_review_necessity_triage_da -v
+          python -m unittest tests.test_semantic_claim_refinement tests.test_semantic_claim_refinement_da -v
+          python -m unittest tests.test_official_docs_intake tests.test_official_docs_intake_da -v
+          python -m unittest tests.test_model_transition_intelligence tests.test_model_transition_intelligence_da -v
+          python -m unittest tests.test_bounded_probe_executor tests.test_bounded_probe_executor_da tests.test_bounded_probe_worker -v
+          python -m unittest tests.test_model_behavior_adaptation tests.test_model_behavior_adaptation_da -v
+          python -m unittest tests.test_external_seed_corpus tests.test_external_seed_corpus_da -v
+          python -m unittest tests.test_reuse_metrics tests.test_reuse_metrics_da -v
+          python -m unittest tests.test_intelligence_compiler tests.test_intelligence_compiler_da -v
+          python -m unittest tests.test_restart_surface tests.test_restart_surface_da -v
+          python -m unittest tests.test_selective_recall tests.test_selective_recall_da -v
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.preflight verify
+      - name: Transition VERIFIED then COMPLETED
+        run: |
+          python -m freezer.cli revise RTS-FRZ-000023 --input docs/implementation/frz000023_inputs/mark_verified.json
+          python -m freezer.cli revise RTS-FRZ-000023 --input docs/implementation/frz000023_inputs/mark_completed.json
+          python -m freezer.cli reindex
+          python -m freezer.build_assessment reindex
+      - name: Post-completion validation
+        run: |
+          python -m unittest tests.test_test_adequacy_gate -v
+          python -m unittest tests.test_test_adequacy_gate_da -v
+          python -m unittest tests.test_human_escalation_gate tests.test_human_escalation_gate_da -v
+          python -m unittest tests.test_review_necessity_triage tests.test_review_necessity_triage_da -v
+          python -m unittest discover -s tests -p 'test_freezer*.py' -v
+          python -m freezer.cli verify
+          python -m freezer.build_assessment verify
+          python -m freezer.preflight verify
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          def current(item_id):
+              p=json.loads((Path('freezer/items')/item_id/'current.json').read_text())
+              return json.loads(Path(p['path']).read_text())
+          for n in range(11,24):
+              row=current(f'RTS-FRZ-{n:06d}')
+              assert row['status']=='COMPLETED', row
+          active=[]
+          for p in Path('freezer/items').glob('RTS-FRZ-*/current.json'):
+              row=current(p.parent.name)
+              if row['status']=='IN_PROGRESS': active.append(row['item_id'])
+          assert active==[], active
+          print('A-K2 COMPLETED; WIP clear')
+          PY
+      - name: Commit generated FREEZER completion only
+        run: |
+          git config user.name rts-bot
+          git config user.email rts-bot@users.noreply.github.com
+          git add freezer
+          git diff --cached --quiet && exit 1 || true
+          git commit -m 'freezer: complete FRZ-000023 false-green test adequacy gate v1'
+          git push origin HEAD:feature/frz-000023-false-green-test-adequacy-gate-v1
