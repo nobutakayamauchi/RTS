@@ -1,0 +1,83 @@
+{
+  "item_id": "RTS-FRZ-000024",
+  "title": "Catalog Cost False-Green Repair v1",
+  "type": "architecture",
+  "status": "IN_PROGRESS",
+  "summary": "FRZ-000023-FG-001で確認されたcatalog/product-description上のcost形容をK1がRECALIBRATE_LIMIT_OR_BUDGETというactive workへ誤変換するfalse greenを、最小境界修正と回帰テストで除去する。修正後は同じK2 held-out/mutation/metamorphic/harness lanesを再実行し、HOLD_FALSE_GREEN_RISKが解消する場合のみADEQUATEへ戻す。",
+  "original_problem": "K2 held-outで `A cost-efficient creative model is described for routine media drafts.` がK0 HUMAN_NOW / no problem-solving routeからK1 RECALIBRATE_LIMIT_OR_BUDGET / AI_CONTINUEへ昇格した。単なる製品説明を予算再調整作業へ変換しており、既存K1 GREEN surfaceでは検出されていなかった。",
+  "why_it_matters": "テスト0件失敗を不良率0%と誤認するとfalse greenを知識として固定する。FG-001を独立修理し、同じ検出器で再検査することで、検出能力と修理効果を分離して証明できる。",
+  "reason_frozen": "costという語を全面的に無視して実際のpricing/billing/limit変更を見逃す過修正、held-out文だけを文字列特例化するfixture過適合、K2期待値だけを変更してGREEN化する見せかけ修正、K0/K1の無関係な挙動変更を禁止する。",
+  "preserved_value": [
+    "historical FRZ-000023-FG-001 remains true and preserved",
+    "catalog adjective alone does not create active work",
+    "real pricing/billing/budget/limit contract changes remain verifiable work",
+    "K2 held-out remains an independent oracle",
+    "K2 mutation and harness controls must remain sound",
+    "no semantic truth, execution, profile-application, promotion, or Canon authority"
+  ],
+  "priority": {
+    "impact": 5,
+    "urgency": 5,
+    "strategic_fit": 5,
+    "readiness": 5,
+    "revenue_value": 2,
+    "dependency_value": 5,
+    "risk_reduction": 5,
+    "confidence": 5,
+    "effort": 1,
+    "uncertainty": 1
+  },
+  "trigger_conditions": [
+    "RTS-FRZ-000023 is COMPLETED",
+    "FRZ-000023-FG-001 is reproducible",
+    "K2 final cleaned-head CI 33130476886 is SUCCESS",
+    "WIP is clear"
+  ],
+  "negative_triggers": [
+    "actual pricing or billing contract change no longer opens a verification route",
+    "repair is a literal special-case for the exact held-out sentence",
+    "K2 mutation controls become invalid or stale without HOLD",
+    "any K0/K1/J-I-A regression fails",
+    "another held-out lane failure appears"
+  ],
+  "dependencies": [
+    "RTS-FRZ-000023 False-Green Test Adequacy Gate v1",
+    "human_escalation_gate/",
+    "test_adequacy_gate/",
+    "tests/test_human_escalation_gate*.py",
+    "tests/test_test_adequacy_gate*.py"
+  ],
+  "source_refs": [
+    "docs/implementation/frz000023_false_green_001.json",
+    "human_escalation_gate/core.py",
+    "tests/test_test_adequacy_gate.py",
+    "thin-rts/ultimate-loop/METEOR_RESULT_FRZ_000023_2026-08-28.md",
+    "K2 final CI run 33130476886"
+  ],
+  "possible_destinations": [
+    "human_escalation_gate/core.py",
+    "tests/test_human_escalation_gate*.py",
+    "tests/test_test_adequacy_gate.py",
+    "persistent FRZ-000024 regression workflow"
+  ],
+  "estimated_hours": {
+    "minimum": 2,
+    "maximum": 6
+  },
+  "tags": [
+    "adaptive-intelligence-v10",
+    "false-green-repair",
+    "catalog-boundary",
+    "cost-route",
+    "held-out",
+    "mutation-testing",
+    "da",
+    "fail-closed"
+  ],
+  "build_authority": "APPROVED",
+  "recall_mode": "MANUAL",
+  "version": 3,
+  "created_at": "2026-08-28T00:58:49Z",
+  "updated_at": "2026-08-28T00:58:49Z",
+  "supersedes": "v002"
+}
