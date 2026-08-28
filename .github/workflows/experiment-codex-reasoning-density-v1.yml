@@ -20,8 +20,10 @@ jobs:
       - name: Validate shell and Python syntax
         run: |
           bash -n experiments/codex_reasoning_density_v1/run.sh
+          bash -n experiments/codex_reasoning_density_v1/run_reuse_sweep.sh
           bash -n experiments/codex_reasoning_density_v1/collect_history.sh
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate.py
+          python -m py_compile experiments/codex_reasoning_density_v1/aggregate_sweep.py
           python -m py_compile experiments/codex_reasoning_density_v1/collect_history.py
           python -m py_compile experiments/codex_reasoning_density_v1/test_collect_history.py
       - name: Validate historical collector semantics
@@ -52,4 +54,39 @@ jobs:
           assert abs(r['comparisons']['cold_to_reuse_uncached_input_reduction']-0.6875)<1e-9, r
           assert r['reference_ratios_only']['cold']==0.02, r
           print('benchmark aggregation semantics valid')
+          PY
+      - name: Validate reuse sweep semantics
+        run: |
+          tmp="$(mktemp -d)"
+          for spec in 'cold 100000 20000' 'reuse 140000 120000' 'reuse_thin 60000 30000' 'reuse_minimal 45000 25000'; do
+            set -- $spec
+            name="$1"; input="$2"; cached="$3"
+            cat > "$tmp/$name.jsonl" <<EOF
+          {"type":"turn.completed","usage":{"input_tokens":$input,"cached_input_tokens":$cached,"output_tokens":1000,"reasoning_output_tokens":500}}
+          EOF
+          done
+          for name in reuse reuse_thin reuse_minimal; do
+            cat > "$tmp/$name.final.txt" <<'EOF'
+          STATE
+          RTS-FRZ-000024 is COMPLETED.
+          ADEQUACY
+          K2 is ADEQUATE only for the bounded current inspection surface; zero observed defects is not zero residual defect risk.
+          NEXT
+          STOP unless a newly authorized bounded sample is requested.
+          EVIDENCE
+          freezer/items/RTS-FRZ-000024/current.json
+          docs/implementation/frz000024_resolution.json
+          test_adequacy_gate/README.md
+          EOF
+          done
+          python experiments/codex_reasoning_density_v1/aggregate_sweep.py --results-dir "$tmp" > /tmp/sweep.json
+          python - "$tmp/reuse_sweep.json" <<'PY'
+          import json, sys
+          r=json.load(open(sys.argv[1]))
+          assert r['comparisons']['full']['candidate_total_below_cold'] is False, r
+          assert r['comparisons']['thin']['candidate_total_below_cold'] is True, r
+          assert r['comparisons']['thin']['candidate_uncached_below_cold'] is True, r
+          assert r['comparisons']['minimal']['quality_gate_pass'] is True, r
+          assert r['strict_winners']==['thin','minimal'], r
+          print('reuse sweep semantics valid')
           PY
