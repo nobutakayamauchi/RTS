@@ -1,0 +1,58 @@
+{
+  "assessor": "RTS governed build assessment — Catalog Cost False-Green Repair v1",
+  "rationale": "K2 independently reproduced a concrete false green: descriptive catalog wording containing a cost cue is promoted by K1 into RECALIBRATE_LIMIT_OR_BUDGET active work. The repair surface is localized to K1 second-pass route recovery plus regression expectations. The change is high risk-reduction, low effort, and directly testable by the existing K2 held-out, mutation, metamorphic, and harness lanes.",
+  "expected_effect": {
+    "impact": 5,
+    "strategic_fit": 5,
+    "revenue_leverage": 2,
+    "risk_reduction": 5,
+    "recurrence": 4,
+    "confidence": 5
+  },
+  "implementation": {
+    "from_scratch_hours": 1,
+    "integration_hours": 1,
+    "validation_hours": 3,
+    "unknown_buffer_hours": 1
+  },
+  "github_scan": {
+    "performed": true,
+    "repositories": ["nobutakayamauchi/RTS"],
+    "queries": [
+      "RECALIBRATE_LIMIT_OR_BUDGET",
+      "cost-efficient held-out",
+      "human escalation gate cost pricing route"
+    ],
+    "assets": [
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "human_escalation_gate/core.py",
+        "ref": "b8d8948f136d2e6f719477535d65f74af067a80a",
+        "kind": "code",
+        "reuse_mode": "MODIFY",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 2,
+        "notes": "Small route-recovery boundary repair only."
+      },
+      {
+        "repository": "nobutakayamauchi/RTS",
+        "path": "tests/test_test_adequacy_gate.py",
+        "ref": "b8d8948f136d2e6f719477535d65f74af067a80a",
+        "kind": "test",
+        "reuse_mode": "REVALIDATE",
+        "license_status": "OWNED",
+        "estimated_hours_saved": 3,
+        "notes": "Existing independent held-out oracle should turn from failed to passed without changing the held-out expected outcome."
+      }
+    ],
+    "gaps": [
+      "K1 cost-route currently treats any cost cue in a K0 HUMAN_NOW anchor as active recalibration work.",
+      "No direct K1 regression distinguishes descriptive cost adjectives from operational pricing/billing contracts."
+    ]
+  },
+  "risks": [
+    "A too-broad guard could suppress legitimate pricing/billing verification.",
+    "A literal held-out special-case could overfit instead of fixing the semantic boundary.",
+    "Changing K1 source can make K2 mutation operators stale; stale operators must HOLD rather than be ignored."
+  ]
+}
