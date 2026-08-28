@@ -22,6 +22,8 @@ make_snapshot() {
   mkdir -p "$dest"
   git archive "$GIT_HEAD" | tar -x -C "$dest"
   rm -rf "$dest/experiments/codex_reasoning_density_v1"
+  [[ ! -e "$dest/.git" ]] || { echo "ERROR: held-out snapshot unexpectedly contains .git" >&2; return 4; }
+  [[ ! -e "$dest/experiments/codex_reasoning_density_v1" ]] || { echo "ERROR: benchmark harness leaked into held-out snapshot" >&2; return 4; }
 }
 
 COLD_PROMPT=$(cat <<'EOF'
@@ -57,12 +59,15 @@ run_one() {
   local started ended rc
   started="$(date +%s)"; echo "=== $stem ($condition, order=$order) ==="
   set +e
-  codex exec --json --ephemeral --sandbox read-only --cd "$sandbox" --model "$MODEL" --output-last-message "$final" "$prompt" >"$jsonl" 2>"$stderr"
+  # The held-out snapshot intentionally has no .git directory so the benchmark
+  # harness cannot be discovered through repository metadata. Codex therefore
+  # must skip only the git-repository presence check; sandbox remains read-only.
+  codex exec --skip-git-repo-check --json --ephemeral --sandbox read-only --cd "$sandbox" --model "$MODEL" --output-last-message "$final" "$prompt" >"$jsonl" 2>"$stderr"
   rc=$?; set -e; ended="$(date +%s)"
   python3 - "$meta" "$stem" "$condition" "$order" "$started" "$ended" "$rc" "$CODEX_VERSION" "$GIT_HEAD" "$MODEL" <<'PY'
 import json,sys
 path,stem,condition,order,started,ended,rc,version,head,model=sys.argv[1:]
-row={"name":stem,"condition":condition,"order_in_pair":int(order),"started_epoch":int(started),"ended_epoch":int(ended),"wall_seconds":int(ended)-int(started),"exit_code":int(rc),"codex_version":version,"git_head":head,"requested_model":model,"fresh_ephemeral":True,"isolated_snapshot":True}
+row={"name":stem,"condition":condition,"order_in_pair":int(order),"started_epoch":int(started),"ended_epoch":int(ended),"wall_seconds":int(ended)-int(started),"exit_code":int(rc),"codex_version":version,"git_head":head,"requested_model":model,"fresh_ephemeral":True,"isolated_snapshot":True,"skip_git_repo_check":True}
 open(path,"w",encoding="utf-8").write(json.dumps(row,ensure_ascii=False,indent=2)+"\n")
 PY
 }
@@ -71,7 +76,7 @@ TMPROOT="$(mktemp -d)"
 trap 'rm -rf "$TMPROOT"' EXIT
 for ((i=1;i<=PAIRS;i++)); do
   SNAP="$TMPROOT/pair$i"
-  make_snapshot "$SNAP"
+  make_snapshot "$SNAP" || exit $?
   ATTEST="$OUT/pair${i}_attestation.json"
   python3 "$EXP/build_attestation.py" --surface "$EXP/heldout_frz000018_surface.json" --output "$ATTEST" >/dev/null || { echo "HOLD: held-out attestation failed" >&2; cat "$ATTEST" >&2 || true; exit 3; }
   ATT="$(cat "$ATTEST")"; APROMPT="$(make_attested_prompt "$ATT")"
