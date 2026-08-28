@@ -20,7 +20,13 @@ jobs:
       - name: Validate shell and Python syntax
         run: |
           bash -n experiments/codex_reasoning_density_v1/run.sh
+          bash -n experiments/codex_reasoning_density_v1/collect_history.sh
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate.py
+          python -m py_compile experiments/codex_reasoning_density_v1/collect_history.py
+          python -m py_compile experiments/codex_reasoning_density_v1/test_collect_history.py
+      - name: Validate historical collector semantics
+        run: |
+          python experiments/codex_reasoning_density_v1/test_collect_history.py
       - name: Validate usage aggregation semantics
         run: |
           tmp="$(mktemp -d)"
