@@ -45,6 +45,10 @@ needle = '''    def test_attempts_do_not_exhaust_an_open_route(self):\n'''
 insert = '''    def test_fg001_catalog_cost_does_not_manufacture_budget_work(self):\n        anchors = [\n            "A cost-efficient creative model is described for routine media drafts.",\n            "The catalog presents a cost-effective model for routine image drafts.",\n            "A cost-optimized model is marketed for everyday creative drafts.",\n        ]\n        for anchor in anchors:\n            with self.subTest(anchor=anchor):\n                self.assertNotIn("RECALIBRATE_LIMIT_OR_BUDGET", recover_escape_routes(anchor))\n\n    def test_operational_pricing_and_cost_changes_keep_budget_route(self):\n        anchors = [\n            "Pricing for input tokens is $5 per million tokens.",\n            "API cost increases from $5 to $7 per million tokens.",\n            "Billing changed and the budget cap must be recalibrated before rollout.",\n            "The token price is 7 USD per million input tokens.",\n        ]\n        for anchor in anchors:\n            with self.subTest(anchor=anchor):\n                self.assertIn("RECALIBRATE_LIMIT_OR_BUDGET", recover_escape_routes(anchor))\n\n    def test_fg001_end_to_end_is_safe_defer(self):\n        k0 = make_k0("A cost-efficient creative model is described for routine media drafts.")\n        self.assertNotEqual(k0["records"][0]["classification"], "HUMAN_NOW")\n        report = evaluate_escalation_report(k0)\n        row = report["records"][0]\n        self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")\n        self.assertNotIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])\n\n'''
 assert s.count(needle) == 1, s.count(needle)
 s = s.replace(needle, insert + needle)
+old = '''        self.assertIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])\n        self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")\n'''
+new = '''        self.assertNotIn("RECALIBRATE_LIMIT_OR_BUDGET", row["recovered_escape_routes"])\n        self.assertEqual(row["disposition"], "WAIT_SAFE_DEFER")\n'''
+assert s.count(old) == 1, s.count(old)
+s = s.replace(old, new)
 p.write_text(s)
 
 
