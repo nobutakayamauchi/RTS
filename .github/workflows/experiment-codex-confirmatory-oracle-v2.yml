@@ -1,0 +1,27 @@
+name: Validate Codex Confirmatory Oracle v2
+
+on:
+  push:
+    branches:
+      - experiment/codex-reasoning-density-v1
+    paths:
+      - 'experiments/codex_reasoning_density_v1/aggregate_confirmatory.py'
+      - 'experiments/codex_reasoning_density_v1/test_confirmatory_oracle.py'
+      - '.github/workflows/experiment-codex-confirmatory-oracle-v2.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile oracle
+        run: |
+          python -m py_compile experiments/codex_reasoning_density_v1/aggregate_confirmatory.py
+          python -m py_compile experiments/codex_reasoning_density_v1/test_confirmatory_oracle.py
+      - name: Validate semantic/provenance symmetry and regression behavior
+        run: |
+          python experiments/codex_reasoning_density_v1/test_confirmatory_oracle.py
