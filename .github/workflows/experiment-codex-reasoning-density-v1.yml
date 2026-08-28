@@ -23,9 +23,11 @@ jobs:
           bash -n experiments/codex_reasoning_density_v1/run_reuse_sweep.sh
           bash -n experiments/codex_reasoning_density_v1/run_restart_surface.sh
           bash -n experiments/codex_reasoning_density_v1/run_attested_restart.sh
+          bash -n experiments/codex_reasoning_density_v1/run_confirmatory_pairs.sh
           bash -n experiments/codex_reasoning_density_v1/collect_history.sh
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate.py
           python -m py_compile experiments/codex_reasoning_density_v1/aggregate_sweep.py
+          python -m py_compile experiments/codex_reasoning_density_v1/aggregate_confirmatory.py
           python -m py_compile experiments/codex_reasoning_density_v1/analyze_transport.py
           python -m py_compile experiments/codex_reasoning_density_v1/build_attestation.py
           python -m py_compile experiments/codex_reasoning_density_v1/collect_history.py
@@ -122,4 +124,61 @@ jobs:
           assert r['strict_winners']==['thin','minimal','restart','attested'], r
           assert t['runs']['reuse_attested']['command_like_items']==1, t
           print('reuse sweep and transport semantics valid')
+          PY
+      - name: Validate fresh paired confirmation semantics
+        run: |
+          tmp="$(mktemp -d)"
+          make_final() {
+            cat > "$1" <<'EOF'
+          STATE
+          RTS-FRZ-000024 is COMPLETED.
+          ADEQUACY
+          K2 is ADEQUATE only for CURRENT_DEFINED_K2_LANES_ONLY; zero observed defects is not zero residual defect risk.
+          NEXT
+          STOP unless a newly authorized bounded sample is requested.
+          EVIDENCE
+          freezer/items/RTS-FRZ-000024/current.json
+          docs/implementation/frz000024_resolution.json
+          test_adequacy_gate/README.md
+          EOF
+          }
+          for i in 1 2 3; do
+            cold=$((100000 + i * 1000)); att=$((40000 + i * 1000))
+            cc=$((20000 + i * 100)); ac=$((15000 + i * 100))
+            cat > "$tmp/pair${i}_cold.jsonl" <<EOF
+          {"type":"item.completed","item":{"type":"command_execution"}}
+          {"type":"turn.completed","usage":{"input_tokens":$cold,"cached_input_tokens":$cc,"output_tokens":1000,"reasoning_output_tokens":500}}
+          EOF
+            cat > "$tmp/pair${i}_attested.jsonl" <<EOF
+          {"type":"turn.completed","usage":{"input_tokens":$att,"cached_input_tokens":$ac,"output_tokens":900,"reasoning_output_tokens":480}}
+          EOF
+            make_final "$tmp/pair${i}_cold.final.txt"
+            make_final "$tmp/pair${i}_attested.final.txt"
+            printf '%s\n' '{"exit_code":0,"git_head":"abc","requested_model":"gpt-test"}' > "$tmp/pair${i}_cold.meta.json"
+            printf '%s\n' '{"exit_code":0,"git_head":"abc","requested_model":"gpt-test"}' > "$tmp/pair${i}_attested.meta.json"
+          done
+          python experiments/codex_reasoning_density_v1/aggregate_confirmatory.py --results-dir "$tmp" --pairs 3 >/tmp/confirm.json
+          python - "$tmp/confirmatory_summary.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r['strict_pair_wins']==3, r
+          assert r['result']=='CONFIRMED_STRICT_WIN', r
+          assert r['median_total_input_reduction']>0, r
+          assert r['median_uncached_input_reduction']>0, r
+          print('positive confirmatory semantics valid')
+          PY
+          python - "$tmp/pair3_attested.jsonl" <<'PY'
+          import json,sys
+          p=sys.argv[1]
+          rows=[json.loads(x) for x in open(p) if x.strip()]
+          rows[-1]['usage']['input_tokens']=150000
+          open(p,'w').write('\n'.join(json.dumps(x) for x in rows)+'\n')
+          PY
+          python experiments/codex_reasoning_density_v1/aggregate_confirmatory.py --results-dir "$tmp" --pairs 3 >/tmp/confirm-negative.json
+          python - "$tmp/confirmatory_summary.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r['strict_pair_wins']==2, r
+          assert r['result']=='NOT_CONFIRMED', r
+          print('negative confirmatory semantics valid')
           PY
