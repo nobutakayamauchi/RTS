@@ -12,7 +12,6 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 import platform
 import re
 import socket
@@ -99,18 +98,67 @@ def extract_event_type(obj: dict[str, Any]) -> str:
     return ""
 
 
+def normalize_usage(mapping: Any) -> dict[str, int]:
+    if not isinstance(mapping, dict):
+        return {}
+    out: dict[str, int] = {}
+    for key in USAGE_KEYS:
+        value = safe_int(mapping.get(key))
+        if value is not None and value >= 0:
+            out[key] = value
+    return out
+
+
 def extract_usage(obj: dict[str, Any]) -> dict[str, int]:
     best: dict[str, int] = {}
     for mapping in walk_dicts(obj):
-        candidate: dict[str, int] = {}
-        for key in USAGE_KEYS:
-            if key in mapping:
-                value = safe_int(mapping[key])
-                if value is not None and value >= 0:
-                    candidate[key] = value
+        candidate = normalize_usage(mapping)
         if len(candidate) > len(best):
             best = candidate
     return best
+
+
+def extract_token_count_snapshot(obj: dict[str, Any]) -> tuple[dict[str, int], dict[str, int]] | None:
+    """Extract Codex session event_msg/token_count total + last-turn usage.
+
+    Observed Codex session schema:
+      payload.type == token_count
+      payload.info.total_token_usage
+      payload.info.last_token_usage
+
+    total_token_usage is cumulative for the session; last_token_usage is the
+    immediately preceding turn. We preserve both instead of summing snapshots.
+    """
+    for mapping in walk_dicts(obj):
+        if mapping.get("type") != "token_count":
+            continue
+        info = mapping.get("info")
+        if not isinstance(info, dict):
+            continue
+        total = normalize_usage(info.get("total_token_usage"))
+        last = normalize_usage(info.get("last_token_usage"))
+        if total:
+            return total, last
+    return None
+
+
+def usage_delta_matches(previous: dict[str, int], current: dict[str, int], last: dict[str, int]) -> bool:
+    """Return true when cumulative delta exactly reproduces last_token_usage.
+
+    Only keys present in last_token_usage are checked. This is evidence that the
+    session stream is cumulative rather than a collection of independent usage
+    rows; it is not a claim about billing semantics outside the observed stream.
+    """
+    if not previous or not current or not last:
+        return False
+    checked = 0
+    for key, last_value in last.items():
+        if key not in previous or key not in current:
+            continue
+        if current[key] - previous[key] != last_value:
+            return False
+        checked += 1
+    return checked >= 2
 
 
 def extract_text(obj: dict[str, Any]) -> str | None:
@@ -151,6 +199,8 @@ class SessionRow:
     model: str | None
     cwd: str | None
     provider: str | None
+    token_count_events: int
+    token_count_delta_verified: bool | None
     turn_completed_events: int
     generic_usage_events: int
     input_tokens: int | None
@@ -159,6 +209,12 @@ class SessionRow:
     output_tokens: int | None
     reasoning_output_tokens: int | None
     total_tokens: int | None
+    last_input_tokens: int | None
+    last_cached_input_tokens: int | None
+    last_cache_write_input_tokens: int | None
+    last_output_tokens: int | None
+    last_reasoning_output_tokens: int | None
+    last_total_tokens: int | None
     usage_method: str
     usage_confidence: str
     task_sha256: str | None
@@ -181,6 +237,8 @@ def sum_usage(events: list[dict[str, int]]) -> dict[str, int]:
 
 
 def parse_session(path: Path, include_preview: bool) -> SessionRow:
+    token_count_totals: list[dict[str, int]] = []
+    token_count_last: list[dict[str, int]] = []
     turn_usage: list[dict[str, int]] = []
     generic_usage: list[dict[str, int]] = []
     session_id = started_at = ended_at = model = cwd = provider = None
@@ -220,6 +278,13 @@ def parse_session(path: Path, include_preview: bool) -> SessionRow:
             if first_task is None:
                 first_task = extract_text(obj)
 
+            token_snapshot = extract_token_count_snapshot(obj)
+            if token_snapshot:
+                total, last = token_snapshot
+                token_count_totals.append(total)
+                token_count_last.append(last)
+                continue
+
             usage = extract_usage(obj)
             if usage:
                 normalized_type = event_lower.replace("_", ".").replace("-", ".")
@@ -228,7 +293,16 @@ def parse_session(path: Path, include_preview: bool) -> SessionRow:
                 else:
                     generic_usage.append(usage)
 
-    if turn_usage:
+    delta_verified: bool | None = None
+    last_totals: dict[str, int] = {}
+    if token_count_totals:
+        totals = token_count_totals[-1]
+        last_totals = token_count_last[-1] if token_count_last else {}
+        if len(token_count_totals) >= 2 and last_totals:
+            delta_verified = usage_delta_matches(token_count_totals[-2], token_count_totals[-1], last_totals)
+        method = "FINAL_TOKEN_COUNT_TOTAL"
+        confidence = "HIGH"
+    elif turn_usage:
         totals = sum_usage(turn_usage)
         method = "SUM_TURN_COMPLETED"
         confidence = "HIGH"
@@ -270,6 +344,8 @@ def parse_session(path: Path, include_preview: bool) -> SessionRow:
         model=scalar(model),
         cwd=scalar(cwd),
         provider=scalar(provider),
+        token_count_events=len(token_count_totals),
+        token_count_delta_verified=delta_verified,
         turn_completed_events=len(turn_usage),
         generic_usage_events=len(generic_usage),
         input_tokens=totals.get("input_tokens"),
@@ -278,6 +354,12 @@ def parse_session(path: Path, include_preview: bool) -> SessionRow:
         output_tokens=totals.get("output_tokens"),
         reasoning_output_tokens=totals.get("reasoning_output_tokens"),
         total_tokens=totals.get("total_tokens"),
+        last_input_tokens=last_totals.get("input_tokens"),
+        last_cached_input_tokens=last_totals.get("cached_input_tokens"),
+        last_cache_write_input_tokens=last_totals.get("cache_write_input_tokens"),
+        last_output_tokens=last_totals.get("output_tokens"),
+        last_reasoning_output_tokens=last_totals.get("reasoning_output_tokens"),
+        last_total_tokens=last_totals.get("total_tokens"),
         usage_method=method,
         usage_confidence=confidence,
         task_sha256=task_hash,
@@ -329,8 +411,6 @@ def discover_benchmark_paths(home: Path) -> list[dict[str, Any]]:
     for root in roots:
         if not root.exists():
             continue
-        # Avoid a full home recursive walk where possible. At home level, inspect
-        # only direct children; deeper scans are limited to known repo roots.
         iterator = root.iterdir() if root == home else root.rglob("*")
         try:
             for path in iterator:
@@ -392,7 +472,7 @@ def main() -> int:
             print(f"WARN: failed to parse {session_path}: {exc}", file=sys.stderr)
 
     inventory = {
-        "schema": "codex-history-inventory/v1",
+        "schema": "codex-history-inventory/v2",
         "generated_at": utc_now(),
         "host": {
             "hostname": socket.gethostname(),
@@ -409,6 +489,12 @@ def main() -> int:
             "task_preview_max_chars": 160 if args.include_task_preview else 0,
             "sensitive_files_excluded": sorted(SENSITIVE_BASENAMES),
         },
+        "usage_semantics": {
+            "token_count_total": "final total_token_usage is treated as session cumulative usage",
+            "token_count_last": "last_token_usage is preserved as the immediately preceding turn",
+            "delta_verified": "true only when previous cumulative total delta reproduces last_token_usage on >=2 comparable fields",
+            "generic_usage": "final generic snapshot only; confidence remains LOW",
+        },
         "files": inventory_codex_files(codex_home),
         "benchmark_paths": discover_benchmark_paths(Path.home()),
         "sessions": [asdict(row) for row in sessions],
@@ -422,11 +508,13 @@ def main() -> int:
     high = sum(1 for row in sessions if row.usage_confidence == "HIGH")
     low = sum(1 for row in sessions if row.usage_confidence == "LOW")
     no_usage = sum(1 for row in sessions if row.usage_confidence == "NONE")
+    verified_delta = sum(1 for row in sessions if row.token_count_delta_verified is True)
     summary = {
         "session_count": len(sessions),
         "usage_high_confidence": high,
         "usage_low_confidence": low,
         "usage_not_found": no_usage,
+        "token_count_delta_verified_sessions": verified_delta,
         "benchmark_path_count": len(inventory["benchmark_paths"]),
         "codex_version": inventory["codex"]["version"],
     }
