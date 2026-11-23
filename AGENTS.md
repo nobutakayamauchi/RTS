@@ -33,4 +33,6 @@ Historical evidence is authoritative only for what happened in original RTS. It 
 - Preserve history; do not rewrite old evidence to match later conclusions.
 
 ## Stop condition
-If the task can be answered or implemented from a current canonical repository, stop loading RTS and route there. Reopen RTS-specific development only with materially new evidence and an explicit decision.
+If the task can be answered or implemented from a different current canonical successor or product repository, stop loading RTS and route there. This stop condition does not apply to explicitly requested BridgePatch maintenance when its canonical material is in this repository; keep that work limited to BridgePatch and do not expand the frozen RTS core.
+
+Reopen RTS-specific development only with materially new external evidence meeting every reopening condition in `docs/audit/RTS_DEVELOPMENT_FREEZE_2026-08-09.md` and an explicit decision.
