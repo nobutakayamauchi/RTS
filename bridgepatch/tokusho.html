@@ -1,15 +1,98 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>特定商取引法に基づく表記｜BridgePatch</title><link rel="stylesheet" href="styles.css"><script src="config.js"></script></head><body>
-<header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">B</span><span>BridgePatch</span></a><nav><a href="index.html">サービスへ戻る</a><a class="nav-cta" data-config-link="freeConsultationUrl" href="#">問い合わせ</a></nav></div></header>
-<main class="legal-page"><div class="container"><p class="eyebrow">Commercial disclosure</p><h1>特定商取引法に基づく表記</h1><p class="small">最終更新：2026-08-15</p>
-<div class="legal-card"><table class="legal-table"><tbody>
-<tr><th>販売事業者</th><td>山内 延天（屋号：RS AI）</td></tr>
-<tr><th>運営責任者</th><td>山内 延天</td></tr>
-<tr><th>所在地</th><td>請求があった場合、申込みの意思決定に先立って十分な時間的余裕をもって、電子メールにより遅滞なく開示します。開示請求は <a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a> へご連絡ください。</td></tr>
-<tr><th>電話番号</th><td>請求があった場合、申込みの意思決定に先立って十分な時間的余裕をもって、電子メールにより遅滞なく開示します。開示請求は <a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a> へご連絡ください。</td></tr>
-<tr><th>問い合わせ先</th><td><a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a></td></tr>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>特定商取引法に基づく表記｜RS AI</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .legal-page [id] { scroll-margin-top: 5.5rem; }
+    .legal-page .container { max-width: 54rem; overflow-wrap: anywhere; }
+    .legal-page dt { font-weight: 700; }
+    .legal-page dd { margin: .2rem 0 1rem; }
+    .product-picker { margin-top: 2rem; }
+    .product-picker h2 { margin: 0 0 .75rem; font-size: 1.1rem; }
+    .product-tabs { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .product-tabs a {
+      display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
+      padding: .45rem .85rem; border: 1px solid #8596aa; border-radius: 10px;
+      background: white; color: #263951; text-decoration: none; line-height: 1.35;
+    }
+    .product-tabs a[aria-selected="true"] {
+      color: white; background: #183b67; border-color: #183b67; font-weight: 700;
+      box-shadow: inset 0 -3px 0 #8cc0ff;
+    }
+    .product-tabs a:focus-visible { outline: 3px solid #176bd0; outline-offset: 3px; }
+    .offer-amount { margin: 1rem 0 1.3rem; }
+    .offer-amount span, .offer-amount strong { display: block; }
+    .offer-amount span { color: #40546b; font-weight: 600; }
+    .offer-amount strong, .rescue-amount { color: #183b67; font-variant-numeric: tabular-nums; }
+    .offer-amount strong { font-size: clamp(1.75rem, 6vw, 2.5rem); line-height: 1.3; }
+    .rescue-prices { margin: 1rem 0; }
+    .rescue-amount { font-size: 1.1em; }
+    @media (prefers-reduced-motion: no-preference) {
+      [role="tabpanel"]:not([hidden]) .offer-amount strong { animation: show-amount 140ms ease-out; }
+      @keyframes show-amount { from { transform: translateY(.1em); } to { transform: translateY(0); } }
+    }
+    @media print {
+      .product-picker, .site-header { display: none; }
+      [role="tabpanel"][hidden] { display: block; }
+    }
+    .legal-page .legal-card > :last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner">
+    <a class="brand" href="https://nobutakayamauchi.github.io/sales-catalog/">RS AI</a>
+    <nav aria-label="サイト内"><a class="nav-cta" href="#products">商品を選ぶ</a></nav>
+  </div></header>
+  <main class="legal-page">
+    <div class="container">
+      <h1>特定商取引法に基づく表記</h1>
+      <p><a href="#seller">販売事業者・連絡先を見る</a></p>
+      <div id="products" class="product-picker">
+        <h2 id="product-list">商品を選ぶ</h2>
+        <nav aria-labelledby="product-list">
+          <div class="product-tabs" id="product-tabs">
+            <a href="#bridgepatch-rescue">BridgePatch · AI業務レスキュー</a>
+            <a href="#bridgepatch">BridgePatch · 業務改善</a>
+            <a href="#axis">AXIS</a>
+            <a href="#webai-bridge">WebAI Bridge</a>
+            <a href="#ai-cm-render">AI CM Render</a>
+            <a href="#invoice-payment-ops">Invoice Payment Ops</a>
+            <a href="#sdn">SDN</a>
+          </div>
+        </nav>
+      </div>
+      <section class="legal-card" id="axis" aria-labelledby="heading-axis">
+        <h2 id="heading-axis">AXIS｜仕様書と見積書の作成</h2>
+        <p class="offer-amount"><span>設計料</span><strong>10,000円</strong></p>
+        <dl>
+          <dt>料金・納品物</dt>
+          <dd>ご相談で決めた業務課題1件について、実装仕様書と実装見積書をお渡しします。ソフトウェアの実装・導入は別途ご依頼いただけます。</dd>
+          <dt>着手前の確認</dt>
+          <dd>対象範囲、納期、納品形式、修正回数、追加調査が必要な場合の費用を確認します。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/axis/sales.html">AXISの商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="bridgepatch" aria-labelledby="heading-bridgepatch">
+        <h2 id="heading-bridgepatch">BridgePatch｜業務の一点改善（個別見積）</h2>
+        <p class="offer-amount"><span>個別見積の範囲</span><strong>50,000〜90,000円</strong></p>
+        <dl>
+          <dt>料金・対象</dt>
+          <dd>既存のツールや運用を活かして業務を1か所改善します。価格は対象範囲と実装内容で決まります。</dd>
+          <dt>見積時の確認</dt>
+          <dd>納品するツール・設定・手順、動作確認の条件、納期、修正範囲を確認します。外部サービスや追加作業が必要な場合は、着手前に費用を提示します。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/bridgepatch/sales.html">BridgePatchの商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="bridgepatch-rescue" aria-labelledby="heading-rescue">
+        <h2 id="heading-rescue">BridgePatch｜AI業務レスキュー</h2>
+        <table class="legal-table rescue-prices" aria-label="AI業務レスキューの料金"><tbody>
+<tr><th>役務の対価</th><td>受注適合チェック：<strong class="rescue-amount">無料</strong>。暫定ツール実装設計書：<strong class="rescue-amount">10,000円（税込）</strong>。1アクション簡易ツール：<strong class="rescue-amount">50,000円（税込）</strong>を標準とし、実際の対象範囲・受入条件を開始前に確定します。特急対応は、確保する営業日1日につき<strong class="rescue-amount">50,000円（税込）</strong>の優先対応料金を標準とし、開始前に総額を提示します。</td></tr>
+        </tbody></table>
+        <table class="legal-table"><tbody>
 <tr><th>販売する役務</th><td>BridgePatch / AI業務レスキュー。無料の受注適合チェック、暫定ツール実装設計書、1アクション簡易ツール等。</td></tr>
-<tr><th>役務の対価</th><td>受注適合チェック：無料。暫定ツール実装設計書：10,000円（税込）。1アクション簡易ツール：50,000円（税込）を標準とし、実際の対象範囲・受入条件を開始前に確定します。特急対応は、確保する営業日1日につき50,000円（税込）の優先対応料金を標準とし、開始前に総額を提示します。</td></tr>
 <tr><th>対価以外の費用</th><td>顧客自身の通信費・インターネット接続費。追加の外部サービス利用、指定外形式への変換その他の費用が必要な場合は、開始前に書面等で内容と総額を提示し、顧客の合意なく必須費用を追加しません。</td></tr>
 <tr><th>支払方法</th><td>10,000円の暫定ツール実装設計書はStripe Payment Linkによるオンライン決済。簡易ツール及び特急対応は、対応可否・仕様・総額を確定後、原則として銀行振込等の個別合意した方法による前払い。</td></tr>
 <tr><th>支払時期</th><td>暫定ツール実装設計書は申込み時に全額前払い。簡易ツール及び特急対応は個別条件に記載した期日までの全額前払いを原則とします。</td></tr>
@@ -18,7 +101,136 @@
 <tr><th>キャンセル・返金</th><td>暫定ツール実装設計書は、当方が着手通知を送信する前は全額返金します。着手通知後は、顧客都合によるキャンセル及び返金を原則として受け付けません。ただし、適用される強行法規その他の法令により異なる取扱いが必要な場合は、その法令に従います。簡易ツール等は、着手前に個別条件としてキャンセル・返金条件を提示します。</td></tr>
 <tr><th>成果・適合性</th><td>売上、利益、顧客獲得、法令遵守、事業成功、あらゆる環境での恒久稼働その他の特定成果を保証しません。対象範囲、安全条件、受入条件及び対象外事項を個別に定めます。</td></tr>
 <tr><th>前払い後の通知</th><td>前払式通信販売について法令上の通知が必要となる場合は、入金確認後、申込みの諾否、販売事業者の氏名・所在地・電話番号、受領額・受領日、役務の種類及び提供時期その他必要事項を電子メールで通知します。</td></tr>
-</tbody></table></div>
-<div class="legal-card"><h2>所在地・電話番号の開示請求</h2><p>件名を「BridgePatch 所在地・電話番号の開示請求」とし、上記問い合わせ先へご連絡ください。申込みの意思決定前に確認できるよう対応します。</p></div>
-<p><a href="terms.html">利用規約</a> / <a href="privacy.html">プライバシーポリシー</a> / <a href="index.html">サービスページ</a></p>
-</div></main><script src="app.js"></script></body></html>
+        </tbody></table>
+        <p><a href="terms.html">AI業務レスキューの利用規約</a> · <a href="privacy.html">プライバシーポリシー</a> · <a href="index.html">サービスページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="webai-bridge" aria-labelledby="heading-webai-bridge">
+        <h2 id="heading-webai-bridge">WebAI Bridge｜OpenAI APIを使った導入</h2>
+        <p class="offer-amount"><span>掲載価格・1回払い</span><strong>98,000円</strong></p>
+        <dl>
+          <dt>料金・利用料</dt>
+          <dd>導入前相談は無料です。標準構成ではお客様ご自身のOpenAI APIキーを使い、API利用料はお客様が負担します。</dd>
+          <dt>購入前の確認</dt>
+          <dd>提供する版、納品する環境・ファイル、利用権の範囲と期間、ホスティングの担当・費用、納期、検収、サポート、キャンセル・返金条件を確認します。</dd>
+          <dt>追加の改善対応</dt>
+          <dd>同一の問題について改善は2回まで無料、3回目以降は1回10,000円です。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/webai-bridge/sales.html">WebAI Bridgeの商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="ai-cm-render" aria-labelledby="heading-ai-cm-render">
+        <h2 id="heading-ai-cm-render">AI CM Render｜15秒の縦型広告動画制作</h2>
+        <p class="offer-amount"><span>現在の制作料金</span><strong>19,800円</strong></p>
+        <dl>
+          <dt>料金・納品物</dt>
+          <dd>使用許諾のある静止画3〜5枚をもとに、モーション・字幕・BGM・効果音を加え、15秒・1080×1920を基本とする縦型MP4をお渡しします。</dd>
+          <dt>購入前の確認</dt>
+          <dd>素材の受け渡し方法、広告内容、納期、修正回数、追加演出・追加費用、キャンセル条件を確認します。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/ai-cm-render/sales.html">AI CM Renderの商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="invoice-payment-ops" aria-labelledby="heading-invoice-payment-ops">
+        <h2 id="heading-invoice-payment-ops">Invoice Payment Ops｜請求・入金管理の導入相談</h2>
+        <p class="offer-amount"><span>基本導入の決済額</span><strong>5,000円</strong></p>
+        <dl>
+          <dt>受付・価格</dt>
+          <dd>提供する版と対応サービスを確認してからお受けする個別導入です。販売ページにある30,000円は追加対応を含む従来の参考額です。</dd>
+          <dt>購入前の確認</dt>
+          <dd>対象サービス、必要な権限、納品物、導入できたかの確認方法、納期と費用を個別に確認します。銀行や会計サービスとの連携は、対象と提供範囲を相談時にご確認ください。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/invoice-payment-ops/sales.html">Invoice Payment Opsの商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="sdn" aria-labelledby="heading-sdn">
+        <h2 id="heading-sdn">Sales Distribution Network（SDN）｜開発・導入の相談受付</h2>
+        <p class="offer-amount"><span>受付状況</span><strong>導入相談</strong></p>
+        <dl>
+          <dt>受付内容</dt>
+          <dd>紹介販売の仕組みについて、開発・導入の相談を受け付けています。現在、すぐに購入できる完成品の販売価格は設定していません。</dd>
+          <dt>注文前の確認</dt>
+          <dd>ご依頼の対象範囲、価格、提供時期、検収条件を個別に決めます。</dd>
+        </dl>
+        <p><a href="https://nobutakayamauchi.github.io/sales-catalog/products/sdn/">Sales Distribution Network（SDN）の商品ページへ</a> · <a href="#products">商品一覧に戻る</a></p>
+      </section>
+      <section class="legal-card" id="seller" aria-labelledby="heading-seller">
+        <h2 id="heading-seller">販売事業者・連絡先</h2>
+        <table class="legal-table"><tbody>
+<tr><th>販売事業者</th><td>山内 延天（屋号：RS AI）</td></tr>
+<tr><th>運営責任者</th><td>山内 延天</td></tr>
+<tr><th>所在地</th><td>請求があった場合、申込みの意思決定に先立って十分な時間的余裕をもって、電子メールにより遅滞なく開示します。開示請求は <a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a> へご連絡ください。</td></tr>
+<tr><th>電話番号</th><td>請求があった場合、申込みの意思決定に先立って十分な時間的余裕をもって、電子メールにより遅滞なく開示します。開示請求は <a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a> へご連絡ください。</td></tr>
+<tr><th>問い合わせ先</th><td><a href="mailto:yamauchi.rts.office@gmail.com">yamauchi.rts.office@gmail.com</a></td></tr>
+        </tbody></table>
+        <p>所在地・電話番号の開示をご希望の方は、件名を「所在地・電話番号の開示請求」として、上記の問い合わせ先へご連絡ください。</p>
+      </section>
+    </div>
+  </main>
+  <script>
+    (() => {
+      const tablist = document.getElementById('product-tabs');
+      const tabs = Array.from(tablist.querySelectorAll('a[href^="#"]'));
+      const panels = tabs.map(tab => document.getElementById(tab.hash.slice(1)));
+      if (!tabs.length || panels.some(panel => !panel)) return;
+
+      tablist.setAttribute('role', 'tablist');
+      tablist.setAttribute('aria-labelledby', 'product-list');
+      tabs.forEach((tab, index) => {
+        const panel = panels[index];
+        tab.id = 'tab-' + panel.id;
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-controls', panel.id);
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', tab.id);
+        panel.tabIndex = 0;
+      });
+
+      function select(tab) {
+        tabs.forEach((item, index) => {
+          const active = item === tab;
+          item.setAttribute('aria-selected', String(active));
+          item.tabIndex = active ? 0 : -1;
+          panels[index].hidden = !active;
+        });
+      }
+
+      function visit(tab) {
+        select(tab);
+        if (location.hash !== tab.hash) history.pushState(null, '', tab.hash);
+      }
+
+      function syncFromUrl() {
+        const target = tabs.find(tab => tab.hash === location.hash);
+        if (target) select(target);
+        else if (!location.hash || !tablist.querySelector('[aria-selected="true"]')) select(tabs[0]);
+      }
+
+      tablist.addEventListener('click', event => {
+        const tab = event.target.closest('[role="tab"]');
+        if (!tab || event.defaultPrevented || event.button !== 0 ||
+            event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+        event.preventDefault();
+        visit(tab);
+      });
+
+      tablist.addEventListener('keydown', event => {
+        const i = tabs.indexOf(event.target);
+        if (i < 0 || event.ctrlKey || event.metaKey || event.altKey) return;
+        let next;
+        switch (event.key) {
+          case 'ArrowRight': next = (i + 1) % tabs.length; break;
+          case 'ArrowLeft': next = (i + tabs.length - 1) % tabs.length; break;
+          case 'Home': next = 0; break;
+          case 'End': next = tabs.length - 1; break;
+          case ' ': next = i; break;
+          default: return;
+        }
+        event.preventDefault();
+        visit(tabs[next]);
+        tabs[next].focus();
+      });
+
+      window.addEventListener('popstate', syncFromUrl);
+      window.addEventListener('hashchange', syncFromUrl);
+      syncFromUrl();
+    })();
+  </script>
+</body>
+</html>
